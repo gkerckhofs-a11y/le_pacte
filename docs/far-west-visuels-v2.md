@@ -47,3 +47,15 @@ Le générateur ajuste aussi les positions des noms ordinaires autour des empris
 Le tronçon de rivière initial est conservé et prolongé vers l’ouest par des frontières communes existantes, en passant entre les sites centraux. Hors de la surface des territoires, deux courbes raccordent le cours aux bords gauche et droit du décor. Le tracé déborde légèrement du cadre SVG, ce qui évite un arrêt visible dans le paysage. Les quatre ponts sont placés sur des points du cours, indépendamment de leur indice dans le nouveau tracé complet.
 
 Treize tests ciblés UI/cartographie réussissent. Ils vérifient notamment la continuité du cours, ses deux sorties du cadre, la présence du tronçon intérieur dans le tracé complet, l’alignement des ponts et la conformité des segments intérieurs aux frontières communes. L’audit géométrique confirme à nouveau les 33 régions et 60 voisinages. Aucune règle ni frontière de territoire n’a changé pendant cette correction.
+
+## Relief et aperçu des fortifications — 2 novembre 2026
+
+Les triangles des crêtes sont remplacés par des affleurements rocheux à contours courbes, couches ombrées et strates claires. Le relief reste décoratif et ne modifie aucun voisinage.
+
+L’aperçu public propose « Voir une fortification » : une palissade et des barricades sont illustrées sur P1, avec un repère +2. Le bouton est réversible et conserve le zoom. Il ne crée pas de session, ne transmet pas d’ordre et ne lit aucun ordre secret. Le renderer ne montre pas de fortification par défaut ; l’option d’illustration explicite refuse les capitales, territoires neutres et identifiants inconnus. Ce bouton est une démonstration visuelle, pas l’affichage public d’ordres de partie.
+
+Règles vérifiées dans `src/engine.ts` : Fortifier coûte 0 Moyen et utilise un ordre ; il ajoute 2 résistance pour la résolution de la manche sur une zone détenue au début de celle-ci, hors capitale. Il ne crée pas de construction permanente.
+
+Les trois sites S1 Grand Dépôt, S2 Mine Centrale et S3 Maison du Conseil partagent les mêmes règles : défense de base 5 et valeur territoriale 2. Aucun revenu de Moyens ou Influence n’est lié à ces sites. Le gain territorial total est plafonné à 4 par équipe et manche et vaut 0 à Stabilité 0. Leurs noms sont thématiques ; aucun bonus individuel de dépôt, de production minière ou de vote supplémentaire n’est implémenté. Voir `src/map.ts`, `src/engine.ts` et le cahier des charges (sections carte, revenus et ordres).
+
+Les tests ciblés UI/cartographie restent verts ; un cas supplémentaire vérifie que l’illustration de fortification est explicite et exclut les cibles interdites. Aucun test cloud ni moteur sans rapport n’a été relancé pour cette modification de présentation.
