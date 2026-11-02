@@ -1,3 +1,4 @@
+import {westernBoard} from './western-board.js';
 const $=s=>document.querySelector(s);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const params=new URLSearchParams(location.search),mode=params.get('mode')??'organizer',sid=params.get('session');
@@ -59,6 +60,7 @@ async function renderHub(){
 function displayOwners(){return mode==='screen'&&view.reveal?view.reveal.owners:view.game.owners;}
 function selectedInfo(){if(!selected)return '<p class="muted">Touchez un territoire pour voir son nom, son propriétaire et ses connexions.</p>';const owner=displayOwners()[selected],type=selected[0];return `<span class="eyebrow">${esc(selected)} · ${type==='S'?'SITE STRATÉGIQUE':type==='C'?'CAPITALE IMPRENABLE':type==='F'?'PASSAGE':'PROVINCE'}</span><h3>${esc(view.edition.territoryLabels[selected])}</h3><p>${owner?esc(label(owner)):'Territoire neutre'} · ${'PNM'.includes(type)?'1':type==='S'?'2':'0'} Prestige</p><p class="muted">Connexions : ${map.neighbors[selected].map(z=>esc(z)).join(' · ')}</p>`;}
 function mapMarkup(){
+ if(view.edition.themeId==='western')return `<div class="map-tools"><span>FRONTIÈRE · 33 territoires · ${map.edges.length} pistes</span><div><button class="quiet" data-action="zoomOut" aria-label="Réduire la carte">−</button><button class="quiet" data-action="zoomIn" aria-label="Agrandir la carte">+</button></div></div><div class="map-scroll frontier-scroll">${westernBoard(map,view.edition,displayOwners(),{selected,contested:mode==='screen'&&view.reveal?.step>=1?view.reveal.result.battles.map(b=>b.target):[]})}</div><div id="territory-info" class="territory-info">${selectedInfo()}</div><p class="legend">C · Capitale imprenable · P/N/M · Province · F · Passage · S · Site stratégique<br>Le médaillon coloré indique l’équipe. Seules les pistes dessinées relient les territoires.</p>`;
  const positions={};for(let i=1;i<=6;i++){const angle=-Math.PI/2+(i-1)*Math.PI/3;for(const [t,r] of [['C',390],['P',310],['N',230],['M',151]])positions[t+i]=[480+Math.cos(angle)*r,480+Math.sin(angle)*r];const fa=angle+Math.PI/6;positions['F'+i]=[480+Math.cos(fa)*252,480+Math.sin(fa)*252];}
  for(let i=1;i<=3;i++){const angle=-Math.PI/3+(i-1)*2*Math.PI/3;positions['S'+i]=[480+Math.cos(angle)*72,480+Math.sin(angle)*72];}
  const lines=map.edges.map(([a,b])=>`<line x1="${positions[a][0]}" y1="${positions[a][1]}" x2="${positions[b][0]}" y2="${positions[b][1]}"/>`).join('');
@@ -123,7 +125,7 @@ function bindForms(){
 }
 $('#main').addEventListener('click',async e=>{
  if(params.get('studio')==='1')return;
- const zone=e.target.closest('[data-zone]');if(zone){selected=zone.dataset.zone;$('#territory-info').innerHTML=selectedInfo();document.querySelectorAll('[data-zone]').forEach(el=>el.classList.toggle('selected',el.dataset.zone===selected));return;}
+ const zone=e.target.closest('[data-zone]');if(zone){selected=zone.dataset.zone;document.querySelectorAll('[data-edge]').forEach(el=>el.classList.toggle('linked',el.dataset.edge.split(':').includes(selected)));$('#territory-info').innerHTML=selectedInfo();document.querySelectorAll('[data-zone]').forEach(el=>(el.classList.toggle('selected',el.dataset.zone===selected),el.setAttribute('aria-pressed',String(el.dataset.zone===selected)),el.classList.toggle('neighbor',map.neighbors[selected].includes(el.dataset.zone))));return;}
  const button=e.target.closest('button');if(!button)return;
  try {
   if(button.dataset.rotateAccess){if(busy)return;const team=button.dataset.rotateAccess;if(!confirm('Renouveler l’accès de '+label(team)+' ? Le lien et les cartons précédents seront invalidés.'))return;busy=true;status(connected);try{const r=await request(`${base()}/access/${team}`,{method:'POST',data:{}});links[team]=r.token;sessionStorage.setItem(`pacte-links:${sid}`,JSON.stringify(links));preparedCards=[];lastSignature='';await refresh();notify('Accès renouvelé. Préparez et imprimez un nouveau carton.');}finally{busy=false;status(connected);}return;}

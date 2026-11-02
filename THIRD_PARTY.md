@@ -19,3 +19,7 @@ Les paquets et leurs licences sont installés par `npm ci`. Aucune clé d’équ
 | @firebase/rules-unit-testing | 6.0.0 | Apache-2.0 | Assertions des règles dans l’Emulator Suite |
 
 Sources primaires : https://github.com/firebase/firebase-js-sdk , https://github.com/firebase/firebase-admin-node , https://github.com/firebase/firebase-functions , https://github.com/googleapis/nodejs-firestore , https://github.com/evanw/esbuild . Les manifestes de paquets installés ont été vérifiés le 2 novembre 2026.
+
+## Illustration Far West — 2 novembre 2026
+
+`public/assets/western/frontier-terrain-v1.webp` : décor généré pour Le Pacte avec l’outil intégré ImageGen, sans image de référence externe, puis encodé en WebP. Ce visuel est une illustration fictive de frontière, sans données géographiques réelles. Les repères, noms et pistes sont rendus séparément en SVG par le code du projet. Prompt conservé dans `docs/far-west-visuels-v1.md`.

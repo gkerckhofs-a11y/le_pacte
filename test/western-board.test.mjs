@@ -1,0 +1,8 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {westernBoard} from '../public/western-board.js';
+import {catalog,map} from '../server/store.ts';
+const owners=Object.fromEntries(map.zones.map(z=>[z,null]));
+test('Far West : chaque territoire et chaque connexion du moteur restent représentés exactement une fois',()=>{const html=westernBoard(map,catalog[0],owners);assert.deepEqual([...html.matchAll(/data-zone="([^"]+)"/g)].map(m=>m[1]).sort(),[...map.zones].sort());assert.deepEqual([...html.matchAll(/data-edge="([^"]+)"/g)].map(m=>m[1]).sort(),map.edges.map(e=>e.join(':')).sort());assert.ok(!html.includes('undefined'));for(const name of Object.values(catalog[0].territoryLabels))assert.ok(html.includes(name)||name.split(' ').every(word=>html.includes(word)));});
+test('Far West : seuls les chemins incidents au lieu sélectionné sont mis en évidence',()=>{const html=westernBoard(map,catalog[0],owners,{selected:'S2'});const linked=[...html.matchAll(/data-edge="([^"]+)" class="frontier-route linked"/g)].map(m=>m[1]);assert.deepEqual(linked.sort(),map.edges.filter(e=>e.includes('S2')).map(e=>e.join(':')).sort());assert.match(html,/aria-pressed="true"[^>]+S2/);});
+test('Far West : les noms éditables sont échappés et les propriétaires restent ceux fournis à la vue',()=>{const edition=structuredClone(catalog[0]);edition.territoryLabels.N1='<script>alert(1)</script>';const html=westernBoard(map,edition,{...owners,N1:'force'});assert.doesNotMatch(html,/<script>/);assert.match(html,/&lt;script&gt;/);assert.match(html,/data-zone="N1"[^>]+--owner:#983c32/);assert.match(westernBoard(map,edition,owners),/data-zone="N1"[^>]+--owner:#465365/);});

@@ -69,6 +69,10 @@ La régie peut choisir une manche déjà résolue, puis afficher : décisions sc
 
 Ce sont des lectures des résultats existants : aucun combat, revenu, vote ou Prestige n’est recalculé. Les comptes, le chronomètre et les ordres restent inchangés. Le classement affiché reste le classement actuel. Les équipes gardent leur carte actuelle. Avancer une phase quitte la relecture ; une résolution normale affiche automatiquement son résultat.
 
+## Carte Far West — première proposition visuelle
+
+[Aperçu de la frontière, sans connexion](https://le-pacte-ludificateur.web.app/far-west.html). La carte Far West utilise un décor illustré, des repères SVG, les noms des lieux et des médaillons d’équipe numérotés. Elle s’applique aux vues Far West du jeu ; les autres univers gardent leur présentation existante. Les 33 lieux et les 60 connexions proviennent toujours du moteur. Sélectionner un lieu affiche sa fiche et souligne les pistes correspondantes. Zoom et défilement sont disponibles. [Réalisation, asset et prompt](docs/far-west-visuels-v1.md).
+
 ## Backend Firebase — 0.5
 
 Projet dédié : `le-pacte-ludificateur` ; application web : `1:48298108779:web:da8e882a62c0c8852dce2e`. Le fichier `.firebaserc` cible ce projet ; `firebase/web-config.json` contient la configuration client fournie par Firebase, sans clé serveur, et n’est pas encore chargé par le frontend local.

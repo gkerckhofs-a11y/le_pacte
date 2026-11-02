@@ -11,7 +11,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
  const publicOrigin=options.publicOrigin?normalizeOrigin(options.publicOrigin):null;
  if(!/^[A-Za-z0-9_-]{32,128}$/.test(organizerToken))throw new Error('Clé régie : au moins 32 caractères');
  const tokenDigest=Buffer.from(tokenHash(organizerToken),'hex');
- const staticFiles:Record<string,[string,string]>={ '/':['index.html','text/html; charset=utf-8'],'/app.js':['app.js','text/javascript; charset=utf-8'],'/studio.js':['studio.js','text/javascript; charset=utf-8'],'/animation.js':['animation.js','text/javascript; charset=utf-8'],'/style.css':['style.css','text/css; charset=utf-8']};
+ const staticFiles:Record<string,[string,string]>={ '/western-board.js':['western-board.js','text/javascript; charset=utf-8'],'/far-west.html':['far-west.html','text/html; charset=utf-8'],'/western-preview.js':['western-preview.js','text/javascript; charset=utf-8'],'/assets/western/frontier-terrain-v1.webp':['assets/western/frontier-terrain-v1.webp','image/webp'], '/':['index.html','text/html; charset=utf-8'],'/app.js':['app.js','text/javascript; charset=utf-8'],'/studio.js':['studio.js','text/javascript; charset=utf-8'],'/animation.js':['animation.js','text/javascript; charset=utf-8'],'/style.css':['style.css','text/css; charset=utf-8']};
  const limiter=new Map<string,{until:number;count:number}>();
  function bearer(req:any){const h=req.headers.authorization;if(!h)return null;if(!/^Bearer [A-Za-z0-9_.-]{32,8192}$/.test(h))throw new Error('Accès invalide');return h.slice(7);}
  function isOrg(t:string|null){return t!==null&&timingSafeEqual(tokenDigest,Buffer.from(tokenHash(t),'hex'));}
