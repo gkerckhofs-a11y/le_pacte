@@ -35,6 +35,8 @@ La déformation géographique combine une variation angulaire monotone, une vari
 
 Une rivière suit la frontière commune entre F2 et M3/P3 ; deux petits ponts décoratifs la traversent à ces deux voisinages. Des crêtes accompagnent deux autres frontières. Les segments de rivière sont repris des mêmes courbes que les territoires ; un test vérifie qu’ils appartiennent chacun à deux régions déjà voisines. Aucun obstacle ni mouvement nouveau n’est introduit.
 
-Les bâtiments disposent de cours de terre, traces d’accès, petites clôtures et touches végétales. Les noms distinguent capitales, sites, provinces et passages ; les codes sont plus discrets. Les teintes de contrôle sont mélangées à une couleur de terre et la texture reste visible. Les noms, codes et médaillons restent vectoriels et les couleurs des médaillons ne sont pas modifiées.
+Les bâtiments disposent de cours de terre, traces d’accès, petites clôtures et touches végétales. Les noms distinguent capitales, sites, provinces et passages ; les codes techniques sont réservés à la fiche du territoire sélectionné pour dégager les noms sur la carte. Les teintes de contrôle sont mélangées à une couleur de terre et la texture reste visible. Les noms, codes et médaillons restent vectoriels et les couleurs des médaillons ne sont pas modifiées.
 
 Vérification ciblée : 12 tests UI/cartographie réussis, dont le contrôle de la rivière sur les frontières communes, et nouvel audit Shapely de la géométrie. Aucun nouveau bitmap, changement de règle, de stockage ou d’authentification pour cette étape.
+
+Le placement des trois sites centraux a été espacé après contrôle visuel, en conservant chaque repère dans sa région.

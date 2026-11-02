@@ -63,7 +63,7 @@ for i,a in angles.items():
 for s,first,start,end in [(1,1,240,0),(2,3,0,120),(3,5,120,240)]:
  prev=(first-2)%6+1;second=first+1
  regions[f'S{s}']=join(cache[f'core{start}'],cache[f'fb{prev}'],cache[f'im{first}'],cache[f'fa{first}'],cache[f'fb{first}'],cache[f'im{second}'],cache[f'fa{second}'],rev(cache[f'core{end}']))
- positions[f'S{s}']=[round(v,2) for v in warp(polar(angles[first]+30,.15))]
+ positions[f'S{s}']=[round(v,2) for v in warp(polar(angles[first]+30,.21))]
 # Optional geometry audit against the authoritative graph, without renderer assumptions.
 if __name__=='__main__':
  import subprocess
