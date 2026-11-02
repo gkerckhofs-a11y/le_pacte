@@ -2,17 +2,18 @@ import {createServer} from 'node:http';
 import {readFileSync} from 'node:fs';
 import {timingSafeEqual} from 'node:crypto';
 import {GameStore,catalog,map,tokenHash} from './store.ts';
+import {BUILTIN_ASSETS,GOAL_RULES} from '../src/studio.ts';
 import type {Actor} from '../src/session.ts';
 export function createGameServer(store:GameStore,organizerToken:string,clock=()=>Date.now()){
  if(!/^[A-Za-z0-9_-]{32,128}$/.test(organizerToken))throw new Error('Clé régie : au moins 32 caractères');
  const tokenDigest=Buffer.from(tokenHash(organizerToken),'hex');
- const staticFiles:Record<string,[string,string]>={ '/':['index.html','text/html; charset=utf-8'],'/app.js':['app.js','text/javascript; charset=utf-8'],'/style.css':['style.css','text/css; charset=utf-8']};
+ const staticFiles:Record<string,[string,string]>={ '/':['index.html','text/html; charset=utf-8'],'/app.js':['app.js','text/javascript; charset=utf-8'],'/studio.js':['studio.js','text/javascript; charset=utf-8'],'/style.css':['style.css','text/css; charset=utf-8']};
  const limiter=new Map<string,{until:number;count:number}>();
  function bearer(req:any){const h=req.headers.authorization;if(!h)return null;if(!/^Bearer [A-Za-z0-9_-]{32,128}$/.test(h))throw new Error('Accès invalide');return h.slice(7);}
  function isOrg(t:string|null){return t!==null&&timingSafeEqual(tokenDigest,Buffer.from(tokenHash(t),'hex'));}
  function requireOrg(req:any):Actor{if(!isOrg(bearer(req)))throw new Error('Accès régie requis');return{role:'organizer',id:'local-organizer'};}
  function actorFor(req:any,id:string):Actor|{role:'public'} {const t=bearer(req);return isOrg(t)?{role:'organizer',id:'local-organizer'}:t?store.authenticateTeam(id,t,clock()):{role:'public'};}
- async function body(req:any){if(req.headers['content-type']?.split(';')[0]!=='application/json')throw new Error('JSON requis');let data='',size=0;for await(const chunk of req){size+=chunk.length;if(size>24576)throw new Error('Requête trop volumineuse');data+=chunk;}try{return JSON.parse(data);}catch{throw new Error('JSON invalide');}}
+ async function body(req:any,limit=24576){if(req.headers['content-type']?.split(';')[0]!=='application/json')throw new Error('JSON requis');let data='',size=0;for await(const chunk of req){size+=chunk.length;if(size>limit)throw new Error('Requête trop volumineuse');data+=chunk;}try{return JSON.parse(data);}catch{throw new Error('JSON invalide');}}
  const server=createServer(async(req,res)=>{
   const json=(status:number,value:unknown)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(value));};
   res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('X-Frame-Options','DENY');
@@ -27,11 +28,25 @@ export function createGameServer(store:GameStore,organizerToken:string,clock=()=
    if(!bucket||bucket.until<now){bucket={until:now+60000,count:0};limiter.set(bucketKey,bucket);}
    if(++bucket.count>1200){json(429,{error:'Trop de requêtes, réessayez dans une minute'});return;}
    if(limiter.size>1000)for(const [k,b] of limiter)if(b.until<now)limiter.delete(k);
-   if(path==='/api/catalog'&&req.method==='GET'){json(200,{editions:catalog,map,serverNow:now});return;}
+   if(path==='/api/catalog'&&req.method==='GET'){json(200,{editions:catalog,map,goalRules:GOAL_RULES,serverNow:now});return;}
+   if(path.startsWith('/api/studio')){
+    requireOrg(req);
+    if(path==='/api/studio'&&req.method==='GET'){json(200,{...store.studio.list(),builtinAssets:BUILTIN_ASSETS,goalRules:GOAL_RULES});return;}
+    if(path==='/api/studio/drafts'&&req.method==='POST'){json(201,store.studio.create(await body(req,131072),catalog,clock()));return;}
+    const route=path.match(/^\/api\/studio\/(drafts|releases)\/([a-f0-9]{24}(?:-v[1-9][0-9]*)?)(?:\/(check|publish|export))?$/);
+    if(!route){json(404,{error:'Route studio introuvable'});return;}
+    const [,collection,id,action]=route;
+    if(req.method==='GET'&&!action){json(200,collection==='drafts'?store.studio.draft(id):store.studio.release(id));return;}
+    if(req.method==='GET'&&action==='export'){json(200,store.studio.export(collection as any,id));return;}
+    if(collection==='drafts'&&req.method==='PUT'&&!action){const d=await body(req,131072);json(200,store.studio.save(id,d.revision,d.edition,clock()));return;}
+    if(collection==='drafts'&&req.method==='POST'&&action==='check'){json(200,store.studio.check(id));return;}
+    if(collection==='drafts'&&req.method==='POST'&&action==='publish'){const d=await body(req);json(201,store.studio.publish(id,d.revision,clock()));return;}
+    json(405,{error:'Une version publiée est en lecture seule'});return;
+   }
    if(path==='/api/sessions'){
     requireOrg(req);
     if(req.method==='GET'){json(200,{sessions:store.list(),serverNow:now});return;}
-    if(req.method==='POST'){const d=await body(req);json(201,store.create(d.code,d.title,d.themeId,now));return;}
+    if(req.method==='POST'){const d=await body(req);json(201,store.create(d.code,d.title,d.themeId,clock(),d.releaseId));return;}
    }
    const match=path.match(/^\/api\/sessions\/([a-f0-9]{24})(?:\/(commands|check|export|access)(?:\/([a-z]+))?)?$/);
    if(!match){json(404,{error:'Route introuvable'});return;}

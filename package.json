@@ -1,6 +1,6 @@
 {
   "name": "le-pacte",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -10,6 +10,7 @@
     "test": "node --test test/*.test.mjs",
     "demo": "node scripts/demo.mjs",
     "start": "node server/start.mjs",
-    "test:integration": "node --test test/http.test.mjs"
+    "test:integration": "node --test test/http.test.mjs",
+    "test:studio": "node --test test/studio.test.mjs test/studio-ui.test.mjs"
   }
 }

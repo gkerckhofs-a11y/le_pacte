@@ -6,6 +6,7 @@ import type {Session,Actor,Command} from '../src/session.ts';
 import {ARCHETYPES,EDGES,NEIGHBORS,ZONES} from '../src/map.ts';
 import type {TeamId} from '../src/map.ts';
 import {validateOrders} from '../src/engine.ts';
+import {EditionStudio} from './studio.ts';
 export const catalog=JSON.parse(readFileSync(new URL('../content/editions.json',import.meta.url),'utf8')).editions;
 export const map={zones:ZONES,edges:EDGES,neighbors:NEIGHBORS,archetypes:ARCHETYPES};
 export const tokenHash=(token:string)=>createHash('sha256').update(token).digest('hex');
@@ -13,24 +14,28 @@ function shuffle<T>(items:T[]):T[]{const out=[...items];for(let i=out.length-1;i
 const check=(b:unknown,m:string)=>{if(!b)throw new Error(m);};
 export class GameStore {
  db:DatabaseSync;
+ studio:EditionStudio;
  constructor(path:string){
   this.db=new DatabaseSync(path);this.db.exec('PRAGMA busy_timeout=5000; PRAGMA journal_mode=WAL;');
   this.db.exec(`CREATE TABLE IF NOT EXISTS sessions(id TEXT PRIMARY KEY, code TEXT UNIQUE NOT NULL, title TEXT NOT NULL, state TEXT NOT NULL);
    CREATE TABLE IF NOT EXISTS team_access(session_id TEXT NOT NULL, team TEXT NOT NULL, hash TEXT NOT NULL UNIQUE, expires INTEGER NOT NULL, last_seen INTEGER, PRIMARY KEY(session_id,team));`);
+  this.studio=new EditionStudio(this);
  }
  close(){this.db.close();}
  transaction<T>(fn:()=>T):T {this.db.exec('BEGIN IMMEDIATE');try{const result=fn();this.db.exec('COMMIT');return result;}catch(e){this.db.exec('ROLLBACK');throw e;}}
  get(id:string):Session{const row=this.db.prepare('SELECT state FROM sessions WHERE id=?').get(id) as {state:string}|undefined;check(row,'Session introuvable');return JSON.parse(row!.state);}
  save(s:Session){this.db.prepare('UPDATE sessions SET state=? WHERE id=?').run(JSON.stringify(s),s.id);}
  list(){return this.db.prepare('SELECT id,code,title,state FROM sessions ORDER BY rowid DESC LIMIT 100').all().map((r:any)=>{const s=JSON.parse(r.state);return{id:r.id,code:r.code,title:r.title,phase:s.phase,round:s.game.round,theme:s.edition.themeId};});}
- create(code:string,title:string,themeId:string,now:number){
+ create(code:string,title:string,themeId:string,now:number,releaseId?:string){
   check(typeof code==='string'&&/^[A-Z0-9][A-Z0-9_-]{2,11}$/.test(code),'Code : 3 à 12 lettres majuscules, chiffres, tirets');
   check(typeof title==='string'&&title.trim().length>0&&title.length<=100,'Titre requis (100 caractères maximum)');
-  const edition=catalog.find((e:any)=>e.themeId===themeId);check(edition,'Univers inconnu');
+  const release=releaseId?this.studio.release(releaseId):null;
+  const edition=release?.edition??catalog.find((e:any)=>e.themeId===themeId);check(edition,'Univers inconnu');
   return this.transaction(()=>{
    check(!this.db.prepare('SELECT id FROM sessions WHERE code=?').get(code),'Code déjà utilisé');
    const id=randomBytes(12).toString('hex');
    const s=createSession(id,'local-organizer',edition,shuffle(['O1','O2','O3','O4','O5','O6']),shuffle([1,2,3,4,5,6]));
+   if(release)(s as any).editionSource={releaseId:release.id,checksum:release.checksum};
    this.db.prepare('INSERT INTO sessions(id,code,title,state) VALUES(?,?,?,?)').run(id,code,title.trim(),JSON.stringify(s));
    const access=ARCHETYPES.map(team=>({team,token:this.rotateInternal(id,team,now)}));return{id,access};
   });

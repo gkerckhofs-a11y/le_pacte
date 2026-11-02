@@ -1,8 +1,8 @@
-# Le Pacte — version locale 0.2.0
+# Le Pacte — version locale 0.3.0
 
 Jeu de stratégie et de diplomatie du Ludificateur : six équipes, 33 territoires, 60 connexions, cinq manches et un seul vainqueur. Développement fondé sur le règlement neutre V1.1 et le cahier des charges multivers V1.0 du 2 novembre 2026.
 
-Cette version ajoute **trois interfaces web reliées à un serveur local et à une base SQLite persistante**. Elle sert aux répétitions techniques. Le déploiement Firebase, le studio des univers et la validation humaine ne sont pas encore réalisés.
+Cette version ajoute **trois interfaces web reliées à un serveur local et à une base SQLite persistante**. Elle sert aux répétitions techniques. Le studio de contenus est disponible depuis la régie. Le déploiement Firebase et la validation humaine ne sont pas encore réalisés.
 
 ## Démarrage
 
@@ -29,7 +29,7 @@ Le serveur écoute uniquement sur `127.0.0.1` par défaut. Les smartphones ne pe
 
 Une clé générée change après redémarrage ; reconnecter la régie avec la nouvelle clé. Les parties et accès d'équipe déjà enregistrés restent dans la base. Pour conserver une même clé, la fournir par environnement ; ne jamais l'ajouter au dépôt. La base et les fichiers d'environnement sont ignorés par Git.
 
-## Les trois interfaces
+## Les interfaces de jeu
 
 - **Régie** : création de session et code personnalisé, sélection d'univers, six accès révocables, suivi des connexions, ressources et décisions privées, avance manuelle, pause/reprise, export JSON et ouverture de projection.
 - **Équipe** : ressources, pouvoir, objectif privé, renseignement, deux ordres avec coût et validation serveur, confirmation de verrouillage, échanges à double consentement, alliances et votes Conseil/Sommet.
@@ -38,6 +38,18 @@ Une clé générée change après redémarrage ; reconnecter la régie avec la n
 Les accès d'équipe sont des clés aléatoires de 32 octets limitées à une seule session et une seule faction, valables 24 heures. Leur empreinte SHA-256 est stockée dans SQLite. Renouveler un accès invalide immédiatement son prédécesseur. Les clés brutes sont remises seulement à leur création et conservées dans l'onglet de régie (`sessionStorage`). Après fermeture de cet onglet, renouveler les liens si nécessaire.
 
 Le jeton entre par le fragment du lien, est retiré de l'adresse affichée et sert aux requêtes via l'en-tête Authorization. La projection n'utilise aucun jeton d'équipe ou de régie. L'accès régie local est unique : il ne remplace pas les comptes Firebase Auth prévus pour la production.
+
+## Studio des univers — 0.3
+
+Depuis l’accueil de régie, ouvrir **Studio des univers**. Dupliquer un des cinq exemples, modifier les contenus, enregistrer le brouillon puis utiliser « Vérifier avant publication ». Le studio édite le titre, l’accroche, l’introduction, l’épilogue, les libellés des ressources, les six factions et leurs couleurs, les 33 lieux, les cinq Conseils et les six intitulés d’objectifs. Les règles des pouvoirs, effets des votes et conditions d’objectifs restent fixes et affichées séparément des récits.
+
+Les trois prévisualisations (projection, équipe, régie) utilisent des données fictives et ne créent pas de partie. Les références médias de cette tranche se limitent aux éléments intégrés : carte SVG, titre typographique et palettes. Cocher l’habillage intégré avant publication. Les illustrations et sons personnalisés ne peuvent pas encore être importés.
+
+Un brouillon incomplet peut être enregistré. La publication exige tous les textes narratifs requis et les références intégrées. Une version publiée est figée, identifiée et munie d’une empreinte SHA-256. Pour la modifier, choisir **Nouvelle version** ; une duplication indépendante crée une autre famille d’univers. La création d’une partie propose les versions publiées avant les exemples de répétition.
+
+Chaque session conserve son propre snapshot de contenu et la référence de version : une publication ultérieure ne modifie ni ses noms, ni ses textes, ni ses règles. Les brouillons portent une révision ; un onglet périmé ne peut pas écraser les changements d’un autre onglet. Les exports JSON du studio peuvent être réimportés, toujours sous forme d’un nouveau brouillon. L’import refuse les identifiants mécaniques modifiés, les nouveaux champs de règles et les médias distants.
+
+Dans le serveur local, le studio et la régie partagent la même clé d’organisateur. La séparation des rôles éditeur/organisateur et les comptes Firebase restent à raccorder avant un service hébergé.
 
 ## Sauvegarde et autorité
 
@@ -54,10 +66,11 @@ Pour sauvegarder la base pendant que le serveur tourne, employer une sauvegarde 
 ```sh
 npm test
 npm run test:integration
+npm run test:studio
 npm run demo
 ```
 
-`npm test` exécute les 62 tests de règles, de session, d'intégration HTTP/SQLite et de génération des écrans. La commande ciblée `test:integration` exécute seulement les 15 tests HTTP et persistance. Les tests d'interface utilisent une frontière DOM minimale : ils vérifient le HTML généré et l'échappement des textes, **pas le rendu visuel ni des interactions navigateur réelles**.
+`npm test` exécute les 77 tests de règles, de session, d'intégration HTTP/SQLite et de génération des écrans. La commande ciblée `test:integration` exécute seulement les 15 tests HTTP et persistance. `test:studio` couvre 15 cas de contenus, versions, HTTP et génération du studio. Les tests d'interface utilisent une frontière DOM minimale : ils vérifient le HTML généré et l'échappement des textes, **pas le rendu visuel ni des interactions navigateur réelles**.
 
 Le navigateur disponible dans l'environnement de préparation n'a pas pu joindre le serveur local. La QA visuelle, le clavier dans un navigateur réel, les résolutions 360 px/1080p/4K, les téléphones et le réseau en salle restent à vérifier. Aucun résultat de test humain ni conformité commerciale n'est revendiqué.
 
@@ -70,8 +83,9 @@ Node exécute les sources TypeScript par effacement des annotations. Le contrôl
 | `src/` | Règles pures, topologie, contenus et contrat de session |
 | `server/store.ts` | Transactions, sessions, accès et scheduler |
 | `server/http.ts` | Autorisations, API et fichiers web autorisés |
+| `server/studio.ts` | Brouillons, révisions, publications et versions immuables |
 | `server/start.mjs` | Démarrage local et arrêt propre |
-| `public/` | Interfaces, styles et carte SVG |
+| `public/` | Interfaces de jeu, studio, styles et carte SVG |
 | `content/editions.json` | Cinq exemples fournis, toujours en brouillon |
 | `test/` | Tests de règles, session, HTTP, persistance et génération HTML |
 | `docs/` | Cahier des charges et état du développement |
@@ -81,7 +95,7 @@ Le frontend est en JavaScript natif, sans étape de compilation ni CDN. Le cahie
 ## Prochaines étapes
 
 1. Attribuer le projet Firebase à Le Pacte, vérifier l'instance et raccorder Auth, stockage transactionnel et projections privées/publiques, avec tests Emulator Suite. Aucun projet Firebase existant n'a été modifié.
-2. Studio de duplication, édition et publication immuable ; compléter les textes, introductions et médias originaux des univers. Les exemples JSON ne sont pas des éditions publiées.
+2. Compléter les cinq univers avec leurs textes éditoriaux définitifs, illustrations et sons originaux ; ajouter la gestion des médias, des droits, des contrastes et les rôles distincts du studio. Les exemples JSON fournis ne sont pas publiés automatiquement.
 3. QR imprimables des accès, tour d'initiation jouable, corrections d'arbitrage motivées, replay de révélation et amélioration des bilans.
 4. Validation visuelle et multiappareils, tests en salle avec six équipes, puis décision de déploiement.
 
