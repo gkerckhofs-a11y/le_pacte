@@ -1,5 +1,5 @@
 // Presentation only: every route is supplied by the authoritative game graph.
-import {westernPositions,westernRegions,westernRivers,westernRidges} from './western-territories.js';
+import {westernPositions,westernRegions,westernRivers,westernRidges,westernBridges} from './western-territories.js';
 export {westernPositions,westernRegions};
 const escape=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function labelLines(name){const words=String(name).split(/\s+/),lines=[''];for(const word of words){const n=lines.length-1;if(lines[n]&&(lines[n]+' '+word).length>20)lines.push(word);else lines[n]+=(lines[n]?' ':'')+word;}return lines;}
@@ -48,7 +48,7 @@ function landmark(z){
 function geography(){
  const trace=points=>'M'+points.map(p=>p.join(' ')).join('L');
  const ridges=westernRidges.map(points=>`<g class="terrain-ridge"><path class="ridge-spine" d="${trace(points)}"/>${points.filter((_,i)=>i%4===2).map(([x,y],i)=>`<path class="ridge-peak" d="M${x-16} ${y+7}l14 -21 17 24-17 -7Z"/><path class="ridge-hatch" d="M${x-2} ${y-14}l2 17 15 7"/>`).join('')}</g>`).join('');
- const rivers=westernRivers.map(points=>`<g class="terrain-river"><path class="river-bank" d="${trace(points)}"/><path class="river-water" d="${trace(points)}"/><path class="river-light" d="${trace(points)}"/>${[6,18].map(i=>{const [x,y]=points[i],before=points[i-1],after=points[i+1],dx=after[0]-before[0],dy=after[1]-before[1],len=Math.hypot(dx,dy),nx=-dy/len*8,ny=dx/len*8;return `<path class="river-bridge" d="M${x-nx} ${y-ny}L${x+nx} ${y+ny}"/>`;}).join('')}</g>`).join('');
+ const rivers=westernRivers.map(points=>`<g class="terrain-river"><path class="river-bank" d="${trace(points)}"/><path class="river-water" d="${trace(points)}"/><path class="river-light" d="${trace(points)}"/>${westernBridges.map(ps=>`<path class="river-bridge" d="${trace(ps)}"/>`).join('')}</g>`).join('');
  return `<g class="geographical-features" aria-hidden="true">${ridges}${rivers}</g>`;
 }
 export function westernBoard(map,edition,owners,{selected=null,contested=[]}={}){

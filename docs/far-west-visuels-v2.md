@@ -41,3 +41,9 @@ Vérification ciblée : 12 tests UI/cartographie réussis, dont le contrôle de 
 
 Le placement des trois sites centraux a été espacé après contrôle visuel, en conservant chaque repère dans sa région.
 Le générateur ajuste aussi les positions des noms ordinaires autour des emprises des neuf bâtiments, en imposant que chaque repère reste à l’intérieur de sa région. La géométrie des territoires n’est pas modifiée par cet ajustement.
+
+## Rivière traversante — 2 novembre 2026
+
+Le tronçon de rivière initial est conservé et prolongé vers l’ouest par des frontières communes existantes, en passant entre les sites centraux. Hors de la surface des territoires, deux courbes raccordent le cours aux bords gauche et droit du décor. Le tracé déborde légèrement du cadre SVG, ce qui évite un arrêt visible dans le paysage. Les quatre ponts sont placés sur des points du cours, indépendamment de leur indice dans le nouveau tracé complet.
+
+Treize tests ciblés UI/cartographie réussissent. Ils vérifient notamment la continuité du cours, ses deux sorties du cadre, la présence du tronçon intérieur dans le tracé complet, l’alignement des ponts et la conformité des segments intérieurs aux frontières communes. L’audit géométrique confirme à nouveau les 33 régions et 60 voisinages. Aucune règle ni frontière de territoire n’a changé pendant cette correction.
