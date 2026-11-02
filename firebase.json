@@ -87,5 +87,13 @@
       "enabled": false
     },
     "singleProjectMode": true
+  },
+  "auth": {
+    "providers": {
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "Le Pacte — Ludificateur",
+        "supportEmail": "gkerckhofs@gmail.com"
+      }
+    }
   }
 }
