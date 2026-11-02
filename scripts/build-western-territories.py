@@ -67,10 +67,23 @@ for s,first,start,end in [(1,1,240,0),(2,3,0,120),(3,5,120,240)]:
 # Optional geometry audit against the authoritative graph, without renderer assumptions.
 if __name__=='__main__':
  import subprocess
- from shapely.geometry import Polygon,Point
+ from shapely.geometry import Polygon,Point,box
  from shapely.ops import unary_union
  graph=json.loads(subprocess.check_output(['node','--input-type=module','-e',"import {EDGES} from './src/map.ts';console.log(JSON.stringify(EDGES))"],cwd=ROOT,text=True))
  polys={k:Polygon(v) for k,v in regions.items()}
+ # Keep ordinary place names clear of the larger fort/site illustrations.
+ buildings=[box(x-45,y-70,x+45,y+2) for z,(x,y) in positions.items() if z[0] in 'CS']
+ for zone,(x,y) in list(positions.items()):
+  if zone[0] in 'CS':continue
+  candidates=[]
+  for dx in range(-50,51,10):
+   for dy in range(-40,41,10):
+    px,py=x+dx,y+dy
+    if not polys[zone].contains(Point(px,py)):continue
+    label=box(px-85,py-7,px+85,py+18)
+    overlap=sum(label.intersection(b).area for b in buildings)
+    candidates.append((overlap*1000+dx*dx+dy*dy,px,py))
+  _,px,py=min(candidates);positions[zone]=[round(px,2),round(py,2)]
  for k,p in polys.items():
   assert p.is_valid and p.area>500,k
   assert p.contains(Point(positions[k])),('label outside',k)

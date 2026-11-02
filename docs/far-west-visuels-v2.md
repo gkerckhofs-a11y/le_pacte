@@ -40,3 +40,4 @@ Les bâtiments disposent de cours de terre, traces d’accès, petites clôtures
 Vérification ciblée : 12 tests UI/cartographie réussis, dont le contrôle de la rivière sur les frontières communes, et nouvel audit Shapely de la géométrie. Aucun nouveau bitmap, changement de règle, de stockage ou d’authentification pour cette étape.
 
 Le placement des trois sites centraux a été espacé après contrôle visuel, en conservant chaque repère dans sa région.
+Le générateur ajuste aussi les positions des noms ordinaires autour des emprises des neuf bâtiments, en imposant que chaque repère reste à l’intérieur de sa région. La géométrie des territoires n’est pas modifiée par cet ajustement.
