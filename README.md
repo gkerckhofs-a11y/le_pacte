@@ -77,7 +77,7 @@ La base nommée `le-pacte` a été créée dans `europe-west1` (Belgique), en é
 
 Le transport HTTP accepte maintenant les deux adaptateurs : SQLite synchrone pour la répétition locale et Firestore asynchrone pour Firebase. Le cloud écrit les coûts, changements d’état, reçus et projections dans une transaction native. Les reçus d’idempotence et les événements vivent dans des sous-collections séparées pour ne pas faire grossir sans limite le document de session. Les lectures filtrées utilisent les Pipelines Enterprise ; le moteur calcule les règles côté serveur.
 
-Les projections publiques et celles des six équipes sont enregistrées séparément de l’état canonique. Les navigateurs passent exclusivement par l’API ; les règles Firestore proposées interdisent toute lecture ou écriture directe, même pour un utilisateur connecté. Ces règles sont un prototype, testé dans l’émulateur ; leur déploiement et leur revue de production restent à faire. Les appels Admin du backend contournent les règles et vérifient donc eux-mêmes l’identité, le propriétaire et la phase, avec une revérification transactionnelle des clés d’équipe.
+Les projections publiques et celles des six équipes sont enregistrées séparément de l’état canonique. Les navigateurs passent exclusivement par l’API ; les règles Firestore proposées interdisent toute lecture ou écriture directe, même pour un utilisateur connecté. Ces règles ont été testées dans l’émulateur puis déployées ; une lecture directe anonyme de la base nommée a été refusée lors du contrôle distant. La revue de sécurité avant diffusion large reste à faire. Les appels Admin du backend contournent les règles et vérifient donc eux-mêmes l’identité, le propriétaire et la phase, avec une revérification transactionnelle des clés d’équipe.
 
 La régie cloud utilise Firebase Auth et des ID tokens vérifiés, compte vérifié et actif, avec les claims booléens `pacteOrganizer` et `pacteEditor`. Les rôles sont distincts. Une connexion Google seule n’accorde aucun rôle ; le code client ne peut pas attribuer de droits. La clé de régie du serveur local est désactivée en mode cloud. Les sessions et les contenus sont isolés par propriétaire. Le compte `gkerckhofs@gmail.com` est précréé avec le rôle organisateur uniquement ; sa première connexion Google et la vérification effective de son adresse restent à valider. Aucun rôle éditeur ne lui a été attribué.
 
@@ -96,7 +96,7 @@ npm run test:cloud
 
 Cette commande force le projet de démonstration `demo-le-pacte`, indépendamment de `.firebaserc`. Le scheduler est testé par son service de données ; la lecture d’une session rattrape également les échéances échues selon l’heure du serveur. Le test du point d’entrée Functions a réussi dans la [CI de la version 0.5](https://github.com/gkerckhofs-a11y/le_pacte/actions/runs/41476679035), sous Node 22, après compilation. L’environnement de préparation bloque les sockets Unix utilisés par ce lanceur Functions ; les tests du transport HTTP et du stockage passent localement.
 
-Seule la configuration Auth a été déployée. Aucun déploiement de Functions, Hosting, règles ou index n’a été effectué dans le projet distant. La facturation est désactivée (`billingEnabled: false`, vérifié le 2 novembre 2026) ; les Functions nécessitent le forfait Blaze. Voir [l’état de préparation](docs/firebase-auth-activation.md). `firebase.json`, les règles et les index sont préparés et doivent être revus avec le propriétaire avant la mise en ligne. Le SQLite existant n’est pas migré automatiquement ; une session locale et une session cloud sont distinctes.
+Le premier déploiement applicatif a eu lieu le 2 novembre 2026, après activation de Blaze par le propriétaire et vérification de `billingEnabled: true`. Le [site est en ligne](https://le-pacte-ludificateur.web.app/) ; les fonctions `api` et `tick` sont actives en Belgique, les règles et les index sont publiés. Voir le [compte rendu de déploiement](docs/deploiement-initial.md). Le SQLite existant n’est pas migré automatiquement ; une session locale et une session cloud sont distinctes.
 
 ## Sauvegarde et autorité
 
@@ -147,7 +147,7 @@ Le frontend est en JavaScript natif, sans étape de compilation ni CDN. Les SDK 
 
 ## Prochaines étapes
 
-1. Le fournisseur Google et le compte organisateur sont préparés. Activer la facturation Blaze avec le propriétaire, revoir la configuration, puis valider le premier déploiement applicatif Firebase et la connexion Google réelle.
+1. Le premier déploiement est effectué. Valider la connexion Google réelle du compte organisateur, puis la création et l’animation d’une session sur les appareils de test.
 2. Compléter les cinq univers avec leurs textes éditoriaux définitifs, illustrations et sons originaux ; ajouter la gestion des médias, des droits, des contrastes et les rôles distincts du studio. Les exemples JSON fournis ne sont pas publiés automatiquement.
 3. Tour d’initiation jouable, corrections d’arbitrage motivées, enrichissement des séquences de révélation et amélioration des bilans.
 4. Validation visuelle et multiappareils, tests en salle avec six équipes, puis décision de déploiement.

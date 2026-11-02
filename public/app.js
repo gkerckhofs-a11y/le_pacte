@@ -32,6 +32,7 @@ function field(label,html){return `<label>${esc(label)}${html}</label>`;}
 function btn(action,text,cls=''){return `<button type="button" data-action="${action}" class="${cls}" data-mutation>${esc(text)}</button>`;}
 async function enterOrganizer(){sessionStorage.setItem(authKey,token);if(sid)await poll();else if(params.get('studio')==='1')await openStudioPage();else await renderHub();$('#logout').hidden=false;}
 function renderLogin(){
+ $('#connection').textContent='○ Non connecté';$('#connection').className='';
  if(runtimeMode==='firebase'){
   $('#main').innerHTML='<section class="welcome"><p class="eyebrow">LE PACTE · ESPACE ORGANISATEUR</p><h1>Entrez en régie.</h1><div class="panel login"><h2>Votre compte Google</h2><p>La connexion nécessite un rôle organisateur ou éditeur attribué à votre compte.</p><button id="google-login">Se connecter avec Google</button><p><a href="/?studio=1">Accéder au studio des univers</a></p></div></section>';
   $('#google-login').onclick=async()=>{try{token=await authSDK.login();await request(params.get('studio')==='1'?'/api/studio':'/api/sessions');await enterOrganizer();}catch(err){notify(err.message,true);}};return;
