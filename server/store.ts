@@ -45,9 +45,9 @@ export class GameStore {
   this.db.prepare('INSERT INTO team_access(session_id,team,hash,expires,last_seen) VALUES(?,?,?,?,NULL) ON CONFLICT(session_id,team) DO UPDATE SET hash=excluded.hash,expires=excluded.expires,last_seen=NULL').run(id,team,tokenHash(token),now+86400000);return token;
  }
  rotate(id:string,team:TeamId,now:number){return this.transaction(()=>{this.get(id);return this.rotateInternal(id,team,now);});}
- authenticateTeam(id:string,token:string,now:number):Actor {
+ authenticateTeam(id:string,token:string,now:number,markSeen=true):Actor {
   const row=this.db.prepare('SELECT team FROM team_access WHERE session_id=? AND hash=? AND expires>?').get(id,tokenHash(token),now) as {team:TeamId}|undefined;
-  check(row,'Accès invalide, expiré ou révoqué');this.db.prepare('UPDATE team_access SET last_seen=? WHERE session_id=? AND team=?').run(now,id,row!.team);return{role:'team',team:row!.team};
+  check(row,'Accès invalide, expiré ou révoqué');if(markSeen)this.db.prepare('UPDATE team_access SET last_seen=? WHERE session_id=? AND team=?').run(now,id,row!.team);return{role:'team',team:row!.team};
  }
  command(id:string,actor:Actor,c:Command,now:number){return this.transaction(()=>{const s=this.get(id);const next=applyCommand(s,actor,c,now);this.save(next);return this.viewState(next,actor,now);});}
  validate(id:string,actor:Actor,orders:any,now:number){const s=this.get(id);check(actor.role==='team'&&s.phase==='ORDERS'&&s.pausedRemaining===null&&s.deadline!==null&&now<s.deadline,'Ordres fermés');check(!s.game.orders[(actor as any).team],'Ordres déjà verrouillés');return{cost:validateOrders(s.game,(actor as any).team,orders)};}

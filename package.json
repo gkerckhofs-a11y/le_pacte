@@ -1,6 +1,6 @@
 {
   "name": "le-pacte",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -11,6 +11,13 @@
     "demo": "node scripts/demo.mjs",
     "start": "node server/start.mjs",
     "test:integration": "node --test test/http.test.mjs",
-    "test:studio": "node --test test/studio.test.mjs test/studio-ui.test.mjs"
+    "test:studio": "node --test test/studio.test.mjs test/studio-ui.test.mjs",
+    "test:animation": "node --test test/animation.test.mjs test/ui.test.mjs"
+  },
+  "dependencies": {
+    "qrcode-generator": "2.0.4"
+  },
+  "devDependencies": {
+    "jsqr": "1.4.0"
   }
 }

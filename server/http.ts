@@ -2,12 +2,14 @@ import {createServer} from 'node:http';
 import {readFileSync} from 'node:fs';
 import {timingSafeEqual} from 'node:crypto';
 import {GameStore,catalog,map,tokenHash} from './store.ts';
+import {accessQr,normalizeOrigin} from './qr.ts';
 import {BUILTIN_ASSETS,GOAL_RULES} from '../src/studio.ts';
 import type {Actor} from '../src/session.ts';
-export function createGameServer(store:GameStore,organizerToken:string,clock=()=>Date.now()){
+export function createGameServer(store:GameStore,organizerToken:string,clock=()=>Date.now(),options:{publicOrigin?:string}={}){
+ const publicOrigin=options.publicOrigin?normalizeOrigin(options.publicOrigin):null;
  if(!/^[A-Za-z0-9_-]{32,128}$/.test(organizerToken))throw new Error('Clé régie : au moins 32 caractères');
  const tokenDigest=Buffer.from(tokenHash(organizerToken),'hex');
- const staticFiles:Record<string,[string,string]>={ '/':['index.html','text/html; charset=utf-8'],'/app.js':['app.js','text/javascript; charset=utf-8'],'/studio.js':['studio.js','text/javascript; charset=utf-8'],'/style.css':['style.css','text/css; charset=utf-8']};
+ const staticFiles:Record<string,[string,string]>={ '/':['index.html','text/html; charset=utf-8'],'/app.js':['app.js','text/javascript; charset=utf-8'],'/studio.js':['studio.js','text/javascript; charset=utf-8'],'/animation.js':['animation.js','text/javascript; charset=utf-8'],'/style.css':['style.css','text/css; charset=utf-8']};
  const limiter=new Map<string,{until:number;count:number}>();
  function bearer(req:any){const h=req.headers.authorization;if(!h)return null;if(!/^Bearer [A-Za-z0-9_-]{32,128}$/.test(h))throw new Error('Accès invalide');return h.slice(7);}
  function isOrg(t:string|null){return t!==null&&timingSafeEqual(tokenDigest,Buffer.from(tokenHash(t),'hex'));}
@@ -48,12 +50,15 @@ export function createGameServer(store:GameStore,organizerToken:string,clock=()=
     if(req.method==='GET'){json(200,{sessions:store.list(),serverNow:now});return;}
     if(req.method==='POST'){const d=await body(req);json(201,store.create(d.code,d.title,d.themeId,clock(),d.releaseId));return;}
    }
-   const match=path.match(/^\/api\/sessions\/([a-f0-9]{24})(?:\/(commands|check|export|access)(?:\/([a-z]+))?)?$/);
+   const match=path.match(/^\/api\/sessions\/([a-f0-9]{24})(?:\/(commands|check|export|access)(?:\/([a-z]+))?(?:\/(qr))?)?$/);
    if(!match){json(404,{error:'Route introuvable'});return;}
-   const [,id,action,team]=match;
+   const [,id,action,team,qr]=match;
+   const accessOrigin=publicOrigin??normalizeOrigin('http://'+req.headers.host);
+   if(qr&&action!=='access'){json(404,{error:'Route introuvable'});return;}
+   if(qr&&req.method==='POST'){requireOrg(req);const d=await body(req);if(typeof d.teamToken!=='string')throw new Error('Clé équipe requise');const actor=store.authenticateTeam(id,d.teamToken,clock(),false);if(actor.role!=='team'||actor.team!==team)throw new Error('Accès QR invalide');json(200,accessQr(accessOrigin,id,d.teamToken));return;}
    if(action==='access'&&req.method==='POST'){requireOrg(req);json(200,{team,token:store.rotate(id,team as any,now)});return;}
    const actor=actorFor(req,id);
-   if(!action&&req.method==='GET'){json(200,store.view(id,actor,now));return;}
+   if(!action&&req.method==='GET'){json(200,{...store.view(id,actor,now),accessOrigin});return;}
    if(action==='export'&&req.method==='GET'){requireOrg(req);json(200,store.get(id));return;}
    if(actor.role==='public'){json(403,{error:'Accès équipe ou régie requis'});return;}
    if(action==='check'&&req.method==='POST'){const data=await body(req);json(200,store.validate(id,actor,data,clock()));return;}

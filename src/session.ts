@@ -4,10 +4,12 @@ import type {TeamId} from './map.ts';
 import {ARCHETYPES} from './map.ts';
 import {executeTrade,signAlliance,endAlliance,inspectGoal} from './diplomacy.ts';
 import type {Trade} from './diplomacy.ts';
+import {replayView} from './replay.ts';
+import type {RevealControl} from './replay.ts';
 import {editionSnapshot} from './editions.ts';
 export type Phase = 'DRAFT'|'LOBBY'|'BRIEFING'|'TUTORIAL'|'RESET'|'SITUATION'|'DIPLOMACY'|'ORDERS'|'COUNCIL'|'RESOLVE'|'SUMMIT'|'RESULTS'|'ARCHIVED';
 export type Actor = {role:'organizer';id:string}|{role:'team';team:TeamId};
-export type Session = {id:string;organizerId:string;edition:any;game:State;phase:Phase;deadline:number|null;pausedRemaining:number|null;revision:number;receipts:Record<string,{actor:string;payload:string}>;offers:Record<string,Trade>;allianceOffers:Record<string,{from:TeamId;to:TeamId}>;summitVotes:Partial<Record<TeamId,{candidate:TeamId;spend:number}>>;ranking:TeamId[];audit:{revision:number;actor:string;kind:string;at:number}[]};
+export type Session = {reveal?:RevealControl;id:string;organizerId:string;edition:any;game:State;phase:Phase;deadline:number|null;pausedRemaining:number|null;revision:number;receipts:Record<string,{actor:string;payload:string}>;offers:Record<string,Trade>;allianceOffers:Record<string,{from:TeamId;to:TeamId}>;summitVotes:Partial<Record<TeamId,{candidate:TeamId;spend:number}>>;ranking:TeamId[];audit:{revision:number;actor:string;kind:string;at:number}[]};
 export type Command = {id:string;sessionId:string;expectedPhase:Phase;expectedRound:number;kind:string;data:any};
 const minutes:Partial<Record<Phase,number>>={BRIEFING:15,TUTORIAL:10,SITUATION:2,DIPLOMACY:8,ORDERS:4,COUNCIL:3,RESOLVE:3,SUMMIT:10,RESULTS:15};
 const key=(a:Actor)=>a.role==='team'?`team:${a.team}`:`organizer:${a.id}`;
@@ -18,6 +20,7 @@ export function createSession(id:string,organizerId:string,edition:any,goals:str
 }
 function setPhase(s:Session,p:Phase,now:number){s.phase=p;s.deadline=minutes[p]?now+minutes[p]!*60000:null;}
 function advance(s:Session,now:number){
+ delete s.reveal;
  switch(s.phase){
   case 'DRAFT':setPhase(s,'LOBBY',now);break;
   case 'LOBBY':setPhase(s,'BRIEFING',now);break;
@@ -27,7 +30,7 @@ function advance(s:Session,now:number){
   case 'SITUATION':setPhase(s,'DIPLOMACY',now);break;
   case 'DIPLOMACY':s.offers={};s.allianceOffers={};setPhase(s,'ORDERS',now);break;
   case 'ORDERS':setPhase(s,'COUNCIL',now);break;
-  case 'COUNCIL':s.game=resolveRound(s.game);setPhase(s,'RESOLVE',now);break;
+  case 'COUNCIL':s.game=resolveRound(s.game);s.reveal={round:s.game.round,step:3};setPhase(s,'RESOLVE',now);break;
   case 'RESOLVE':if(s.game.round===5)setPhase(s,'SUMMIT',now);else{s.game=beginRound(s.game);setPhase(s,'SITUATION',now);}break;
   case 'SUMMIT':{const r=finishGame(s.game,s.summitVotes);s.game=r.state;s.ranking=r.ranking;setPhase(s,'RESULTS',now);break;}
   case 'RESULTS':setPhase(s,'ARCHIVED',now);break;
@@ -48,6 +51,7 @@ export function applyCommand(input:Session,actor:Actor,c:Command,now:number):Ses
  const org=()=>requireTrue(actor.role==='organizer','Régie uniquement');
  const requirePhase=(p:Phase)=>requireTrue(s.phase===p&&s.pausedRemaining===null&&(s.deadline===null||now<s.deadline),'Phase fermée, suspendue ou délai dépassé');
  if(c.kind==='advance'){org();requireTrue(s.pausedRemaining===null,'Session suspendue');advance(s,now);}
+ else if(c.kind==='replay'){org();requireTrue(d&&Number.isInteger(d.round)&&Number.isInteger(d.step),'Révélation invalide');replayView(s.game,d);s.reveal={round:d.round,step:d.step};}
  else if(c.kind==='pause'){org();requireTrue(s.deadline!==null&&s.pausedRemaining===null,'Aucun chronomètre actif');s.pausedRemaining=Math.max(0,s.deadline!-now);s.deadline=null;}
  else if(c.kind==='resume'){org();requireTrue(s.pausedRemaining!==null,'Session non suspendue');s.deadline=now+s.pausedRemaining!;s.pausedRemaining=null;}
  else {
@@ -79,9 +83,9 @@ export function applyCommand(input:Session,actor:Actor,c:Command,now:number):Ses
  s.revision++;Object.defineProperty(s.receipts,c.id,{value:{actor:actorKey,payload},enumerable:true,writable:true,configurable:true});s.audit.push({revision:s.revision,actor:actorKey,kind:c.kind,at:now});return s;
 }
 export function sessionView(s:Session,actor:Actor|{role:'public'}) {
- const common={id:s.id,edition:structuredClone(s.edition),phase:s.phase,deadline:s.deadline,pausedRemaining:s.pausedRemaining,game:publicView(s.game),...(s.game.finished?{ranking:structuredClone(s.ranking)}:{})};
+ const common={id:s.id,reveal:replayView(s.game,s.reveal),edition:structuredClone(s.edition),phase:s.phase,deadline:s.deadline,pausedRemaining:s.pausedRemaining,game:publicView(s.game),...(s.game.finished?{ranking:structuredClone(s.ranking)}:{})};
  if(actor.role==='public')return common;
- if(actor.role==='organizer'){requireTrue(actor.id===s.organizerId,'Accès refusé');return structuredClone(s);}
+ if(actor.role==='organizer'){requireTrue(actor.id===s.organizerId,'Accès refusé');return {...structuredClone(s),reveal:replayView(s.game,s.reveal)};}
  requireTrue(ARCHETYPES.includes(actor.team),'Équipe inconnue');
  return {...common,game:teamView(s.game,actor.team),offers:Object.values(s.offers).filter(o=>o.from===actor.team||o.to===actor.team).map(o=>structuredClone(o)),allianceOffers:Object.entries(s.allianceOffers).filter(([,o])=>o.from===actor.team||o.to===actor.team).map(([id,o])=>({id,...o})),summitVote:structuredClone(s.summitVotes[actor.team]??null)};
 }

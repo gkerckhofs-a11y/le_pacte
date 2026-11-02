@@ -1,14 +1,15 @@
-# Le Pacte — version locale 0.3.0
+# Le Pacte — version locale 0.4.0
 
 Jeu de stratégie et de diplomatie du Ludificateur : six équipes, 33 territoires, 60 connexions, cinq manches et un seul vainqueur. Développement fondé sur le règlement neutre V1.1 et le cahier des charges multivers V1.0 du 2 novembre 2026.
 
-Cette version ajoute **trois interfaces web reliées à un serveur local et à une base SQLite persistante**. Elle sert aux répétitions techniques. Le studio de contenus est disponible depuis la régie. Le déploiement Firebase et la validation humaine ne sont pas encore réalisés.
+Cette version ajoute **trois interfaces web reliées à un serveur local et à une base SQLite persistante**. Elle sert aux répétitions techniques. Le studio de contenus est disponible depuis la régie. Un projet Firebase dédié et une application web sont créés ; le backend distant, le déploiement et la validation humaine ne sont pas encore réalisés.
 
 ## Démarrage
 
-Node.js 24 minimum. Aucun paquet externe à installer.
+Node.js 24 minimum. Installer les dépendances verrouillées, puis lancer le serveur :
 
 ```sh
+npm ci
 npm start
 ```
 
@@ -25,13 +26,14 @@ Le serveur écoute uniquement sur `127.0.0.1` par défaut. Les smartphones ne pe
 | `PORT` | `3000` | Port HTTP |
 | `PACTE_HOST` | `127.0.0.1` | Interface d'écoute |
 | `PACTE_DATABASE` | `.data/le-pacte.sqlite` | Sauvegarde SQLite |
+| `PACTE_PUBLIC_ORIGIN` | Origine HTTP de la requête | Adresse publique à encoder dans les QR, par exemple une adresse réseau joignable ; origine HTTP(S) seule, sans chemin |
 | `PACTE_ORGANIZER_TOKEN` | Générée au démarrage | Clé locale de régie, 32 à 128 caractères `A-Z a-z 0-9 _ -` |
 
 Une clé générée change après redémarrage ; reconnecter la régie avec la nouvelle clé. Les parties et accès d'équipe déjà enregistrés restent dans la base. Pour conserver une même clé, la fournir par environnement ; ne jamais l'ajouter au dépôt. La base et les fichiers d'environnement sont ignorés par Git.
 
 ## Les interfaces de jeu
 
-- **Régie** : création de session et code personnalisé, sélection d'univers, six accès révocables, suivi des connexions, ressources et décisions privées, avance manuelle, pause/reprise, export JSON et ouverture de projection.
+- **Régie** : cartons QR imprimables, rejeu visuel des résolutions, création de session et code personnalisé, sélection d'univers, six accès révocables, suivi des connexions, ressources et décisions privées, avance manuelle, pause/reprise, export JSON et ouverture de projection.
 - **Équipe** : ressources, pouvoir, objectif privé, renseignement, deux ordres avec coût et validation serveur, confirmation de verrouillage, échanges à double consentement, alliances et votes Conseil/Sommet.
 - **Projection** : carte SVG avec formes et numéros de factions, minuteur, propriétaires, alliances, scores, Stabilité, décisions du Conseil, rapports et résultats finaux. Aucun ordre, vote ou objectif non révélé n'est transmis à cette vue.
 
@@ -51,6 +53,28 @@ Chaque session conserve son propre snapshot de contenu et la référence de vers
 
 Dans le serveur local, le studio et la régie partagent la même clé d’organisateur. La séparation des rôles éditeur/organisateur et les comptes Firebase restent à raccorder avant un service hébergé.
 
+## QR et cartons d’équipe — 0.4
+
+Depuis une session en régie : **Afficher le QR** pour un accès individuel, ou **Préparer les six cartons QR**, puis **Imprimer les cartons**. La feuille est prévue en A4 portrait avec six cartes. Le navigateur gère l’impression et l’enregistrement PDF. Le rendu papier et la lecture par les téléphones réels restent à vérifier.
+
+Les QR sont calculés par le serveur du jeu, sans service externe. Leur décodage est testé avec un lecteur indépendant. Ils contiennent le lien privé complet et sa clé dans le fragment. Le serveur vérifie la session, l’équipe et la validité de la clé avant de produire un QR ; cette opération ne marque pas l’équipe comme connectée.
+
+**Renouveler** invalide immédiatement le lien et les cartons précédents d’une équipe. Si les clés ne sont plus disponibles dans l’onglet de régie, la préparation demande confirmation avant de renouveler les seuls accès manquants. Une clé expirée doit également être renouvelée ; les QR ne prolongent jamais la validité d’une clé.
+
+L’adresse encodée doit être joignable depuis le téléphone. `localhost` et `127.0.0.1` désignent l’appareil qui scanne, pas l’ordinateur de régie. Ouvrir la régie sur une adresse réseau adéquate, ou configurer `PACTE_PUBLIC_ORIGIN`. Derrière un proxy HTTPS, définir explicitement cette variable. Modifier l’adresse ne déploie pas le serveur et ne configure pas le réseau.
+
+## Relecture des résolutions — 0.4
+
+La régie peut choisir une manche déjà résolue, puis afficher : décisions scellées, attaques, soutiens décisifs, résultats. La projection reconstruit la carte historique à partir des changements de propriétaire archivés. Les étapes avant le résultat montrent la situation précédant cette résolution. Les territoires attaqués sont signalés ; aucune origine d’attaque n’est inventée.
+
+Ce sont des lectures des résultats existants : aucun combat, revenu, vote ou Prestige n’est recalculé. Les comptes, le chronomètre et les ordres restent inchangés. Le classement affiché reste le classement actuel. Les équipes gardent leur carte actuelle. Avancer une phase quitte la relecture ; une résolution normale affiche automatiquement son résultat.
+
+## Préparation Firebase
+
+Projet dédié : `le-pacte-ludificateur` ; application web : `1:48298108779:web:da8e882a62c0c8852dce2e`. Le fichier `.firebaserc` cible ce projet ; `firebase/web-config.json` contient la configuration client fournie par Firebase, sans clé serveur, et n’est pas encore chargé par le frontend local.
+
+À la vérification du 2 novembre 2026, la liste des bases Firestore a renvoyé une erreur 403 indiquant que l’API Firestore n’avait pas été activée dans ce projet. Aucune base, région, règle d’accès, Function ou application hébergée n’a été déployée par cette tranche. Les autres projets n’ont pas été modifiés. Les étapes suivantes sont l’activation/configuration de la base après choix d’édition et de région, l’authentification, le stockage transactionnel distant, puis les tests et la validation du déploiement.
+
 ## Sauvegarde et autorité
 
 Toutes les mutations passent par `applyCommand`, depuis un serveur qui détermine l'identité et l'heure. Le serveur HTTP ne fournit jamais les sources du moteur, la base, les jetons bruts ou un état privé à la projection. Les transactions `BEGIN IMMEDIATE` sérialisent lecture, validation et écriture SQLite. Un refus laisse l'état inchangé. Un même reçu de commande ne produit pas deux dépenses ; les deux acceptations d'une même offre ne peuvent pas être exécutées toutes les deux.
@@ -67,10 +91,11 @@ Pour sauvegarder la base pendant que le serveur tourne, employer une sauvegarde 
 npm test
 npm run test:integration
 npm run test:studio
+npm run test:animation
 npm run demo
 ```
 
-`npm test` exécute les 77 tests de règles, de session, d'intégration HTTP/SQLite et de génération des écrans. La commande ciblée `test:integration` exécute seulement les 15 tests HTTP et persistance. `test:studio` couvre 15 cas de contenus, versions, HTTP et génération du studio. Les tests d'interface utilisent une frontière DOM minimale : ils vérifient le HTML généré et l'échappement des textes, **pas le rendu visuel ni des interactions navigateur réelles**.
+`npm test` exécute les 89 tests de règles, de session, d'intégration HTTP/SQLite et de génération des écrans. La commande ciblée `test:integration` exécute seulement les 15 tests HTTP et persistance. `test:studio` couvre 15 cas de contenus, versions, HTTP et génération du studio. `test:animation` cible les 11 tests QR/relecture et les 6 tests de génération des écrans. Les tests d'interface utilisent une frontière DOM minimale : ils vérifient le HTML généré et l'échappement des textes, **pas le rendu visuel ni des interactions navigateur réelles**.
 
 Le navigateur disponible dans l'environnement de préparation n'a pas pu joindre le serveur local. La QA visuelle, le clavier dans un navigateur réel, les résolutions 360 px/1080p/4K, les téléphones et le réseau en salle restent à vérifier. Aucun résultat de test humain ni conformité commerciale n'est revendiqué.
 
@@ -84,19 +109,21 @@ Node exécute les sources TypeScript par effacement des annotations. Le contrôl
 | `server/store.ts` | Transactions, sessions, accès et scheduler |
 | `server/http.ts` | Autorisations, API et fichiers web autorisés |
 | `server/studio.ts` | Brouillons, révisions, publications et versions immuables |
+| `server/qr.ts` | Génération locale des QR SVG et validation de leur origine |
+| `src/replay.ts` | Cartes historiques dérivées des résultats archivés |
 | `server/start.mjs` | Démarrage local et arrêt propre |
-| `public/` | Interfaces de jeu, studio, styles et carte SVG |
+| `public/` | Interfaces de jeu, studio, cartons QR, relecture, styles et carte SVG |
 | `content/editions.json` | Cinq exemples fournis, toujours en brouillon |
 | `test/` | Tests de règles, session, HTTP, persistance et génération HTML |
 | `docs/` | Cahier des charges et état du développement |
 
-Le frontend est en JavaScript natif, sans étape de compilation ni CDN. Le cahier recommande React/TypeScript sans l'imposer ; ce choix permet de vérifier cette tranche locale sans installer de dépendances. Le moteur reste en TypeScript, indépendant du frontend et du stockage.
+Le frontend est en JavaScript natif, sans étape de compilation ni CDN. Le runtime utilise `qrcode-generator` pour les QR ; `jsqr` est uniquement une dépendance de test. Le verrouillage est dans `package-lock.json`. Le cahier recommande React/TypeScript sans l'imposer ; ce choix permet de vérifier cette tranche locale sans installer de dépendances. Le moteur reste en TypeScript, indépendant du frontend et du stockage.
 
 ## Prochaines étapes
 
-1. Attribuer le projet Firebase à Le Pacte, vérifier l'instance et raccorder Auth, stockage transactionnel et projections privées/publiques, avec tests Emulator Suite. Aucun projet Firebase existant n'a été modifié.
+1. Configurer la base et raccorder Auth, stockage transactionnel et projections privées/publiques au projet Firebase dédié, avec tests Emulator Suite. Le serveur de jeu reste local pour le moment.
 2. Compléter les cinq univers avec leurs textes éditoriaux définitifs, illustrations et sons originaux ; ajouter la gestion des médias, des droits, des contrastes et les rôles distincts du studio. Les exemples JSON fournis ne sont pas publiés automatiquement.
-3. QR imprimables des accès, tour d'initiation jouable, corrections d'arbitrage motivées, replay de révélation et amélioration des bilans.
+3. Tour d’initiation jouable, corrections d’arbitrage motivées, enrichissement des séquences de révélation et amélioration des bilans.
 4. Validation visuelle et multiappareils, tests en salle avec six équipes, puis décision de déploiement.
 
 ## Sources

@@ -6,7 +6,7 @@ import {createGameServer} from './http.ts';
 const path=resolve(process.env.PACTE_DATABASE??'.data/le-pacte.sqlite');mkdirSync(dirname(path),{recursive:true,mode:0o700});
 const store=new GameStore(path),token=process.env.PACTE_ORGANIZER_TOKEN??randomBytes(32).toString('base64url');
 const host=process.env.PACTE_HOST??'127.0.0.1',port=Number(process.env.PORT??3000);
-const server=createGameServer(store,token);
+const server=createGameServer(store,token,()=>Date.now(),{publicOrigin:process.env.PACTE_PUBLIC_ORIGIN});
 const timer=setInterval(()=>{try{store.advanceDue(Date.now());}catch{console.error('Transition automatique interrompue : vérifier la session en régie.');}},1000);
 server.listen(port,host,()=>{
  console.log(`Le Pacte — répétition locale : http://${host}:${port}`);

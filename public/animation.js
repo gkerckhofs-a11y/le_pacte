@@ -1,0 +1,11 @@
+// Pure display helpers: no game command, resource mutation or recalculation.
+export const REVEAL_STEPS=['Décisions scellées','Attaques','Soutiens décisifs','Résultats'];
+export function revealReport(reveal,edition,escape){
+ const {result:r,step,round}=reveal,label=id=>edition.factionLabels[id]??id;
+ const body=step===0?'<h2>Toutes les décisions sont scellées.</h2><p>La carte montre la situation avant cette résolution.</p>':step===1?`<h2>Les tentatives sont dévoilées.</h2>${r.battles.length?r.battles.map(b=>`<div class="battle"><b>${escape(b.target)} · ${escape(edition.territoryLabels[b.target])}</b><p>${b.attacks.map(a=>escape(label(a.team))+` : ${a.power}`).join(' / ')} · résistance ${b.resistance}</p></div>`).join(''):'<p>Aucune tentative de conquête.</p>'}`:step===2?`<h2>Les soutiens qui ont compté.</h2>${r.decisive.length?`<p>${r.decisive.map(id=>escape(label(id))).join(' · ')}</p><p>Chacune de ces équipes a marqué le point de soutien décisif.</p>`:'<p>Aucun soutien décisif sur cette manche.</p>'}`:`<h2>Le territoire a parlé.</h2>${r.battles.map(b=>`<div class="battle"><b>${escape(b.target)}</b><p>${b.after!==b.before?escape(label(b.after))+' prend le contrôle.':'Le contrôle reste inchangé.'}</p></div>`).join('')}<p>Conseil ${r.council??': aucun choix adopté'} · Stabilité ${r.stability}/6.</p><h3>Prestige territorial de cette manche</h3>${Object.entries(r.territorial).map(([id,points])=>`<p>${escape(label(id))} : +${points}</p>`).join('')}`;
+ return `<section class="panel report reveal-report"><p class="eyebrow">RELECTURE M${round} · ${escape(REVEAL_STEPS[step])} · ${step+1}/4</p>${body}<p class="muted">Le classement général à droite reste celui de la partie actuelle.</p></section>`;
+}
+export function accessCards(cards,edition,title,code,escape){
+ if(!cards.length)return '';
+ return `<div class="print-heading"><h2>${escape(title)}</h2><p>${escape(code)} · Six accès privés d’équipe</p></div><div class="access-cards-grid">${cards.map(card=>`<article class="access-card"><p class="eyebrow">LE PACTE · ÉQUIPE ${card.number}</p><h3>${escape(edition.factionLabels[card.team])}</h3><div class="card-qr">${card.svg}</div><p><b>${escape(code)}</b> · ${escape(title)}</p><small>Scannez pour rejoindre votre équipe.<br>Accès privé : ne pas projeter ni partager avec une autre équipe.</small></article>`).join('')}</div>`;
+}
