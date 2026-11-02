@@ -24,3 +24,7 @@ Shapely sert seulement à la régénération et à l’audit ; aucune dépendanc
 ## Vérifications ciblées
 
 27 tests réussis : rendu UI, transport HTTP et renderer Far West. Deux contrôles spécifiques vérifient les frontières partagées à partir des segments du fichier livré et la position de chaque repère dans sa région. L’audit Shapely indépendant confirme aussi l’absence de chevauchements et de trous. Syntaxe des modules et diff vérifiés.
+
+## Bâtiments — 2 novembre 2026
+
+Les neuf repères bâtis (six forts, dépôt, mine, Conseil) utilisent des miniatures SVG originales avec faces ombrées, matériaux bois/pierre, petites fenêtres et détails propres à leur fonction. Les forts portent palissades, tours et fanion ; le dépôt, des caisses ; la mine, un chevalement et un wagonnet ; la maison du Conseil, un porche et un petit clocheton. Les bâtiments ont été agrandis et les codes/médaillons décalés pour dégager leurs silhouettes. Les noms et les contours gardent leur fonction de lecture du jeu. Aucun nouveau bitmap ni dépendance n’est ajouté. Onze tests ciblés de rendu UI et de géométrie réussissent après ce changement.
