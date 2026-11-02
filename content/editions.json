@@ -1,0 +1,583 @@
+{
+  "_notice": "Propositions de contenus narratifs, non validées en production. Images et ressources finales à réaliser et vérifier. Formules toujours dans le moteur V1.1.",
+  "schemaVersion": "1.0",
+  "rulesetId": "pacte-neutral-1.1",
+  "mapId": "pacte-map-33-v1",
+  "editions": [
+    {
+      "themeId": "western",
+      "rulesetId": "pacte-neutral-1.1",
+      "mapId": "pacte-map-33-v1",
+      "editionVersion": "0.1.0-example",
+      "publicationStatus": "DRAFT_EXAMPLE_NOT_READY_FOR_PRODUCTION",
+      "title": "Le Pacte — Les territoires de la frontière",
+      "pitch": "Six puissances veulent façonner un territoire en pleine transformation.",
+      "resourceLabels": {
+        "means": "Approvisionnements",
+        "influence": "Réputation",
+        "stability": "Ordre territorial",
+        "prestige": "Renommée",
+        "council": "Assemblée du territoire"
+      },
+      "factionLabels": {
+        "force": "La Milice",
+        "commerce": "Les Négociants",
+        "pouvoir": "Le Gouvernorat",
+        "diplomatie": "Les Notables",
+        "industrie": "La Compagnie minière",
+        "renseignement": "Les Éclaireurs"
+      },
+      "factionColors": {
+        "force": "#983c32",
+        "commerce": "#ad792b",
+        "pouvoir": "#5d648d",
+        "diplomatie": "#318079",
+        "industrie": "#607e90",
+        "renseignement": "#755f76"
+      },
+      "territoryLabels": {
+        "C1": "Fort des Collines",
+        "C2": "Camp de la Rivière",
+        "C3": "Bastion Rouge",
+        "C4": "Fort du Désert",
+        "C5": "Poste de la Frontière",
+        "C6": "Fort des Pins",
+        "P1": "Vallée des Colons",
+        "P2": "Plaine des Bisons",
+        "P3": "Plateau Rocheux",
+        "P4": "Terres Brûlées",
+        "P5": "Bassin des Éleveurs",
+        "P6": "Forêt des Pionniers",
+        "N1": "Ruisseau Clair",
+        "N2": "Prairie Haute",
+        "N3": "Gorge du Vent",
+        "N4": "Crique Sèche",
+        "N5": "Champ de Poussière",
+        "N6": "Bois de l’Aube",
+        "M1": "Chemin des Mineurs",
+        "M2": "Col des Chariots",
+        "M3": "Bassin des Sources",
+        "M4": "Défilé du Coyote",
+        "M5": "Marais Salés",
+        "M6": "Passe du Nord",
+        "F1": "Piste de l’Est",
+        "F2": "Piste du Canyon",
+        "F3": "Piste des Mules",
+        "F4": "Piste des Pionniers",
+        "F5": "Piste du Sud",
+        "F6": "Piste du Fleuve",
+        "S1": "Grand Dépôt",
+        "S2": "Mine Centrale",
+        "S3": "Maison du Conseil"
+      },
+      "councils": [
+        {
+          "round": 1,
+          "title": "La sécurité des convois",
+          "optionAEffectId": "M1_LOGISTICS",
+          "optionBEffectId": "M1_LOCAL_DEFENSE"
+        },
+        {
+          "round": 2,
+          "title": "L’ouverture des pistes",
+          "optionAEffectId": "M2_NEUTRAL_EXPANSION",
+          "optionBEffectId": "M2_SITE_DEFENSE"
+        },
+        {
+          "round": 3,
+          "title": "Les réserves communes",
+          "optionAEffectId": "M3_SUPPORT_BOOST",
+          "optionBEffectId": "M3_RESERVE"
+        },
+        {
+          "round": 4,
+          "title": "La lutte pour les dépôts",
+          "optionAEffectId": "M4_SITE_OFFENSE",
+          "optionBEffectId": "M4_SITE_FORTRESS"
+        },
+        {
+          "round": 5,
+          "title": "Le dernier conseil",
+          "optionAEffectId": "M5_REPAIR",
+          "optionBEffectId": "M5_MOBILIZATION"
+        }
+      ],
+      "secretObjectiveText": {
+        "O1": "Contrôler au moins un site stratégique S à la fin de M5",
+        "O2": "Contrôler au moins trois provinces de valeur P, N ou M à la fin de M5",
+        "O3": "Contrôler au moins deux passages F à la fin de M5",
+        "O4": "Avoir apporté au moins deux soutiens décisifs pendant M1 à M5",
+        "O5": "Avoir participé à trois Conseils gagnants en dépensant au moins une Influence à chaque vote",
+        "O6": "Avoir conquis au moins trois zones contrôlées par un adversaire au début de leur manche"
+      },
+      "assets": {
+        "mapVector": "TO_CREATE",
+        "backgroundIllustration": "TO_CREATE",
+        "logo": "TO_CREATE",
+        "introBackground": "TO_CREATE",
+        "endBackground": "TO_CREATE",
+        "audioOptional": "TO_CREATE"
+      }
+    },
+    {
+      "themeId": "mafia",
+      "rulesetId": "pacte-neutral-1.1",
+      "mapId": "pacte-map-33-v1",
+      "editionVersion": "0.1.0-example",
+      "publicationStatus": "DRAFT_EXAMPLE_NOT_READY_FOR_PRODUCTION",
+      "title": "Le Pacte — La cité des familles",
+      "pitch": "Dans une ville fictive, six organisations négocient et se disputent les lieux de pouvoir.",
+      "resourceLabels": {
+        "means": "Liquidités",
+        "influence": "Relations",
+        "stability": "Paix des quartiers",
+        "prestige": "Ascendant",
+        "council": "Commission des familles"
+      },
+      "factionLabels": {
+        "force": "Les Hommes de main",
+        "commerce": "Les Contrebandiers",
+        "pouvoir": "Le Directoire",
+        "diplomatie": "Les Intermédiaires",
+        "industrie": "Les Distilleries",
+        "renseignement": "Les Informateurs"
+      },
+      "factionColors": {
+        "force": "#8c4643",
+        "commerce": "#96753d",
+        "pouvoir": "#59698a",
+        "diplomatie": "#40756e",
+        "industrie": "#6b6783",
+        "renseignement": "#58626e"
+      },
+      "territoryLabels": {
+        "C1": "Quartier des Docks",
+        "C2": "Quartier des Lanternes",
+        "C3": "Quartier du Canal",
+        "C4": "Quartier des Théâtres",
+        "C5": "Quartier des Ateliers",
+        "C6": "Quartier de la Gare",
+        "P1": "Rue des Entrepôts",
+        "P2": "Avenue du Bal",
+        "P3": "Place des Taxis",
+        "P4": "Boulevard des Salles",
+        "P5": "Rue de la Fonderie",
+        "P6": "Avenue des Terminaux",
+        "N1": "Cour du Commerce",
+        "N2": "Marché des Halles",
+        "N3": "Allée des Moulins",
+        "N4": "Pavillons du Parc",
+        "N5": "Impasse des Usines",
+        "N6": "Place des Voyageurs",
+        "M1": "Marché Couvert",
+        "M2": "Hôtel du Canal",
+        "M3": "Atelier des Affaires",
+        "M4": "Dépôt Municipal",
+        "M5": "Salon du Centre",
+        "M6": "Bureau des Comptes",
+        "F1": "Passage du Tunnel",
+        "F2": "Pont des Brumes",
+        "F3": "Rue du Métro",
+        "F4": "Bretelle des Docks",
+        "F5": "Tunnel du Sud",
+        "F6": "Passerelle de la Gare",
+        "S1": "Port Franc",
+        "S2": "Banque Centrale",
+        "S3": "Hôtel de Ville"
+      },
+      "councils": [
+        {
+          "round": 1,
+          "title": "La protection des circuits",
+          "optionAEffectId": "M1_LOGISTICS",
+          "optionBEffectId": "M1_LOCAL_DEFENSE"
+        },
+        {
+          "round": 2,
+          "title": "Les rues et les entrepôts",
+          "optionAEffectId": "M2_NEUTRAL_EXPANSION",
+          "optionBEffectId": "M2_SITE_DEFENSE"
+        },
+        {
+          "round": 3,
+          "title": "Les réserves de la cité",
+          "optionAEffectId": "M3_SUPPORT_BOOST",
+          "optionBEffectId": "M3_RESERVE"
+        },
+        {
+          "round": 4,
+          "title": "Les positions du centre",
+          "optionAEffectId": "M4_SITE_OFFENSE",
+          "optionBEffectId": "M4_SITE_FORTRESS"
+        },
+        {
+          "round": 5,
+          "title": "La commission finale",
+          "optionAEffectId": "M5_REPAIR",
+          "optionBEffectId": "M5_MOBILIZATION"
+        }
+      ],
+      "secretObjectiveText": {
+        "O1": "Contrôler au moins un site stratégique S à la fin de M5",
+        "O2": "Contrôler au moins trois provinces de valeur P, N ou M à la fin de M5",
+        "O3": "Contrôler au moins deux passages F à la fin de M5",
+        "O4": "Avoir apporté au moins deux soutiens décisifs pendant M1 à M5",
+        "O5": "Avoir participé à trois Conseils gagnants en dépensant au moins une Influence à chaque vote",
+        "O6": "Avoir conquis au moins trois zones contrôlées par un adversaire au début de leur manche"
+      },
+      "assets": {
+        "mapVector": "TO_CREATE",
+        "backgroundIllustration": "TO_CREATE",
+        "logo": "TO_CREATE",
+        "introBackground": "TO_CREATE",
+        "endBackground": "TO_CREATE",
+        "audioOptional": "TO_CREATE"
+      }
+    },
+    {
+      "themeId": "corporate",
+      "rulesetId": "pacte-neutral-1.1",
+      "mapId": "pacte-map-33-v1",
+      "editionVersion": "0.1.0-example",
+      "publicationStatus": "DRAFT_EXAMPLE_NOT_READY_FOR_PRODUCTION",
+      "title": "Le Pacte — Consortium",
+      "pitch": "Six puissances économiques rivalisent pour les actifs stratégiques d’un marché instable.",
+      "resourceLabels": {
+        "means": "Budget",
+        "influence": "Influence",
+        "stability": "Confiance du marché",
+        "prestige": "Réussite",
+        "council": "Conseil stratégique"
+      },
+      "factionLabels": {
+        "force": "Les Opérations",
+        "commerce": "Le Commerce",
+        "pouvoir": "Le Conseil de direction",
+        "diplomatie": "Les Relations stratégiques",
+        "industrie": "Le Pôle industriel",
+        "renseignement": "La Veille stratégique"
+      },
+      "factionColors": {
+        "force": "#bf5851",
+        "commerce": "#a78043",
+        "pouvoir": "#6a60a5",
+        "diplomatie": "#33898d",
+        "industrie": "#4b7aa8",
+        "renseignement": "#556579"
+      },
+      "territoryLabels": {
+        "C1": "Siège Nord",
+        "C2": "Siège Est",
+        "C3": "Siège Sud-Est",
+        "C4": "Siège Sud",
+        "C5": "Siège Ouest",
+        "C6": "Siège Nord-Ouest",
+        "P1": "Agence du Plateau",
+        "P2": "Agence des Rives",
+        "P3": "Bureau Technologique",
+        "P4": "Campus Commercial",
+        "P5": "Parc des Services",
+        "P6": "Centre des Partenaires",
+        "N1": "Atelier Prototype",
+        "N2": "Agence Locale",
+        "N3": "Plateforme Clients",
+        "N4": "Bureau des Contrats",
+        "N5": "Pôle Formation",
+        "N6": "Centre d’Essais",
+        "M1": "Plateforme Régionale",
+        "M2": "Centre de Distribution",
+        "M3": "Campus d’Innovation",
+        "M4": "Bourse des Ressources",
+        "M5": "Hub des Opérations",
+        "M6": "Centre de Gestion",
+        "F1": "Corridor Nord",
+        "F2": "Passage Interzone",
+        "F3": "Liaison Orientale",
+        "F4": "Accès Métropolitain",
+        "F5": "Réseau Sud",
+        "F6": "Couloir Transversal",
+        "S1": "Hub Logistique",
+        "S2": "Centre de Données",
+        "S3": "Conseil Central"
+      },
+      "councils": [
+        {
+          "round": 1,
+          "title": "Budget ou protection des actifs",
+          "optionAEffectId": "M1_LOGISTICS",
+          "optionBEffectId": "M1_LOCAL_DEFENSE"
+        },
+        {
+          "round": 2,
+          "title": "Ouverture du marché",
+          "optionAEffectId": "M2_NEUTRAL_EXPANSION",
+          "optionBEffectId": "M2_SITE_DEFENSE"
+        },
+        {
+          "round": 3,
+          "title": "Partenariats et réserves",
+          "optionAEffectId": "M3_SUPPORT_BOOST",
+          "optionBEffectId": "M3_RESERVE"
+        },
+        {
+          "round": 4,
+          "title": "Contrôle des centres clés",
+          "optionAEffectId": "M4_SITE_OFFENSE",
+          "optionBEffectId": "M4_SITE_FORTRESS"
+        },
+        {
+          "round": 5,
+          "title": "Décision de clôture",
+          "optionAEffectId": "M5_REPAIR",
+          "optionBEffectId": "M5_MOBILIZATION"
+        }
+      ],
+      "secretObjectiveText": {
+        "O1": "Contrôler au moins un site stratégique S à la fin de M5",
+        "O2": "Contrôler au moins trois provinces de valeur P, N ou M à la fin de M5",
+        "O3": "Contrôler au moins deux passages F à la fin de M5",
+        "O4": "Avoir apporté au moins deux soutiens décisifs pendant M1 à M5",
+        "O5": "Avoir participé à trois Conseils gagnants en dépensant au moins une Influence à chaque vote",
+        "O6": "Avoir conquis au moins trois zones contrôlées par un adversaire au début de leur manche"
+      },
+      "assets": {
+        "mapVector": "TO_CREATE",
+        "backgroundIllustration": "TO_CREATE",
+        "logo": "TO_CREATE",
+        "introBackground": "TO_CREATE",
+        "endBackground": "TO_CREATE",
+        "audioOptional": "TO_CREATE"
+      }
+    },
+    {
+      "themeId": "medieval",
+      "rulesetId": "pacte-neutral-1.1",
+      "mapId": "pacte-map-33-v1",
+      "editionVersion": "0.1.0-example",
+      "publicationStatus": "DRAFT_EXAMPLE_NOT_READY_FOR_PRODUCTION",
+      "title": "Le Pacte — La couronne disputée",
+      "pitch": "Six maisons et corps du royaume se disputent les terres, les routes et les lois.",
+      "resourceLabels": {
+        "means": "Écus",
+        "influence": "Autorité",
+        "stability": "Paix du royaume",
+        "prestige": "Gloire",
+        "council": "Conseil du royaume"
+      },
+      "factionLabels": {
+        "force": "La Garde",
+        "commerce": "La Guilde marchande",
+        "pouvoir": "La Cour",
+        "diplomatie": "Les Émissaires",
+        "industrie": "Les Artisans",
+        "renseignement": "Les Espions"
+      },
+      "factionColors": {
+        "force": "#9f443a",
+        "commerce": "#b2873d",
+        "pouvoir": "#685d8f",
+        "diplomatie": "#46806d",
+        "industrie": "#667b91",
+        "renseignement": "#786774"
+      },
+      "territoryLabels": {
+        "C1": "Bastion de l’Aube",
+        "C2": "Donjon des Saules",
+        "C3": "Château des Roches",
+        "C4": "Tour des Brumes",
+        "C5": "Fort des Moissons",
+        "C6": "Citadelle du Nord",
+        "P1": "Vallée des Vergers",
+        "P2": "Comté des Rivières",
+        "P3": "Marches des Pierres",
+        "P4": "Plaines des Moissons",
+        "P5": "Terres du Bois",
+        "P6": "Seigneurie des Sources",
+        "N1": "Village de l’Étang",
+        "N2": "Moulin des Vents",
+        "N3": "Hameau de la Crête",
+        "N4": "Ferme du Levant",
+        "N5": "Bois des Chênes",
+        "N6": "Prairie du Gué",
+        "M1": "Route des Pèlerins",
+        "M2": "Pont des Marchands",
+        "M3": "Marché des Tisserands",
+        "M4": "Passage des Monts",
+        "M5": "Col des Forgerons",
+        "M6": "Clairière des Scribes",
+        "F1": "Gué des Deux Rives",
+        "F2": "Pont du Roi",
+        "F3": "Route de l’Ancien Fort",
+        "F4": "Porte des Champs",
+        "F5": "Passage du Sud",
+        "F6": "Route des Remparts",
+        "S1": "La Citadelle",
+        "S2": "Grand Marché",
+        "S3": "Abbaye du Conseil"
+      },
+      "councils": [
+        {
+          "round": 1,
+          "title": "Le trésor et les murailles",
+          "optionAEffectId": "M1_LOGISTICS",
+          "optionBEffectId": "M1_LOCAL_DEFENSE"
+        },
+        {
+          "round": 2,
+          "title": "L’accès aux marches",
+          "optionAEffectId": "M2_NEUTRAL_EXPANSION",
+          "optionBEffectId": "M2_SITE_DEFENSE"
+        },
+        {
+          "round": 3,
+          "title": "Les alliances du royaume",
+          "optionAEffectId": "M3_SUPPORT_BOOST",
+          "optionBEffectId": "M3_RESERVE"
+        },
+        {
+          "round": 4,
+          "title": "Le siège des lieux forts",
+          "optionAEffectId": "M4_SITE_OFFENSE",
+          "optionBEffectId": "M4_SITE_FORTRESS"
+        },
+        {
+          "round": 5,
+          "title": "Le grand arbitrage",
+          "optionAEffectId": "M5_REPAIR",
+          "optionBEffectId": "M5_MOBILIZATION"
+        }
+      ],
+      "secretObjectiveText": {
+        "O1": "Contrôler au moins un site stratégique S à la fin de M5",
+        "O2": "Contrôler au moins trois provinces de valeur P, N ou M à la fin de M5",
+        "O3": "Contrôler au moins deux passages F à la fin de M5",
+        "O4": "Avoir apporté au moins deux soutiens décisifs pendant M1 à M5",
+        "O5": "Avoir participé à trois Conseils gagnants en dépensant au moins une Influence à chaque vote",
+        "O6": "Avoir conquis au moins trois zones contrôlées par un adversaire au début de leur manche"
+      },
+      "assets": {
+        "mapVector": "TO_CREATE",
+        "backgroundIllustration": "TO_CREATE",
+        "logo": "TO_CREATE",
+        "introBackground": "TO_CREATE",
+        "endBackground": "TO_CREATE",
+        "audioOptional": "TO_CREATE"
+      }
+    },
+    {
+      "themeId": "futuriste",
+      "rulesetId": "pacte-neutral-1.1",
+      "mapId": "pacte-map-33-v1",
+      "editionVersion": "0.1.0-example",
+      "publicationStatus": "DRAFT_EXAMPLE_NOT_READY_FOR_PRODUCTION",
+      "title": "Le Pacte — Les mondes divisés",
+      "pitch": "Six puissances se disputent un réseau d’installations pendant une crise systémique.",
+      "resourceLabels": {
+        "means": "Crédits",
+        "influence": "Influence",
+        "stability": "Équilibre du système",
+        "prestige": "Prestige",
+        "council": "Sénat sectoriel"
+      },
+      "factionLabels": {
+        "force": "La Flotte",
+        "commerce": "La Ligue marchande",
+        "pouvoir": "Le Directoire stellaire",
+        "diplomatie": "Le Corps diplomatique",
+        "industrie": "Les Constructeurs",
+        "renseignement": "Les Renseignements"
+      },
+      "factionColors": {
+        "force": "#a54965",
+        "commerce": "#ac8542",
+        "pouvoir": "#665cb5",
+        "diplomatie": "#2d9f94",
+        "industrie": "#497caf",
+        "renseignement": "#7187a0"
+      },
+      "territoryLabels": {
+        "C1": "Base Horizon",
+        "C2": "Base Aster",
+        "C3": "Base Kepler",
+        "C4": "Base Vega",
+        "C5": "Base Solstice",
+        "C6": "Base Polaris",
+        "P1": "Secteur Auroral",
+        "P2": "Secteur Delta",
+        "P3": "Secteur Orion",
+        "P4": "Secteur Nébuleuse",
+        "P5": "Secteur Titan",
+        "P6": "Secteur Zenith",
+        "N1": "Relais Alpha",
+        "N2": "Relais Sigma",
+        "N3": "Relais Gamma",
+        "N4": "Relais Lambda",
+        "N5": "Relais Epsilon",
+        "N6": "Relais Kappa",
+        "M1": "Ceinture de Transit",
+        "M2": "Portail Azur",
+        "M3": "Nœud Quantique",
+        "M4": "Station des Courants",
+        "M5": "Chantier Orbital",
+        "M6": "Noyau des Communications",
+        "F1": "Couloir Nord",
+        "F2": "Hypervoie Deux",
+        "F3": "Corridor des Anneaux",
+        "F4": "Transit Zéro",
+        "F5": "Saut Austral",
+        "F6": "Voie des Confins",
+        "S1": "Astroport",
+        "S2": "Réacteur Central",
+        "S3": "Station du Sénat"
+      },
+      "councils": [
+        {
+          "round": 1,
+          "title": "Ravitaillement des stations",
+          "optionAEffectId": "M1_LOGISTICS",
+          "optionBEffectId": "M1_LOCAL_DEFENSE"
+        },
+        {
+          "round": 2,
+          "title": "Ouverture des voies",
+          "optionAEffectId": "M2_NEUTRAL_EXPANSION",
+          "optionBEffectId": "M2_SITE_DEFENSE"
+        },
+        {
+          "round": 3,
+          "title": "Ressources interstellaires",
+          "optionAEffectId": "M3_SUPPORT_BOOST",
+          "optionBEffectId": "M3_RESERVE"
+        },
+        {
+          "round": 4,
+          "title": "Maîtrise du noyau",
+          "optionAEffectId": "M4_SITE_OFFENSE",
+          "optionBEffectId": "M4_SITE_FORTRESS"
+        },
+        {
+          "round": 5,
+          "title": "Réinitialisation du système",
+          "optionAEffectId": "M5_REPAIR",
+          "optionBEffectId": "M5_MOBILIZATION"
+        }
+      ],
+      "secretObjectiveText": {
+        "O1": "Contrôler au moins un site stratégique S à la fin de M5",
+        "O2": "Contrôler au moins trois provinces de valeur P, N ou M à la fin de M5",
+        "O3": "Contrôler au moins deux passages F à la fin de M5",
+        "O4": "Avoir apporté au moins deux soutiens décisifs pendant M1 à M5",
+        "O5": "Avoir participé à trois Conseils gagnants en dépensant au moins une Influence à chaque vote",
+        "O6": "Avoir conquis au moins trois zones contrôlées par un adversaire au début de leur manche"
+      },
+      "assets": {
+        "mapVector": "TO_CREATE",
+        "backgroundIllustration": "TO_CREATE",
+        "logo": "TO_CREATE",
+        "introBackground": "TO_CREATE",
+        "endBackground": "TO_CREATE",
+        "audioOptional": "TO_CREATE"
+      }
+    }
+  ]
+}
