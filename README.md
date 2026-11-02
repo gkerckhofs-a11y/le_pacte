@@ -1,8 +1,8 @@
-# Le Pacte — version locale 0.4.0
+# Le Pacte — version 0.5.0 — local et backend Firebase
 
 Jeu de stratégie et de diplomatie du Ludificateur : six équipes, 33 territoires, 60 connexions, cinq manches et un seul vainqueur. Développement fondé sur le règlement neutre V1.1 et le cahier des charges multivers V1.0 du 2 novembre 2026.
 
-Cette version ajoute **trois interfaces web reliées à un serveur local et à une base SQLite persistante**. Elle sert aux répétitions techniques. Le studio de contenus est disponible depuis la régie. Un projet Firebase dédié et une application web sont créés ; le backend distant, le déploiement et la validation humaine ne sont pas encore réalisés.
+Cette version ajoute **trois interfaces web reliées à un serveur local et à une base SQLite persistante**. Elle sert aux répétitions techniques. Le studio de contenus est disponible depuis la régie. Le backend Firestore/Firebase Auth est raccordé dans le code et testé dans l’Emulator Suite. La base distante existe en Belgique. Le fournisseur Google, le premier compte autorisé, la mise en ligne et la validation humaine restent à finaliser.
 
 ## Démarrage
 
@@ -69,11 +69,34 @@ La régie peut choisir une manche déjà résolue, puis afficher : décisions sc
 
 Ce sont des lectures des résultats existants : aucun combat, revenu, vote ou Prestige n’est recalculé. Les comptes, le chronomètre et les ordres restent inchangés. Le classement affiché reste le classement actuel. Les équipes gardent leur carte actuelle. Avancer une phase quitte la relecture ; une résolution normale affiche automatiquement son résultat.
 
-## Préparation Firebase
+## Backend Firebase — 0.5
 
 Projet dédié : `le-pacte-ludificateur` ; application web : `1:48298108779:web:da8e882a62c0c8852dce2e`. Le fichier `.firebaserc` cible ce projet ; `firebase/web-config.json` contient la configuration client fournie par Firebase, sans clé serveur, et n’est pas encore chargé par le frontend local.
 
-À la vérification du 2 novembre 2026, la liste des bases Firestore a renvoyé une erreur 403 indiquant que l’API Firestore n’avait pas été activée dans ce projet. Aucune base, région, règle d’accès, Function ou application hébergée n’a été déployée par cette tranche. Les autres projets n’ont pas été modifiés. Les étapes suivantes sont l’activation/configuration de la base après choix d’édition et de région, l’authentification, le stockage transactionnel distant, puis les tests et la validation du déploiement.
+La base nommée `le-pacte` a été créée dans `europe-west1` (Belgique), en édition Enterprise native, avec accès Firestore et mises à jour temps réel activés. MongoDB est désactivé. L’API Firestore est activée. Aucun document de jeu de test n’a été écrit dans cette base distante : tous les tests utilisent `demo-le-pacte` avec les émulateurs.
+
+Le transport HTTP accepte maintenant les deux adaptateurs : SQLite synchrone pour la répétition locale et Firestore asynchrone pour Firebase. Le cloud écrit les coûts, changements d’état, reçus et projections dans une transaction native. Les reçus d’idempotence et les événements vivent dans des sous-collections séparées pour ne pas faire grossir sans limite le document de session. Les lectures filtrées utilisent les Pipelines Enterprise ; le moteur calcule les règles côté serveur.
+
+Les projections publiques et celles des six équipes sont enregistrées séparément de l’état canonique. Les navigateurs passent exclusivement par l’API ; les règles Firestore proposées interdisent toute lecture ou écriture directe, même pour un utilisateur connecté. Ces règles sont un prototype, testé dans l’émulateur ; leur déploiement et leur revue de production restent à faire. Les appels Admin du backend contournent les règles et vérifient donc eux-mêmes l’identité, le propriétaire et la phase, avec une revérification transactionnelle des clés d’équipe.
+
+La régie cloud utilise Firebase Auth et des ID tokens vérifiés, compte vérifié et actif, avec les claims booléens `pacteOrganizer` et `pacteEditor`. Les rôles sont distincts. Une connexion Google seule n’accorde aucun rôle ; le code client ne peut pas attribuer de droits. La clé de régie du serveur local est désactivée en mode cloud. Les sessions et les contenus sont isolés par propriétaire. Aucune attribution de rôle à un compte réel n’a été effectuée.
+
+Le build prépare une API HTTPS `api`, une fonction planifiée `tick` et le frontend Hosting. Le frontend cloud propose la connexion Google avec le SDK, renouvelant ses ID tokens avant les requêtes. L’activation effective du fournisseur Google et l’attribution du premier rôle sont encore nécessaires. Le clic de connexion avec un compte réel n’est pas validé dans cette tranche.
+
+```sh
+npm run build:firebase
+node scripts/verify-cloud-build.mjs
+```
+
+Les fonctions sont compilées pour Node 22 ; la répétition locale et les tests des sources utilisent Node 24. Les émulateurs Firestore/Auth nécessitent Java 21. Ils refusent les tests cloud si les variables d’émulation ne sont pas présentes. Pour les lancer :
+
+```sh
+npm run test:cloud
+```
+
+Cette commande force le projet de démonstration `demo-le-pacte`, indépendamment de `.firebaserc`. Le scheduler est testé par son service de données ; la lecture d’une session rattrape également les échéances échues selon l’heure du serveur. Le test du point d’entrée Functions est lancé séparément dans la CI, sous Node 22, après compilation. L’environnement de préparation bloque les sockets Unix utilisés par ce lanceur Functions ; les tests du transport HTTP et du stockage passent localement.
+
+Aucun déploiement de Functions, Hosting, règles ou index n’a été effectué dans le projet distant. `firebase.json`, les règles et les index sont préparés et doivent être revus avec le propriétaire avant la mise en ligne. Le SQLite existant n’est pas migré automatiquement ; une session locale et une session cloud sont distinctes.
 
 ## Sauvegarde et autorité
 
@@ -92,10 +115,11 @@ npm test
 npm run test:integration
 npm run test:studio
 npm run test:animation
+npm run test:cloud
 npm run demo
 ```
 
-`npm test` exécute les 89 tests de règles, de session, d'intégration HTTP/SQLite et de génération des écrans. La commande ciblée `test:integration` exécute seulement les 15 tests HTTP et persistance. `test:studio` couvre 15 cas de contenus, versions, HTTP et génération du studio. `test:animation` cible les 11 tests QR/relecture et les 6 tests de génération des écrans. Les tests d'interface utilisent une frontière DOM minimale : ils vérifient le HTML généré et l'échappement des textes, **pas le rendu visuel ni des interactions navigateur réelles**.
+`npm test` exécute les 90 tests locaux de règles, de session, d'intégration HTTP/SQLite et de génération des écrans. La commande ciblée `test:integration` exécute seulement les 15 tests HTTP et persistance. `test:studio` couvre 15 cas de contenus, versions, HTTP et génération du studio. `test:animation` cible les 11 tests QR/relecture et les 6 tests de génération des écrans. Les 17 tests cloud supplémentaires tournent uniquement dans les émulateurs Firestore Enterprise/Auth. Ils vérifient transactions, isolation des propriétaires, idempotence, révocation en cours de requête, versions et règles fermées. Les tests d'interface utilisent une frontière DOM minimale : ils vérifient le HTML généré et l'échappement des textes, **pas le rendu visuel ni des interactions navigateur réelles**.
 
 Le navigateur disponible dans l'environnement de préparation n'a pas pu joindre le serveur local. La QA visuelle, le clavier dans un navigateur réel, les résolutions 360 px/1080p/4K, les téléphones et le réseau en salle restent à vérifier. Aucun résultat de test humain ni conformité commerciale n'est revendiqué.
 
@@ -109,6 +133,8 @@ Node exécute les sources TypeScript par effacement des annotations. Le contrôl
 | `server/store.ts` | Transactions, sessions, accès et scheduler |
 | `server/http.ts` | Autorisations, API et fichiers web autorisés |
 | `server/studio.ts` | Brouillons, révisions, publications et versions immuables |
+| `cloud/` | Stockage Firestore, studio transactionnel, vérification Auth et entrées Functions |
+| `client/auth.ts` | Connexion Google et cycle des ID tokens du navigateur |
 | `server/qr.ts` | Génération locale des QR SVG et validation de leur origine |
 | `src/replay.ts` | Cartes historiques dérivées des résultats archivés |
 | `server/start.mjs` | Démarrage local et arrêt propre |
@@ -117,11 +143,11 @@ Node exécute les sources TypeScript par effacement des annotations. Le contrôl
 | `test/` | Tests de règles, session, HTTP, persistance et génération HTML |
 | `docs/` | Cahier des charges et état du développement |
 
-Le frontend est en JavaScript natif, sans étape de compilation ni CDN. Le runtime utilise `qrcode-generator` pour les QR ; `jsqr` est uniquement une dépendance de test. Le verrouillage est dans `package-lock.json`. Le cahier recommande React/TypeScript sans l'imposer ; ce choix permet de vérifier cette tranche locale sans installer de dépendances. Le moteur reste en TypeScript, indépendant du frontend et du stockage.
+Le frontend est en JavaScript natif, sans étape de compilation ni CDN. Les SDK Firebase, l’encodeur QR et les outils de build/test sont verrouillés dans les manifests. Le frontend Auth est compilé localement, sans CDN ; `jsqr` reste uniquement un lecteur de test. Le verrouillage est dans `package-lock.json`. Le cahier recommande React/TypeScript sans l'imposer ; ce choix permet de vérifier cette tranche locale sans installer de dépendances. Le moteur reste en TypeScript, indépendant du frontend et du stockage.
 
 ## Prochaines étapes
 
-1. Configurer la base et raccorder Auth, stockage transactionnel et projections privées/publiques au projet Firebase dédié, avec tests Emulator Suite. Le serveur de jeu reste local pour le moment.
+1. Revoir la configuration préparée, activer le fournisseur Google et le premier compte autorisé, puis valider et effectuer le premier déploiement Firebase. Aucun déploiement n’a encore eu lieu.
 2. Compléter les cinq univers avec leurs textes éditoriaux définitifs, illustrations et sons originaux ; ajouter la gestion des médias, des droits, des contrastes et les rôles distincts du studio. Les exemples JSON fournis ne sont pas publiés automatiquement.
 3. Tour d’initiation jouable, corrections d’arbitrage motivées, enrichissement des séquences de révélation et amélioration des bilans.
 4. Validation visuelle et multiappareils, tests en salle avec six équipes, puis décision de déploiement.

@@ -8,7 +8,7 @@ import {replayView} from './replay.ts';
 import type {RevealControl} from './replay.ts';
 import {editionSnapshot} from './editions.ts';
 export type Phase = 'DRAFT'|'LOBBY'|'BRIEFING'|'TUTORIAL'|'RESET'|'SITUATION'|'DIPLOMACY'|'ORDERS'|'COUNCIL'|'RESOLVE'|'SUMMIT'|'RESULTS'|'ARCHIVED';
-export type Actor = {role:'organizer';id:string}|{role:'team';team:TeamId};
+export type Actor = {role:'organizer';id:string;editor?:boolean}|{role:'team';team:TeamId;accessHash?:string};
 export type Session = {reveal?:RevealControl;id:string;organizerId:string;edition:any;game:State;phase:Phase;deadline:number|null;pausedRemaining:number|null;revision:number;receipts:Record<string,{actor:string;payload:string}>;offers:Record<string,Trade>;allianceOffers:Record<string,{from:TeamId;to:TeamId}>;summitVotes:Partial<Record<TeamId,{candidate:TeamId;spend:number}>>;ranking:TeamId[];audit:{revision:number;actor:string;kind:string;at:number}[]};
 export type Command = {id:string;sessionId:string;expectedPhase:Phase;expectedRound:number;kind:string;data:any};
 const minutes:Partial<Record<Phase,number>>={BRIEFING:15,TUTORIAL:10,SITUATION:2,DIPLOMACY:8,ORDERS:4,COUNCIL:3,RESOLVE:3,SUMMIT:10,RESULTS:15};

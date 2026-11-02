@@ -1,0 +1,79 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "pacteSessions",
+      "queryScope": "COLLECTION",
+      "density": "DENSE",
+      "apiScope": "ANY_API",
+      "fields": [
+        {
+          "fieldPath": "ownerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "updated",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "pacteDrafts",
+      "queryScope": "COLLECTION",
+      "density": "DENSE",
+      "apiScope": "ANY_API",
+      "fields": [
+        {
+          "fieldPath": "ownerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "updated",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "pacteReleases",
+      "queryScope": "COLLECTION",
+      "density": "DENSE",
+      "apiScope": "ANY_API",
+      "fields": [
+        {
+          "fieldPath": "ownerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "created",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "pacteSessions",
+      "fieldPath": "json",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "pactePublic",
+      "fieldPath": "json",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "views",
+      "fieldPath": "json",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "pacteDrafts",
+      "fieldPath": "json",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "pacteReleases",
+      "fieldPath": "json",
+      "indexes": []
+    }
+  ]
+}

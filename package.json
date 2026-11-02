@@ -1,6 +1,6 @@
 {
   "name": "le-pacte",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -12,12 +12,20 @@
     "start": "node server/start.mjs",
     "test:integration": "node --test test/http.test.mjs",
     "test:studio": "node --test test/studio.test.mjs test/studio-ui.test.mjs",
-    "test:animation": "node --test test/animation.test.mjs test/ui.test.mjs"
+    "test:animation": "node --test test/animation.test.mjs test/ui.test.mjs",
+    "build:firebase": "node scripts/build-firebase.mjs",
+    "test:cloud": "npx -y firebase-tools@latest emulators:exec --project demo-le-pacte --only firestore,auth \"node --test test/cloud/*.test.mjs\""
   },
   "dependencies": {
-    "qrcode-generator": "2.0.4"
+    "qrcode-generator": "2.0.4",
+    "firebase-admin": "14.5.0",
+    "firebase-functions": "7.4.0",
+    "@google-cloud/firestore": "9.4.0",
+    "firebase": "13.1.0"
   },
   "devDependencies": {
-    "jsqr": "1.4.0"
+    "jsqr": "1.4.0",
+    "esbuild": "0.28.2",
+    "@firebase/rules-unit-testing": "6.0.0"
   }
 }

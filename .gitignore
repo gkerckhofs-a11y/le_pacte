@@ -9,3 +9,6 @@ coverage/
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm
+functions/lib/
+functions/node_modules/
+.firebase/

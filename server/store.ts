@@ -1,16 +1,14 @@
 import {DatabaseSync} from 'node:sqlite';
-import {randomBytes,randomInt,createHash} from 'node:crypto';
-import {readFileSync} from 'node:fs';
+import {randomBytes} from 'node:crypto';
 import {createSession,applyCommand,sessionView} from '../src/session.ts';
 import type {Session,Actor,Command} from '../src/session.ts';
-import {ARCHETYPES,EDGES,NEIGHBORS,ZONES} from '../src/map.ts';
+import {ARCHETYPES} from '../src/map.ts';
 import type {TeamId} from '../src/map.ts';
 import {validateOrders} from '../src/engine.ts';
 import {EditionStudio} from './studio.ts';
-export const catalog=JSON.parse(readFileSync(new URL('../content/editions.json',import.meta.url),'utf8')).editions;
-export const map={zones:ZONES,edges:EDGES,neighbors:NEIGHBORS,archetypes:ARCHETYPES};
-export const tokenHash=(token:string)=>createHash('sha256').update(token).digest('hex');
-function shuffle<T>(items:T[]):T[]{const out=[...items];for(let i=out.length-1;i>0;i--){const j=randomInt(i+1);[out[i],out[j]]=[out[j],out[i]];}return out;}
+import {catalog,map} from './catalog.ts';
+import {tokenHash,shuffle} from './security.ts';
+export {catalog,map,tokenHash};
 const check=(b:unknown,m:string)=>{if(!b)throw new Error(m);};
 export class GameStore {
  db:DatabaseSync;
@@ -47,9 +45,9 @@ export class GameStore {
  rotate(id:string,team:TeamId,now:number){return this.transaction(()=>{this.get(id);return this.rotateInternal(id,team,now);});}
  authenticateTeam(id:string,token:string,now:number,markSeen=true):Actor {
   const row=this.db.prepare('SELECT team FROM team_access WHERE session_id=? AND hash=? AND expires>?').get(id,tokenHash(token),now) as {team:TeamId}|undefined;
-  check(row,'Accès invalide, expiré ou révoqué');if(markSeen)this.db.prepare('UPDATE team_access SET last_seen=? WHERE session_id=? AND team=?').run(now,id,row!.team);return{role:'team',team:row!.team};
+  check(row,'Accès invalide, expiré ou révoqué');if(markSeen)this.db.prepare('UPDATE team_access SET last_seen=? WHERE session_id=? AND team=?').run(now,id,row!.team);return{role:'team',team:row!.team,accessHash:tokenHash(token)};
  }
- command(id:string,actor:Actor,c:Command,now:number){return this.transaction(()=>{const s=this.get(id);const next=applyCommand(s,actor,c,now);this.save(next);return this.viewState(next,actor,now);});}
+ command(id:string,actor:Actor,c:Command,now:number){return this.transaction(()=>{const s=this.get(id);if(actor.role==='team'&&actor.accessHash){const access:any=this.db.prepare('SELECT hash,expires FROM team_access WHERE session_id=? AND team=?').get(id,actor.team);check(access&&access.hash===actor.accessHash&&access.expires>now,'Accès invalide, expiré ou révoqué');}const next=applyCommand(s,actor,c,now);this.save(next);return this.viewState(next,actor,now);});}
  validate(id:string,actor:Actor,orders:any,now:number){const s=this.get(id);check(actor.role==='team'&&s.phase==='ORDERS'&&s.pausedRemaining===null&&s.deadline!==null&&now<s.deadline,'Ordres fermés');check(!s.game.orders[(actor as any).team],'Ordres déjà verrouillés');return{cost:validateOrders(s.game,(actor as any).team,orders)};}
  viewState(s:Session,actor:Actor|{role:'public'},now:number){
   const row=this.db.prepare('SELECT code,title FROM sessions WHERE id=?').get(s.id) as {code:string;title:string};
