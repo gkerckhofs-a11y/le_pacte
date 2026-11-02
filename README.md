@@ -71,7 +71,7 @@ Ce sont des lectures des résultats existants : aucun combat, revenu, vote ou Pr
 
 ## Carte Far West — première proposition visuelle
 
-[Aperçu de la frontière, sans connexion](https://le-pacte-ludificateur.web.app/far-west.html). La carte Far West utilise un décor illustré, des repères SVG, les noms des lieux et des médaillons d’équipe numérotés. Elle s’applique aux vues Far West du jeu ; les autres univers gardent leur présentation existante. Les 33 lieux et les 60 connexions proviennent toujours du moteur. Sélectionner un lieu affiche sa fiche et souligne les pistes correspondantes. Zoom et défilement sont disponibles. [Réalisation, asset et prompt](docs/far-west-visuels-v1.md).
+[Aperçu de la frontière, sans connexion](https://le-pacte-ludificateur.web.app/far-west.html). La carte Far West utilise un décor illustré et 33 territoires jointifs aux frontières irrégulières, teintés selon leur propriétaire, avec noms et médaillons numérotés. Elle s’applique aux vues Far West du jeu ; les autres univers gardent leur présentation existante. Les 33 lieux et les 60 connexions proviennent toujours du moteur. Sélectionner un territoire affiche sa fiche et signale ses voisins. Les frontières communes correspondent exactement aux 60 connexions du moteur ; un contact par un point ne suffit pas. Zoom et défilement sont disponibles. [Frontières et vérifications](docs/far-west-visuels-v2.md) · [Décor et prompt](docs/far-west-visuels-v1.md).
 
 ## Backend Firebase — 0.5
 
