@@ -37,6 +37,8 @@ test('Vote complet à six familles → résultat réservé à la régie → rév
  assert.equal(s.phase,'COUNCIL');assert.equal(s.game.vote.turn,'A');
  const actions=[['A','pour',1],['B','contre',1],['C','contre',1],['D','contre',1],['E','contre',1],['F','contre',1]];
  for(const [family,kind,amount] of actions)s=run(s,team(family),'vote',{kind,amount});
+ assert.equal(s.game.vote?.phase,'await_leader');
+ s=run(s,team('F'),'chooseLeader',{family:'B'});
  assert.equal(s.phase,'AWAITING_REVEAL');
  assert.equal(narrativePublicView(s).reveal,null);
  assert.equal(narrativePublicView(s).dilemma.title,'Le monopole du chemin de fer');
