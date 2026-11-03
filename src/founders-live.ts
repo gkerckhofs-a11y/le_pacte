@@ -8,7 +8,7 @@
 import {
   createFoundersGame,openFoundersDilemma,castFoundersAction,
   moderatorResolveFoundersTie,moderatorChooseFoundersLeader,
-  applyFoundersCityEffects,transferFoundersDollars,FOUNDERS,totalPower
+  applyFoundersCityEffects,transferFoundersDollars,FOUNDERS,totalPower,expectedFoundersPowerSupply
 } from './founders.ts';
 import {
   DEFAULT_GOAL_CARDS,DEFAULT_SCORE_RULES,validateGoalCards,validateScoreRules,
@@ -145,7 +145,7 @@ export function applyNarrativeCommand(input,actor,command,now){
   default:throw new Error('Commande narrative inconnue');
  }
  s.revision++;s.updatedAt=now;
- check(totalPower(s.game)===s.game.powerSupply,'Conservation de l’Influence violée');
+ check(totalPower(s.game)===expectedFoundersPowerSupply(s.game),'Conservation de l’Influence violée');
  return s;
 }
 function publicDilemma(s){
