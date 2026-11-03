@@ -29,3 +29,7 @@ Boutons, instructions, règles, projection, régie et erreurs du moteur utilisen
 ## Validation ciblée
 
 31 tests de syntaxe, identité, HTTP, thèmes, projection, vote et gestion des conflits d’enregistrement. Construction Firebase et vérification des bundles. Dans le navigateur : conservation du brouillon après changement d’onglet et actualisation d’une autre famille, enregistrement avec confirmation locale, lisibilité de la skin rouge et règles avec les rôles inversés. Le scénario navigateur de concurrence utilise une fixture locale, distincte de la partie de test utilisateur.
+
+## Contrôle après publication
+
+Source applicative : `e26d067543da738f51a653c76e4a87404e298913`. Déploiement Functions + Hosting réussi, suivi de la version finale Hosting `5cda65edb6deaab2`. Vérification du formulaire publié : enregistrement du nom existant avec confirmation persistante à côté du champ, sans renommer une famille de l’utilisateur. Vérification de la skin et des règles dans la session de démonstration publiée.
