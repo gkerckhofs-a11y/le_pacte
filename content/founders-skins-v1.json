@@ -3,11 +3,11 @@
   "skins": [
     {
       "id": "western",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "title": "Western — Hot Spring",
       "universe": "western",
       "status": "prototype",
-      "description": "Ville pionnière, poussière et boiseries",
+      "description": "Panorama peint de Hot Spring, six quartiers évolutifs selon les jauges",
       "labels": {
         "currency": "Dollars",
         "influence": "Influence politique",

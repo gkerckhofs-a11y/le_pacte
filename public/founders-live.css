@@ -88,3 +88,5 @@ body[data-skin].family-dashboard .family-stat{background:var(--team-dark)}
 body[data-skin].family-dashboard .eyebrow,body[data-skin].family-dashboard .eyeline{color:var(--team)}
 body[data-skin=corporate] .city-evolution,body[data-skin=corporate] .city-legend summary{color:var(--gold)}
 body[data-skin=corporate] .small.muted{color:var(--muted)}
+
+#city[data-renderer=painted-western]{position:relative;background:#c49a6a}#city .painted-status{position:absolute;bottom:0;left:0;right:0;padding:8px 12px;margin:0;color:#fff;background:#1a2229dc;font-size:12px}#city[data-renderer=painted-western] svg{display:block;width:100%;height:auto}
