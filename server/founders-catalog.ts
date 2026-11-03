@@ -1,4 +1,5 @@
 import {createHash} from 'node:crypto';
+import {DEFAULT_GOAL_CARDS,DEFAULT_SCORE_RULES} from '../src/founders-scoring.ts';
 import {parseFoundersSheets} from '../src/founders-sheet-import.ts';
 import skins from '../content/founders-skins-v1.json' with {type:'json'};
 import story from '../content/fondateurs-sheet-sample-v1.json' with {type:'json'};
@@ -37,7 +38,8 @@ export async function founderLibraryFor(store,ownerId){
  return result;
 }
 export async function foundersCatalogFor(store,ownerId){
- return listFoundersLibrary(await founderLibraryFor(store,ownerId));
+ return {...listFoundersLibrary(await founderLibraryFor(store,ownerId)),
+   goalCardPresets:structuredClone(DEFAULT_GOAL_CARDS),scoreRulesPreset:structuredClone(DEFAULT_SCORE_RULES)};
 }
 export async function foundersPreviewFor(store,ownerId,selection){
  return prepareFoundersSession(await founderLibraryFor(store,ownerId),selection);

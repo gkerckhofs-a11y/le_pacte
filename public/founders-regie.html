@@ -18,6 +18,7 @@
   <div class="panel">
    <div class="row between"><div><div class="eyeline" id="sessionCode"></div><h2 id="sessionTitle" style="font-size:28px;margin-top:6px"></h2></div><span id="revision" class="chip"></span></div>
    <p id="dilemmaInfo" class="muted"></p>
+   <p id="tiePriority" class="small muted"></p>
    <div class="row" id="actions">
     <button id="start" type="button" hidden>Démarrer la séance</button>
     <button id="reveal" type="button" hidden>Révéler la décision</button>
@@ -26,6 +27,11 @@
    <div id="lastReveal" class="card" hidden><h3 id="outcomeHeading"></h3><p id="outcomeDetail"></p></div>
    <p class="small muted">La régie révèle les conséquences après le vote. Les futures ramifications restent secrètes pour les familles.</p>
    <div class="row"><a id="publicLink" href="#" target="_blank" rel="noopener">Ouvrir l'écran public</a></div>
+  </div>
+  <div class="panel" id="finalPanel" style="margin-top:16px" hidden>
+   <div class="eyeline">Résultat de la campagne</div><h2 id="finalWinner">Famille gagnante</h2>
+   <p class="small muted">Barème de test V2.6 ; une seule famille déclarée vainqueure.</p>
+   <div id="ranking"></div>
   </div>
   <div class="panel" style="margin-top:16px">
    <h2>Familles et accès porte-parole</h2>

@@ -78,6 +78,28 @@ small{color:#656a6e}a{color:inherit}ol{padding-left:20px;line-height:1.6}
     <label for="gameTitle">Nom de la partie</label><input id="gameTitle" value="Le Pacte des Fondateurs — Répétition" maxlength="100">
     <label for="gameCode">Code de partie (unique)</label><input id="gameCode" value="PACTE01" pattern="[A-Z0-9][A-Z0-9_-]{2,11}" maxlength="12">
     <div id="familySettings"></div>
+    <hr><h2>Barème final de test</h2>
+    <p class="note">Les cartes de familles donnent deux paliers d'objectif secret. Ces valeurs restent expérimentales et seront ajustées après les tests humains.</p>
+    <div class="grid2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+      <label for="secretFirst">Points objectif palier 1<input id="secretFirst" type="number" min="0" max="12" value="3"></label>
+      <label for="secretSecond">Points objectif palier 2<input id="secretSecond" type="number" min="0" max="12" value="5"></label>
+      <label for="councilEvery">1 point politique tous les X votes gagnants<input id="councilEvery" type="number" min="1" max="20" value="2"></label>
+      <label for="councilMax">Plafond des points politiques<input id="councilMax" type="number" min="0" max="10" value="3"></label>
+      <label for="money1">Dollars pour 1 point<input id="money1" type="number" min="0" max="500" value="10"></label>
+      <label for="money2">Dollars pour 2 points<input id="money2" type="number" min="0" max="500" value="13"></label>
+      <label for="money3">Dollars pour 3 points<input id="money3" type="number" min="0" max="500" value="16"></label>
+      <label for="power1">Influence pour 1 point<input id="power1" type="number" min="0" max="500" value="6"></label>
+      <label for="power2">Influence pour 2 points<input id="power2" type="number" min="0" max="500" value="10"></label>
+    </div>
+
+    <button type="button" id="analyzeGoals">Analyser les objectifs du scénario</button>
+    <div id="goalAnalysis" class="metric" style="margin-top:13px" hidden>
+      <h3>Accessibilité des objectifs</h3>
+      <p class="note">Comparaison des fins possibles, sans modéliser le comportement réel des joueurs. Ces pourcentages ne prédisent pas leur réussite.</p>
+      <div id="goalAnalysisRows"></div>
+      <p id="analysisSummary" class="note"></p>
+    </div>
+    <hr>
     <button type="button" id="createNarrative">Créer la partie narrative</button>
     <div id="createdGame" hidden>
       <h3>Partie créée</h3>

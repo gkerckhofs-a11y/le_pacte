@@ -10,6 +10,10 @@ import {
   moderatorResolveFoundersTie,moderatorChooseFoundersLeader,
   applyFoundersCityEffects,transferFoundersDollars,FOUNDERS,totalPower
 } from './founders.ts';
+import {
+  DEFAULT_GOAL_CARDS,DEFAULT_SCORE_RULES,validateGoalCards,validateScoreRules,
+  evaluateGoal,calculateFoundersFinal
+} from './founders-scoring.ts';
 
 const copy=x=>structuredClone(x);
 const check=(ok,message)=>{if(!ok)throw new Error(message);};
@@ -20,14 +24,14 @@ const maxOffers=60;
 const phaseNames=['READY','COUNCIL','AWAITING_REVEAL','REVEALED','FINISHED'];
 export const TEST_FAMILY_OBJECTIVES=Object.freeze([
   'Objectif de test : faire atteindre au moins 7/10 à l’Économie.',
-  'Objectif de test : conserver au moins 15 dollars en fin de partie.',
-  'Objectif de test : faire atteindre au moins 7/10 à la Sécurité.',
-  'Objectif de test : faire atteindre au moins 7/10 à la Satisfaction.',
-  'Objectif de test : faire atteindre au moins 7/10 au Bien-être.',
-  'Objectif de test : faire atteindre au moins 7/10 au Développement.'
+  'Objectif de test : faire monter la Sécurité (5 puis 7).',
+  'Objectif de test : faire progresser la Satisfaction populaire (4 puis 6).',
+  'Objectif de test : améliorer le Bien-être (6 puis 8).',
+  'Objectif de test : développer la ville (8 puis 10).',
+  'Objectif de test : préserver l’autonomie des fondateurs en affaiblissant la Stabilité (4 puis 3).'
 ]);
 
-export function createNarrativeSession(preview,{id,ownerId,code,title,objectives=TEST_FAMILY_OBJECTIVES,names=FOUNDERS.map(id=>'Famille '+id),now=Date.now()}) {
+export function createNarrativeSession(preview,{id,ownerId,code,title,objectives=TEST_FAMILY_OBJECTIVES,names=FOUNDERS.map(id=>'Famille '+id),goalCards=DEFAULT_GOAL_CARDS,scoreRules=DEFAULT_SCORE_RULES,initiativeOrder=FOUNDERS,now=Date.now()}) {
  check(preview?.kind==='founders-session-preview-v2.3'&&preview.previewOnly===true,'Configuration narrative invalide');
  check(typeof id==='string'&&/^[a-f0-9]{24}$/.test(id),'Identifiant de session invalide');
  check(str(ownerId,128),'Organisateur requis');
@@ -35,6 +39,9 @@ export function createNarrativeSession(preview,{id,ownerId,code,title,objectives
  check(str(title,100),'Titre de partie invalide');
  check(Array.isArray(objectives)&&objectives.length===6&&objectives.every(x=>str(x,500)),'Six objectifs de famille requis');
  check(Array.isArray(names)&&names.length===6&&names.every(x=>str(x,60)),'Six noms de famille requis');
+ const goalErrors=validateGoalCards(goalCards);check(!goalErrors.length,goalErrors.join(' ; '));
+ const scoreErrors=validateScoreRules(scoreRules);check(!scoreErrors.length,scoreErrors.join(' ; '));
+ check(Array.isArray(initiativeOrder)&&initiativeOrder.length===6&&new Set(initiativeOrder).size===6&&initiativeOrder.every(id=>FOUNDERS.includes(id)),'Tirage des familles invalide');
  check(Number.isSafeInteger(now)&&now>=0,'Horodatage invalide');
  check(preview.scenario?.dilemmas?.some(d=>d.id===preview.scenario?.scenario?.entry_dilemma),'Dilemme de départ introuvable');
  check(preview.game?.ruleset==='founders-v2-prototype','Moteur de votes incompatible');
@@ -44,6 +51,7 @@ export function createNarrativeSession(preview,{id,ownerId,code,title,objectives
   source:copy(preview.source),game:copy(preview.game),
   names:Object.fromEntries(FOUNDERS.map((id,i)=>[id,names[i]])),
   goals:Object.fromEntries(FOUNDERS.map((id,i)=>[id,objectives[i]])),
+  goalCards:copy(goalCards),scoreRules:copy(scoreRules),initiativeOrder:copy(initiativeOrder),finalResults:null,
   phase:'READY',currentDilemmaId:preview.scenario.scenario.entry_dilemma,
   lastReveal:null,revealedHistory:[],offers:{},revision:0,createdAt:now,updatedAt:now
  };
@@ -105,7 +113,7 @@ export function applyNarrativeCommand(input,actor,command,now){
   }
   case 'next': {
    org();check(s.phase==='REVEALED','Révéler le résultat avant de poursuivre');
-   if(s.lastReveal.nextId===null){s.phase='FINISHED';break;}
+   if(s.lastReveal.nextId===null){s.phase='FINISHED';s.finalResults=calculateFoundersFinal(s);break;}
    check(s.revealedHistory.length<=s.scenario.dilemmas.length*3,'Nombre maximal de dilemmes atteint');
    s.currentDilemmaId=s.lastReveal.nextId;s.lastReveal=null;
    s.game=openFoundersDilemma(s.game,s.currentDilemmaId);s.phase='COUNCIL';
@@ -161,12 +169,16 @@ export function narrativePublicView(s){
     pendingLeaderChoices:v.pendingLeaderChoices?copy(v.pendingLeaderChoices):[]}:
     {phase:s.phase==='AWAITING_REVEAL'?'closed':'inactive',turn:null,bids:{},choices:{},pendingLeaderChoices:[]},
   reveal:s.phase==='REVEALED'||s.phase==='FINISHED'?copy(s.lastReveal):null,
-  history:copy(s.revealedHistory)
+  history:copy(s.revealedHistory),
+  finalTieOrder:copy(s.initiativeOrder??FOUNDERS),
+  finalResults:s.phase==='FINISHED'?copy(s.finalResults):null
  };
 }
 export function narrativeFamilyView(s,family){
  check(familyId(family),'Famille inconnue');
  const view=narrativePublicView(s),v=s.game.vote;
+ const card=s.goalCards?.[family]??DEFAULT_GOAL_CARDS[family];
+ const progress=evaluateGoal(card,s.game.city,s.scoreRules??DEFAULT_SCORE_RULES);
  const offers=Object.values(s.offers).filter(o=>o.from===family||o.to===family).map(copy);
  return {...view,self:{id:family,name:s.names[family],objective:s.goals[family],
   members:s.game.families[family].members,power:s.game.families[family].power,dollars:s.game.families[family].dollars,
@@ -174,11 +186,12 @@ export function narrativeFamilyView(s,family){
   mayVote:s.phase==='COUNCIL'&&v?.phase==='voting'&&v?.turn===family,
   mayResolve:s.phase==='COUNCIL'&&v?.phase==='await_moderator'&&s.game.moderator===family,
   mayChooseLeader:s.phase==='COUNCIL'&&v?.phase==='await_leader'&&s.game.moderator===family},
-  offers};
+  goalCard:copy(card),goalProgress:progress,offers};
 }
 export function narrativeOrganizerView(s){
  return {...narrativePublicView(s),familyGoals:copy(s.goals),familyResources:copy(s.game.families),
   source:copy(s.source),selection:copy(s.selection),offers:copy(s.offers),
+  goalCards:copy(s.goalCards??DEFAULT_GOAL_CARDS),scoreRules:copy(s.scoreRules??DEFAULT_SCORE_RULES),initiativeOrder:copy(s.initiativeOrder??FOUNDERS),
   game:copy(s.game),scenario:copy(s.scenario)};
 }
 export function narrativeView(s,actor){

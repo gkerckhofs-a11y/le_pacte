@@ -61,6 +61,22 @@ function render(data){
  set('influence',self.power);set('dollars',self.dollars);
  set('influenceLabel',data.skin.labels.influence);set('dollarLabel',data.skin.labels.currency);
  set('objective',self.objective);
+ if(data.goalCard&&data.goalProgress){
+  const card=data.goalCard,progress=data.goalProgress;
+  set('goalTitle',card.title);
+  const direction=card.direction==='at_least'?'au moins':'au plus';
+  const indicator=data.skin.labels.resources[card.indicator]||card.indicator;
+  set('goalConditions',indicator+' : '+direction+' '+card.firstTarget+' (palier 1), puis '+direction+' '+card.secondTarget+' (palier 2).');
+  set('goalStatus','Indicateur actuel : '+progress.value+'/10 · Paliers atteints : '+(progress.first?'1':'0')+' / '+(progress.second?'1':'0')+
+      ' · Points provisoires : '+progress.points+'/'+progress.maxPoints);
+ }
+ const final=$('personalResult');final.hidden=!data.finalResults;
+ if(data.finalResults){
+  const r=data.finalResults.ranking.find(item=>item.family===self.id);
+  set('personalResultText',r.rank===1?'Votre famille remporte Le Pacte !':'Classement : '+r.rank+' / 6. Vainqueur : '+data.finalResults.ranking[0].name);
+  set('personalScoreBreakdown','Objectif secret '+r.score.secret+' · Dollars '+r.score.wealth+
+      ' · Votes '+r.score.council+' · Influence '+r.score.influence+' = '+r.score.total+' points');
+ }
  set('familyStats',self.members+' membre(s) · Meneur '+data.leader+' · Modérateur '+data.moderator);
  set('committed',self.choice?'Votre position : '+self.choice+' · Mise engagée : '+self.bid:'Aucun vote engagé pour ce dilemme.');
  set('voteHint',self.mayVote?'Votre famille doit décider maintenant.':data.phase==='COUNCIL'?'Vous pouvez négocier en attendant votre tour.':'Le Conseil attend la prochaine phase.');
