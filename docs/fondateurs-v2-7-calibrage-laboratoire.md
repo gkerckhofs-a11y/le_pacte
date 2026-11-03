@@ -1,6 +1,6 @@
 # Le Pacte V2.7 — Calibrage des ressources et laboratoire politique
 
-Date : 3 novembre 2026 · Branche expérimentale `feat/fondateurs-v2-7-calibration-lab` · **Non déployée**.
+Date : 3 novembre 2026 · Branche expérimentale `feat/fondateurs-v2-7-calibration-lab` · **Publiée sur Firebase le 3 novembre 2026** — voir [le compte rendu de publication](deploiement-v2-7.md).
 
 ## Objectif de cette tranche
 
@@ -64,4 +64,4 @@ La CI du dépôt doit également continuer de vérifier le moteur territorial sa
 
 ## État de publication
 
-Cette tranche reste sur une branche de proposition. **Aucun merge dans `main` et aucun déploiement Firebase n'est effectué ici.** Les PR empilées sont V2.2 → V2.3 → V2.4 → V2.5 → V2.6 → V2.7. Une publication exige une confirmation des droits Firebase, une revue de sécurité et un test Google Auth / Sheets réel.
+Cette version est publiée sur Firebase après confirmation explicite du propriétaire le 3 novembre 2026. Elle reste sur la branche V2.7, sans merge dans `main`. Les PR empilées sont V2.2 → V2.3 → V2.4 → V2.5 → V2.6 → V2.7. Les parcours applicatifs Google Auth / Sheets réels et la répétition humaine restent à valider. Voir [le compte rendu](deploiement-v2-7.md) pour les vérifications effectuées et leurs limites.
