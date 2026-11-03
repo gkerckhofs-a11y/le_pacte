@@ -4,7 +4,7 @@
  * Pure functions, no network, storage, authentication or background imports.
  * Catalogue records are immutable by convention: APIs always return clones.
  */
-import {createFoundersGame} from './founders.ts';
+import {createFoundersGame,FOUNDERS_DEFAULT_CALIBRATION,validateFoundersCalibration} from './founders.ts';
 
 export const FOUNDERS_RESOURCE_IDS = Object.freeze([
   'economie','securite','satisfaction','bien_etre','developpement','stabilite'
@@ -159,7 +159,7 @@ export function listFoundersLibrary(input){
   })).sort((a,b)=>a.title.localeCompare(b.title,'fr'))
  };
 }
-export function prepareFoundersSession(input,{scenarioId,scenarioVersion,skinId,members=[5,5,5,5,5,5]}){
+export function prepareFoundersSession(input,{scenarioId,scenarioVersion,skinId,members=[5,5,5,5,5,5],calibration=FOUNDERS_DEFAULT_CALIBRATION}){
  if(input.kind!=='founders-library-v2.3')throw new Error('Catalogue invalide');
  const record=Object.hasOwn(input.scenarios,scenarioId)?input.scenarios[scenarioId]:undefined;
  if(!record)throw new Error('Scénario inconnu');
@@ -171,7 +171,9 @@ export function prepareFoundersSession(input,{scenarioId,scenarioVersion,skinId,
  const skin=Object.hasOwn(input.skins,skinId)?input.skins[skinId]:undefined;
  if(!skin||skin.status==='archived')throw new Error('Skin inconnue ou archivée');
  // This is only a preview. The running session persistence layer is not wired.
- const game=createFoundersGame({members});
+ const calibrationErrors=validateFoundersCalibration(calibration);
+ if(calibrationErrors.length)throw new Error(calibrationErrors.join(' ; '));
+ const game=createFoundersGame({members,calibration});
  const warnings=[];
  if(skin.universe!==release.payload.scenario.universe)warnings.push('Univers différent : le visuel ne traduit pas automatiquement le texte narratif.');
  if(skin.status==='prototype')warnings.push('Skin en cours de conception, affichage non final.');
@@ -181,7 +183,7 @@ export function prepareFoundersSession(input,{scenarioId,scenarioVersion,skinId,
   kind:'founders-session-preview-v2.3',
   previewOnly:true,
   selection:{scenarioId,scenarioVersion:release.version,skinId,skinVersion:skin.version},
-  settings:{members:clone(members),spokespersonVotingAccessPerFamily:1},
+  settings:{members:clone(members),calibration:clone(calibration),spokespersonVotingAccessPerFamily:1},
   scenario:clone(release.payload),
   source:clone(release.source),
   skin:clone(skin),
