@@ -19,3 +19,7 @@ Le lancement relit l’état avant d’envoyer la commande. Une modification sim
 22 tests de syntaxe, HTTP et parcours de régie. Le test HTTP simule un nom enregistré entre la lecture et le lancement, puis vérifie l’ouverture de D01 et le droit de vote du Maire. Les tests couvrent aussi le démarrage concurrent, les erreurs et la limite des relances.
 
 Dans le navigateur, une répétition locale distincte a été ouverte avec la nouvelle interface, lancée par le bouton puis retrouvée via le sélecteur sans identifiant. La vérification de connexion Google en production porte sur l’écran et ses libellés ; aucune connexion Google interactive n’a été effectuée à la place de l’utilisateur.
+
+## Publication
+
+Source applicative `b4320ef547f097a5cb4965de0b483b9ecfcebb85`. Hosting publié avec succès : version `177d80f951835f35`. Écran Google non connecté vérifié dans le navigateur publié : statut « Connexion requise », bouton « Se connecter avec Google » et absence du champ de clé locale. Les erreurs de connexion restent visibles jusqu’à une nouvelle tentative. Les permissions et le moteur serveur sont inchangés ; seul Hosting a été redéployé.
