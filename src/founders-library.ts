@@ -124,7 +124,7 @@ export function createFoundersLibrary(){
 export function registerFoundersSkin(input,skin){
  if(input.kind!=='founders-library-v2.3')throw new Error('Catalogue invalide');
  requireValid(validateFoundersSkin(skin),'Skin invalide');
- const library=clone(input),prior=library.skins[skin.id];
+ const library=clone(input),prior=Object.hasOwn(library.skins,skin.id)?library.skins[skin.id]:undefined;
  if(prior)throw new Error('Skin déjà enregistrée : '+skin.id+' (version '+prior.version+')');
  library.skins[skin.id]=clone(skin);return library;
 }
@@ -137,8 +137,8 @@ export function publishFoundersScenario(input,{payload,source,version}){
  const demoSource=keys(source,['type','label'])&&source.type==='bundled_fixture';
  if(!(sheetSource||demoSource)||!txt(source.label,1,160))throw new Error('Source de scénario invalide');
  const library=clone(input),id=payload.scenario.id;
- const record=library.scenarios[id]??{id,releases:{}};
- if(record.releases[version])throw new Error('Version de scénario déjà publiée : '+id+'@'+version);
+ const record=Object.hasOwn(library.scenarios,id)?library.scenarios[id]:{id,releases:{}};
+ if(Object.hasOwn(record.releases,version))throw new Error('Version de scénario déjà publiée : '+id+'@'+version);
  record.releases[version]={version,source:clone(source),payload:clone(payload)};
  library.scenarios[id]=record;return library;
 }
@@ -161,13 +161,14 @@ export function listFoundersLibrary(input){
 }
 export function prepareFoundersSession(input,{scenarioId,scenarioVersion,skinId,members=[5,5,5,5,5,5]}){
  if(input.kind!=='founders-library-v2.3')throw new Error('Catalogue invalide');
- const record=input.scenarios[scenarioId];
+ const record=Object.hasOwn(input.scenarios,scenarioId)?input.scenarios[scenarioId]:undefined;
  if(!record)throw new Error('Scénario inconnu');
  const versions=Object.keys(record.releases).sort(cmpSemver);
- const release=record.releases[scenarioVersion??versions.at(-1)];
+ const selectedVersion=scenarioVersion??versions.at(-1);
+ const release=Object.hasOwn(record.releases,selectedVersion)?record.releases[selectedVersion]:undefined;
  if(!release)throw new Error('Version du scénario inconnue');
  if(release.payload.scenario.status==='archived')throw new Error('Scénario archivé');
- const skin=input.skins[skinId];
+ const skin=Object.hasOwn(input.skins,skinId)?input.skins[skinId]:undefined;
  if(!skin||skin.status==='archived')throw new Error('Skin inconnue ou archivée');
  // This is only a preview. The running session persistence layer is not wired.
  const game=createFoundersGame({members});
