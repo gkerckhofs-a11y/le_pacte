@@ -1,0 +1,155 @@
+{
+  "schema_version": "1.0.0",
+  "skins": [
+    {
+      "id": "western",
+      "version": "1.0.0",
+      "title": "Western — Hot Spring",
+      "universe": "western",
+      "status": "prototype",
+      "description": "Ville pionnière, poussière et boiseries",
+      "labels": {
+        "currency": "Dollars",
+        "influence": "Influence politique",
+        "resources": {
+          "economie": "Économie",
+          "securite": "Sécurité",
+          "satisfaction": "Satisfaction",
+          "bien_etre": "Bien-être",
+          "developpement": "Développement",
+          "stabilite": "Stabilité"
+        }
+      },
+      "theme": {
+        "background": "#1A1917",
+        "foreground": "#F2E9DB",
+        "accent": "#AC793D"
+      },
+      "publicScene": {
+        "type": "city",
+        "baseImageUrl": null,
+        "variants": []
+      }
+    },
+    {
+      "id": "mafia",
+      "version": "1.0.0",
+      "title": "Mafia — Prohibition",
+      "universe": "mafia",
+      "status": "prototype",
+      "description": "Ville des années 1920, clubs et journaux",
+      "labels": {
+        "currency": "Dollars",
+        "influence": "Pouvoir politique",
+        "resources": {
+          "economie": "Commerce",
+          "securite": "Sécurité",
+          "satisfaction": "Opinion",
+          "bien_etre": "Conditions de vie",
+          "developpement": "Modernisation",
+          "stabilite": "Stabilité"
+        }
+      },
+      "theme": {
+        "background": "#17191F",
+        "foreground": "#F5F0E6",
+        "accent": "#B69C73"
+      },
+      "publicScene": {
+        "type": "city",
+        "baseImageUrl": null,
+        "variants": []
+      }
+    },
+    {
+      "id": "corporate",
+      "version": "1.0.0",
+      "title": "Corporate — Conseil",
+      "universe": "corporate",
+      "status": "prototype",
+      "description": "Entreprise contemporaine et conseil d'administration",
+      "labels": {
+        "currency": "Budget",
+        "influence": "Influence au conseil",
+        "resources": {
+          "economie": "Résultats",
+          "securite": "Conformité",
+          "satisfaction": "Engagement",
+          "bien_etre": "Qualité de vie",
+          "developpement": "Innovation",
+          "stabilite": "Stabilité"
+        }
+      },
+      "theme": {
+        "background": "#F7F9FC",
+        "foreground": "#16202F",
+        "accent": "#327BA5"
+      },
+      "publicScene": {
+        "type": "organization",
+        "baseImageUrl": null,
+        "variants": []
+      }
+    },
+    {
+      "id": "medieval",
+      "version": "1.0.0",
+      "title": "Médiéval — Royaume",
+      "universe": "medieval",
+      "status": "prototype",
+      "description": "Cité médiévale et routes marchandes",
+      "labels": {
+        "currency": "Écus",
+        "influence": "Influence au conseil",
+        "resources": {
+          "economie": "Richesse",
+          "securite": "Ordre",
+          "satisfaction": "Soutien du peuple",
+          "bien_etre": "Santé du peuple",
+          "developpement": "Progrès",
+          "stabilite": "Stabilité"
+        }
+      },
+      "theme": {
+        "background": "#1B2420",
+        "foreground": "#F6EAD1",
+        "accent": "#947744"
+      },
+      "publicScene": {
+        "type": "landscape",
+        "baseImageUrl": null,
+        "variants": []
+      }
+    },
+    {
+      "id": "futuriste",
+      "version": "1.0.0",
+      "title": "Futuriste — Colonie",
+      "universe": "futuriste",
+      "status": "prototype",
+      "description": "Colonie futuriste et institutions interstellaires",
+      "labels": {
+        "currency": "Crédits",
+        "influence": "Influence politique",
+        "resources": {
+          "economie": "Économie",
+          "securite": "Sécurité",
+          "satisfaction": "Adhésion",
+          "bien_etre": "Qualité de vie",
+          "developpement": "Technologie",
+          "stabilite": "Stabilité"
+        }
+      },
+      "theme": {
+        "background": "#101A27",
+        "foreground": "#EDF6FF",
+        "accent": "#46A7B5"
+      },
+      "publicScene": {
+        "type": "city",
+        "baseImageUrl": null,
+        "variants": []
+      }
+    }
+  ]
+}
