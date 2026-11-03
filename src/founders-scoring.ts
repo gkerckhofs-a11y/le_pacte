@@ -12,13 +12,15 @@ const copy=x=>structuredClone(x);
 const check=(ok,m)=>{if(!ok)throw new Error(m);};
 const integer=(n,min,max)=>Number.isSafeInteger(n)&&n>=min&&n<=max;
 const text=(v,max=180)=>typeof v==='string'&&v.trim().length>0&&v.length<=max;
+// Hot Spring candidate calibration, 2026-11-03. See docs/fondateurs-equilibrage.md.
+// Existing sessions retain their own goalCards snapshot. Formula/version unchanged.
 const defaults=[
- ['A','Guilde des négociants','Développer les affaires et enrichir Hot Spring.','economie','at_least',6,8],
+ ['A','Guilde des négociants','Développer les affaires et enrichir Hot Spring.','economie','at_least',6,7],
  ['B','Gardes et justice','Faire de Hot Spring une place sûre pour les voyageurs.','securite','at_least',5,7],
- ['C','Voix du peuple','Gagner la confiance des habitants.','satisfaction','at_least',4,6],
+ ['C','Voix du peuple','Gagner la confiance des habitants.','satisfaction','at_least',4,7],
  ['D','Médecins et bâtisseurs','Améliorer les conditions de vie des pionniers.','bien_etre','at_least',6,8],
- ['E','La ville de demain','Faire progresser les équipements et institutions.','developpement','at_least',8,10],
- ['F','Les indépendants','Empêcher la ville de se soumettre à un pouvoir trop centralisé.','stabilite','at_most',4,3]
+ ['E','La ville de demain','Faire progresser les équipements et institutions.','developpement','at_least',7,9],
+ ['F','Les indépendants','Empêcher la ville de se soumettre à un pouvoir trop centralisé.','stabilite','at_most',4,2]
 ];
 export const DEFAULT_GOAL_CARDS=Object.freeze(Object.fromEntries(defaults.map(
  ([id,title,description,indicator,direction,firstTarget,secondTarget])=>[id,{

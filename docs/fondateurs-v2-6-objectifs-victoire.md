@@ -30,7 +30,9 @@ La Stabilité part à 5 et reste entre 2 et 5 dans cette version de l'histoire ;
 
 Tous les coefficients ci-dessus sont éditables dans le formulaire de création, à l'exception des points de rang des paliers de dollars (1/2/3) et d'Influence (1/2), figés pour ce premier prototype.
 
-## Objectifs secrets préconfigurés (modifiables)
+## Objectifs secrets préconfigurés V2.6 (historiques, modifiables)
+
+Les valeurs ci-dessous décrivent la V2.6 initiale. Le [candidat d’équilibrage du 3 novembre](fondateurs-equilibrage.md) remplace les valeurs par défaut pour les nouvelles configurations dans la branche, sans modifier les sessions enregistrées.
 
 | Famille | Orientation | Palier 1 | Palier 2 | Fins à chaque palier |
 | --- | --- | ---: | ---: | --- |
