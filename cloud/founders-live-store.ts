@@ -1,5 +1,5 @@
 import {randomBytes} from 'node:crypto';
-import {tokenHash} from '../server/security.ts';
+import {tokenHash,shuffle} from '../server/security.ts';
 import {createNarrativeSession,applyNarrativeCommand,narrativeView} from '../src/founders-live.ts';
 import {Pipelines} from '@google-cloud/firestore';
 
@@ -26,10 +26,10 @@ export class FirestoreNarrativeSessions{
     scenarioId:s.selection.scenarioId,scenarioVersion:s.selection.scenarioVersion,skinId:s.selection.skinId};
   });
  }
- async create({ownerId,preview,code,title,objectives,names,now}){
+ async create({ownerId,preview,code,title,objectives,names,goalCards,scoreRules,now}){
   check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
   const id=randomBytes(12).toString('hex');
-  const s=createNarrativeSession(preview,{id,ownerId,code,title,objectives,names,now});
+  const s=createNarrativeSession(preview,{id,ownerId,code,title,objectives,names,goalCards,scoreRules,initiativeOrder:shuffle(['A','B','C','D','E','F']),now});
   const access=familyIds.map(family=>({family,token:randomBytes(32).toString('base64url')}));
   const ref=this.ref(id),codeRef=this.db.doc('pacteNarrativeCodes/'+code);
   await this.db.runTransaction(async tx=>{
