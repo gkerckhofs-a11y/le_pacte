@@ -10,3 +10,12 @@ Livraison du 3 novembre 2026.
 - La partie vierge et la démonstration de résultat sont distinctes. Les liens privés des équipes sont transmis à l’organisateur uniquement ; ils ne sont ni dans ce dépôt ni dans les fichiers publics.
 
 Validation ciblée : 29 tests de domaine, HTTP, catalogue, projection et syntaxe d’interface ; construction Firebase et vérification des bundles. Les contrôles automatiques ne remplacent pas une partie humaine pour juger l’équilibre.
+
+## Vérification en ligne
+
+- Source : `e044ec7bd55eaa7048e9fdbcf1ecf93b037d0524`.
+- Déploiement Functions + Hosting réussi ; version finale Hosting `7d7172cc9bea9b52`.
+- Dix JPEG servis avec statut HTTP 200, signature JPEG vérifiée.
+- Six accès privés contrôlés sur l’API publiée : phase READY, 8 points d’influence et 10 dollars chacun, sans objectifs des autres équipes.
+- Démonstration séparée : vote révélé 4 POUR / 3 CONTRE en influence ; économie 5 → 6, satisfaction 5 → 4 et développement 5 → 7.
+- Vérification dans le navigateur de la projection publiée, des jauges, du tableau de bord privé et de l’onglet Règles. La partie de test reste en préparation.
