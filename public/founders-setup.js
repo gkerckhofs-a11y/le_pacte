@@ -26,6 +26,7 @@ $("load").addEventListener("click",async()=>{
  $("load").disabled=true;state("Chargement des catalogues…");
  try{
   catalog=await api("/api/founders/catalog");
+  loadGoalPresets(catalog.goalCardPresets,catalog.scoreRulesPreset);
   fill($("scenario"),catalog.scenarios,"Aucun scénario");
   fill($("skin"),catalog.skins,"Aucune skin");
   $("config").hidden=!(catalog.scenarios.length&&catalog.skins.length);
@@ -99,26 +100,78 @@ $('googleLogin').addEventListener('click',async()=>{
 initFirebaseAuth();
 
 
-const DEFAULT_GOALS=[
- 'Objectif de test : faire atteindre au moins 7/10 à l’Économie.',
- 'Objectif de test : conserver au moins 15 dollars en fin de partie.',
- 'Objectif de test : faire atteindre au moins 7/10 à la Sécurité.',
- 'Objectif de test : faire atteindre au moins 7/10 à la Satisfaction.',
- 'Objectif de test : faire atteindre au moins 7/10 au Bien-être.',
- 'Objectif de test : faire atteindre au moins 7/10 au Développement.'
+const FAMILY_IDS=[...'ABCDEF'];
+const INDICATORS=[
+ ['economie','Économie'],['securite','Sécurité'],['satisfaction','Satisfaction populaire'],
+ ['bien_etre','Bien-être'],['developpement','Développement'],['stabilite','Stabilité']
 ];
-for(let i=0;i<6;i++){
- const id='ABCDEF'[i],section=document.createElement('div');
- section.className='metric';section.style.marginTop='10px';
+function field(section,id,label,type='text',max=0){
+ const lbl=document.createElement('label');lbl.htmlFor=id;lbl.textContent=label;
+ const input=document.createElement(type==='textarea'?'textarea':'input');
+ input.id=id;
+ if(type!=='textarea')input.type=type;
+ if(type==='number'){input.min='0';input.max='10';}
+ else input.maxLength=max||500;
+ section.append(lbl,input);
+ return input;
+}
+for(const id of FAMILY_IDS){
+ const section=document.createElement('div');section.className='metric';section.style.marginTop='10px';
  const head=document.createElement('strong');head.textContent='Famille '+id;section.append(head);
- const nameLabel=document.createElement('label');nameLabel.htmlFor='name-'+id;nameLabel.textContent='Nom de la famille';
- const name=document.createElement('input');name.id='name-'+id;name.maxLength=60;name.value='Famille '+id;
- const goalLabel=document.createElement('label');goalLabel.htmlFor='goal-'+id;goalLabel.textContent='Objectif secret (prototype)';
- const goal=document.createElement('textarea');goal.id='goal-'+id;goal.maxLength=500;goal.value=DEFAULT_GOALS[i];
- goal.style.width='100%';goal.style.minHeight='55px';
- section.append(nameLabel,name,goalLabel,goal);
+ const name=field(section,'name-'+id,'Nom de la famille','text',60);name.value='Famille '+id;
+ field(section,'goalTitle-'+id,'Titre de l’ambition secrète','text',120);
+ field(section,'goal-'+id,'Contexte secret de la famille','textarea',500);
+ const metricLabel=document.createElement('label');metricLabel.htmlFor='goalIndicator-'+id;metricLabel.textContent='Indicateur à influencer';
+ const metric=document.createElement('select');metric.id='goalIndicator-'+id;
+ for(const [value,title] of INDICATORS){const o=document.createElement('option');o.value=value;o.textContent=title;metric.append(o);}
+ section.append(metricLabel,metric);
+ const directionLabel=document.createElement('label');directionLabel.htmlFor='goalDirection-'+id;directionLabel.textContent='Orientation de l’objectif';
+ const direction=document.createElement('select');direction.id='goalDirection-'+id;
+ for(const [value,title] of [['at_least','Faire monter cet indicateur'],['at_most','Faire baisser cet indicateur']]){
+  const o=document.createElement('option');o.value=value;o.textContent=title;direction.append(o);
+ }
+ section.append(directionLabel,direction);
+ field(section,'firstTarget-'+id,'Seuil du palier 1 (0 à 10)','number');
+ field(section,'secondTarget-'+id,'Seuil du palier 2, plus exigeant (0 à 10)','number');
  $('familySettings').append(section);
 }
+function loadGoalPresets(cards,rules){
+ if(!cards||!rules)return;
+ for(const id of FAMILY_IDS){
+  const card=cards[id];if(!card)continue;
+  $('goalTitle-'+id).value=card.title;
+  $('goal-'+id).value=card.description;
+  $('goalIndicator-'+id).value=card.indicator;
+  $('goalDirection-'+id).value=card.direction;
+  $('firstTarget-'+id).value=card.firstTarget;
+  $('secondTarget-'+id).value=card.secondTarget;
+ }
+ const settings={secretFirst:rules.secretFirst,secretSecond:rules.secretSecond,
+  councilEvery:rules.councilVotesPerPoint,councilMax:rules.councilPointsMax,
+  money1:rules.wealthTiers[0][0],money2:rules.wealthTiers[1][0],money3:rules.wealthTiers[2][0],
+  power1:rules.influenceTiers[0][0],power2:rules.influenceTiers[1][0]};
+ for(const [id,value] of Object.entries(settings))$(id).value=value;
+}
+function collectGoalCards(){
+ return Object.fromEntries(FAMILY_IDS.map(id=>[id,{
+  id:'F_'+id,
+  title:$('goalTitle-'+id).value.trim(),
+  description:$('goal-'+id).value.trim(),
+  indicator:$('goalIndicator-'+id).value,
+  direction:$('goalDirection-'+id).value,
+  firstTarget:Number($('firstTarget-'+id).value),
+  secondTarget:Number($('secondTarget-'+id).value)
+ }]));
+}
+function collectScoreRules(){
+ return {version:'founders-score-v2.6',
+  secretFirst:Number($('secretFirst').value),secretSecond:Number($('secretSecond').value),
+  councilVotesPerPoint:Number($('councilEvery').value),councilPointsMax:Number($('councilMax').value),
+  wealthTiers:[[Number($('money1').value),1],[Number($('money2').value),2],[Number($('money3').value),3]],
+  influenceTiers:[[Number($('power1').value),1],[Number($('power2').value),2]]
+ };
+}
+
 for(const el of ['scenario','scenarioVersion','skin','members']){
  $(el).addEventListener('change',()=>{
   selectedPreview=null;$('preview').hidden=true;$('empty').hidden=false;
@@ -128,10 +181,11 @@ $('createNarrative').addEventListener('click',async()=>{
  if(!selectedPreview){state('Prévisualisez la sélection avant de créer la partie.','error');return;}
  const names=[...'ABCDEF'].map(id=>$('name-'+id).value.trim());
  const objectives=[...'ABCDEF'].map(id=>$('goal-'+id).value.trim());
+ const goalCards=collectGoalCards(),scoreRules=collectScoreRules();
  const code=$('gameCode').value.trim(),title=$('gameTitle').value.trim();
  const button=$('createNarrative');button.disabled=true;state('Création de la session…');
  try{
-  const result=await api('/api/founders/sessions','POST',{...selectedPreview,code,title,names,objectives});
+  const result=await api('/api/founders/sessions','POST',{...selectedPreview,code,title,names,objectives,goalCards,scoreRules});
   if(!authSDK)sessionStorage.setItem('pacte-founder-organizer-key',$('token').value.trim());
   const links=$('createdLinks');links.replaceChildren();
   const append=(label,path)=>{
