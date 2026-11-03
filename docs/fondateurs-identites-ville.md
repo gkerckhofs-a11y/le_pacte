@@ -1,5 +1,7 @@
 # Équipes colorées et ville évolutive — 3 novembre 2026
 
+État actualisé : publié sur Firebase le 3 novembre 2026 ; voir le [compte rendu de mise en ligne](deploiement-skins-2026-11-03.md). Les mentions de non-publication ci-dessous décrivent la tranche avant ce déploiement.
+
 ## Identité publique d’une équipe
 
 Six couleurs distinctes sont choisies dans la préparation : Bleue ◆, Rouge ●, Verte ▲, Jaune ☀, Violette ✦, Orange ■. L’organisateur peut les permuter entre les six emplacements. L’API refuse une couleur inconnue et les doublons. Les lettres A–F restent des identifiants internes du moteur ; l’interface affiche les couleurs, symboles et noms de famille dans les votes, négociations et classements. Les couleurs n’accordent aucun bonus et ne changent pas les objectifs secrets des emplacements.

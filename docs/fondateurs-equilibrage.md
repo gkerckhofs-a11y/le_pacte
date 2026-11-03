@@ -1,5 +1,7 @@
 # Hot Spring — candidat d’équilibrage du 3 novembre 2026
 
+État actualisé : publié sur Firebase le 3 novembre 2026 ; voir le [compte rendu de mise en ligne](deploiement-skins-2026-11-03.md). Les mentions de non-publication ci-dessous décrivent la tranche avant ce déploiement.
+
 ## Diagnostic et décision
 
 Le signal utilisateur « E a seulement deux victoires » ne précise pas le nombre d'essais, la graine, les réglages et le mode. Cette valeur exacte n'est donc pas reproduite ici. Sur une comparaison indépendante avec les réglages initiaux par défaut, E est néanmoins la famille qui gagne le moins souvent dans chacun des trois modes.

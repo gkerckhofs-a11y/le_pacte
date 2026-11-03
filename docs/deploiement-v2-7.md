@@ -1,5 +1,7 @@
 # Publication Firebase V2.7 — 3 novembre 2026
 
+État actualisé : publié sur Firebase le 3 novembre 2026 ; voir le [compte rendu de mise en ligne](deploiement-skins-2026-11-03.md). Les mentions de non-publication ci-dessous décrivent la tranche avant ce déploiement.
+
 Projet : `le-pacte-ludificateur`.
 
 Interface de préparation : https://le-pacte-ludificateur.web.app/founders-setup.html

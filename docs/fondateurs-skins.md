@@ -1,5 +1,7 @@
 # Atelier des univers — prototypes visuels du 3 novembre 2026
 
+État actualisé : publié sur Firebase le 3 novembre 2026 ; voir le [compte rendu de mise en ligne](deploiement-skins-2026-11-03.md). Les mentions de non-publication ci-dessous décrivent la tranche avant ce déploiement.
+
 ## Livraison
 
 Les cinq habillages existants ont maintenant une direction d’interface et un décor vectoriel natif. Leurs métadonnées passent en version 1.1.0 ; leur statut reste `prototype`.
