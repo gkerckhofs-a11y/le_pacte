@@ -56,6 +56,27 @@ export function validateGoalCards(cards){
  for(const key of Object.keys(cards))if(!FOUNDERS.includes(key))errors.push('Famille inconnue : '+key);
  return errors;
 }
+export function validateScoreRules(rule){
+ const errors=[];
+ if(!rule||typeof rule!=='object'||Array.isArray(rule))return ['Barème invalide'];
+ const allowed=['version','secretFirst','secretSecond','wealthTiers','councilVotesPerPoint','councilPointsMax','influenceTiers'];
+ if(Object.keys(rule).some(k=>!allowed.includes(k)))errors.push('Champ de barème inconnu');
+ if(rule.version!=='founders-score-v2.6')errors.push('Version du barème incompatible');
+ if(!integer(rule.secretFirst,0,12)||!integer(rule.secretSecond,0,12)||rule.secretFirst+rule.secretSecond<1)errors.push('Points secrets invalides');
+ if(!integer(rule.councilVotesPerPoint,1,20)||!integer(rule.councilPointsMax,0,10))errors.push('Points de Conseil invalides');
+ const validateTiers=(tiers,maxCount,label)=>{
+  if(!Array.isArray(tiers)||tiers.length!==maxCount){errors.push('Paliers '+label+' invalides');return;}
+  let lastThreshold=-1,lastPoints=-1;
+  for(const tier of tiers){
+   if(!Array.isArray(tier)||tier.length!==2||!integer(tier[0],0,500)||!integer(tier[1],0,10)||tier[0]<=lastThreshold||tier[1]<=lastPoints)errors.push('Paliers '+label+' non croissants');
+   else {lastThreshold=tier[0];lastPoints=tier[1];}
+  }
+ };
+ validateTiers(rule.wealthTiers,3,'dollars');
+ validateTiers(rule.influenceTiers,2,'Influence');
+ return [...new Set(errors)];
+}
+
 export function evaluateGoal(card,city,rule=DEFAULT_SCORE_RULES){
  const errors=validateGoalCard(card);check(!errors.length,errors.join(' ; '));
  const value=city?.[card.indicator];
@@ -74,7 +95,7 @@ export function calculateFoundersFinal(s){
  const cards=s.goalCards??DEFAULT_GOAL_CARDS;
  const errors=validateGoalCards(cards);check(!errors.length,errors.join(' ; '));
  const rule=s.scoreRules??DEFAULT_SCORE_RULES;
- check(rule.version==='founders-score-v2.6','Barème incompatible');
+ const ruleErrors=validateScoreRules(rule);check(!ruleErrors.length,ruleErrors.join(' ; '));
  const order=s.initiativeOrder??FOUNDERS;
  check(Array.isArray(order)&&order.length===6&&new Set(order).size===6&&order.every(x=>FOUNDERS.includes(x)),'Tirage de départ invalide');
  const results=FOUNDERS.map(id=>{
