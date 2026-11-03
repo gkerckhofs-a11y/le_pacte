@@ -7,6 +7,7 @@ import type {StorePort,Operator} from './ports.ts';
 import {accessQr,normalizeOrigin} from './qr.ts';
 import {BUILTIN_ASSETS,GOAL_RULES} from '../src/studio.ts';
 import {foundersCatalogFor,foundersPreviewFor,foundersStoryCheck,prepareFoundersSheetsImport} from './founders-catalog.ts';
+import {DEFAULT_GOAL_CARDS,analyzeFoundersGoalReachability} from '../src/founders-scoring.ts';
 import type {Actor} from '../src/session.ts';
 export function createGameServer(store:StorePort,organizerToken:string,clock=()=>Date.now(),options:{clientAuth?:any;authEmulatorUrl?:string;apiOnly?:boolean;publicOrigin?:string;verifyOperator?:(token:string)=>Promise<Operator|null>}={}){
  const publicOrigin=options.publicOrigin?normalizeOrigin(options.publicOrigin):null;
@@ -48,6 +49,14 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
    }
    if(path==='/api/founders/preview'&&req.method==='POST'){
     const actor=await requireOrg(req);json(200,await foundersPreviewFor(store,actor.id,await body(req,4096)));return;
+   }
+   if(path==='/api/founders/scoring/analyze'&&req.method==='POST'){
+    const actor=await requireOrg(req);
+    const d=await body(req,12000);
+    const p=await foundersPreviewFor(store,actor.id,{
+      scenarioId:d.scenarioId,scenarioVersion:d.scenarioVersion,skinId:d.skinId
+    });
+    json(200,analyzeFoundersGoalReachability(p.scenario,d.goalCards??DEFAULT_GOAL_CARDS));return;
    }
    if(path==='/api/founders/stories/check'&&req.method==='POST'){
     await requireOrg(req);json(200,foundersStoryCheck(await body(req,700000)));return;
