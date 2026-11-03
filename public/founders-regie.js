@@ -3,7 +3,7 @@ import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
 import {teamCaption,teamLabel,colorize} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id),p=new URLSearchParams(location.search);
-const sid=p.get('session');let authSDK=null,cloud=false,token='',current=null,busy=false,initialized=false,authenticating=false;
+const sid=p.get('session');let authSDK=null,cloud=false,token='',current=null,busy=false,initialized=false,authenticating=false,waitingForLogin=false;
 const labels={READY:'Prêt',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'En attente de la révélation',REVEALED:'Résultat annoncé',FINISHED:'Partie terminée'};
 const gaugeIds=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
 const set=(id,v)=>$(id).textContent=String(v??'');
@@ -11,7 +11,7 @@ const secure=()=>validNarrativeSession(sid);
 function step(number){for(let i=1;i<=3;i++)if(i===number)$('step'+i).setAttribute('aria-current','step');else $('step'+i).removeAttribute('aria-current');}
 function account(){const user=authSDK?.currentAccount?.();return user?.email||user?.displayName||'Compte organisateur connecté';}
 async function init(){
- initialized=false;$('login').disabled=true;$('retryInit').hidden=true;set('phase','Connexion en cours…');set('loginMessage','');
+ initialized=false;waitingForLogin=false;$('login').disabled=true;$('retryInit').hidden=true;set('phase','Connexion en cours…');set('loginMessage','');
  try{
   if(sid&&!secure())throw new Error('Ce lien de régie est incomplet ou invalide. Retrouvez la partie depuis sa configuration.');
   const r=await fetch('/api/catalog',{cache:'no-store'});
@@ -65,20 +65,21 @@ function connectionFailure(error){
  set('loginMessage',organizerError(error));$('loginPanel').hidden=false;
  if(!current)set('phase','Connexion requise');
  if(error.status===403||/organisateur Google|Clé régie requise/.test(error.message)){
+  waitingForLogin=true;
   $('regieContent').hidden=true;$('accountPanel').hidden=true;step(1);
   const user=authSDK?.currentAccount?.();
   if(user){set('login','Changer de compte Google');set('loginMessage','Compte connecté : '+account()+'. '+organizerError(error));}
  }
 }
 async function refresh(){
- if(busy||!initialized||authenticating)return;
+ if(busy||!initialized||authenticating||waitingForLogin)return;
  try{
   if(!secure()){
    if(!$('sessionPicker').hidden)return;
    await listSessions();connected();set('phase','Choisir une partie');step(2);return;
   }
   const s=await api('');
-  if(busy||s.revision<(current?.revision??-1))return;
+  if(busy||authenticating||waitingForLogin||s.revision<(current?.revision??-1))return;
   if(current?.revision!==s.revision)render(s);
   connected();$('regieContent').hidden=false;
  }catch(error){connectionFailure(error);}
@@ -195,12 +196,12 @@ $('copyAccess').addEventListener('click',async()=>{
 });
 async function login(){
  if(!initialized||authenticating)return;
- authenticating=true;current=null;$('regieContent').hidden=true;$('sessionPicker').hidden=true;$('accountPanel').hidden=true;$('login').disabled=true;$('changeAccount').disabled=true;set('loginMessage','Ouverture de la connexion…');
+ authenticating=true;waitingForLogin=false;current=null;$('regieContent').hidden=true;$('sessionPicker').hidden=true;$('accountPanel').hidden=true;$('login').disabled=true;$('changeAccount').disabled=true;set('loginMessage','Ouverture de la connexion…');
  try{
   if(cloud)await authSDK.login();
   else sessionStorage.setItem('pacte-founder-organizer-key',$('localKey').value.trim());
   authenticating=false;await refresh();
- }catch(error){set('loginMessage',organizerError(error));$('loginPanel').hidden=false;}
+ }catch(error){waitingForLogin=true;set('loginMessage',organizerError(error));$('loginPanel').hidden=false;}
  finally{authenticating=false;$('login').disabled=false;$('changeAccount').disabled=false;}
 }
 $('login').addEventListener('click',login);
