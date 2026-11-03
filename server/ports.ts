@@ -3,6 +3,7 @@ import type {Actor,Command} from '../src/session.ts';
 // SQLite and asynchronous Firestore adapters implement the same HTTP boundary.
 export interface StorePort {
  studio:any;
+ narrative?:any;
  list(ownerId?:string):any;
  create(code:string,title:string,themeId:string,now:number,releaseId?:string,ownerId?:string):any;
  get(id:string,ownerId?:string):any;
