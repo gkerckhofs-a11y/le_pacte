@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {createFoundersGame,totalPower,FOUNDERS_DEFAULT_CALIBRATION,validateFoundersCalibration} from '../src/founders.ts';
+import {createFoundersGame,totalPower,FOUNDERS_DEFAULT_CALIBRATION,validateFoundersCalibration,expectedFoundersPowerSupply,openFoundersDilemma,castFoundersAction} from '../src/founders.ts';
 import {foundersPreview} from '../server/founders-catalog.ts';
 import {createNarrativeSession,applyNarrativeCommand,narrativePublicView} from '../src/founders-live.ts';
 import {simulateFoundersPolicies} from '../src/founders-policy-lab.ts';
@@ -75,4 +75,13 @@ test('Garde-fou anti-boucle : limitation déclarée sans inventer de vainqueur',
  assert.equal(Object.values(s.families).reduce((n,f)=>n+f.wins,0),0);
  assert.equal(s.families.A.winShare,null);
  assert.ok(Object.keys(s.failures).some(x=>x.includes('Trop de dilemmes')));
+});
+
+test('Compatibilité : une session V2.6 enregistrée sans powerSupply reste jouable',()=>{
+ let old=createFoundersGame();delete old.powerSupply;
+ assert.equal(expectedFoundersPowerSupply(old),51);
+ old=openFoundersDilemma(old,'D01');
+ old=castFoundersAction(old,'A',{kind:'pour',amount:1});
+ assert.equal(totalPower(old),51);
+ assert.equal(old.vote.turn,'B');
 });
