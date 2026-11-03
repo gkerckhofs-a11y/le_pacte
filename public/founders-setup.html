@@ -92,6 +92,14 @@ small{color:#656a6e}a{color:inherit}ol{padding-left:20px;line-height:1.6}
       <label for="power2">Influence pour 2 points<input id="power2" type="number" min="0" max="500" value="10"></label>
     </div>
 
+    <button type="button" id="analyzeGoals">Analyser les objectifs du scénario</button>
+    <div id="goalAnalysis" class="metric" style="margin-top:13px" hidden>
+      <h3>Accessibilité des objectifs</h3>
+      <p class="note">Comparaison des fins possibles, sans modéliser le comportement réel des joueurs. Ces pourcentages ne prédisent pas leur réussite.</p>
+      <div id="goalAnalysisRows"></div>
+      <p id="analysisSummary" class="note"></p>
+    </div>
+    <hr>
     <button type="button" id="createNarrative">Créer la partie narrative</button>
     <div id="createdGame" hidden>
       <h3>Partie créée</h3>
