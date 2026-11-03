@@ -35,3 +35,25 @@ hr{border:0;border-top:1px solid var(--border);margin:20px 0}
 .instructions{font-size:13px;line-height:1.5;color:var(--muted)}
 @media(max-width:900px){.layout{grid-template-columns:1fr}}
 @media(max-width:600px){.top{display:block}.page{padding:16px}.panel{padding:16px}.grid2{grid-template-columns:1fr}}
+/* Family identity: color is always paired with its name and a distinct symbol. */
+.team-marker{color:var(--team);border-left:3px solid var(--team);padding-left:9px}
+.family-dashboard{--team:#82baff;--team-dark:#142b43;--gold:var(--team);--accent:var(--team);background:radial-gradient(ellipse at 10% 0,var(--team-dark),transparent 65%),#12191f;min-height:100vh}
+.family-dashboard .top{background:linear-gradient(110deg,var(--team-dark),#151b20);border-top:5px solid var(--team);border-bottom-color:var(--team)}
+.family-dashboard h1{color:var(--team)}
+.family-dashboard .panel{border-top:2px solid var(--team)}
+.family-dashboard button:not(.secondary){background:var(--team);border-color:var(--team);color:#13191f}
+.family-dashboard button.secondary{border-color:var(--team)}
+.family-dashboard .family-stat{background:var(--team-dark)}
+.family-dashboard .bar{background:var(--team)}
+.identity-panel{margin-bottom:20px}.identity-panel input{max-width:420px}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--team,#e5b867);outline-offset:4px}
+.building-sign{font:700 13px Georgia,serif;fill:#4b3c29;letter-spacing:.4px}.scene-note{font:700 8px Georgia,serif;fill:#57452e}
+.city-layer{animation:town-arrival .65s ease-out both}
+.city-evolution{color:#e2c895;line-height:1.6;min-height:1.6em}
+.city-legend{padding:14px 18px;border:1px solid var(--border);border-radius:10px;background:var(--panel)}
+.city-legend summary{cursor:pointer;color:#e3c994;font-size:13px}
+.city-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 24px;font-size:13px}
+.city-details strong,.city-details span{display:block}.city-details span{color:var(--muted);margin-top:5px}
+@keyframes town-arrival{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.city-layer{animation:none}.bar{transition:none}}
+@media(max-width:600px){.city-details{grid-template-columns:1fr}}

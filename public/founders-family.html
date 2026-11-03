@@ -1,9 +1,14 @@
 <!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Le Pacte · Espace Famille</title><link rel="stylesheet" href="/founders-live.css"><script src="/founders-family.js" defer></script></head>
-<body>
-<header class="top"><div><div class="eyebrow">Le Pacte · Votre Maison</div><h1 id="familyName">Espace porte-parole</h1></div><div class="row"><span class="chip" id="phase">Connexion…</span><span class="chip" id="turn">—</span></div></header>
+<title>Le Pacte · Espace Famille</title><link rel="stylesheet" href="/founders-live.css"><script type="module" src="/founders-family.js"></script></head>
+<body class="family-dashboard">
+<header class="top"><div><div class="eyebrow"><span id="teamIdentity">Le Pacte · Votre équipe</span></div><h1 id="familyName">Espace porte-parole</h1></div><div class="row"><span class="chip" id="phase">Connexion…</span><span class="chip" id="turn">—</span></div></header>
 <main class="page">
+<section id="identityPanel" class="panel identity-panel" hidden>
+ <div class="eyeline">Avant l’ouverture du Conseil</div><h2>Choisissez votre nom de famille</h2>
+ <p class="small muted">Un nom choisi ensemble, enregistré par votre porte-parole. Votre couleur reste le repère de l’équipe pendant la partie.</p>
+ <form id="identityForm" class="row"><label for="chosenName">Nom de famille</label><input id="chosenName" maxlength="60" required placeholder="Ex. Famille Blackwood"><button>Enregistrer le nom</button></form>
+</section>
 <div class="layout">
 <div>
  <section class="panel">

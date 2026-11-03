@@ -1,3 +1,4 @@
+import {teamCaption,teamLabel} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id),params=new URLSearchParams(location.search);
 const sessionId=params.get('session'),key='pacte-founder-family-'+sessionId;
@@ -35,7 +36,7 @@ function offers(data){
  for(const o of data.offers.slice(-30).reverse()){
   const el=document.createElement('div');el.className='card';
   const content=document.createElement('p');
-  content.textContent=(o.from===data.self.id?'Vous proposez ':'Proposition reçue : ')+o.amount+' $ de '+o.from+' à '+o.to+' · '+o.reason+' · '+o.status;
+  content.textContent=(o.from===data.self.id?'Vous proposez ':'Proposition reçue : ')+o.amount+' $ de '+teamLabel(data,o.from)+' à '+teamLabel(data,o.to)+' · '+o.reason+' · '+o.status;
   el.append(content);
   if(o.status==='pending'&&o.to===data.self.id){
    for(const [name,kind] of [['Accepter','acceptOffer'],['Refuser','rejectOffer']]){
@@ -52,8 +53,12 @@ function offers(data){
 function render(data){
  current=data;
  const self=data.self,c=data.council;
+ document.body.style.setProperty('--team',self.color.hex);document.body.style.setProperty('--team-dark',self.color.dark);
+ set('teamIdentity',self.color.symbol+' Équipe '+self.color.label+' · Porte-parole');
+ $('identityPanel').hidden=data.phase!=='READY';
+ if(document.activeElement!==$('chosenName'))$('chosenName').value=self.name==='Nom à choisir'?'':self.name;
  set('familyName',self.name);set('phase',nice[data.phase]||data.phase);
- set('turn',data.phase==='COUNCIL'?(c.turn===self.id?'À vous !':c.turn?'À '+c.turn:c.phase==='await_moderator'?'Arbitrage':'Choix du Meneur'):'—');
+ set('turn',data.phase==='COUNCIL'?(c.turn===self.id?'À vous !':c.turn?'À '+teamLabel(data,c.turn):c.phase==='await_moderator'?'Arbitrage':'Choix du Meneur'):'—');
  set('dilemmaLabel',data.dilemma?'Chapitre '+data.dilemma.chapter:'Conseil des Fondateurs');
  set('dilemmaTitle',data.dilemma?.title||(data.phase==='FINISHED'?'Fin de la campagne':'Conseil en préparation'));
  set('dilemmaText',data.dilemma?.public_text||'');
@@ -73,11 +78,11 @@ function render(data){
  const final=$('personalResult');final.hidden=!data.finalResults;
  if(data.finalResults){
   const r=data.finalResults.ranking.find(item=>item.family===self.id);
-  set('personalResultText',r.rank===1?'Votre famille remporte Le Pacte !':'Classement : '+r.rank+' / 6. Vainqueur : '+data.finalResults.ranking[0].name);
+  set('personalResultText',r.rank===1?'Votre famille remporte Le Pacte !':'Classement : '+r.rank+' / 6. Vainqueur : '+teamLabel(data,data.finalResults.ranking[0].family));
   set('personalScoreBreakdown','Objectif secret '+r.score.secret+' · Dollars '+r.score.wealth+
       ' · Votes '+r.score.council+' · Influence '+r.score.influence+' = '+r.score.total+' points');
  }
- set('familyStats',self.members+' membre(s) · Meneur '+data.leader+' · Modérateur '+data.moderator);
+ set('familyStats',self.members+' membre(s) · Meneur : '+teamLabel(data,data.leader)+' · Modérateur : '+teamLabel(data,data.moderator));
  set('committed',self.choice?'Votre position : '+self.choice+' · Mise engagée : '+self.bid:'Aucun vote engagé pour ce dilemme.');
  set('voteHint',self.mayVote?'Votre famille doit décider maintenant.':data.phase==='COUNCIL'?'Vous pouvez négocier en attendant votre tour.':'Le Conseil attend la prochaine phase.');
  $('firstVote').hidden=!(self.mayVote&&self.choice===null);
@@ -86,12 +91,12 @@ function render(data){
  $('moderatorLeader').hidden=!self.mayChooseLeader;
  const candidate=$('leaderCandidates');candidate.replaceChildren();
  if(self.mayChooseLeader)for(const id of c.pendingLeaderChoices){
-  const b=document.createElement('button');b.textContent='Désigner '+id;b.addEventListener('click',()=>command('chooseLeader',{family:id}));candidate.append(b);
+  const b=document.createElement('button');b.textContent='Désigner '+teamLabel(data,id);b.addEventListener('click',()=>command('chooseLeader',{family:id}));candidate.append(b);
  }
  $('offerForm').hidden=data.phase!=='COUNCIL';
  const target=$('targetFamily'),prev=target.value;target.replaceChildren();
  for(const f of data.families.filter(f=>f.id!==self.id)){
-  const option=document.createElement('option');option.value=f.id;option.textContent=f.name;target.append(option);
+  const option=document.createElement('option');option.value=f.id;option.textContent=teamCaption(f);target.append(option);
  }
  if(Array.from(target.options).some(x=>x.value===prev))target.value=prev;
  const reveal=$('lastReveal');reveal.hidden=!data.reveal;
@@ -125,4 +130,5 @@ $('offerForm').addEventListener('submit',e=>{
  const id=crypto.randomUUID();
  command('offer',{id,to:$('targetFamily').value,amount:Number($('offerAmount').value),reason:$('offerReason').value.trim()});
 });
+$('identityForm').addEventListener('submit',e=>{e.preventDefault();command('setIdentity',{name:$('chosenName').value.trim(),color:current.self.color.id});});
 refresh();setInterval(refresh,2500);

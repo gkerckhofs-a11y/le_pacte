@@ -1,3 +1,4 @@
+import {TEAM_COLORS,DEFAULT_TEAM_COLORS,teamCaption} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id);
 let catalog=null,authSDK=null,selectedPreview=null;
@@ -117,8 +118,14 @@ function field(section,id,label,type='text',max=0){
 }
 for(const id of FAMILY_IDS){
  const section=document.createElement('div');section.className='metric';section.style.marginTop='10px';
- const head=document.createElement('strong');head.textContent='Famille '+id;section.append(head);
- const name=field(section,'name-'+id,'Nom de la famille','text',60);name.value='Famille '+id;
+ const head=document.createElement('strong');head.textContent='Équipe '+TEAM_COLORS[FAMILY_IDS.indexOf(id)].label;section.append(head);
+ const name=field(section,'name-'+id,'Nom de la famille','text',60);name.value='Nom à choisir';name.placeholder='Choisi par les joueurs, ex. Blackwood';
+ const colorLabel=document.createElement('label');colorLabel.htmlFor='color-'+id;colorLabel.textContent='Couleur de l’équipe';
+ const color=document.createElement('select');color.id='color-'+id;
+ for(const c of TEAM_COLORS){const option=document.createElement('option');option.value=c.id;option.textContent=c.symbol+' '+c.label;color.append(option);}
+ color.value=DEFAULT_TEAM_COLORS[FAMILY_IDS.indexOf(id)];section.append(colorLabel,color);
+ color.addEventListener('change',()=>{head.textContent='Équipe '+TEAM_COLORS.find(c=>c.id===color.value).label;section.style.borderLeft='4px solid '+TEAM_COLORS.find(c=>c.id===color.value).hex;});
+ section.style.borderLeft='4px solid '+TEAM_COLORS[FAMILY_IDS.indexOf(id)].hex;
  field(section,'goalTitle-'+id,'Titre de l’ambition secrète','text',120);
  field(section,'goal-'+id,'Contexte secret de la famille','textarea',500);
  const metricLabel=document.createElement('label');metricLabel.htmlFor='goalIndicator-'+id;metricLabel.textContent='Indicateur à influencer';
@@ -191,12 +198,14 @@ for(const el of ['scenario','scenarioVersion','skin','members','initPower','init
 $('createNarrative').addEventListener('click',async()=>{
  if(!selectedPreview){state('Prévisualisez la sélection avant de créer la partie.','error');return;}
  const names=[...'ABCDEF'].map(id=>$('name-'+id).value.trim());
+ const colors=FAMILY_IDS.map(id=>$('color-'+id).value);
+ if(new Set(colors).size!==6){state('Choisissez une couleur différente pour chaque équipe.','error');return;}
  const objectives=[...'ABCDEF'].map(id=>$('goal-'+id).value.trim());
  const goalCards=collectGoalCards(),scoreRules=collectScoreRules();
  const code=$('gameCode').value.trim(),title=$('gameTitle').value.trim();
  const button=$('createNarrative');button.disabled=true;state('Création de la session…');
  try{
-  const result=await api('/api/founders/sessions','POST',{...selectedPreview,code,title,names,objectives,goalCards,scoreRules});
+  const result=await api('/api/founders/sessions','POST',{...selectedPreview,code,title,names,colors,objectives,goalCards,scoreRules});
   if(!authSDK)sessionStorage.setItem('pacte-founder-organizer-key',$('token').value.trim());
   const links=$('createdLinks');links.replaceChildren();
   const append=(label,path)=>{
@@ -209,7 +218,7 @@ $('createNarrative').addEventListener('click',async()=>{
   append('Ouvrir la projection publique','/founders-city.html?session='+result.id);
   for(const a of result.access){
    const path='/founders-family.html?session='+result.id+'#token='+encodeURIComponent(a.token);
-   append('Accès privé porte-parole : Famille '+a.family,path);
+   const i=FAMILY_IDS.indexOf(a.family);append('Accès privé porte-parole : '+teamCaption({name:names[i],color:TEAM_COLORS.find(c=>c.id===colors[i])}),path);
   }
   $('createdGame').hidden=false;
   button.disabled=true;

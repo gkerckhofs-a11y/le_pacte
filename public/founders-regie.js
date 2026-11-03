@@ -1,3 +1,4 @@
+import {teamCaption,teamLabel,colorize} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id),p=new URLSearchParams(location.search);
 const sid=p.get('session');let authSDK=null,cloud=false,token='',current=null,busy=false;
@@ -57,7 +58,7 @@ function render(s){
  current=s;set('phase',labels[s.phase]||s.phase);set('sessionCode',s.code+' · '+s.selection.scenarioVersion+' · skin '+s.selection.skinId);
  set('sessionTitle',s.title);set('revision','Révision '+s.revision);
  set('dilemmaInfo',s.dilemma?'Délibération : '+s.dilemma.title+(s.dilemma.vote_question?' — '+s.dilemma.vote_question:''):'');
- set('tiePriority','Tirage de départage final : '+s.finalTieOrder.join(' → '));
+ set('tiePriority','Tirage de départage final : '+s.finalTieOrder.map(id=>teamLabel(s,id)).join(' → '));
  $('start').hidden=s.phase!=='READY';
  $('reveal').hidden=s.phase!=='AWAITING_REVEAL';
  $('next').hidden=s.phase!=='REVEALED';
@@ -66,14 +67,14 @@ function render(s){
  if(s.reveal){set('outcomeHeading',s.reveal.winner==='pour'?'POUR l’emporte':'CONTRE l’emporte');set('outcomeDetail',s.reveal.narration);}
  $('publicLink').href='/founders-city.html?session='+s.id;
  gauge(s);
- set('votePhase',s.council.turn?'Au tour de '+s.council.turn:
+ set('votePhase',s.council.turn?'Au tour de '+teamLabel(s,s.council.turn):
   s.council.phase==='await_moderator'?'Le Modérateur arbitre':
   s.council.phase==='await_leader'?'Le Modérateur désigne un Meneur':
   s.phase==='AWAITING_REVEAL'?'Vote clos':'');
  const votes=$('ballots');votes.replaceChildren();
  for(const f of s.families){
   const card=document.createElement('div');card.className='ballot';
-  const a=document.createElement('span');a.textContent=f.name;
+  const a=document.createElement('span');a.textContent=teamCaption(f);colorize(a,f);
   const b=document.createElement('span');b.textContent=s.council.choices[f.id]||'—';
   const c=document.createElement('strong');c.textContent=s.council.bids[f.id]||0;
   card.append(a,b,c);votes.append(card);
@@ -82,7 +83,7 @@ function render(s){
  for(const family of s.families){
   const el=document.createElement('div');el.className='card';
   const head=document.createElement('div');head.className='row between';
-  const name=document.createElement('strong');name.textContent=family.name+' · '+family.members+' pers.';
+  const name=document.createElement('strong');name.textContent=teamCaption(family)+' · '+family.members+' pers.';
   const button=document.createElement('button');button.className='secondary';button.textContent='Créer un accès';
   button.addEventListener('click',()=>rotate(family.id));head.append(name,button);el.append(head);
   const details=document.createElement('div');details.className='small muted';
@@ -92,11 +93,11 @@ function render(s){
  }
  const final=$('finalPanel');final.hidden=!s.finalResults;
  if(s.finalResults){
-  set('finalWinner',s.finalResults.ranking[0].name+' remporte la partie ('+s.finalResults.ranking[0].score.total+' pts)');
+  set('finalWinner',teamLabel(s,s.finalResults.ranking[0].family)+' remporte la partie ('+s.finalResults.ranking[0].score.total+' pts)');
   const root=$('ranking');root.replaceChildren();
   for(const r of s.finalResults.ranking){
    const el=document.createElement('div');el.className='ballot';
-   const family=document.createElement('strong');family.textContent=r.rank+'. '+r.name;
+   const family=document.createElement('strong');family.textContent=r.rank+'. '+teamLabel(s,r.family);
    const detail=document.createElement('span');detail.textContent='Objectif '+r.score.secret+' · Richesse '+r.score.wealth+
       ' · Politique '+r.score.council+' · Influence '+r.score.influence;
    const points=document.createElement('strong');points.textContent=r.score.total;

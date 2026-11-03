@@ -1,3 +1,4 @@
+import {DEFAULT_TEAM_COLORS,teamColor} from '../public/founders-identity.js';
 /**
  * LE PACTE — independent narrative session domain (V2.5).
  *
@@ -23,15 +24,15 @@ const has=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
 const maxOffers=60;
 const phaseNames=['READY','COUNCIL','AWAITING_REVEAL','REVEALED','FINISHED'];
 export const TEST_FAMILY_OBJECTIVES=Object.freeze([
-  'Objectif de test : faire atteindre au moins 7/10 à l’Économie.',
+  'Objectif de test : développer l’Économie selon les paliers de votre ambition.',
   'Objectif de test : faire monter la Sécurité (5 puis 7).',
-  'Objectif de test : faire progresser la Satisfaction populaire (4 puis 6).',
+  'Objectif de test : faire progresser la Satisfaction populaire (voir les paliers de votre ambition).',
   'Objectif de test : améliorer le Bien-être (6 puis 8).',
-  'Objectif de test : développer la ville (8 puis 10).',
-  'Objectif de test : préserver l’autonomie des fondateurs en affaiblissant la Stabilité (4 puis 3).'
+  'Objectif de test : développer la ville (voir les paliers de votre ambition).',
+  'Objectif de test : préserver l’autonomie des fondateurs en affaiblissant la Stabilité (voir les paliers de votre ambition).'
 ]);
 
-export function createNarrativeSession(preview,{id,ownerId,code,title,objectives=TEST_FAMILY_OBJECTIVES,names=FOUNDERS.map(id=>'Famille '+id),goalCards=DEFAULT_GOAL_CARDS,scoreRules=DEFAULT_SCORE_RULES,initiativeOrder=FOUNDERS,now=Date.now()}) {
+export function createNarrativeSession(preview,{id,ownerId,code,title,objectives=TEST_FAMILY_OBJECTIVES,names=FOUNDERS.map(()=> 'Nom à choisir'),colors=DEFAULT_TEAM_COLORS,goalCards=DEFAULT_GOAL_CARDS,scoreRules=DEFAULT_SCORE_RULES,initiativeOrder=FOUNDERS,now=Date.now()}) {
  check(preview?.kind==='founders-session-preview-v2.3'&&preview.previewOnly===true,'Configuration narrative invalide');
  check(typeof id==='string'&&/^[a-f0-9]{24}$/.test(id),'Identifiant de session invalide');
  check(str(ownerId,128),'Organisateur requis');
@@ -39,6 +40,7 @@ export function createNarrativeSession(preview,{id,ownerId,code,title,objectives
  check(str(title,100),'Titre de partie invalide');
  check(Array.isArray(objectives)&&objectives.length===6&&objectives.every(x=>str(x,500)),'Six objectifs de famille requis');
  check(Array.isArray(names)&&names.length===6&&names.every(x=>str(x,60)),'Six noms de famille requis');
+ check(Array.isArray(colors)&&colors.length===6&&new Set(colors).size===6&&colors.every(c=>teamColor(c)),'Six couleurs distinctes de la palette requises');
  const goalErrors=validateGoalCards(goalCards);check(!goalErrors.length,goalErrors.join(' ; '));
  const scoreErrors=validateScoreRules(scoreRules);check(!scoreErrors.length,scoreErrors.join(' ; '));
  check(Array.isArray(initiativeOrder)&&initiativeOrder.length===6&&new Set(initiativeOrder).size===6&&initiativeOrder.every(id=>FOUNDERS.includes(id)),'Tirage des familles invalide');
@@ -50,6 +52,7 @@ export function createNarrativeSession(preview,{id,ownerId,code,title,objectives
   selection:copy(preview.selection),scenario:copy(preview.scenario),skin:copy(preview.skin),
   source:copy(preview.source),game:copy(preview.game),
   names:Object.fromEntries(FOUNDERS.map((id,i)=>[id,names[i]])),
+  colors:Object.fromEntries(FOUNDERS.map((id,i)=>[id,colors[i]])),
   goals:Object.fromEntries(FOUNDERS.map((id,i)=>[id,objectives[i]])),
   goalCards:copy(goalCards),scoreRules:copy(scoreRules),initiativeOrder:copy(initiativeOrder),finalResults:null,
   phase:'READY',currentDilemmaId:preview.scenario.scenario.entry_dilemma,
@@ -78,6 +81,18 @@ export function applyNarrativeCommand(input,actor,command,now){
  const org=()=>check(actor.role==='organizer','Régie uniquement');
  const team=()=>check(actor.role==='team','Porte-parole uniquement');
  switch(kind){
+  case 'setIdentity': {
+   check(s.phase==='READY','Identité figée après le lancement');
+   const fid=actor.role==='team'?actor.family:data.family;
+   check(familyId(fid),'Famille inconnue');
+   if(actor.role==='team')check(data.family===undefined||data.family===fid,'Votre famille uniquement');
+   check(str(data.name,60),'Nom de famille requis (60 caractères maximum)');
+   check(teamColor(data.color),'Couleur inconnue');
+   const currentColors=s.colors??Object.fromEntries(FOUNDERS.map((id,i)=>[id,DEFAULT_TEAM_COLORS[i]]));
+   check(!FOUNDERS.some(id=>id!==fid&&currentColors[id]===data.color),'Cette couleur appartient déjà à une autre équipe');
+   s.names[fid]=data.name.trim();s.colors={...currentColors,[fid]:data.color};break;
+  }
+
   case 'start':
    org();check(s.phase==='READY','La partie est déjà lancée');
    s.game=openFoundersDilemma(s.game,s.currentDilemmaId);s.phase='COUNCIL';break;
@@ -162,7 +177,7 @@ export function narrativePublicView(s){
   kind:s.kind,id:s.id,code:s.code,title:s.title,phase:s.phase,revision:s.revision,
   story:{id:s.scenario.scenario.id,title:s.scenario.scenario.title,location:s.scenario.scenario.location,year:s.scenario.scenario.year},
   skin:{id:s.skin.id,title:s.skin.title,labels:copy(s.skin.labels),theme:copy(s.skin.theme),publicScene:copy(s.skin.publicScene)},
-  city:copy(s.game.city),families:FOUNDERS.map(id=>({id,name:s.names[id],members:s.game.families[id].members})),
+  city:copy(s.game.city),families:FOUNDERS.map((id,i)=>({id,name:s.names[id],color:copy(teamColor(s.colors?.[id]??DEFAULT_TEAM_COLORS[i])),members:s.game.families[id].members})),
   leader:s.game.leader,moderator:s.game.moderator,
   dilemma:publicDilemma(s),
   council:v?{phase:v.phase,turn:v.turn,bids:copy(v.bids),choices:copy(v.choices),
@@ -180,7 +195,7 @@ export function narrativeFamilyView(s,family){
  const card=s.goalCards?.[family]??DEFAULT_GOAL_CARDS[family];
  const progress=evaluateGoal(card,s.game.city,s.scoreRules??DEFAULT_SCORE_RULES);
  const offers=Object.values(s.offers).filter(o=>o.from===family||o.to===family).map(copy);
- return {...view,self:{id:family,name:s.names[family],objective:s.goals[family],
+ return {...view,self:{id:family,name:s.names[family],color:copy(view.families.find(f=>f.id===family).color),objective:s.goals[family],
   members:s.game.families[family].members,power:s.game.families[family].power,dollars:s.game.families[family].dollars,
   choice:v?.choices[family]??null,bid:v?.bids[family]??0,
   mayVote:s.phase==='COUNCIL'&&v?.phase==='voting'&&v?.turn===family,
