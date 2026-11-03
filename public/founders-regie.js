@@ -1,26 +1,35 @@
+import {councilGuidance,startCouncil,organizerError,validNarrativeSession} from './founders-regie-flow.js';
 import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
 import {teamCaption,teamLabel,colorize} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id),p=new URLSearchParams(location.search);
-const sid=p.get('session');let authSDK=null,cloud=false,token='',current=null,busy=false;
+const sid=p.get('session');let authSDK=null,cloud=false,token='',current=null,busy=false,initialized=false,authenticating=false;
 const labels={READY:'Prêt',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'En attente de la révélation',REVEALED:'Résultat annoncé',FINISHED:'Partie terminée'};
 const gaugeIds=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
 const set=(id,v)=>$(id).textContent=String(v??'');
-const secure=()=>sid&&/^[a-f0-9]{24}$/.test(sid);
+const secure=()=>validNarrativeSession(sid);
+function step(number){for(let i=1;i<=3;i++)if(i===number)$('step'+i).setAttribute('aria-current','step');else $('step'+i).removeAttribute('aria-current');}
+function account(){const user=authSDK?.currentAccount?.();return user?.email||user?.displayName||'Compte organisateur connecté';}
 async function init(){
- if(!secure())throw new Error('Adresse de régie incomplète : identifiant de partie manquant.');
- const r=await fetch('/api/catalog',{cache:'no-store'});
- if(!r.ok)throw new Error('Connexion API indisponible');
- const c=await r.json();cloud=c.authMode==='firebase';
- if(cloud){
-  authSDK=await import('/firebase-auth.js');
-  await authSDK.configure(c.firebaseConfig,c.authEmulatorUrl);
-  $('localKey').hidden=true;
- }else{
-  token=sessionStorage.getItem('pacte-founder-organizer-key')||'';
-  $('localKey').value=token;
- }
- await refresh();
+ initialized=false;$('login').disabled=true;$('retryInit').hidden=true;set('phase','Connexion en cours…');set('loginMessage','');
+ try{
+  if(sid&&!secure())throw new Error('Ce lien de régie est incomplet ou invalide. Retrouvez la partie depuis sa configuration.');
+  const r=await fetch('/api/catalog',{cache:'no-store'});
+  if(!r.ok)throw new Error('Le serveur ne répond pas. Vérifiez votre connexion et réessayez.');
+  const c=await r.json();cloud=c.authMode==='firebase';
+  $('localLogin').hidden=cloud;
+  if(cloud){
+   authSDK=await import('/firebase-auth.js');
+   await authSDK.configure(c.firebaseConfig,c.authEmulatorUrl);
+   set('loginHelp','Utilisez le compte Google organisateur qui a créé la partie. Les liens des équipes ne permettent pas de lancer le jeu.');
+   set('login','Se connecter avec Google');
+  }else{
+   token=sessionStorage.getItem('pacte-founder-organizer-key')||'';$('localKey').value=token;
+   set('loginHelp','Saisissez la clé organisateur de votre répétition locale.');set('login','Ouvrir la régie');
+  }
+  initialized=true;$('login').disabled=false;
+  await refresh();
+ }catch(error){set('phase','Connexion indisponible');set('loginMessage',organizerError(error));$('retryInit').hidden=false;}
 }
 async function organizerToken(){
  if(cloud){token=await authSDK.currentToken();if(!token)throw new Error('Connectez le compte organisateur Google.');}
@@ -33,16 +42,46 @@ async function api(path,method='GET',body){
  const r=await fetch('/api/founders/sessions/'+sid+path,{
   method,headers:{Authorization:'Bearer '+bearer,...(body?{'Content-Type':'application/json'}:{})},
   body:body?JSON.stringify(body):undefined,cache:'no-store'});
- const data=await r.json();if(!r.ok)throw new Error(data.error||'Requête refusée');
+ const data=await r.json();if(!r.ok){const error=new Error(data.error||'Requête refusée');error.status=r.status;throw error;}
  return data;
 }
+async function listSessions(){
+ const bearer=await organizerToken(),r=await fetch('/api/founders/sessions',{headers:{Authorization:'Bearer '+bearer},cache:'no-store'});
+ const data=await r.json();if(!r.ok){const error=new Error(data.error||'Impossible de retrouver vos parties.');error.status=r.status;throw error;}
+ const root=$('sessionsList');root.replaceChildren();$('sessionPicker').hidden=false;
+ for(const session of data.sessions){
+  if(!validNarrativeSession(session.id))continue;
+  const row=document.createElement('div');row.className='card row between';
+  const title=document.createElement('strong');title.textContent=session.code+' · '+session.title+' · '+(labels[session.phase]||session.phase);
+  const link=document.createElement('a');link.textContent='Ouvrir la régie →';link.href='/founders-regie.html?session='+session.id;row.append(title,link);root.append(row);
+ }
+ if(!data.sessions.length)root.textContent='Aucune partie trouvée pour ce compte. Changez de compte Google ou créez une partie.';
+}
+function connected(){
+ $('loginPanel').hidden=true;$('accountPanel').hidden=false;$('chooseSession').hidden=false;$('changeAccount').hidden=!cloud;
+ set('signedInAs',cloud?'Connecté : '+account():'Régie locale connectée');
+}
+function connectionFailure(error){
+ set('loginMessage',organizerError(error));$('loginPanel').hidden=false;
+ if(!current)set('phase','Connexion requise');
+ if(error.status===403||/organisateur Google|Clé régie requise/.test(error.message)){
+  $('regieContent').hidden=true;$('accountPanel').hidden=true;step(1);
+  const user=authSDK?.currentAccount?.();
+  if(user){set('login','Changer de compte Google');set('loginMessage','Compte connecté : '+account()+'. '+organizerError(error));}
+ }
+}
 async function refresh(){
- if(busy||!secure())return;
+ if(busy||!initialized||authenticating)return;
  try{
-  const s=await api('');if(current?.revision!==s.revision)render(s);
-  $('loginPanel').hidden=true;$('regieContent').hidden=false;
-  set('notice','');
- }catch(e){set('loginMessage',e.message);$('loginPanel').hidden=false;}
+  if(!secure()){
+   if(!$('sessionPicker').hidden)return;
+   await listSessions();connected();set('phase','Choisir une partie');step(2);return;
+  }
+  const s=await api('');
+  if(busy||s.revision<(current?.revision??-1))return;
+  if(current?.revision!==s.revision)render(s);
+  connected();$('regieContent').hidden=false;
+ }catch(error){connectionFailure(error);}
 }
 function gauge(s){
  const root=$('gauges');root.replaceChildren();
@@ -57,14 +96,19 @@ function gauge(s){
 }
 function render(s){
  applySkin(document.body,s.skin);
- current=s;set('phase',labels[s.phase]||s.phase);set('sessionCode',s.code+' · '+s.selection.scenarioVersion+' · skin '+s.selection.skinId);
+ current=s;
+ const guidance=councilGuidance(s);step(guidance.step);set('stageTitle',guidance.title);set('stageHint',guidance.hint);
+ $('preparation').hidden=s.phase!=='READY';
+ const named=s.families.filter(f=>f.name&&f.name!=='Nom à choisir').length;set('teamReadyCount',named+'/6 équipes ont choisi leur nom');
+ $('preparePublicLink').href='/founders-city.html?session='+s.id;
+ set('phase',labels[s.phase]||s.phase);set('sessionCode',s.code+' · '+s.selection.scenarioVersion+' · skin '+s.selection.skinId);
  set('sessionTitle',s.title);set('revision','Révision '+s.revision);
  set('dilemmaInfo',s.dilemma?'Délibération : '+s.dilemma.title+(s.dilemma.vote_question?' — '+s.dilemma.vote_question:''):'');
  set('tiePriority','Tirage de départage final : '+s.finalTieOrder.map(id=>teamLabel(s,id)).join(' → '));
  $('start').hidden=s.phase!=='READY';
  $('reveal').hidden=s.phase!=='AWAITING_REVEAL';
  $('next').hidden=s.phase!=='REVEALED';
- $('next').textContent=s.reveal?.nextId===null?'Terminer la campagne':'Dilemme suivant';
+ $('next').textContent=s.reveal?.nextId===null?'Terminer la partie':'Dilemme suivant';
  $('lastReveal').hidden=!s.reveal;
  if(s.reveal){set('outcomeHeading',s.reveal.winner==='pour'?'POUR l’emporte':'CONTRE l’emporte');set('outcomeDetail',s.reveal.narration);}
  $('publicLink').href='/founders-city.html?session='+s.id;
@@ -86,7 +130,7 @@ function render(s){
   const el=document.createElement('div');el.className='card';
   const head=document.createElement('div');head.className='row between';
   const name=document.createElement('strong');name.textContent=teamCaption(family)+' · '+family.members+' pers.';
-  const button=document.createElement('button');button.className='secondary';button.textContent='Créer un accès';
+  const button=document.createElement('button');button.className='secondary';button.textContent='Renouveler le lien privé';
   button.addEventListener('click',()=>rotate(family.id));head.append(name,button);el.append(head);
   const details=document.createElement('div');details.className='small muted';
   const resources=s.familyResources[family.id];
@@ -116,12 +160,12 @@ function render(s){
 }
 async function command(kind,data={}){
  if(!current||busy)return;
- busy=true;set('notice','Enregistrement…');
+ busy=true;set('actionMessage','Enregistrement…');$('actions').querySelectorAll('button').forEach(b=>b.disabled=true);
  try{
   const s=await api('/commands','POST',{kind,data,expectedRevision:current.revision});
-  render(s);set('notice','Commande enregistrée.');
- }catch(e){set('notice',e.message);}
- finally{busy=false;}
+  render(s);set('actionMessage',kind==='reveal'?'Décision révélée sur la projection.':s.phase==='FINISHED'?'Partie terminée : classement affiché.':'Le prochain dilemme est ouvert.');
+ }catch(e){set('actionMessage',e.message);try{render(await api(''));}catch{}}
+ finally{busy=false;$('actions').querySelectorAll('button').forEach(b=>b.disabled=false);}
 }
 async function rotate(family){
  if(busy)return;busy=true;set('notice','Renouvellement du jeton…');
@@ -134,19 +178,33 @@ async function rotate(family){
  }catch(e){set('notice',e.message);}
  finally{busy=false;}
 }
-$('start').addEventListener('click',()=>command('start'));
+$('start').addEventListener('click',async()=>{
+ if(!current||busy)return;
+ busy=true;$('start').disabled=true;set('actionMessage','Ouverture du premier dilemme…');
+ try{
+  const result=await startCouncil(api);render(result.view);
+  set('actionMessage',result.started?'Partie lancée. Le premier dilemme est affiché ; le Maire peut voter sur son écran d’équipe.':'La partie a déjà démarré. La régie affiche son état actuel.');
+ }catch(error){set('actionMessage',organizerError(error));try{render(await api(''));}catch{}}
+ finally{busy=false;$('start').disabled=false;}
+});
 $('reveal').addEventListener('click',()=>command('reveal'));
 $('next').addEventListener('click',()=>command('next'));
 $('copyAccess').addEventListener('click',async()=>{
  try{await navigator.clipboard.writeText($('newAccessLink').value);set('notice','Lien copié.');}
  catch{set('notice','Sélectionnez et copiez le lien dans le champ.');}
 });
-$('login').addEventListener('click',async()=>{
+async function login(){
+ if(!initialized||authenticating)return;
+ authenticating=true;current=null;$('regieContent').hidden=true;$('sessionPicker').hidden=true;$('accountPanel').hidden=true;$('login').disabled=true;$('changeAccount').disabled=true;set('loginMessage','Ouverture de la connexion…');
  try{
   if(cloud)await authSDK.login();
   else sessionStorage.setItem('pacte-founder-organizer-key',$('localKey').value.trim());
-  await refresh();
- }catch(e){set('loginMessage',e.message);}
-});
-init().catch(e=>{set('loginMessage',e.message);});
-setInterval(refresh,2500);
+  authenticating=false;await refresh();
+ }catch(error){set('loginMessage',organizerError(error));$('loginPanel').hidden=false;}
+ finally{authenticating=false;$('login').disabled=false;$('changeAccount').disabled=false;}
+}
+$('login').addEventListener('click',login);
+$('changeAccount').addEventListener('click',login);
+$('retryInit').addEventListener('click',init);
+$('chooseSession').addEventListener('click',async()=>{try{await listSessions();}catch(error){set('notice',organizerError(error));}});
+init();setInterval(refresh,2500);

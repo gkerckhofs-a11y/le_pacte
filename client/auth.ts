@@ -7,6 +7,7 @@ export async function configure(config:any,emulatorUrl?:string){
  if(emulatorUrl){if(!['localhost','127.0.0.1'].includes(location.hostname)||!config.projectId.startsWith('demo-'))throw new Error('Émulateur Auth refusé hors environnement local de démonstration');connectAuthEmulator(auth,emulatorUrl,{disableWarnings:true});}
  await setPersistence(auth,browserSessionPersistence);await auth.authStateReady();
 }
+export function currentAccount(){const user=auth?.currentUser;return user?{email:user.email,displayName:user.displayName}:null;}
 export async function currentToken(){await auth.authStateReady();return auth.currentUser?await auth.currentUser.getIdToken():'';}
 export async function login(){const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});await signInWithPopup(auth,provider);return currentToken();}
 /**
