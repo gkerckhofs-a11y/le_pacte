@@ -1,0 +1,474 @@
+{
+  "kind": "held-out",
+  "seeds": [
+    44009,
+    77123,
+    180031,
+    900001,
+    314159
+  ],
+  "runsPerSeed": 120,
+  "caution": "Synthetic agents, not human win probabilities. Same six goals and initial resources in both versions. Agents prefer immediate directional gauge gains; they do not anticipate unlocks or negotiate freely.",
+  "versions": {
+    "1-1": {
+      "prudent": {
+        "completed": 600,
+        "failed": 0,
+        "coverage": [
+          "D01",
+          "D02",
+          "D03",
+          "D04",
+          "D05",
+          "D06",
+          "D07",
+          "D08",
+          "D09",
+          "D10",
+          "D11",
+          "D12",
+          "D13",
+          "D14",
+          "D15",
+          "D16",
+          "D17",
+          "D18",
+          "D19",
+          "D20"
+        ],
+        "families": {
+          "A": {
+            "wins": 105,
+            "minRelevant": 7,
+            "maxRelevant": 9,
+            "winPercent": 17.5,
+            "meanPoints": 8.72,
+            "meanGoalPoints": 4.16
+          },
+          "B": {
+            "wins": 55,
+            "minRelevant": 0,
+            "maxRelevant": 3,
+            "winPercent": 9.17,
+            "meanPoints": 8.66,
+            "meanGoalPoints": 3.56
+          },
+          "C": {
+            "wins": 90,
+            "minRelevant": 5,
+            "maxRelevant": 8,
+            "winPercent": 15,
+            "meanPoints": 8.43,
+            "meanGoalPoints": 3.69
+          },
+          "D": {
+            "wins": 120,
+            "minRelevant": 3,
+            "maxRelevant": 7,
+            "winPercent": 20,
+            "meanPoints": 8.67,
+            "meanGoalPoints": 3.73
+          },
+          "E": {
+            "wins": 114,
+            "minRelevant": 4,
+            "maxRelevant": 7,
+            "winPercent": 19,
+            "meanPoints": 9.3,
+            "meanGoalPoints": 4.42
+          },
+          "F": {
+            "wins": 116,
+            "minRelevant": 2,
+            "maxRelevant": 3,
+            "winPercent": 19.33,
+            "meanPoints": 9.64,
+            "meanGoalPoints": 4.48
+          }
+        }
+      },
+      "ambitieux": {
+        "completed": 600,
+        "failed": 0,
+        "coverage": [
+          "D01",
+          "D02",
+          "D03",
+          "D04",
+          "D05",
+          "D06",
+          "D07",
+          "D08",
+          "D09",
+          "D10",
+          "D11",
+          "D12",
+          "D13",
+          "D14",
+          "D15",
+          "D16",
+          "D17",
+          "D18",
+          "D19",
+          "D20"
+        ],
+        "families": {
+          "A": {
+            "wins": 101,
+            "minRelevant": 7,
+            "maxRelevant": 9,
+            "winPercent": 16.83,
+            "meanPoints": 7.63,
+            "meanGoalPoints": 3.62
+          },
+          "B": {
+            "wins": 65,
+            "minRelevant": 0,
+            "maxRelevant": 3,
+            "winPercent": 10.83,
+            "meanPoints": 8.37,
+            "meanGoalPoints": 3.6
+          },
+          "C": {
+            "wins": 81,
+            "minRelevant": 5,
+            "maxRelevant": 8,
+            "winPercent": 13.5,
+            "meanPoints": 7.8,
+            "meanGoalPoints": 3.42
+          },
+          "D": {
+            "wins": 118,
+            "minRelevant": 3,
+            "maxRelevant": 7,
+            "winPercent": 19.67,
+            "meanPoints": 8.31,
+            "meanGoalPoints": 3.67
+          },
+          "E": {
+            "wins": 161,
+            "minRelevant": 4,
+            "maxRelevant": 7,
+            "winPercent": 26.83,
+            "meanPoints": 9.62,
+            "meanGoalPoints": 4.92
+          },
+          "F": {
+            "wins": 74,
+            "minRelevant": 2,
+            "maxRelevant": 3,
+            "winPercent": 12.33,
+            "meanPoints": 8.84,
+            "meanGoalPoints": 3.89
+          }
+        }
+      },
+      "mixte": {
+        "completed": 600,
+        "failed": 0,
+        "coverage": [
+          "D01",
+          "D02",
+          "D03",
+          "D04",
+          "D05",
+          "D06",
+          "D07",
+          "D08",
+          "D09",
+          "D10",
+          "D11",
+          "D12",
+          "D13",
+          "D14",
+          "D15",
+          "D16",
+          "D17",
+          "D18",
+          "D19",
+          "D20"
+        ],
+        "families": {
+          "A": {
+            "wins": 89,
+            "minRelevant": 7,
+            "maxRelevant": 9,
+            "winPercent": 14.83,
+            "meanPoints": 8.13,
+            "meanGoalPoints": 3.88
+          },
+          "B": {
+            "wins": 60,
+            "minRelevant": 0,
+            "maxRelevant": 3,
+            "winPercent": 10,
+            "meanPoints": 8.49,
+            "meanGoalPoints": 3.63
+          },
+          "C": {
+            "wins": 94,
+            "minRelevant": 5,
+            "maxRelevant": 8,
+            "winPercent": 15.67,
+            "meanPoints": 8.29,
+            "meanGoalPoints": 3.66
+          },
+          "D": {
+            "wins": 114,
+            "minRelevant": 3,
+            "maxRelevant": 7,
+            "winPercent": 19,
+            "meanPoints": 8.32,
+            "meanGoalPoints": 3.65
+          },
+          "E": {
+            "wins": 139,
+            "minRelevant": 4,
+            "maxRelevant": 7,
+            "winPercent": 23.17,
+            "meanPoints": 9.44,
+            "meanGoalPoints": 4.8
+          },
+          "F": {
+            "wins": 104,
+            "minRelevant": 2,
+            "maxRelevant": 3,
+            "winPercent": 17.33,
+            "meanPoints": 9.15,
+            "meanGoalPoints": 4.19
+          }
+        }
+      }
+    },
+    "1-2": {
+      "prudent": {
+        "completed": 600,
+        "failed": 0,
+        "coverage": [
+          "D01",
+          "D02",
+          "D03",
+          "D04",
+          "D05",
+          "D06",
+          "D07",
+          "D08",
+          "D09",
+          "D10",
+          "D11",
+          "D12",
+          "D13",
+          "D14",
+          "D15",
+          "D16",
+          "D17",
+          "D18",
+          "D19",
+          "D20"
+        ],
+        "families": {
+          "A": {
+            "wins": 118,
+            "minRelevant": 7,
+            "maxRelevant": 9,
+            "winPercent": 19.67,
+            "meanPoints": 8.75,
+            "meanGoalPoints": 4.21
+          },
+          "B": {
+            "wins": 95,
+            "minRelevant": 3,
+            "maxRelevant": 6,
+            "winPercent": 15.83,
+            "meanPoints": 7.91,
+            "meanGoalPoints": 3.07
+          },
+          "C": {
+            "wins": 102,
+            "minRelevant": 5,
+            "maxRelevant": 8,
+            "winPercent": 17,
+            "meanPoints": 8.28,
+            "meanGoalPoints": 3.47
+          },
+          "D": {
+            "wins": 89,
+            "minRelevant": 3,
+            "maxRelevant": 7,
+            "winPercent": 14.83,
+            "meanPoints": 8.65,
+            "meanGoalPoints": 3.73
+          },
+          "E": {
+            "wins": 107,
+            "minRelevant": 4,
+            "maxRelevant": 7,
+            "winPercent": 17.83,
+            "meanPoints": 9.16,
+            "meanGoalPoints": 4.22
+          },
+          "F": {
+            "wins": 89,
+            "minRelevant": 2,
+            "maxRelevant": 3,
+            "winPercent": 14.83,
+            "meanPoints": 9.13,
+            "meanGoalPoints": 3.94
+          }
+        }
+      },
+      "ambitieux": {
+        "completed": 600,
+        "failed": 0,
+        "coverage": [
+          "D01",
+          "D02",
+          "D03",
+          "D04",
+          "D05",
+          "D06",
+          "D07",
+          "D08",
+          "D09",
+          "D10",
+          "D11",
+          "D12",
+          "D13",
+          "D14",
+          "D15",
+          "D16",
+          "D17",
+          "D18",
+          "D19",
+          "D20"
+        ],
+        "families": {
+          "A": {
+            "wins": 98,
+            "minRelevant": 7,
+            "maxRelevant": 9,
+            "winPercent": 16.33,
+            "meanPoints": 7.35,
+            "meanGoalPoints": 3.44
+          },
+          "B": {
+            "wins": 138,
+            "minRelevant": 3,
+            "maxRelevant": 6,
+            "winPercent": 23,
+            "meanPoints": 8.75,
+            "meanGoalPoints": 4.15
+          },
+          "C": {
+            "wins": 96,
+            "minRelevant": 5,
+            "maxRelevant": 8,
+            "winPercent": 16,
+            "meanPoints": 7.93,
+            "meanGoalPoints": 3.45
+          },
+          "D": {
+            "wins": 103,
+            "minRelevant": 3,
+            "maxRelevant": 7,
+            "winPercent": 17.17,
+            "meanPoints": 8.65,
+            "meanGoalPoints": 4.03
+          },
+          "E": {
+            "wins": 115,
+            "minRelevant": 4,
+            "maxRelevant": 7,
+            "winPercent": 19.17,
+            "meanPoints": 9.34,
+            "meanGoalPoints": 4.67
+          },
+          "F": {
+            "wins": 50,
+            "minRelevant": 2,
+            "maxRelevant": 3,
+            "winPercent": 8.33,
+            "meanPoints": 7.79,
+            "meanGoalPoints": 2.95
+          }
+        }
+      },
+      "mixte": {
+        "completed": 600,
+        "failed": 0,
+        "coverage": [
+          "D01",
+          "D02",
+          "D03",
+          "D04",
+          "D05",
+          "D06",
+          "D07",
+          "D08",
+          "D09",
+          "D10",
+          "D11",
+          "D12",
+          "D13",
+          "D14",
+          "D15",
+          "D16",
+          "D17",
+          "D18",
+          "D19",
+          "D20"
+        ],
+        "families": {
+          "A": {
+            "wins": 99,
+            "minRelevant": 7,
+            "maxRelevant": 9,
+            "winPercent": 16.5,
+            "meanPoints": 7.89,
+            "meanGoalPoints": 3.65
+          },
+          "B": {
+            "wins": 123,
+            "minRelevant": 3,
+            "maxRelevant": 6,
+            "winPercent": 20.5,
+            "meanPoints": 8.55,
+            "meanGoalPoints": 4.09
+          },
+          "C": {
+            "wins": 75,
+            "minRelevant": 5,
+            "maxRelevant": 8,
+            "winPercent": 12.5,
+            "meanPoints": 7.94,
+            "meanGoalPoints": 3.44
+          },
+          "D": {
+            "wins": 122,
+            "minRelevant": 3,
+            "maxRelevant": 7,
+            "winPercent": 20.33,
+            "meanPoints": 8.62,
+            "meanGoalPoints": 3.95
+          },
+          "E": {
+            "wins": 114,
+            "minRelevant": 4,
+            "maxRelevant": 7,
+            "winPercent": 19,
+            "meanPoints": 9.2,
+            "meanGoalPoints": 4.51
+          },
+          "F": {
+            "wins": 67,
+            "minRelevant": 2,
+            "maxRelevant": 3,
+            "winPercent": 11.17,
+            "meanPoints": 8.16,
+            "meanGoalPoints": 3.18
+          }
+        }
+      }
+    }
+  }
+}

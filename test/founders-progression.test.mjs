@@ -82,10 +82,12 @@ test('Hybrid: impossible schema, unknown references, unsafe conditions and too m
   s=>s.dilemmas[0]=null
  ]){const s=fixture().scenario;mutate(s);assert.ok(validateFoundersStory(s).length);}
 });
-test('Hybrid: old branch-only analyzers reject the new mode rather than reporting misleading balance figures',()=>{
+test('Hybrid: exhaustive branch analyzer rejects hybrids; policy lab follows the reserve',()=>{
  const story=fixture().scenario;
  assert.throws(()=>analyzeFoundersGoalReachability(story),/hybride/);
- assert.throws(()=>simulateFoundersPolicies(story),/hybride/);
+ const report=simulateFoundersPolicies(story,{runs:12});
+ assert.equal(report.completed,12,JSON.stringify(report.failures));
+ assert.ok(report.meanCouncils>=8&&report.meanCouncils<=10);
 });
 
 test('Hybrid: identical POUR decisions can lead to different chapter orders across sessions',()=>{

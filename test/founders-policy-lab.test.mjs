@@ -85,3 +85,23 @@ test('Compatibilité : une session V2.6 enregistrée sans powerSupply reste joua
  assert.equal(totalPower(old),51);
  assert.equal(old.vote.turn,'B');
 });
+
+test('Hybride : conservation des versions et leviers garantis pour les six ambitions',()=>{
+ const old=foundersPreview({scenarioId:'hot-spring-reserve-hybride',scenarioVersion:'1.1.0',skinId:'western'}).scenario;
+ const story=foundersPreview({scenarioId:'hot-spring-reserve-hybride',scenarioVersion:'1.2.0',skinId:'western'}).scenario;
+ assert.equal(old.dilemmas[0].outcomes.pour.effects.find(e=>e.indicator==='economie').value,1);
+ assert.equal(story.dilemmas[0].outcomes.pour.effects.find(e=>e.indicator==='economie').value,2);
+ const required=story.dilemmas.filter(d=>['required','finale'].includes(d.access.category));
+ for(const indicator of Object.keys(FOUNDERS_DEFAULT_CALIBRATION.city)){
+  const meaningful=required.filter(d=>JSON.stringify(d.outcomes.pour.effects.filter(e=>e.indicator===indicator))!==JSON.stringify(d.outcomes.contre.effects.filter(e=>e.indicator===indicator)));
+  assert.ok(meaningful.length>=2,indicator+' needs multiple guaranteed decisions');
+ }
+ const a=simulateFoundersPolicies(story,{runs:12,seed:44221,includeSamples:true});
+ assert.deepEqual(a,simulateFoundersPolicies(story,{runs:12,seed:44221,includeSamples:true}));
+ assert.equal(a.failed,0);
+ for(const sample of a.samples){
+  assert.equal(sample.trace.at(-1).id,'D10');
+  assert.equal(new Set(sample.trace.map(t=>t.id)).size,sample.trace.length);
+  for(const d of required)assert.ok(sample.trace.some(t=>t.id===d.id));
+ }
+});

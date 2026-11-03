@@ -1,0 +1,356 @@
+{
+  "style": "Western painterly realism, Hot Spring 1876",
+  "jobs": [
+    {
+      "id": "d01-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d01-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Steam locomotive arriving at a small rough timber rail depot under construction, workers laying rails in foreground, angry shopkeepers looking at shipping invoices. Railway is the main subject. No grand palace or dome. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Le chantier avance ; les tarifs exclusifs divisent la ville."
+    },
+    {
+      "id": "d01-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d01-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: A railway company agent packs his rolled plans onto a departing wagon, satisfied independent merchants reopen their shops while a municipal mounted patrol rides the existing dusty road. No railway has been built. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les artisans saluent leur indépendance, mais les investissements ralentissent."
+    },
+    {
+      "id": "d02-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d02-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Private guards escort a freight wagon, inspecting a resentful shopkeeper’s cargo beside timber warehouses. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les convois sont mieux protégés ; les contrôles privés irritent les habitants."
+    },
+    {
+      "id": "d02-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d02-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: A sheriff turns away private hired guards at a warehouse, relieved townsfolk nearby and an unescorted freight wagon setting out. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "La ville garde le contrôle des armes, mais les convois restent exposés."
+    },
+    {
+      "id": "d03-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d03-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Farmers draw clean water from a freshly completed communal stone well, with muddy tools and a municipal pay chest nearby. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les fermiers retrouvent de l’eau ; la dépense pèse sur l’activité municipale."
+    },
+    {
+      "id": "d03-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d03-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Private water vendor sells a barrel of water from his wagon while poorer farming families wait with empty pails in a dry field. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les travaux sont reportés ; les conditions de vie et la confiance se dégradent."
+    },
+    {
+      "id": "d04-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d04-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Carpenters raise the timber frame of a modest public school on a hill, teacher and children observe, town treasurer pays workers. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "L’école ouvre aux familles ; son financement réduit les moyens des affaires."
+    },
+    {
+      "id": "d04-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d04-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Small private classroom inside a storefront admits children whose parents can pay; another parent and child remain outside, without melodrama. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "L’initiative privée allège la charge publique, mais creuse la fracture sociale."
+    },
+    {
+      "id": "d05-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d05-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Active coal mine with timber headframe and loaded coal carts, paid workers and a weary dust-covered miner beside sparse vegetation. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "La mine apporte emplois et équipements, au prix de conditions de vie plus difficiles."
+    },
+    {
+      "id": "d05-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d05-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Protected unmined valley, residents looking across intact fields while a mining investor rolls up his plans beside a departing wagon. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les riverains sont soulagés ; les investisseurs se retirent."
+    },
+    {
+      "id": "d06-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d06-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Inside modest frontier bank, banker hands loan money to a shopkeeper over a municipal guarantee document, long line of borrowers. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Le crédit soutient les commerces ; les engagements publics accentuent le déséquilibre."
+    },
+    {
+      "id": "d06-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d06-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Town official returns an unsigned guarantee document to banker, disappointed merchant closes his coin purse; quiet bank lobby. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "La prudence protège les finances communes, mais freine les affaires."
+    },
+    {
+      "id": "d07-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d07-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Laborers rest beside a paused construction site while their representative shakes hands over an agreement with a foreman. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les travailleurs obtiennent des concessions ; les chantiers ralentissent."
+    },
+    {
+      "id": "d07-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d07-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Busy building site with workers hauling lumber under an impatient foreman, a small group of dissatisfied laborers watches. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les investissements continuent, mais la colère des travailleurs grandit."
+    },
+    {
+      "id": "d08-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d08-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Printer distributes fresh newspapers beside a hand-operated printing press, townspeople argue heatedly, sheriff tries to calm the group. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "La publication est protégée ; la liberté de la presse accompagne une crise politique."
+    },
+    {
+      "id": "d08-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d08-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Silent printing press and tied bundles of withheld newspapers, frustrated journalist, outside a calm street with municipal patrol. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Le scandale est contenu pour un temps ; la confiance des habitants s’érode."
+    },
+    {
+      "id": "d09-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d09-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Modest canvas camp quarantine: doctor carries water and linens to tents while supply wagons wait behind a rope boundary. No gore, no disaster spectacle. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "L’isolement freine la maladie et bloque une partie du commerce."
+    },
+    {
+      "id": "d09-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d09-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Supply wagons continue through a camp of canvas tents while a doctor tends a tired seated adult nearby. No gore or mass suffering. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les échanges continuent ; la maladie touche davantage d’habitants."
+    },
+    {
+      "id": "d10-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d10-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: New municipal charter ceremonially signed in modest council hall, sheriff and town officials coordinating patrols over a street map. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "La charte structure la ville et impose de nouvelles charges communes."
+    },
+    {
+      "id": "d10-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d10-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Unsigned charter rolled up on a council table; delegates leave separately through an open door toward competing patrol groups and working shops. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "L’autonomie préserve des moyens immédiats, mais laisse les institutions fragiles."
+    },
+    {
+      "id": "d11",
+      "kind": "dilemma",
+      "path": "public/assets/western/dilemmas/d11.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Merchants close wooden shop shutters and assemble with freight drivers in a dusty market street, a mediator approaches. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les commerçants font front : débat avant la décision."
+    },
+    {
+      "id": "d11-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d11-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Merchants and a mediator negotiate at a trestle table while loaded delivery wagons stand idle behind them. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "La médiation apaise les commerçants, mais ralentit les livraisons."
+    },
+    {
+      "id": "d11-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d11-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Escorted freight wagons move past closed shops and peacefully protesting merchants. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les échanges sont protégés ; la contestation s’amplifie."
+    },
+    {
+      "id": "d12",
+      "kind": "dilemma",
+      "path": "public/assets/western/dilemmas/d12.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Railway depot manager and merchants debate shipping invoices beside stacked freight and a steam locomotive. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les tarifs du rail : débat avant la décision."
+    },
+    {
+      "id": "d12-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d12-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Railway crew repairs track while a merchant reluctantly pays a higher shipping bill at the nearby freight counter. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les recettes financent les travaux, mais les marchands dénoncent la hausse."
+    },
+    {
+      "id": "d12-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d12-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Relieved merchants load affordable freight while abandoned repair tools and unfinished track work lie in the background. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les marchands conservent leurs marges ; les travaux sont ralentis."
+    },
+    {
+      "id": "d13",
+      "kind": "dilemma",
+      "path": "public/assets/western/dilemmas/d13.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Private guards and municipal sheriff discuss boundaries at a narrow road entrance to the town, travelers waiting. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Le serment des gardes : débat avant la décision."
+    },
+    {
+      "id": "d13-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d13-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Private guards examine luggage at a wooden road checkpoint, a line of impatient travelers waits. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les accès sont mieux surveillés ; les habitants supportent des contrôles intrusifs."
+    },
+    {
+      "id": "d13-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d13-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Travelers move freely along an open road while private guards stay beside their warehouse fence. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les habitants retrouvent leur liberté de circulation, mais les patrouilles couvrent moins de terrain."
+    },
+    {
+      "id": "d14",
+      "kind": "dilemma",
+      "path": "public/assets/western/dilemmas/d14.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Farmers and workshop owners debate how to divide water at a communal well and branching wooden water troughs. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Le partage de l’eau : débat avant la décision."
+    },
+    {
+      "id": "d14-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d14-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Water flows into irrigated farm plots, farmer tends crops while workshop water barrels remain empty nearby. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les fermes disposent de davantage d’eau ; les ateliers doivent ralentir leur activité."
+    },
+    {
+      "id": "d14-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d14-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Water barrels delivered to busy workshops while farmers wait at the well with mostly empty buckets. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les ateliers produisent davantage, mais les familles rurales subissent les restrictions."
+    },
+    {
+      "id": "d15",
+      "kind": "dilemma",
+      "path": "public/assets/western/dilemmas/d15.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Crowded modest schoolhouse, teacher and parents examine a plan for an extra room while children sit on benches. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les bancs de l’école : débat avant la décision."
+    },
+    {
+      "id": "d15-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d15-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Carpenters complete an additional schoolroom with new benches while teacher welcomes pupils. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Une salle supplémentaire améliore l’accueil et l’équipement, mais mobilise les moyens de la ville."
+    },
+    {
+      "id": "d15-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d15-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Two groups of pupils exchange places at the schoolhouse doorway at midday, parents discuss shortened lessons. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les horaires alternés préservent des moyens pour les affaires ; les parents protestent contre les journées raccourcies."
+    },
+    {
+      "id": "d16",
+      "kind": "dilemma",
+      "path": "public/assets/western/dilemmas/d16.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Miners and engineer inspect aging timber supports at a coal mine entrance, a loaded mine cart stopped. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les étais de la mine : débat avant la décision."
+    },
+    {
+      "id": "d16-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d16-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Miners install sturdy new timber supports inside a safely lit mine gallery while empty coal carts remain still. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les galeries consolidées améliorent les conditions de travail ; l’arrêt coûte des recettes."
+    },
+    {
+      "id": "d16-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d16-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Small crew continues loading coal carts under worn timber supports, laborers look tired, no collapse or injury. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "L’extraction maintient les recettes, mais les ouvriers restent exposés à des conditions difficiles."
+    },
+    {
+      "id": "d17",
+      "kind": "dilemma",
+      "path": "public/assets/western/dilemmas/d17.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Citizens and banker discuss closed account books on a bank counter, a public auditor waiting with a ledger. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les comptes de la banque : débat avant la décision."
+    },
+    {
+      "id": "d17-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d17-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Auditor opens bank ledgers before attentive townspeople while loan applicants wait at a separate counter. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les contrôles rassurent les habitants, mais ralentissent les nouveaux prêts."
+    },
+    {
+      "id": "d17-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d17-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Banker quickly hands a loan to merchant behind a closed office door, worried citizens wait outside with unanswered questions. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les prêts restent rapides ; les habitants dénoncent l’absence de contrôle public."
+    },
+    {
+      "id": "d18",
+      "kind": "dilemma",
+      "path": "public/assets/western/dilemmas/d18.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Labor representatives and workshop owners debate working hours at a table, a clock and work tools nearby. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "La commission des horaires : débat avant la décision."
+    },
+    {
+      "id": "d18-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d18-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Public commission clerk checks work-hour records in a carpenter’s workshop while workers take a scheduled rest. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Le contrôle commun protège les conditions de travail et rassure les ouvriers ; son financement pèse sur l’activité."
+    },
+    {
+      "id": "d18-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d18-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Separate workshop owners negotiate individually with laborers; one workshop closes while the neighboring crew keeps working. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les ateliers disposent de plus de souplesse ; les protections deviennent inégales."
+    },
+    {
+      "id": "d19",
+      "kind": "dilemma",
+      "path": "public/assets/western/dilemmas/d19.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Residents and shopkeepers debate a street plan with sheriff at dusk, dim oil lamps and unpatrolled side streets visible. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les rues sans patrouille : débat avant la décision."
+    },
+    {
+      "id": "d19-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d19-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: New municipal patrol walks through a modest residential street at dusk while a treasurer pays wages from a small chest. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les patrouilles renforcent la protection, mais leur financement réduit les moyens des affaires."
+    },
+    {
+      "id": "d19-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d19-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Workers install oil street lamps and improve wooden walkways on main street; residents of a dark distant lane watch. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les rues fréquentées sont mieux équipées ; les quartiers éloignés dénoncent leur mise à l’écart."
+    },
+    {
+      "id": "d20",
+      "kind": "dilemma",
+      "path": "public/assets/western/dilemmas/d20.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Residents and merchants survey a vacant central lot, one carries a public square plan and another warehouse drawings. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "La place du marché : débat avant la décision."
+    },
+    {
+      "id": "d20-pour",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d20-pour.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: New simple public square with benches and shade trees where residents gather, undeveloped commercial plot at the edge. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "La place favorise les rencontres et l’adhésion ; la ville renonce à des recettes commerciales."
+    },
+    {
+      "id": "d20-contre",
+      "kind": "resolution",
+      "path": "public/assets/western/resolutions/d20-contre.png",
+      "prompt": "Use case: illustration-story. Asset type: landscape narrative illustration for the Western board game Le Pacte, 16:9. Setting: fictional Hot Spring, American frontier, 1876. Richly detailed painterly realism, warm ochre wooden buildings, sandstone mesas, natural lamplight or daylight, hand-painted oil texture, clear readable composition. Adults in period clothing, no modern objects, no text, no logos, no watermark, no UI, no panel collage. Show one concrete scene, with mixed political interests, without caricature. Primary scene: Busy new timber freight warehouses occupy the former gathering lot, carts unload goods while residents pass without a place to sit. Depict exactly this event; no unrelated landmark or grand buildings. Landscape constraint: Hot Spring is only the town name. NO hot springs, geothermal pools, travertine terraces, waterfalls or steaming water anywhere in this scene. Ordinary dry frontier streets and natural distant hills. Water wells and irrigation, when requested, contain ordinary freshwater, not thermal water.",
+      "alt": "Les entrepôts soutiennent les échanges, mais les habitants regrettent la disparition du lieu de rencontre."
+    }
+  ],
+  "landscapeRule": "Sources chaudes discrètes, hors de la ville ; absentes sauf nécessité narrative. Aucun bassin, cascade thermale ou terrasse de travertin en décor systématique."
+}

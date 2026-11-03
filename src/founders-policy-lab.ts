@@ -15,6 +15,8 @@ import {
  calculateFoundersFinal
 } from './founders-scoring.ts';
 
+import {isHybrid,chooseNarrativeNext} from './founders-progression.ts';
+
 const check=(ok,message)=>{if(!ok)throw new Error(message);};
 const integer=(n,low,high)=>Number.isSafeInteger(n)&&n>=low&&n<=high;
 const MODES=['prudent','ambitieux','mixte'];
@@ -135,7 +137,7 @@ function oneRun(story,goals,rule,calibration,seed,mode,maxDilemmas) {
   check(totalPower(game)===game.powerSupply,'Conservation du Pouvoir violée');
   trace.push({id,winner:resolved.winner,city:{...game.city},
    reserve:game.pool,collectiveDollars:totalDollars(game),voteActions:actions});
-  id=outcome.next_id;councils++;
+  id=isHybrid(story)?chooseNarrativeNext({id:'policy-'+seed,scenario:story,game,revealedHistory:trace}):outcome.next_id;councils++;
  }
  check(councils>=1,'Aucun dilemme joué');
  const finished={
@@ -150,9 +152,8 @@ function oneRun(story,goals,rule,calibration,seed,mode,maxDilemmas) {
 export function simulateFoundersPolicies(story,{
  cards=DEFAULT_GOAL_CARDS,rule=DEFAULT_SCORE_RULES,
  calibration=FOUNDERS_DEFAULT_CALIBRATION,
- runs=36,seed=20261103,mode='mixte',maxDilemmas=30
+ runs=36,seed=20261103,mode='mixte',maxDilemmas=30,includeSamples=false
 }={}){
- check(story?.scenario?.progression?.mode!=='hybrid','Le laboratoire de politiques ne prend pas encore en charge la réserve hybride.');
  check(story?.scenario?.entry_dilemma&&Array.isArray(story.dilemmas)&&story.dilemmas.length>=1,'Scénario invalide');
  check(!validateGoalCards(cards).length,'Objectifs invalides');
  check(!validateScoreRules(rule).length,'Barème invalide');
@@ -163,12 +164,13 @@ export function simulateFoundersPolicies(story,{
  check(integer(maxDilemmas,1,50),'Limite de dilemmes invalide');
  const familyTotals=Object.fromEntries(FOUNDERS.map(id=>[id,{wins:0,points:0,goal:0,money:0,power:0}]));
  const cityTotal=Object.fromEntries(METRICS.map(id=>[id,0]));
- const examples=[];
+ const examples=[],samples=[];
  let completed=0,failed=0,offers=0,voteActions=0,dilemmas=0;
  const failures={};
  for(let i=0;i<runs;i++){
   try{
    const x=oneRun(story,cards,rule,calibration,(seed+i*1013904223)>>>0,mode,maxDilemmas);
+   if(includeSamples)samples.push({city:x.final.city,ranking:x.final.ranking,trace:x.trace});
    completed++;offers+=x.stats.offersAccepted;voteActions+=x.stats.powerActions;dilemmas+=x.stats.councils;
    for(const metric of METRICS)cityTotal[metric]+=x.final.city[metric];
    for(const row of x.final.ranking){
@@ -198,6 +200,7 @@ export function simulateFoundersPolicies(story,{
   meanVoteActionsPerCouncil:dilemmas?average(voteActions,dilemmas):null,
   meanOffersAcceptedPerGame:average(offers,completed),
   examples,
+  ...(includeSamples?{samples}:{}),
   caution:'Comportements artificiels paramétrés : ce tableau ne représente ni des données humaines ni une probabilité réelle de gagner.'
  };
 }
