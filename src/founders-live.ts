@@ -96,6 +96,8 @@ export function applyNarrativeCommand(input,actor,command,now){
    s.game=applyFoundersCityEffects(s.game,outcome.effects.map(e=>({
     resource:e.indicator,kind:e.operation,...(e.operation==='delta'?{amount:e.value}:{})
    })));
+   // Offers are scoped to the council; unaccepted negotiations expire after resolution.
+   for(const offer of Object.values(s.offers))if(offer.status==='pending')offer.status='expired';
    s.lastReveal={id:d.id,title:d.title,winner:result.winner,yes:result.yes,no:result.no,
     narration:outcome.narration,effects:copy(outcome.effects),nextId:outcome.next_id};
    s.revealedHistory.push({...copy(s.lastReveal),city:copy(s.game.city)});
