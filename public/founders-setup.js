@@ -205,3 +205,32 @@ $('createNarrative').addEventListener('click',async()=>{
   state('Session '+result.code+' créée : six liens privés prêts à être distribués.','success');
  }catch(e){state(e.message,'error');button.disabled=false;}
 });
+
+$('analyzeGoals').addEventListener('click',async()=>{
+ if(!selectedPreview){state('Prévisualisez d’abord le scénario et la skin.','error');return;}
+ const button=$('analyzeGoals');button.disabled=true;
+ state('Analyse des embranchements du scénario…');
+ try{
+  const result=await api('/api/founders/scoring/analyze','POST',{
+   ...selectedPreview,goalCards:collectGoalCards()
+  });
+  const area=$('goalAnalysisRows');area.replaceChildren();
+  for(const id of FAMILY_IDS){
+   const g=result.goals[id];
+   const row=document.createElement('div');row.className='metric';row.style.marginTop='8px';
+   const title=document.createElement('strong');title.textContent=id+' · '+g.title;
+   const detail=document.createElement('p');detail.className='note';
+   const percent=x=>x===null?'—':(x*100).toFixed(1)+' %';
+   detail.textContent='Palier 1 : '+g.first+'/'+result.endings+' fins ('+percent(g.firstShare)+
+    ') · Palier 2 : '+g.second+'/'+result.endings+' fins ('+percent(g.secondShare)+')';
+   row.append(title,detail);area.append(row);
+  }
+  $('analysisSummary').textContent=result.endings+' fins explorées'+
+   (result.truncated?' · Limite d’exploration atteinte':'')+
+   (result.invalidPaths?' · '+result.invalidPaths+' chemins invalides':'')+
+   '. Résultats combinatoires : pas des probabilités humaines.';
+  $('goalAnalysis').hidden=false;
+  state('Analyse terminée. Modifie les seuils puis relance si nécessaire.','success');
+ }catch(e){state(e.message,'error');}
+ finally{button.disabled=false;}
+});
