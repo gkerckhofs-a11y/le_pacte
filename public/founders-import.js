@@ -1,4 +1,4 @@
-import {configure,currentToken,authorizeSheetsRead} from '/firebase-auth.js';
+let authSDK=null;
 const $=id=>document.getElementById(id);
 const NAMES=['Parametres','Dilemmes','Effets','Branches'];
 const RANGES=['Parametres!A1:C50','Dilemmes!A1:P550','Effets!A1:F10500','Branches!A1:E1100'];
@@ -8,11 +8,11 @@ async function init(){
  const r=await fetch('/api/catalog',{cache:'no-store'});if(!r.ok)throw new Error('Configuration du moteur inaccessible');
  const data=await r.json();
  runtime=data.authMode;
- if(runtime==='firebase'){await configure(data.firebaseConfig,data.authEmulatorUrl);$('localAuth').hidden=true;}
+ if(runtime==='firebase'){authSDK=await import('/firebase-auth.js');await authSDK.configure(data.firebaseConfig,data.authEmulatorUrl);$('localAuth').hidden=true;}
  else $('localAuth').hidden=false;
 }
 async function bearer(){
- if(runtime==='firebase'){const token=await currentToken();if(!token)throw new Error('Connexion Google Firebase requise');return token;}
+ if(runtime==='firebase'){const token=await authSDK.currentToken();if(!token)throw new Error('Connexion Google Firebase requise');return token;}
  const key=$('localToken').value.trim();if(!key)throw new Error('Clé régie locale requise');return key;
 }
 async function api(path,data){
@@ -67,7 +67,7 @@ $('google').addEventListener('click',async()=>{
  $('google').disabled=true;status('Autorisation de lecture Google Sheets…');
  try{
   if(runtime==='firebase'){
-   googleAccess=await authorizeSheetsRead();
+   googleAccess=await authSDK.authorizeSheetsRead();
   } else {
    // Local repeat: OAuth is not available without a Firebase config.
    throw new Error('La lecture Google Sheets nécessite l’application Firebase et sa connexion Google. L’import reste testable via l’API en local.');
