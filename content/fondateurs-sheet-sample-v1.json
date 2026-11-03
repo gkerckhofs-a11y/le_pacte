@@ -1,0 +1,598 @@
+{
+  "schema_version": "1.0.0",
+  "scenario": {
+    "id": "fondateurs-hot-spring-demo",
+    "title": "Le Pacte des Fondateurs — Mini-test Hot Spring",
+    "universe": "western",
+    "location": "Hot Spring",
+    "year": 1876,
+    "entry_dilemma": "D01",
+    "status": "prototype"
+  },
+  "dilemmas": [
+    {
+      "id": "D01",
+      "chapter": 1,
+      "title": "Le monopole du chemin de fer",
+      "public_text": "Une compagnie propose de relier Hot Spring au réseau ferroviaire. En échange, elle exige vingt ans d'exclusivité sur le transport des marchandises.",
+      "vote_question": "Le Conseil accorde-t-il l'exclusivité à la compagnie ?",
+      "labels": {
+        "pour": "Accorder le monopole",
+        "contre": "Refuser le monopole"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le chantier commence, mais les commerçants dénoncent les tarifs imposés.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "developpement",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D02"
+        },
+        "contre": {
+          "narration": "La compagnie se retire provisoirement ; les artisans locaux saluent la décision.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "developpement",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D03"
+        }
+      },
+      "image": {
+        "url": null,
+        "alt": "Train à vapeur arrivant à Hot Spring",
+        "credit": null,
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "rail",
+        "commerce"
+      ]
+    },
+    {
+      "id": "D02",
+      "chapter": 1,
+      "title": "Les hommes de la compagnie",
+      "public_text": "À la suite de vols sur la piste des convois, une agence privée offre de patrouiller armée. Son contrat lui accorderait une large autonomie.",
+      "vote_question": "Le Conseil autorise-t-il les gardes privés ?",
+      "labels": {
+        "pour": "Autoriser les patrouilles",
+        "contre": "Refuser les patrouilles"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les convois circulent mieux, mais des habitants dénoncent des abus.",
+          "effects": [
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D04"
+        },
+        "contre": {
+          "narration": "La ville conserve le contrôle de la force publique, au prix de risques persistants.",
+          "effects": [
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D04"
+        }
+      },
+      "image": {
+        "url": null,
+        "alt": "Gardes armés devant une diligence",
+        "credit": null,
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "securite",
+        "justice"
+      ]
+    },
+    {
+      "id": "D03",
+      "chapter": 1,
+      "title": "Le puits des fermiers",
+      "public_text": "Les familles installées hors de la ville accusent le propriétaire d'une source de détourner l'eau au profit de ses terres. Un nouveau puits collectif pourrait apaiser les tensions.",
+      "vote_question": "Le Conseil finance-t-il un puits collectif ?",
+      "labels": {
+        "pour": "Financer le puits",
+        "contre": "Reporter les travaux"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les fermiers retrouvent de l'eau, mais le budget municipal se tend.",
+          "effects": [
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D04"
+        },
+        "contre": {
+          "narration": "La trésorerie est épargnée ; les tensions avec les fermiers s'aggravent.",
+          "effects": [
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": "D04"
+        }
+      },
+      "image": {
+        "url": null,
+        "alt": "Puits et terres agricoles au bord de Hot Spring",
+        "credit": null,
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "eau",
+        "fermes"
+      ]
+    },
+    {
+      "id": "D04",
+      "chapter": 2,
+      "title": "L'école sur la colline",
+      "public_text": "Les nouveaux arrivants réclament une école. Les familles aisées préfèrent une institution privée, moins coûteuse pour la ville, mais inaccessible à certains enfants.",
+      "vote_question": "Le Conseil ouvre-t-il une école publique ?",
+      "labels": {
+        "pour": "Créer l'école publique",
+        "contre": "Laisser l'initiative au privé"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "La ville attire de nouvelles familles mais doit assumer les dépenses.",
+          "effects": [
+            {
+              "indicator": "developpement",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D05"
+        },
+        "contre": {
+          "narration": "Quelques privilégiés sont instruits ; la fracture sociale s'accentue.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D05"
+        }
+      },
+      "image": {
+        "url": null,
+        "alt": "École en bois sur une colline au-dessus de la ville",
+        "credit": null,
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "education",
+        "population"
+      ]
+    },
+    {
+      "id": "D05",
+      "chapter": 2,
+      "title": "La concession de charbon",
+      "public_text": "Une société minière promet des salaires et des recettes à condition d'exploiter une vallée boisée. Des riverains craignent pour leurs habitations.",
+      "vote_question": "Le Conseil délivre-t-il la concession minière ?",
+      "labels": {
+        "pour": "Accorder la concession",
+        "contre": "Protéger la vallée"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "La mine ouvre et apporte des emplois ; les conditions de travail inquiètent.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "developpement",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D06"
+        },
+        "contre": {
+          "narration": "La vallée est préservée, mais les investisseurs se détournent de Hot Spring.",
+          "effects": [
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D07"
+        }
+      },
+      "image": {
+        "url": null,
+        "alt": "Mine de charbon et forêt menacée",
+        "credit": null,
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "mine",
+        "industrie"
+      ]
+    },
+    {
+      "id": "D06",
+      "chapter": 3,
+      "title": "La banque des pionniers",
+      "public_text": "Un banquier propose d'ouvrir une caisse de crédit pour les commerces. En contrepartie, la ville garantirait une partie des pertes éventuelles.",
+      "vote_question": "Le Conseil garantit-il les prêts ?",
+      "labels": {
+        "pour": "Garantir les prêts",
+        "contre": "Refuser la garantie"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les commerces empruntent et investissent ; la ville prend un risque financier.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "stabilite",
+              "operation": "away_from_center"
+            }
+          ],
+          "next_id": "D08"
+        },
+        "contre": {
+          "narration": "Les finances publiques sont protégées mais l'accès au crédit reste difficile.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "stabilite",
+              "operation": "toward_center"
+            }
+          ],
+          "next_id": "D08"
+        }
+      },
+      "image": {
+        "url": null,
+        "alt": "Façade d'une petite banque de l'Ouest",
+        "credit": null,
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "finance",
+        "commerce"
+      ]
+    },
+    {
+      "id": "D07",
+      "chapter": 3,
+      "title": "La grève des journaliers",
+      "public_text": "Les ouvriers de plusieurs chantiers exigent une journée de travail plus courte. Les entrepreneurs menacent de suspendre leurs investissements.",
+      "vote_question": "Le Conseil soutient-il les revendications des ouvriers ?",
+      "labels": {
+        "pour": "Soutenir les ouvriers",
+        "contre": "Soutenir les entrepreneurs"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les travailleurs obtiennent des concessions, mais les chantiers ralentissent.",
+          "effects": [
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D08"
+        },
+        "contre": {
+          "narration": "Les chantiers avancent ; la colère sociale monte.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": "D08"
+        }
+      },
+      "image": {
+        "url": null,
+        "alt": "Ouvriers réunis devant un chantier de l'Ouest",
+        "credit": null,
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "travail",
+        "conflit_social"
+      ]
+    },
+    {
+      "id": "D08",
+      "chapter": 3,
+      "title": "La presse de Hot Spring",
+      "public_text": "Une journaliste veut publier des documents mettant en cause plusieurs notables. Certains conseillers demandent une censure temporaire pour éviter une crise politique.",
+      "vote_question": "Le Conseil protège-t-il la publication ?",
+      "labels": {
+        "pour": "Garantir la liberté de publier",
+        "contre": "Suspendre la publication"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le scandale éclate, mais la liberté de la presse est préservée.",
+          "effects": [
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "stabilite",
+              "operation": "away_from_center"
+            }
+          ],
+          "next_id": "D09"
+        },
+        "contre": {
+          "narration": "Le scandale est étouffé pour un temps ; la confiance des habitants se fragilise.",
+          "effects": [
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -2
+            },
+            {
+              "indicator": "stabilite",
+              "operation": "toward_center"
+            }
+          ],
+          "next_id": "D09"
+        }
+      },
+      "image": {
+        "url": null,
+        "alt": "Atelier d'imprimerie d'un journal Western",
+        "credit": null,
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "presse",
+        "scandale"
+      ]
+    },
+    {
+      "id": "D09",
+      "chapter": 4,
+      "title": "La fièvre du campement",
+      "public_text": "Une maladie se répand parmi les nouveaux arrivants. Le médecin demande d'isoler le campement pendant quelques jours, au risque de bloquer le commerce.",
+      "vote_question": "Le Conseil impose-t-il une quarantaine ?",
+      "labels": {
+        "pour": "Décréter la quarantaine",
+        "contre": "Maintenir les échanges"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "La propagation ralentit ; les marchands subissent des pertes.",
+          "effects": [
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": "D10"
+        },
+        "contre": {
+          "narration": "Le commerce continue ; les malades sont plus nombreux.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": "D10"
+        }
+      },
+      "image": {
+        "url": null,
+        "alt": "Campement de pionniers et médecin avec sacoche",
+        "credit": null,
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "sante",
+        "commerce"
+      ]
+    },
+    {
+      "id": "D10",
+      "chapter": 4,
+      "title": "La charte de Hot Spring",
+      "public_text": "La ville peut désormais obtenir un statut municipal reconnu, à condition d'adopter une charte, de financer des services communs et de répartir publiquement les responsabilités.",
+      "vote_question": "Le Conseil adopte-t-il la charte municipale ?",
+      "labels": {
+        "pour": "Adopter la charte",
+        "contre": "Reporter la charte"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Hot Spring devient une municipalité plus structurée, avec de nouvelles obligations.",
+          "effects": [
+            {
+              "indicator": "developpement",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "stabilite",
+              "operation": "toward_center"
+            }
+          ],
+          "next_id": null
+        },
+        "contre": {
+          "narration": "Les familles conservent leur autonomie, mais les institutions restent fragiles.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "stabilite",
+              "operation": "away_from_center"
+            }
+          ],
+          "next_id": null
+        }
+      },
+      "image": {
+        "url": null,
+        "alt": "Hôtel de ville de Hot Spring et habitants assemblés",
+        "credit": null,
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "charte",
+        "finale"
+      ]
+    }
+  ]
+}
