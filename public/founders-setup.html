@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Le Pacte · Configuration narrative V2.3</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#191b20;background:#f4f4f1}
+*{box-sizing:border-box}body{margin:0}header{background:#14171b;color:white;padding:26px clamp(16px,4vw,64px)}header h1{font-size:clamp(24px,4vw,38px);letter-spacing:-1px;margin:8px 0 0}header p{color:#cad0d3;margin:8px 0 0}
+main{max-width:1060px;margin:28px auto;padding:0 18px 50px;display:grid;grid-template-columns:minmax(300px,390px) 1fr;gap:20px}
+article{background:white;border:1px solid #dedfdc;border-radius:14px;padding:24px;min-width:0}
+h2{font-size:19px;margin:0 0 20px}label{display:block;font-size:13px;font-weight:650;margin:20px 0 7px}
+input,select{display:block;width:100%;border:1px solid #bcbfbd;border-radius:7px;font:inherit;padding:12px;background:white;color:#151617}
+button{display:block;cursor:pointer;padding:12px 18px;background:#1d252b;color:white;border:0;border-radius:8px;font-weight:700;font-size:15px}
+button:hover{background:#32404a}button:disabled{opacity:.5;cursor:not-allowed}
+.note{font-size:12px;line-height:1.55;color:#52565a}
+.button-row{display:flex;gap:8px;margin-top:24px;flex-wrap:wrap}
+#preview[hidden],#results[hidden]{display:none}
+.meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:22px}
+.metric{padding:15px;background:#f4f4f1;border-radius:8px}
+.metric span{display:block;color:#53565a;font-size:12px}.metric strong{display:block;font-size:21px;margin-top:4px}
+.pill{display:inline-block;padding:4px 8px;border-radius:5px;background:#e4eceb;color:#1d574d;font-size:12px;font-weight:650}
+#status{font-size:14px;line-height:1.5;margin-top:16px;min-height:24px}
+#status[data-type=error]{color:#9f3529}
+#status[data-type=success]{color:#195f45}
+h3{margin:20px 0 6px}.warn{padding:9px 12px;border-left:3px solid #b1863c;background:#faf7ee;margin-top:8px}
+#skinPreview{height:11px;border-radius:9px;margin-top:14px;background:#b4b4b4}
+small{color:#656a6e}a{color:inherit}ol{padding-left:20px;line-height:1.6}
+@media(max-width:760px){main{display:block}article{margin-bottom:16px}}
+</style>
+<script src="/founders-setup.js" defer></script>
+</head>
+<body>
+<header>
+ <div class="note" style="color:#c1c8cc">LUDIFICATEUR / LE PACTE · RÉGIE DE CONCEPTION</div>
+ <h1>Configurer une expérience narrative</h1>
+ <p>Scénario indépendant de la skin. Aperçu V2.3, sans création ni publication de partie.</p>
+</header>
+<main>
+ <article>
+  <h2>Choix de la partie</h2>
+  <label for="token">Jeton d'accès régie</label>
+  <input id="token" type="password" autocomplete="off" placeholder="Clé régie ou jeton opérateur">
+  <div class="button-row"><button id="load" type="button">Charger les bibliothèques</button></div>
+  <p class="note">Le jeton reste dans cette page pendant son ouverture. Aucun stockage local n'est effectué.</p>
+  <form id="config" hidden>
+   <label for="scenario">Scénario narratif</label>
+   <select id="scenario" required></select>
+   <label for="skin">Skin graphique</label>
+   <select id="skin" required></select>
+   <label for="members">Participants des six familles (séparés par des virgules)</label>
+   <input id="members" value="5,5,5,5,5,5" pattern="[0-9, ]+" required>
+   <p class="note">Un seul porte-parole connecté par famille, quel que soit l'effectif.</p>
+   <button type="submit">Prévisualiser la configuration</button>
+  </form>
+  <div id="status" role="status" aria-live="polite"></div>
+ </article>
+ <article>
+  <h2>Prévisualisation</h2>
+  <div id="empty"><p class="note">Charge d'abord les bibliothèques, puis choisis un scénario et un habillage pour afficher leur compatibilité.</p>
+  <ol><li>Choisir l'histoire issue d'un Sheets.</li><li>Choisir la skin, sans réécrire les dilemmes.</li><li>Contrôler les six effectifs avant de créer une session dans une tranche future.</li></ol></div>
+  <div id="preview" hidden>
+    <span class="pill">APERÇU UNIQUEMENT</span>
+    <h3 id="storyTitle"></h3><p id="storyInfo"></p>
+    <div id="skinPreview"></div><h3 id="skinTitle"></h3><p id="skinInfo"></p>
+    <div class="meta">
+      <div class="metric"><span>Dilemmes</span><strong id="countDilemmas"></strong></div>
+      <div class="metric"><span>Participants</span><strong id="countMembers"></strong></div>
+      <div class="metric"><span>Familles</span><strong>6</strong></div>
+      <div class="metric"><span>Connexions de vote</span><strong>6</strong></div>
+    </div>
+    <div id="warnings"></div>
+    <p class="note">Le décor public et les interfaces familles seront raccordés dans une étape ultérieure. Les parties en cours conserveront les versions choisies.</p>
+  </div>
+ </article>
+</main>
+</body>
+</html>
