@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le Pacte · Import Google Sheets</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#f3f3f1;color:#15191e}
+*{box-sizing:border-box}body{margin:0}header{background:#171a1e;color:white;padding:27px max(20px,calc((100vw - 1060px)/2))}
+header a{font-size:13px;color:#c7d5d8}h1{font-size:clamp(23px,4vw,38px);margin:12px 0 7px;letter-spacing:-.8px}header p{color:#bfc6c9;margin:0}
+main{max-width:1070px;padding:26px 16px 60px;margin:auto;display:grid;gap:20px;grid-template-columns:minmax(320px,.95fr) 1.05fr}
+article{background:white;padding:24px;border:1px solid #d8dcd8;border-radius:13px}h2{font-size:20px;margin:0 0 16px}
+label{font-size:13px;font-weight:700;display:block;margin:18px 0 6px}
+input{font:inherit;border:1px solid #b6c0be;border-radius:7px;padding:12px;width:100%;color:inherit}
+button{font:inherit;font-weight:700;border:0;border-radius:8px;background:#20282e;color:white;padding:12px 16px;cursor:pointer;margin-top:15px}
+button:disabled{opacity:.5;cursor:not-allowed}button.secondary{background:#e7ebe8;color:#20282e}
+p.small,.small{font-size:12px;color:#545c62;line-height:1.55}
+#state{margin:15px 0 0;padding:9px 0;font-size:14px;white-space:pre-wrap}#state.error{color:#a13027}#state.ok{color:#266c50}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:15px 0}
+.value{border-radius:8px;background:#f5f6f3;padding:13px}.value b{display:block;font-size:24px}.value span{color:#5a6466;font-size:12px}
+#errors,#warnings{padding-left:20px;font-size:13px;line-height:1.5;max-height:230px;overflow:auto}
+li{margin-top:5px}#warnings{color:#765523}
+[hidden]{display:none!important}code{padding:2px 4px;border-radius:4px;background:#f0f3f3}
+@media(max-width:800px){main{display:block}article{margin-bottom:16px}}
+</style><script type="module" src="/founders-import.js"></script></head>
+<body>
+<header><a href="/founders-setup.html">← Retour à la configuration des parties</a>
+<h1>Importer un scénario Google Sheets</h1><p>Lire, contrôler, prévisualiser puis publier une version complète. Les parties en cours ne seront pas modifiées.</p></header>
+<main>
+ <article>
+  <h2>Source Google Sheets</h2>
+  <div id="localAuth" hidden><label for="localToken">Clé régie locale</label><input id="localToken" type="password" autocomplete="off"></div>
+  <button id="google" type="button">Autoriser la lecture de Google Sheets</button>
+  <p class="small">Choisis ton compte Google ayant accès au fichier. L'autorisation est limitée à la lecture et reste dans ce navigateur ; aucun jeton Google n'est envoyé au moteur.</p>
+  <label for="sheetUrl">Lien Google Sheets à importer</label>
+  <input id="sheetUrl" type="url" placeholder="https://docs.google.com/spreadsheets/d/…/edit" autocomplete="url">
+  <button type="button" id="read">Lire et vérifier le classeur</button>
+  <div id="state" role="status" aria-live="polite"></div>
+  <p class="small">Onglets requis : <code>Parametres</code>, <code>Dilemmes</code>, <code>Effets</code>, <code>Branches</code>.</p>
+ </article>
+ <article>
+  <h2>Prévisualisation avant publication</h2>
+  <div id="empty"><p class="small">Aucun scénario chargé. Les erreurs bloquantes et les avertissements s'afficheront ici.</p></div>
+  <div id="results" hidden>
+   <h3 id="storyTitle"></h3><p class="small" id="storyInfo"></p>
+   <div class="grid">
+    <div class="value"><b id="dilemmas">—</b><span>Dilemmes</span></div>
+    <div class="value"><b id="effects">—</b><span>Effets</span></div>
+    <div class="value"><b id="branches">—</b><span>Branches</span></div>
+    <div class="value"><b id="missingImages">—</b><span>Images manquantes</span></div>
+   </div>
+   <h3>Erreurs bloquantes</h3><ul id="errors"></ul>
+   <h3>Avertissements</h3><ul id="warnings"></ul>
+   <div id="publishArea" hidden>
+    <label for="version">Numéro de la nouvelle version publiée</label>
+    <input id="version" value="1.0.0" pattern="[1-9][0-9]*\.[0-9]+\.[0-9]+" required>
+    <p class="small">Une version publiée est immuable. Pour actualiser le scénario, crée une nouvelle version (par exemple 1.1.0).</p>
+    <button type="button" id="publish">Publier cette version</button>
+   </div>
+  </div>
+ </article>
+</main></body></html>

@@ -9,4 +9,18 @@ export async function configure(config:any,emulatorUrl?:string){
 }
 export async function currentToken(){await auth.authStateReady();return auth.currentUser?await auth.currentUser.getIdToken():'';}
 export async function login(){const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});await signInWithPopup(auth,provider);return currentToken();}
+/**
+ * The spreadsheet OAuth token stays only in the organizer's browser memory.
+ * It is never sent to Le Pacte. The backend receives only read cell values.
+ * This is separate from the Firebase ID token used for operator authorization.
+ */
+export async function authorizeSheetsRead(){
+ const provider=new GoogleAuthProvider();
+ provider.addScope('https://www.googleapis.com/auth/spreadsheets.readonly');
+ provider.setCustomParameters({prompt:'select_account'});
+ const result=await signInWithPopup(auth,provider);
+ const accessToken=GoogleAuthProvider.credentialFromResult(result)?.accessToken;
+ if(!accessToken)throw new Error('Autorisation Google Sheets indisponible');
+ return accessToken;
+}
 export async function logout(){await signOut(auth);}

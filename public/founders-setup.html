@@ -38,14 +38,17 @@ small{color:#656a6e}a{color:inherit}ol{padding-left:20px;line-height:1.6}
 </header>
 <main>
  <article>
-  <h2>Choix de la partie</h2>
-  <label for="token">Jeton d'accès régie</label>
+  <h2>Choix de la partie</h2><p class="note"><a href="/founders-import.html">Importer un scénario depuis Google Sheets →</a></p>
+  <label id="tokenLabel" for="token">Jeton d'accès régie</label>
   <input id="token" type="password" autocomplete="off" placeholder="Clé régie ou jeton opérateur">
+  <button id="googleLogin" type="button" class="secondary" hidden>Se connecter avec Google</button>
   <div class="button-row"><button id="load" type="button">Charger les bibliothèques</button></div>
   <p class="note">Le jeton reste dans cette page pendant son ouverture. Aucun stockage local n'est effectué.</p>
   <form id="config" hidden>
    <label for="scenario">Scénario narratif</label>
    <select id="scenario" required></select>
+   <label for="scenarioVersion">Version publiée</label>
+   <select id="scenarioVersion" required></select>
    <label for="skin">Skin graphique</label>
    <select id="skin" required></select>
    <label for="members">Participants des six familles (séparés par des virgules)</label>

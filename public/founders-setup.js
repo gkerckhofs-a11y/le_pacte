@@ -1,10 +1,10 @@
 "use strict";
 const $=id=>document.getElementById(id);
-let catalog=null;
+let catalog=null,authSDK=null;
 const state=(message,type="info")=>{$("status").textContent=message;$("status").dataset.type=type;};
 async function api(path,method="GET",payload){
- const key=$("token").value.trim();
- if(!key)throw new Error("Jeton régie requis.");
+ const key=authSDK?await authSDK.currentToken():$("token").value.trim();
+ if(!key)throw new Error("Connexion régie requise.");
  const opts={method,headers:{Authorization:"Bearer "+key}};
  if(payload!==undefined){opts.headers["Content-Type"]="application/json";opts.body=JSON.stringify(payload);}
  const response=await fetch(path,opts);
@@ -35,7 +35,16 @@ $("load").addEventListener("click",async()=>{
  }catch(e){state(e.message,"error");}
  finally{$("load").disabled=false;}
 });
+function versionsForSelectedStory(){
+ const story=catalog?.scenarios?.find(s=>s.id===$('scenario').value);
+ const select=$('scenarioVersion');select.replaceChildren();
+ for(const version of story?.releases??[]){
+  const opt=document.createElement('option');opt.value=version;opt.textContent='Version '+version;select.append(opt);
+ }
+ if(story?.version)select.value=story.version;
+}
 function autoSkin(){
+ versionsForSelectedStory();
  if(!catalog)return;
  const story=catalog.scenarios.find(s=>s.id===$("scenario").value);
  const matching=catalog.skins.find(s=>s.universe===story?.universe);
@@ -48,7 +57,7 @@ $("config").addEventListener("submit",async event=>{
  if(members.length!==6||members.some(n=>!Number.isInteger(n)||n<1||n>300)){
   state("Indiquer exactement six effectifs entiers (1 à 300).","error");return;
  }
- const payload={scenarioId:$("scenario").value,skinId:$("skin").value,members};
+ const payload={scenarioId:$("scenario").value,scenarioVersion:$("scenarioVersion").value,skinId:$("skin").value,members};
  state("Vérification de la configuration…");
  try{
   const p=await api("/api/founders/preview","POST",payload);
@@ -65,3 +74,23 @@ $("config").addEventListener("submit",async event=>{
   state("Aperçu calculé. Aucune partie créée ou modifiée.","success");
  }catch(e){state(e.message,"error");}
 });
+
+async function initFirebaseAuth(){
+ try{
+  const r=await fetch('/api/catalog',{cache:'no-store'});
+  if(!r.ok)throw new Error('Configuration indisponible');
+  const settings=await r.json();
+  if(settings.authMode==='firebase'){
+   authSDK=await import('/firebase-auth.js');
+   await authSDK.configure(settings.firebaseConfig,settings.authEmulatorUrl);
+   $('token').hidden=true;$('tokenLabel').hidden=true;$('googleLogin').hidden=false;
+  }
+ }catch(e){state('Connexion : '+e.message,'error');}
+}
+$('googleLogin').addEventListener('click',async()=>{
+ try{
+  await authSDK.login();
+  $('load').click();
+ }catch(e){state(e.message,'error');}
+});
+initFirebaseAuth();

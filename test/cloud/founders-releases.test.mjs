@@ -1,0 +1,28 @@
+import {test,after} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {createHash,randomBytes} from 'node:crypto';
+import {initializeApp,deleteApp} from 'firebase-admin/app';
+import {getFirestore} from 'firebase-admin/firestore';
+import {FirestoreFoundersReleases} from '../../cloud/founders-releases.ts';
+if(!process.env.FIRESTORE_EMULATOR_HOST)throw new Error('Firestore Emulator required : never run against production');
+const app=initializeApp({projectId:'demo-le-pacte'},'founders-import-releases-'+randomBytes(5).toString('hex'));
+const db=getFirestore(app,'le-pacte'),studio=new FirestoreFoundersReleases(db);
+after(async()=>{await db.terminate();await deleteApp(app);});
+test('Firestore : publications versionnées immuables, transaction concurrente et séparation des propriétaires',async()=>{
+ const payload=JSON.parse(readFileSync(new URL('../../content/fondateurs-sheet-sample-v1.json',import.meta.url),'utf8'));
+ const checksum=createHash('sha256').update(JSON.stringify(payload)).digest('hex');
+ const ownerId='founders-owner-'+randomBytes(6).toString('hex');
+ const source={type:'google_sheets',spreadsheetId:'SHEETS_TEST_123456789012345',label:'Master test privé'};
+ const args={ownerId,source,payload,version:'1.0.0',checksum,now:Date.now()};
+ const attempts=await Promise.allSettled([studio.publish(args),studio.publish(args)]);
+ assert.equal(attempts.filter(r=>r.status==='fulfilled').length,1);
+ assert.equal(attempts.filter(r=>r.status==='rejected').length,1);
+ const owned=await studio.list(ownerId),other=await studio.list('unrelated-owner');
+ assert.equal(owned.length,1);assert.equal(other.length,0);
+ assert.equal(owned[0].checksum,checksum);
+ assert.equal(owned[0].source.spreadsheetId,source.spreadsheetId);
+ const r=await studio.publish({...args,version:'1.1.0',now:Date.now()+1});
+ assert.equal(r.version,'1.1.0');
+ assert.equal((await studio.list(ownerId)).length,2);
+});

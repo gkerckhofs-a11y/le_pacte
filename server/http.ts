@@ -6,13 +6,13 @@ import {tokenHash} from './security.ts';
 import type {StorePort,Operator} from './ports.ts';
 import {accessQr,normalizeOrigin} from './qr.ts';
 import {BUILTIN_ASSETS,GOAL_RULES} from '../src/studio.ts';
-import {foundersCatalog,foundersPreview,foundersStoryCheck} from './founders-catalog.ts';
+import {foundersCatalogFor,foundersPreviewFor,foundersStoryCheck,prepareFoundersSheetsImport} from './founders-catalog.ts';
 import type {Actor} from '../src/session.ts';
 export function createGameServer(store:StorePort,organizerToken:string,clock=()=>Date.now(),options:{clientAuth?:any;authEmulatorUrl?:string;apiOnly?:boolean;publicOrigin?:string;verifyOperator?:(token:string)=>Promise<Operator|null>}={}){
  const publicOrigin=options.publicOrigin?normalizeOrigin(options.publicOrigin):null;
  if(!/^[A-Za-z0-9_-]{32,128}$/.test(organizerToken))throw new Error('Clé régie : au moins 32 caractères');
  const tokenDigest=Buffer.from(tokenHash(organizerToken),'hex');
- const staticFiles:Record<string,[string,string]>={ '/founders-setup.html':['founders-setup.html','text/html; charset=utf-8'], '/founders-setup.js':['founders-setup.js','text/javascript; charset=utf-8'], '/western-board.js':['western-board.js','text/javascript; charset=utf-8'],'/western-territories.js':['western-territories.js','text/javascript; charset=utf-8'],'/far-west.html':['far-west.html','text/html; charset=utf-8'],'/western-preview.js':['western-preview.js','text/javascript; charset=utf-8'],'/assets/western/frontier-terrain-v1.webp':['assets/western/frontier-terrain-v1.webp','image/webp'], '/':['index.html','text/html; charset=utf-8'],'/app.js':['app.js','text/javascript; charset=utf-8'],'/studio.js':['studio.js','text/javascript; charset=utf-8'],'/animation.js':['animation.js','text/javascript; charset=utf-8'],'/style.css':['style.css','text/css; charset=utf-8']};
+ const staticFiles:Record<string,[string,string]>={ '/founders-import.html':['founders-import.html','text/html; charset=utf-8'], '/founders-import.js':['founders-import.js','text/javascript; charset=utf-8'], '/founders-setup.html':['founders-setup.html','text/html; charset=utf-8'], '/founders-setup.js':['founders-setup.js','text/javascript; charset=utf-8'], '/western-board.js':['western-board.js','text/javascript; charset=utf-8'],'/western-territories.js':['western-territories.js','text/javascript; charset=utf-8'],'/far-west.html':['far-west.html','text/html; charset=utf-8'],'/western-preview.js':['western-preview.js','text/javascript; charset=utf-8'],'/assets/western/frontier-terrain-v1.webp':['assets/western/frontier-terrain-v1.webp','image/webp'], '/':['index.html','text/html; charset=utf-8'],'/app.js':['app.js','text/javascript; charset=utf-8'],'/studio.js':['studio.js','text/javascript; charset=utf-8'],'/animation.js':['animation.js','text/javascript; charset=utf-8'],'/style.css':['style.css','text/css; charset=utf-8']};
  const limiter=new Map<string,{until:number;count:number}>();
  function bearer(req:any){const h=req.headers.authorization;if(!h)return null;if(!/^Bearer [A-Za-z0-9_.-]{32,8192}$/.test(h))throw new Error('Accès invalide');return h.slice(7);}
  function isOrg(t:string|null){return t!==null&&timingSafeEqual(tokenDigest,Buffer.from(tokenHash(t),'hex'));}
@@ -31,7 +31,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
  const server=createServer(async(req,res)=>{
   const json=(status:number,value:unknown)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(value));};
   res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('X-Frame-Options','DENY');
-  res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
+  res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://sheets.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com; img-src 'self' data:; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
   try {
    const url=new URL(req.url??'/','http://localhost');const path=url.pathname;
    if(!options.apiOnly&&req.method==='GET'&&staticFiles[path]){const [file,type]=staticFiles[path];res.writeHead(200,{'Content-Type':type});res.end(readFileSync(new URL(`../public/${file}`,import.meta.url)));return;}
@@ -42,15 +42,35 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
    if(!bucket||bucket.until<now){bucket={until:now+60000,count:0};limiter.set(bucketKey,bucket);}
    if(++bucket.count>1200){json(429,{error:'Trop de requêtes, réessayez dans une minute'});return;}
    if(limiter.size>1000)for(const [k,b] of limiter)if(b.until<now)limiter.delete(k);
-   // Isolated narrative preview API. Operator-only and read-only: never mutates live territorial sessions.
+   // Narrative studio : authenticated organizer only. Does not mutate territorial sessions.
    if(path==='/api/founders/catalog'&&req.method==='GET'){
-    await requireOrg(req);json(200,foundersCatalog());return;
+    const actor=await requireOrg(req);json(200,await foundersCatalogFor(store,actor.id));return;
    }
    if(path==='/api/founders/preview'&&req.method==='POST'){
-    await requireOrg(req);json(200,foundersPreview(await body(req,4096)));return;
+    const actor=await requireOrg(req);json(200,await foundersPreviewFor(store,actor.id,await body(req,4096)));return;
    }
    if(path==='/api/founders/stories/check'&&req.method==='POST'){
-    await requireOrg(req);json(200,foundersStoryCheck(await body(req,262144)));return;
+    await requireOrg(req);json(200,foundersStoryCheck(await body(req,700000)));return;
+   }
+   if(path==='/api/founders/import/preview'&&req.method==='POST'){
+    await requireOrg(req);
+    const parsed=prepareFoundersSheetsImport(await body(req,950000));
+    json(200,parsed);return;
+   }
+   if(path==='/api/founders/import/publish'&&req.method==='POST'){
+    const actor=await requireOrg(req);
+    if(!store.founders)throw new Error('Studio narratif indisponible');
+    const d=await body(req,950000),parsed=prepareFoundersSheetsImport(d);
+    if(!parsed.valid){json(400,{errors:parsed.errors});return;}
+    if(typeof d.expectedChecksum!=='string'||parsed.checksum!==d.expectedChecksum)
+      throw new Error('Le contenu a changé depuis la prévisualisation : recommencer');
+    if(typeof d.version!=='string'||!/^[1-9]\d*\.\d+\.\d+$/.test(d.version))
+      throw new Error('Version semver requise (exemple : 1.0.0)');
+    const published=await store.founders.publish({
+      ownerId:actor.id,source:d.source,payload:parsed.story,version:d.version,
+      checksum:parsed.checksum,now
+    });
+    json(201,{...published,warnings:parsed.warnings});return;
    }
    if(path==='/api/catalog'&&req.method==='GET'){json(200,{editions:catalog,map,goalRules:GOAL_RULES,authMode:options.verifyOperator?'firebase':'local',...(options.clientAuth?{firebaseConfig:options.clientAuth}:{}),...(options.authEmulatorUrl?{authEmulatorUrl:options.authEmulatorUrl}:{}),serverNow:now});return;}
    if(path==='/api/editions'&&req.method==='GET'){const actor=await requireOrg(req);const list=await store.studio.list((actor as {id:string}).id);json(200,{releases:list.releases,canEdit:(actor as {editor?:boolean}).editor===true});return;}
