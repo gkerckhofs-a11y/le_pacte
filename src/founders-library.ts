@@ -87,7 +87,7 @@ export function validateFoundersStory(payload) {
   visited.add(id);for(const x of graph.get(id))if(x!==null)todo.push(x);
  }
  for(const d of ds)if(d&&d.id&&!visited.has(d.id))errors.push('Dilemme inaccessible depuis le début : '+d.id);
- if(!ds.some(d=>isObj(d.outcomes)&&OUTCOMES.some(o=>d.outcomes[o]?.next_id===null)))errors.push('Aucune sortie FIN');
+ if(!ds.some(d=>isObj(d)&&isObj(d.outcomes)&&OUTCOMES.some(o=>d.outcomes[o]?.next_id===null)))errors.push('Aucune sortie FIN');
  return [...new Set(errors)];
 }
 
