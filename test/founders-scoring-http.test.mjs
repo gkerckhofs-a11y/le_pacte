@@ -21,6 +21,16 @@ test('HTTP : objectifs et barème sur mesure, secrets privés puis classement fi
  assert.equal(catalog.body.scoreRulesPreset.secretFirst,3);
  const cards=structuredClone(catalog.body.goalCardPresets);
  cards.A.firstTarget=5;cards.A.secondTarget=8;
+ const analysis=await request('/api/founders/scoring/analyze','POST',{
+  scenarioId:'fondateurs-hot-spring-demo',skinId:'western',goalCards:cards
+ });
+ assert.equal(analysis.status,200,JSON.stringify(analysis.body));
+ assert.equal(analysis.body.endings,256);
+ assert.equal(analysis.body.goals.A.first,144); // palier personnalisé : Économie >= 5
+ const unauthorized=await request('/api/founders/scoring/analyze','POST',{
+  scenarioId:'fondateurs-hot-spring-demo',skinId:'western'
+ },null);
+ assert.equal(unauthorized.status,403);
  const opts={scenarioId:'fondateurs-hot-spring-demo',skinId:'western',
   code:'SCORE26',title:'Test de classement',members:[5,7,6,9,8,10],goalCards:cards,
   scoreRules:{...catalog.body.scoreRulesPreset,secretFirst:4,secretSecond:4}};
