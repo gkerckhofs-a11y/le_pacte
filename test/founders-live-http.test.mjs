@@ -61,6 +61,8 @@ test('HTTP narratif : Conseil multi-équipes, affichage secret avant la révéla
   const vote=await f.command(s.id,s.tokens[id],'vote',{kind,amount});
   assert.equal(vote.status,200,JSON.stringify(vote.body));
  }
+ const choose=await f.command(s.id,s.tokens.F,'chooseLeader',{family:'B'});
+ assert.equal(choose.status,200,JSON.stringify(choose.body));
  const before=await f.req(base);
  assert.equal(before.body.phase,'AWAITING_REVEAL');
  assert.equal(before.body.reveal,null);
