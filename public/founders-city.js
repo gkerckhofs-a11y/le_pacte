@@ -52,6 +52,19 @@ function render(s){
   s.phase==='AWAITING_REVEAL'?'Résultat sous scellés : la régie doit le révéler.':
   s.phase==='REVEALED'?'Le Conseil attend le prochain dilemme.':
   s.phase==='FINISHED'?'Les décisions finales ont été proclamées.':'La séance n’a pas encore commencé.');
+ const final=$('finalResults');final.hidden=!s.finalResults;
+ if(s.finalResults){
+  const ranking=s.finalResults.ranking;
+  text('winnerTitle','Victoire de '+ranking[0].name+' · '+ranking[0].score.total+' points');
+  const root=$('finalRanking');root.replaceChildren();
+  for(const p of ranking){
+   const line=document.createElement('div');line.className='ballot';
+   const a=document.createElement('strong');a.textContent=p.rank+'. '+p.name+(p.rank===1?' ★':'');
+   const b=document.createElement('span');b.textContent='Secret '+p.score.secret+' · $ '+p.score.wealth+' · Conseil '+p.score.council+' · Influence '+p.score.influence;
+   const n=document.createElement('strong');n.textContent=p.score.total+' pts';
+   line.append(a,b,n);root.append(line);
+  }
+ }
 }
 async function tick(){
  if(!sessionId||!/^[a-f0-9]{24}$/.test(sessionId)){text('notice','Lien de projection incomplet : session introuvable.');return;}
