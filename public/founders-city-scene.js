@@ -1,3 +1,4 @@
+import {UNIVERSE_DETAILS,universeSceneMarkup} from './founders-skin-scenes.js';
 const METRICS=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
 const DETAILS={
  economie:['Les étals sont fermés ; les échanges se font rares.','Quelques marchands approvisionnent la rue principale.','Le marché se remplit de marchandises et de chariots.'],
@@ -8,17 +9,18 @@ const DETAILS={
  stabilite:['Des assemblées locales autonomes occupent la place du Conseil.','Les familles se réunissent autour d’un Conseil commun.','La mairie et les affichages municipaux structurent la vie publique.']
 };
 const LABELS={economie:'Économie',securite:'Sécurité',satisfaction:'Satisfaction',bien_etre:'Bien-être',developpement:'Développement',stabilite:'Stabilité'};
-export function cityVisualState(city){
+export function cityVisualState(city,skinId='western',labels=LABELS){
  return Object.fromEntries(METRICS.map(key=>{
   const value=city[key];if(!Number.isInteger(value)||value<0||value>10)throw new Error('Jauge de ville invalide : '+key);
   const level=value<=3?0:value<=6?1:2;
-  return [key,{level,value,label:LABELS[key],description:DETAILS[key][level]}];
+  return [key,{level,value,label:labels[key]??LABELS[key],description:(UNIVERSE_DETAILS[skinId]??DETAILS)[key][level]}];
  }));
 }
 const windows=(x,y,n)=>Array.from({length:n},(_,i)=>`<g transform="translate(${x+i*38} ${y})"><rect width="23" height="31" fill="#93b3b5" stroke="#493829" stroke-width="4"/><path d="M11 0v31M0 15h23" stroke="#d6c3a0" stroke-width="2"/></g>`).join('');
 const person=(x,y,color='#544e57')=>`<g transform="translate(${x} ${y})"><ellipse cy="15" rx="11" ry="3" fill="#674c3a" opacity=".2"/><path d="M-5 0l-2 15m12-15 2 15M-7-14H7L9 2H-9Z" fill="${color}" stroke="#493b35" stroke-width="2"/><circle cy="-22" r="6" fill="#d0a77c"/><path d="M-10-26h20m-15-1v-5h10v5" stroke="#5a4031" stroke-width="3"/></g>`;
 const layer=(metric,level,content)=>`<g data-city-metric="${metric}" data-city-level="${level}" class="city-layer">${content}</g>`;
-export function mountCity(root){
+export function mountCity(root,skinId='western'){
+ if(skinId!=='western'){root.innerHTML=universeSceneMarkup(skinId);return;}
  // Template contains fixed artwork only. User/scenario strings use textContent below.
  root.innerHTML=`<svg viewBox="0 0 1440 650" role="img" aria-labelledby="townTitle townDesc">
  <title id="townTitle">Hot Spring, une ville qui évolue avec le Conseil</title><desc id="townDesc"></desc>
@@ -81,8 +83,8 @@ export function mountCity(root){
  <g fill="none" stroke="#ab895c" stroke-width="2" opacity=".65"><path d="M20 602q40-9 80 0m230-23q36-8 57-2m689 33q38-9 73-1m109-68q38-9 73-1"/><path d="M28 530l4-12 5 11m888 44 5-14 4 12m466-35 3-15 5 12" stroke="#7c8962"/></g>
  </svg>`;
 }
-export function updateCity(root,city){
- const states=cityVisualState(city);
+export function updateCity(root,city,skinId='western',labels){
+ const states=cityVisualState(city,skinId,labels);
  for(const node of root.querySelectorAll('[data-city-metric]'))node.hidden=Number(node.dataset.cityLevel)!==states[node.dataset.cityMetric].level;
  // SVG does not consistently honor HTMLElement.hidden, so set its display too.
  for(const node of root.querySelectorAll('[data-city-metric]'))node.style.display=Number(node.dataset.cityLevel)===states[node.dataset.cityMetric].level?'':'none';

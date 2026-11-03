@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-const ui=['founders-setup.js','founders-import.js','founders-family.js','founders-city.js','founders-regie.js','founders-identity.js','founders-city-scene.js'];
+const ui=['founders-setup.js','founders-import.js','founders-family.js','founders-city.js','founders-regie.js','founders-identity.js','founders-city-scene.js','founders-skin-theme.js','founders-skin-scenes.js','founders-skins.js'];
 for(const name of ui){
  test('Syntaxe interface narrative : '+name,()=>{
   const file=fileURLToPath(new URL('../public/'+name,import.meta.url));

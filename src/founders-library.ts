@@ -1,3 +1,4 @@
+import {nativeSkinScene} from '../public/founders-skin-theme.js';
 /**
  * LE PACTE V2.3 — narrative catalogue domain, deliberately independent
  * from the legacy 33-territory edition/studio modules.
@@ -155,7 +156,7 @@ export function listFoundersLibrary(input){
   }).sort((a,b)=>a.title.localeCompare(b.title,'fr')),
   skins:Object.values(input.skins).map(s=>({
    id:s.id,title:s.title,universe:s.universe,status:s.status,version:s.version,
-   sceneReady:!!s.publicScene.baseImageUrl
+   sceneReady:!!s.publicScene.baseImageUrl||nativeSkinScene(s.id)
   })).sort((a,b)=>a.title.localeCompare(b.title,'fr'))
  };
 }
@@ -177,7 +178,7 @@ export function prepareFoundersSession(input,{scenarioId,scenarioVersion,skinId,
  const warnings=[];
  if(skin.universe!==release.payload.scenario.universe)warnings.push('Univers différent : le visuel ne traduit pas automatiquement le texte narratif.');
  if(skin.status==='prototype')warnings.push('Skin en cours de conception, affichage non final.');
- if(!skin.publicScene.baseImageUrl)warnings.push('Décor public à créer : aucune image de ville disponible.');
+ if(!skin.publicScene.baseImageUrl&&!nativeSkinScene(skin.id))warnings.push('Décor public à créer : aucune image de ville disponible.');
  if(release.payload.scenario.status==='prototype')warnings.push('Scénario de test non validé.');
  return {
   kind:'founders-session-preview-v2.3',

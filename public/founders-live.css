@@ -57,3 +57,34 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 @keyframes town-arrival{from{opacity:0}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){.city-layer{animation:none}.bar{transition:none}}
 @media(max-width:600px){.city-details{grid-template-columns:1fr}}
+/* Universe-specific surface treatments; team color remains an independent layer. */
+body[data-skin] h1,body[data-skin] h2,body[data-skin] h3{font-family:var(--heading-font,Georgia,serif)}
+body[data-skin] button:not(.secondary){background:var(--gold);border-color:var(--gold);color:var(--bg)}
+body[data-skin] input,body[data-skin] select,body[data-skin] textarea{background:var(--panel2);color:var(--paper);border-color:var(--border)}
+body[data-skin] .chip{color:var(--paper);border-color:var(--border)}
+body[data-skin] .field label{color:var(--muted)}
+body[data-skin] .card,body[data-skin] .family-stat{background:var(--panel2)}
+body[data-skin] .top{border-color:var(--border)}
+body[data-skin=western] .panel{border-radius:5px;box-shadow:inset 0 0 0 3px #ffffff04}
+body[data-skin=western] .top{background-image:repeating-linear-gradient(0deg,#ffffff02 0 1px,transparent 1px 7px)}
+body[data-skin=mafia] .panel{border-radius:2px;position:relative;border-top:3px double var(--border)}
+body[data-skin=mafia] .eyebrow,body[data-skin=mafia] .eyeline{letter-spacing:.23em}
+body[data-skin=mafia] .top{border-bottom:4px double var(--border)}
+body[data-skin=medieval] .panel{border-radius:16px 16px 5px 5px;border-top:3px solid var(--border)}
+body[data-skin=medieval] h2::first-letter{color:var(--gold)}
+body[data-skin=futuriste] .panel{border-radius:3px 22px 3px 3px;box-shadow:inset 0 2px 0 #88e3ed18}
+body[data-skin=futuriste] .eyeline,body[data-skin=futuriste] .eyebrow{font-family:ui-monospace,monospace}
+body[data-skin=futuriste] .top{background-image:linear-gradient(90deg,#46a7b516,transparent)}
+body[data-skin=corporate] .panel{border-radius:15px;box-shadow:0 6px 22px #16202f07}
+body[data-skin=corporate] .top{background:#fff}
+body[data-skin=corporate] .track{background:#dce5ed}
+body[data-skin=corporate] .ballot{border-color:var(--border)}
+body[data-skin=corporate] .status-good{color:#216340}body[data-skin=corporate] .status-bad{color:#a42829}
+body[data-skin].family-dashboard{--gold:var(--team);--accent:var(--team);background:radial-gradient(ellipse at 10% 0,var(--team-dark),transparent 65%),var(--bg)}
+body[data-skin].family-dashboard .top{background:linear-gradient(110deg,var(--team-dark),var(--bg));border-top-color:var(--team)}
+body[data-skin].family-dashboard button:not(.secondary){background:var(--team);color:var(--bg);border-color:var(--team)}
+body[data-skin=corporate].family-dashboard button:not(.secondary){color:#fff}
+body[data-skin].family-dashboard .family-stat{background:var(--team-dark)}
+body[data-skin].family-dashboard .eyebrow,body[data-skin].family-dashboard .eyeline{color:var(--team)}
+body[data-skin=corporate] .city-evolution,body[data-skin=corporate] .city-legend summary{color:var(--gold)}
+body[data-skin=corporate] .small.muted{color:var(--muted)}

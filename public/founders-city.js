@@ -1,11 +1,12 @@
+import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
 import {mountCity,updateCity} from './founders-city-scene.js';
 import {teamCaption,teamLabel,colorize} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id),param=new URLSearchParams(location.search);
 const sessionId=param.get('session');
 const resources=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
-let lastRevision=null,previousCityStates=null;
-mountCity($('city'));
+let lastRevision=null,previousCityStates=null,mountedSkin=null;
+
 const pretty={READY:'Préparation',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'Vote clos',REVEALED:'Conséquences révélées',FINISHED:'Fin de partie'};
 function text(id,value){$(id).textContent=String(value??'');}
 function drawGauges(s){
@@ -24,6 +25,7 @@ function drawGauges(s){
 
 }
 function render(s){
+ applySkin(document.body,s.skin);text('universeTitle','Le Pacte · '+s.skin.title);
  lastRevision=s.revision;
  text('pageTitle',s.story.location+' · '+s.story.year);text('phase',pretty[s.phase]||s.phase);
  text('chapter',s.dilemma?'Chapitre '+s.dilemma.chapter:'Le Conseil des Fondateurs');
@@ -33,9 +35,10 @@ function render(s){
  text('dilemmaText',s.dilemma?.public_text||(s.phase==='FINISHED'?'Les délibérations sont terminées.':'Le Conseil attend le signal de la régie.'));
  text('question',s.dilemma?.vote_question||'');
  drawGauges(s);
- const cityStates=updateCity($('city'),s.city);
+ if(mountedSkin!==s.skin.id){mountCity($('city'),s.skin.id);mountedSkin=s.skin.id;previousCityStates=null;}
+ const cityStates=updateCity($('city'),s.city,s.skin.id,s.skin.labels.resources);
  const changes=Object.entries(cityStates).filter(([key,state])=>previousCityStates&&state.level!==previousCityStates[key].level).map(([,state])=>state.description);
- text('cityEvolution',changes.length?changes.join(' '):'La ville reflète les décisions révélées du Conseil.');
+ text('cityEvolution',changes.length?changes.join(' '):'Le paysage reflète les décisions révélées du Conseil.');
  previousCityStates=cityStates;
  const details=$('cityDetails');details.replaceChildren();
  for(const state of Object.values(cityStates)){
@@ -71,7 +74,7 @@ function render(s){
   for(const p of ranking){
    const line=document.createElement('div');line.className='ballot';
    const a=document.createElement('strong');a.textContent=p.rank+'. '+teamLabel(s,p.family)+(p.rank===1?' ★':'');
-   const b=document.createElement('span');b.textContent='Secret '+p.score.secret+' · $ '+p.score.wealth+' · Conseil '+p.score.council+' · Influence '+p.score.influence;
+   const b=document.createElement('span');b.textContent='Secret '+p.score.secret+' · '+s.skin.labels.currency+' '+p.score.wealth+' · Conseil '+p.score.council+' · Influence '+p.score.influence;
    const n=document.createElement('strong');n.textContent=p.score.total+' pts';
    line.append(a,b,n);root.append(line);
   }

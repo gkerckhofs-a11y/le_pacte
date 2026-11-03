@@ -1,3 +1,4 @@
+import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
 import {teamCaption,teamLabel,colorize} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id),p=new URLSearchParams(location.search);
@@ -55,6 +56,7 @@ function gauge(s){
  }
 }
 function render(s){
+ applySkin(document.body,s.skin);
  current=s;set('phase',labels[s.phase]||s.phase);set('sessionCode',s.code+' · '+s.selection.scenarioVersion+' · skin '+s.selection.skinId);
  set('sessionTitle',s.title);set('revision','Révision '+s.revision);
  set('dilemmaInfo',s.dilemma?'Délibération : '+s.dilemma.title+(s.dilemma.vote_question?' — '+s.dilemma.vote_question:''):'');
@@ -88,7 +90,7 @@ function render(s){
   button.addEventListener('click',()=>rotate(family.id));head.append(name,button);el.append(head);
   const details=document.createElement('div');details.className='small muted';
   const resources=s.familyResources[family.id];
-  details.textContent='Influence '+resources.power+' · Dollars '+resources.dollars;
+  details.textContent='Influence '+resources.power+' · '+s.skin.labels.currency+' '+resources.dollars;
   el.append(details);families.append(el);
  }
  const final=$('finalPanel');final.hidden=!s.finalResults;

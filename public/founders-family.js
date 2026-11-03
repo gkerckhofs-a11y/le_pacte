@@ -1,3 +1,4 @@
+import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
 import {teamCaption,teamLabel} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id),params=new URLSearchParams(location.search);
@@ -36,7 +37,7 @@ function offers(data){
  for(const o of data.offers.slice(-30).reverse()){
   const el=document.createElement('div');el.className='card';
   const content=document.createElement('p');
-  content.textContent=(o.from===data.self.id?'Vous proposez ':'Proposition reçue : ')+o.amount+' $ de '+teamLabel(data,o.from)+' à '+teamLabel(data,o.to)+' · '+o.reason+' · '+o.status;
+  content.textContent=(o.from===data.self.id?'Vous proposez ':'Proposition reçue : ')+o.amount+' '+data.skin.labels.currency+' de '+teamLabel(data,o.from)+' à '+teamLabel(data,o.to)+' · '+o.reason+' · '+o.status;
   el.append(content);
   if(o.status==='pending'&&o.to===data.self.id){
    for(const [name,kind] of [['Accepter','acceptOffer'],['Refuser','rejectOffer']]){
@@ -53,7 +54,7 @@ function offers(data){
 function render(data){
  current=data;
  const self=data.self,c=data.council;
- document.body.style.setProperty('--team',self.color.hex);document.body.style.setProperty('--team-dark',self.color.dark);
+ applySkin(document.body,data.skin);applyTeamTheme(document.body,self.color,data.skin);
  set('teamIdentity',self.color.symbol+' Équipe '+self.color.label+' · Porte-parole');
  $('identityPanel').hidden=data.phase!=='READY';
  if(document.activeElement!==$('chosenName'))$('chosenName').value=self.name==='Nom à choisir'?'':self.name;
@@ -64,7 +65,7 @@ function render(data){
  set('dilemmaText',data.dilemma?.public_text||'');
  set('question',data.dilemma?.vote_question||'');
  set('influence',self.power);set('dollars',self.dollars);
- set('influenceLabel',data.skin.labels.influence);set('dollarLabel',data.skin.labels.currency);
+ set('influenceLabel',data.skin.labels.influence);set('dollarLabel',data.skin.labels.currency);set('offerAmountLabel',data.skin.labels.currency+' proposés');
  set('objective',self.objective);
  if(data.goalCard&&data.goalProgress){
   const card=data.goalCard,progress=data.goalProgress;
@@ -79,7 +80,7 @@ function render(data){
  if(data.finalResults){
   const r=data.finalResults.ranking.find(item=>item.family===self.id);
   set('personalResultText',r.rank===1?'Votre famille remporte Le Pacte !':'Classement : '+r.rank+' / 6. Vainqueur : '+teamLabel(data,data.finalResults.ranking[0].family));
-  set('personalScoreBreakdown','Objectif secret '+r.score.secret+' · Dollars '+r.score.wealth+
+  set('personalScoreBreakdown','Objectif secret '+r.score.secret+' · '+data.skin.labels.currency+' '+r.score.wealth+
       ' · Votes '+r.score.council+' · Influence '+r.score.influence+' = '+r.score.total+' points');
  }
  set('familyStats',self.members+' membre(s) · Meneur : '+teamLabel(data,data.leader)+' · Modérateur : '+teamLabel(data,data.moderator));

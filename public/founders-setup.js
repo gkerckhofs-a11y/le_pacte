@@ -1,3 +1,4 @@
+import {mountCity,updateCity} from './founders-city-scene.js';
 import {TEAM_COLORS,DEFAULT_TEAM_COLORS,teamCaption} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id);
@@ -71,7 +72,8 @@ $("config").addEventListener("submit",async event=>{
   $("storyInfo").textContent=p.scenario.scenario.location+" · "+p.scenario.scenario.year+" · version "+p.selection.scenarioVersion;
   $("skinTitle").textContent=p.skin.title;
   $("skinInfo").textContent=p.skin.description+" · version "+p.selection.skinVersion;
-  $("skinPreview").style.background=p.skin.theme.accent;
+  mountCity($('skinPreview'),p.skin.id);updateCity($('skinPreview'),p.game.city,p.skin.id,p.skin.labels.resources);
+  $('skinPreview').querySelector('svg').style.cssText='width:100%;height:100%;object-fit:contain';
   $("countDilemmas").textContent=String(p.scenario.dilemmas.length);
   $("countMembers").textContent=String(p.settings.members.reduce((a,b)=>a+b,0));
   $("warnings").replaceChildren();
