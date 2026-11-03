@@ -170,6 +170,7 @@ export function narrativePublicView(s){
     {phase:s.phase==='AWAITING_REVEAL'?'closed':'inactive',turn:null,bids:{},choices:{},pendingLeaderChoices:[]},
   reveal:s.phase==='REVEALED'||s.phase==='FINISHED'?copy(s.lastReveal):null,
   history:copy(s.revealedHistory),
+  finalTieOrder:copy(s.initiativeOrder??FOUNDERS),
   finalResults:s.phase==='FINISHED'?copy(s.finalResults):null
  };
 }
