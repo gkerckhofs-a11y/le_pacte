@@ -1,6 +1,6 @@
 "use strict";
 const $=id=>document.getElementById(id);
-let catalog=null,authSDK=null;
+let catalog=null,authSDK=null,selectedPreview=null;
 const state=(message,type="info")=>{$("status").textContent=message;$("status").dataset.type=type;};
 async function api(path,method="GET",payload){
  const key=authSDK?await authSDK.currentToken():$("token").value.trim();
@@ -30,6 +30,7 @@ $("load").addEventListener("click",async()=>{
   fill($("skin"),catalog.skins,"Aucune skin");
   $("config").hidden=!(catalog.scenarios.length&&catalog.skins.length);
   $("preview").hidden=true;$("empty").hidden=false;
+  selectedPreview=null;
   state(catalog.scenarios.length+" scénario(s), "+catalog.skins.length+" skin(s).","success");
   autoSkin();
  }catch(e){state(e.message,"error");}
@@ -61,6 +62,8 @@ $("config").addEventListener("submit",async event=>{
  state("Vérification de la configuration…");
  try{
   const p=await api("/api/founders/preview","POST",payload);
+  selectedPreview=payload;
+  $('createdGame').hidden=true;
   $("empty").hidden=true;$("preview").hidden=false;
   $("storyTitle").textContent=p.scenario.scenario.title;
   $("storyInfo").textContent=p.scenario.scenario.location+" · "+p.scenario.scenario.year+" · version "+p.selection.scenarioVersion;
@@ -94,3 +97,57 @@ $('googleLogin').addEventListener('click',async()=>{
  }catch(e){state(e.message,'error');}
 });
 initFirebaseAuth();
+
+
+const DEFAULT_GOALS=[
+ 'Objectif de test : faire atteindre au moins 7/10 à l’Économie.',
+ 'Objectif de test : conserver au moins 15 dollars en fin de partie.',
+ 'Objectif de test : faire atteindre au moins 7/10 à la Sécurité.',
+ 'Objectif de test : faire atteindre au moins 7/10 à la Satisfaction.',
+ 'Objectif de test : faire atteindre au moins 7/10 au Bien-être.',
+ 'Objectif de test : faire atteindre au moins 7/10 au Développement.'
+];
+for(let i=0;i<6;i++){
+ const id='ABCDEF'[i],section=document.createElement('div');
+ section.className='metric';section.style.marginTop='10px';
+ const head=document.createElement('strong');head.textContent='Famille '+id;section.append(head);
+ const nameLabel=document.createElement('label');nameLabel.htmlFor='name-'+id;nameLabel.textContent='Nom de la famille';
+ const name=document.createElement('input');name.id='name-'+id;name.maxLength=60;name.value='Famille '+id;
+ const goalLabel=document.createElement('label');goalLabel.htmlFor='goal-'+id;goalLabel.textContent='Objectif secret (prototype)';
+ const goal=document.createElement('textarea');goal.id='goal-'+id;goal.maxLength=500;goal.value=DEFAULT_GOALS[i];
+ goal.style.width='100%';goal.style.minHeight='55px';
+ section.append(nameLabel,name,goalLabel,goal);
+ $('familySettings').append(section);
+}
+for(const el of ['scenario','scenarioVersion','skin','members']){
+ $(el).addEventListener('change',()=>{
+  selectedPreview=null;$('preview').hidden=true;$('empty').hidden=false;
+ });
+}
+$('createNarrative').addEventListener('click',async()=>{
+ if(!selectedPreview){state('Prévisualisez la sélection avant de créer la partie.','error');return;}
+ const names=[...'ABCDEF'].map(id=>$('name-'+id).value.trim());
+ const objectives=[...'ABCDEF'].map(id=>$('goal-'+id).value.trim());
+ const code=$('gameCode').value.trim(),title=$('gameTitle').value.trim();
+ const button=$('createNarrative');button.disabled=true;state('Création de la session…');
+ try{
+  const result=await api('/api/founders/sessions','POST',{...selectedPreview,code,title,names,objectives});
+  if(!authSDK)sessionStorage.setItem('pacte-founder-organizer-key',$('token').value.trim());
+  const links=$('createdLinks');links.replaceChildren();
+  const append=(label,path)=>{
+   const url=new URL(path,location.origin);
+   const el=document.createElement('div');el.className='card';el.style.padding='9px';
+   const a=document.createElement('a');a.href=url.href;a.textContent=label;a.target='_blank';a.rel='noopener';
+   el.append(a);links.append(el);
+  };
+  append('Ouvrir la régie de la partie','/founders-regie.html?session='+result.id);
+  append('Ouvrir la projection publique','/founders-city.html?session='+result.id);
+  for(const a of result.access){
+   const path='/founders-family.html?session='+result.id+'#token='+encodeURIComponent(a.token);
+   append('Accès privé porte-parole : Famille '+a.family,path);
+  }
+  $('createdGame').hidden=false;
+  button.disabled=true;
+  state('Session '+result.code+' créée : six liens privés prêts à être distribués.','success');
+ }catch(e){state(e.message,'error');button.disabled=false;}
+});

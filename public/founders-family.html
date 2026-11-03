@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Le Pacte · Espace Famille</title><link rel="stylesheet" href="/founders-live.css"><script src="/founders-family.js" defer></script></head>
+<body>
+<header class="top"><div><div class="eyebrow">Le Pacte · Votre Maison</div><h1 id="familyName">Espace porte-parole</h1></div><div class="row"><span class="chip" id="phase">Connexion…</span><span class="chip" id="turn">—</span></div></header>
+<main class="page">
+<div class="layout">
+<div>
+ <section class="panel">
+  <div class="eyeline" id="dilemmaLabel">Le conseil municipal</div>
+  <h2 id="dilemmaTitle" style="font-size:28px;margin-top:10px">Attente du Conseil</h2>
+  <p id="dilemmaText" class="small muted"></p>
+  <p id="question" style="font-size:19px"></p>
+  <div id="lastReveal" class="card" hidden><strong id="resultTitle"></strong><p id="resultNarration"></p></div>
+ </section>
+ <section class="panel" style="margin-top:16px">
+  <h2>Votre décision politique</h2><p class="instructions" id="voteHint">Le porte-parole vote au nom de toute sa famille, après concertation.</p>
+  <div id="firstVote" hidden>
+   <div class="field"><label for="voteAmount">Influence engagée</label><input type="number" min="1" max="500" id="voteAmount" value="1"></div>
+   <div class="row"><button data-vote="pour">Voter POUR</button><button data-vote="contre" class="secondary">Voter CONTRE</button></div>
+   <hr><div class="row"><button data-vote="passe_pouvoir" class="secondary">Passer · récupérer l’Influence</button><button data-vote="passe_moderateur" class="secondary">Passer · devenir Modérateur</button></div>
+  </div>
+  <div id="raiseVote" hidden>
+   <div class="field"><label for="raiseAmount">Augmenter la mise (même camp)</label><input type="number" min="1" max="500" id="raiseAmount" value="1"></div>
+   <div class="row"><button data-vote="augmenter">Augmenter la mise</button><button data-vote="maintien" class="secondary">Maintenir ma position</button></div>
+  </div>
+  <div id="moderatorTie" hidden><p>Le Conseil est à égalité : le Modérateur doit trancher.</p><div class="row"><button data-tie="pour">Décider POUR</button><button data-tie="contre" class="secondary">Décider CONTRE</button></div></div>
+  <div id="moderatorLeader" hidden><p>Choisis le nouveau Meneur parmi les familles gagnantes à égalité.</p><div id="leaderCandidates" class="row"></div></div>
+ </section>
+ <section class="panel" style="margin-top:16px">
+  <h2>Vos négociations</h2>
+  <p class="small muted">Les diplomates négocient physiquement. Le porte-parole enregistre les propositions financières et les confirme.</p>
+  <form id="offerForm">
+   <div class="grid2">
+    <div class="field"><label for="targetFamily">Famille destinataire</label><select id="targetFamily" required></select></div>
+    <div class="field"><label for="offerAmount">Dollars proposés</label><input id="offerAmount" type="number" min="1" value="1" required></div>
+   </div>
+   <div class="field"><label for="offerReason">Objet de l'accord</label><input id="offerReason" maxlength="300" required placeholder="Soutien au vote, abstention, arbitrage…"></div>
+   <button type="submit">Proposer le transfert</button>
+  </form>
+  <div id="offers"></div>
+ </section>
+</div>
+<aside>
+ <section class="panel"><h2>Vos ressources</h2><div class="grid2">
+  <div class="family-stat"><span class="small muted" id="influenceLabel">Influence disponible</span><strong id="influence">—</strong></div>
+  <div class="family-stat"><span class="small muted" id="dollarLabel">Dollars</span><strong id="dollars">—</strong></div>
+ </div><p class="small muted" id="committed"></p><hr>
+ <div class="eyeline">Confidentiel · Votre famille uniquement</div><h2 style="margin-top:10px">Objectif secret</h2><p id="objective">Cet objectif sera visible après connexion.</p>
+ <hr><p class="small muted" id="familyStats"></p></section>
+ <section class="panel" style="margin-top:16px"><h2>État de la ville</h2><div id="gauges"></div></section>
+</aside></div><div id="notice" role="status" style="margin-top:16px"></div>
+</main></body></html>

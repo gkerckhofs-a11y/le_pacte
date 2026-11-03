@@ -33,8 +33,8 @@ small{color:#656a6e}a{color:inherit}ol{padding-left:20px;line-height:1.6}
 <body>
 <header>
  <div class="note" style="color:#c1c8cc">LUDIFICATEUR / LE PACTE · RÉGIE DE CONCEPTION</div>
- <h1>Configurer une expérience narrative</h1>
- <p>Scénario indépendant de la skin. Aperçu V2.3, sans création ni publication de partie.</p>
+ <h1>Créer une partie narrative</h1>
+ <p>Scénario indépendant de la skin. Configure les six familles et lance une répétition narrative.</p>
 </header>
 <main>
  <article>
@@ -63,7 +63,7 @@ small{color:#656a6e}a{color:inherit}ol{padding-left:20px;line-height:1.6}
   <div id="empty"><p class="note">Charge d'abord les bibliothèques, puis choisis un scénario et un habillage pour afficher leur compatibilité.</p>
   <ol><li>Choisir l'histoire issue d'un Sheets.</li><li>Choisir la skin, sans réécrire les dilemmes.</li><li>Contrôler les six effectifs avant de créer une session dans une tranche future.</li></ol></div>
   <div id="preview" hidden>
-    <span class="pill">APERÇU UNIQUEMENT</span>
+    <span class="pill">APERÇU DE CONFIGURATION</span>
     <h3 id="storyTitle"></h3><p id="storyInfo"></p>
     <div id="skinPreview"></div><h3 id="skinTitle"></h3><p id="skinInfo"></p>
     <div class="meta">
@@ -73,7 +73,17 @@ small{color:#656a6e}a{color:inherit}ol{padding-left:20px;line-height:1.6}
       <div class="metric"><span>Connexions de vote</span><strong>6</strong></div>
     </div>
     <div id="warnings"></div>
-    <p class="note">Le décor public et les interfaces familles seront raccordés dans une étape ultérieure. Les parties en cours conserveront les versions choisies.</p>
+    <hr><h2>Paramétrer cette partie</h2>
+    <p class="note">Les objectifs ci-dessous sont des exemples de test, à personnaliser avant de lancer une vraie animation. Ils ne constituent pas encore un barème de victoire.</p>
+    <label for="gameTitle">Nom de la partie</label><input id="gameTitle" value="Le Pacte des Fondateurs — Répétition" maxlength="100">
+    <label for="gameCode">Code de partie (unique)</label><input id="gameCode" value="PACTE01" pattern="[A-Z0-9][A-Z0-9_-]{2,11}" maxlength="12">
+    <div id="familySettings"></div>
+    <button type="button" id="createNarrative">Créer la partie narrative</button>
+    <div id="createdGame" hidden>
+      <h3>Partie créée</h3>
+      <p class="note">Distribuer un lien confidentiel à chaque porte-parole. Tous les autres participants jouent sans connexion.</p>
+      <div id="createdLinks"></div>
+    </div>
   </div>
  </article>
 </main>

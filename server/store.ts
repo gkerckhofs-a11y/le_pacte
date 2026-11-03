@@ -1,3 +1,4 @@
+import {LocalNarrativeSessions} from './founders-live-store.ts';
 import {LocalFoundersReleases} from './founders-release-store.ts';
 import {DatabaseSync} from 'node:sqlite';
 import {randomBytes} from 'node:crypto';
@@ -15,12 +16,14 @@ export class GameStore {
  db:DatabaseSync;
  studio:EditionStudio;
  founders:LocalFoundersReleases;
+ narrative:LocalNarrativeSessions;
  constructor(path:string){
   this.db=new DatabaseSync(path);this.db.exec('PRAGMA busy_timeout=5000; PRAGMA journal_mode=WAL;');
   this.db.exec(`CREATE TABLE IF NOT EXISTS sessions(id TEXT PRIMARY KEY, code TEXT UNIQUE NOT NULL, title TEXT NOT NULL, state TEXT NOT NULL);
    CREATE TABLE IF NOT EXISTS team_access(session_id TEXT NOT NULL, team TEXT NOT NULL, hash TEXT NOT NULL UNIQUE, expires INTEGER NOT NULL, last_seen INTEGER, PRIMARY KEY(session_id,team));`);
   this.studio=new EditionStudio(this);
   this.founders=new LocalFoundersReleases(this.db);
+  this.narrative=new LocalNarrativeSessions(this.db);
  }
  close(){this.db.close();}
  transaction<T>(fn:()=>T):T {this.db.exec('BEGIN IMMEDIATE');try{const result=fn();this.db.exec('COMMIT');return result;}catch(e){this.db.exec('ROLLBACK');throw e;}}
