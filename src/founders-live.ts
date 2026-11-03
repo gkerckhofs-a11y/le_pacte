@@ -145,7 +145,7 @@ export function applyNarrativeCommand(input,actor,command,now){
   default:throw new Error('Commande narrative inconnue');
  }
  s.revision++;s.updatedAt=now;
- check(totalPower(s.game)===51,'Conservation de l’Influence violée');
+ check(totalPower(s.game)===s.game.powerSupply,'Conservation de l’Influence violée');
  return s;
 }
 function publicDilemma(s){
