@@ -32,7 +32,7 @@ function render(s){
  text('pageTitle',s.story.location+' · '+s.story.year);text('phase',pretty[s.phase]||s.phase);
  text('chapter',s.dilemma?'Chapitre '+s.dilemma.chapter:'Le Conseil des Fondateurs');
  text('tiePriority','Départage final si égalité parfaite : '+s.finalTieOrder.map(id=>teamLabel(s,id)).join(' → '));
- text('turn',s.council.turn?'Tour de '+teamLabel(s,s.council.turn):'Shérif '+teamLabel(s,s.leader));
+ text('turn',s.council.turn?'Tour de '+teamLabel(s,s.council.turn):'Maire '+teamLabel(s,s.leader));
  text('dilemmaTitle',s.dilemma?.title||(s.phase==='FINISHED'?'La ville entre dans l’histoire':'Bienvenue au Conseil'));
  text('dilemmaText',s.dilemma?.public_text||(s.phase==='FINISHED'?'Les délibérations sont terminées.':'Le Conseil attend le signal de la régie.'));
  text('question',s.dilemma?.vote_question||'');
@@ -66,7 +66,7 @@ function render(s){
   row.append(n,v,amount);ballots.append(row);
  }
  text('councilStatus',s.phase==='COUNCIL'?
-  'Shérif : '+teamLabel(s,s.leader)+' · Maire : '+teamLabel(s,s.moderator)+' · '+(s.council.turn?'Au tour de '+teamLabel(s,s.council.turn):'Arbitrage en cours'):
+  'Maire : '+teamLabel(s,s.leader)+' · Shérif : '+teamLabel(s,s.moderator)+' · '+(s.council.turn?'Au tour de '+teamLabel(s,s.council.turn):'Arbitrage en cours'):
   s.phase==='AWAITING_REVEAL'?'Résultat sous scellés : la régie doit le révéler.':
   s.phase==='REVEALED'?'Le Conseil attend le prochain dilemme.':
   s.phase==='FINISHED'?'Les décisions finales ont été proclamées.':'La séance n’a pas encore commencé.');

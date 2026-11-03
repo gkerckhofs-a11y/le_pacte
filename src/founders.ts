@@ -34,7 +34,7 @@ export function validateFoundersCalibration(settings){
 }
 export function createFoundersGame({members=[5,5,5,5,5,5],leader='A',moderator='F',calibration=FOUNDERS_DEFAULT_CALIBRATION}={}) {
  requireThat(Array.isArray(members)&&members.length===6&&members.every(n=>integer(n,1,300)), 'Six effectifs positifs obligatoires');
- requireThat(validFamily(leader)&&validFamily(moderator),'Shérif ou maire inconnu');
+ requireThat(validFamily(leader)&&validFamily(moderator),'Maire ou shérif inconnu');
  const errors=validateFoundersCalibration(calibration);
  requireThat(!errors.length,errors.join(' ; '));
  const powerSupply=6*calibration.initialPower+calibration.initialPool;
@@ -75,7 +75,7 @@ function complete(s,winner,leaderChoice=null) {
   const biggest=Math.max(...candidates.map(id=>v.bids[id]));
   const tied=candidates.filter(id=>v.bids[id]===biggest);
   if(tied.length>1 && !leaderChoice){v.phase='await_leader';v.pendingWinner=winner;v.pendingLeaderChoices=tied;return s;}
-  requireThat(tied.includes(leaderChoice)||tied.length===1,'Shérif final invalide');
+  requireThat(tied.includes(leaderChoice)||tied.length===1,'Maire final invalide');
   newLeader=tied.length===1?tied[0]:leaderChoice;
  }
  const oldPool=s.pool;const each=passes.length?Math.floor(oldPool/passes.length):0;
@@ -108,7 +108,7 @@ export function castFoundersAction(input,id,action) {
   } else {
    requireThat(action.amount===undefined||action.amount===0,'Abstention sans mise');
    if(kind==='passe_moderateur'){
-    requireThat(!v.moderatorClaimed,'Maire déjà revendiqué pendant ce vote');
+    requireThat(!v.moderatorClaimed,'Shérif déjà revendiqué pendant ce vote');
     v.moderatorClaimed=true;s.moderator=id;
    }
    v.choices[id]=kind;s.families[id].dollars+=1;
@@ -134,12 +134,12 @@ export function castFoundersAction(input,id,action) {
  return s;
 }
 export function moderatorResolveFoundersTie(input,id,winner) {
- requireThat(input.vote?.phase==='await_moderator'&&id===input.moderator,'Seul le Maire peut départager');
+ requireThat(input.vote?.phase==='await_moderator'&&id===input.moderator,'Seul le Shérif peut départager');
  return complete(clone(input),winner);
 }
 export function moderatorChooseFoundersLeader(input,id,leader) {
- requireThat(input.vote?.phase==='await_leader'&&id===input.moderator,'Seul le Maire choisit le nouveau Shérif');
- requireThat(input.vote.pendingLeaderChoices.includes(leader),'Cette famille ne peut pas être Shérif');
+ requireThat(input.vote?.phase==='await_leader'&&id===input.moderator,'Seul le Shérif choisit le nouveau Maire');
+ requireThat(input.vote.pendingLeaderChoices.includes(leader),'Cette famille ne peut pas être Maire');
  return complete(clone(input),input.vote.pendingWinner,leader);
 }
 export function applyFoundersCityEffects(input,effects) {

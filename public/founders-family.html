@@ -2,7 +2,7 @@
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Le Pacte · Espace Famille</title><link rel="stylesheet" href="/founders-live.css"><script type="module" src="/founders-family.js"></script></head>
 <body class="family-dashboard">
-<header class="top"><div><div class="eyebrow"><span id="teamIdentity">Le Pacte · Votre équipe</span></div><h1 id="familyName">Espace porte-parole</h1></div><div class="row"><span class="chip" id="phase">Connexion…</span><span class="chip" id="turn">—</span></div></header>
+<header class="top"><div><div class="western-edition">Hot Spring · 1876 · Conseil des Fondateurs</div><div class="eyebrow"><span id="teamIdentity">Le Pacte · Votre équipe</span></div><h1 id="familyName">Espace porte-parole</h1></div><div class="row"><span class="chip" id="phase">Connexion…</span><span class="chip" id="turn">—</span></div></header>
 <main class="page">
 <nav class="dashboard-tabs" role="tablist" aria-label="Tableau de bord de l’équipe">
  <button id="boardTab" type="button" role="tab" aria-selected="true" aria-controls="boardPanel">Ma table</button>
@@ -12,7 +12,8 @@
 <section id="identityPanel" class="panel identity-panel" hidden>
  <div class="eyeline">Avant l’ouverture du Conseil</div><h2>Choisissez votre nom de famille</h2>
  <p class="small muted">Un nom choisi ensemble, enregistré par votre porte-parole. Votre couleur reste le repère de l’équipe pendant la partie.</p>
- <form id="identityForm" class="row"><label for="chosenName">Nom de famille</label><input id="chosenName" maxlength="60" required placeholder="Ex. Famille Blackwood"><button>Enregistrer le nom</button></form>
+ <form id="identityForm" class="row"><label for="chosenName">Nom de famille</label><input id="chosenName" maxlength="60" required placeholder="Ex. Famille Blackwood"><button id="saveIdentity" type="submit">Enregistrer le nom</button></form>
+ <p id="identityNotice" class="identity-notice" role="status" aria-live="polite"></p>
 </section>
 <div class="layout">
 <div>
@@ -29,14 +30,14 @@
   <div id="firstVote" hidden>
    <div class="field"><label for="voteAmount">Influence engagée</label><input type="number" min="1" max="500" id="voteAmount" value="1"></div>
    <div class="row"><button data-vote="pour">Voter POUR</button><button data-vote="contre" class="secondary">Voter CONTRE</button></div>
-   <hr><div class="row"><button data-vote="passe_pouvoir" class="secondary">Passer · récupérer l’Influence</button><button data-vote="passe_moderateur" class="secondary">Passer · devenir Maire</button></div>
+   <hr><div class="row"><button data-vote="passe_pouvoir" class="secondary">Passer · récupérer l’Influence</button><button data-vote="passe_moderateur" class="secondary">Passer · devenir Shérif</button></div>
   </div>
   <div id="raiseVote" hidden>
    <div class="field"><label for="raiseAmount">Augmenter la mise (même camp)</label><input type="number" min="1" max="500" id="raiseAmount" value="1"></div>
    <div class="row"><button data-vote="augmenter">Augmenter la mise</button><button data-vote="maintien" class="secondary">Maintenir ma position</button></div>
   </div>
-  <div id="moderatorTie" hidden><p>Le Conseil est à égalité : le Maire doit trancher.</p><div class="row"><button data-tie="pour">Décider POUR</button><button data-tie="contre" class="secondary">Décider CONTRE</button></div></div>
-  <div id="moderatorLeader" hidden><p>Choisis le nouveau Shérif parmi les familles gagnantes à égalité.</p><div id="leaderCandidates" class="row"></div></div>
+  <div id="moderatorTie" hidden><p>Le Conseil est à égalité : le Shérif doit trancher.</p><div class="row"><button data-tie="pour">Décider POUR</button><button data-tie="contre" class="secondary">Décider CONTRE</button></div></div>
+  <div id="moderatorLeader" hidden><p>Choisis le nouveau Maire parmi les familles gagnantes à égalité.</p><div id="leaderCandidates" class="row"></div></div>
  </section>
  <section class="panel" style="margin-top:16px">
   <h2>Vos négociations</h2>
@@ -70,15 +71,15 @@
 <section id="rulesPanel" class="panel rules-panel" role="tabpanel" aria-labelledby="rulesTab" hidden>
  <div class="eyeline">Aide de jeu · Les six familles</div><h2>Les règles à portée de main</h2>
  <p>Discutez en équipe. Votre chef d’équipe, ou porte-parole, enregistre une décision au nom de toute la famille. Le nombre de membres ne multiplie pas les votes.</p>
- <h3>Shérif et Maire</h3>
- <p><strong>Le Shérif mène le vote.</strong> Il joue en premier. Une famille dont la mise devient strictement supérieure à toutes les autres prend ce rôle. Le tour avance dans l’ordre des six équipes et le vote se ferme quand la famille juste avant le Shérif a joué.</p>
- <p><strong>Le Maire départage.</strong> Si les sommes d’influence POUR et CONTRE sont égales, il choisit l’issue. Si un nouveau Shérif doit être choisi parmi plusieurs familles gagnantes à la plus forte mise, le Maire les départage également.</p>
+ <h3>Maire et Shérif</h3>
+ <p><strong>Le Maire mène le vote.</strong> Il joue en premier. Une famille dont la mise devient strictement supérieure à toutes les autres prend ce rôle. Le tour avance dans l’ordre des six équipes et le vote se ferme quand la famille juste avant le Maire a joué.</p>
+ <p><strong>Le Shérif départage.</strong> Si les sommes d’influence POUR et CONTRE sont égales, il choisit l’issue. Si un nouveau Maire doit être choisi parmi plusieurs familles gagnantes à la plus forte mise, le Shérif les départage également.</p>
  <h3>À votre tour</h3>
  <ol><li>Votez <strong>POUR</strong> ou <strong>CONTRE</strong> en engageant au moins un point d’influence disponible.</li>
- <li>Ou passez : <strong>récupérer l’influence</strong> permet de partager la réserve commune avec les autres familles ayant choisi cette option à la résolution ; le reliquat reste en réserve. <strong>Devenir Maire</strong> vous donne le rôle si personne ne l’a déjà revendiqué pendant ce vote. Dans les deux cas, passer rapporte un dollar.</li>
+ <li>Ou passez : <strong>récupérer l’influence</strong> permet de partager la réserve commune avec les autres familles ayant choisi cette option à la résolution ; le reliquat reste en réserve. <strong>Devenir Shérif</strong> vous donne le rôle si personne ne l’a déjà revendiqué pendant ce vote. Dans les deux cas, passer rapporte un dollar.</li>
  <li>Si le tour revient à vous, maintenez votre position ou ajoutez de l’influence dans le même camp. Une abstention ne peut plus changer de position.</li></ol>
  <h3>Résultat et ressources</h3>
- <p>Les points d’influence engagés déterminent le résultat, pas le nombre d’équipes. Les mises du camp gagnant vont à la réserve commune ; les mises du camp perdant sont rendues. Le Shérif reste en place s’il appartient au camp gagnant ; sinon, la plus forte mise gagnante prend le rôle. Si tout le monde passe, le Maire devient Shérif.</p>
+ <p>Les points d’influence engagés déterminent le résultat, pas le nombre d’équipes. Les mises du camp gagnant vont à la réserve commune ; les mises du camp perdant sont rendues. Le Maire reste en place s’il appartient au camp gagnant ; sinon, la plus forte mise gagnante prend le rôle. Si tout le monde passe, le Shérif devient Maire.</p>
  <p>La régie révèle ensuite les conséquences. L’écran projeté montre le dilemme, les votes et l’évolution des indicateurs de la ville. Votre influence disponible, vos dollars et votre objectif secret sont dans « Ma table ».</p>
  <h3>Négocier et gagner</h3>
  <p>Vous pouvez proposer un transfert de dollars pendant le Conseil. Il n’est exécuté qu’après acceptation de la famille destinataire. Les offres encore en attente expirent à la révélation.</p>

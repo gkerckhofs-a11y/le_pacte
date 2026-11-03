@@ -107,7 +107,7 @@ export function applyNarrativeCommand(input,actor,command,now){
    if(!s.game.vote)s.phase='AWAITING_REVEAL';
    break;
   case 'chooseLeader':
-   team();check(s.phase==='COUNCIL'&&s.game.vote?.phase==='await_leader','Aucun Shérif à départager');
+   team();check(s.phase==='COUNCIL'&&s.game.vote?.phase==='await_leader','Aucun Maire à départager');
    s.game=moderatorChooseFoundersLeader(s.game,actor.family,data.family);
    if(!s.game.vote)s.phase='AWAITING_REVEAL';
    break;

@@ -20,6 +20,7 @@ export function applySkin(root,skin){
 export function applyTeamTheme(root,color,skin){
  const light=skin?.id==='corporate';
  const accent=light?TEAM_INKS[color.id]:color.hex;
- root.style.setProperty('--team',accent);root.style.setProperty('--gold',accent);root.style.setProperty('--accent',accent);
+ root.style.setProperty('--team',accent);
+ if(skin?.id!=='western'){root.style.setProperty('--gold',accent);root.style.setProperty('--accent',accent);}
  root.style.setProperty('--team-dark',light?'#eaf0f6':color.dark);
 }

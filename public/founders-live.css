@@ -108,3 +108,35 @@ body[data-skin=corporate] .small.muted{color:var(--muted)}
 @media(min-width:1600px){.projection-dashboard .page{padding:20px 30px}.dilemma-panel p{font-size:20px}.dilemma-panel #question{font-size:25px}.projection-results .ballot,.projection-results .gauge-head{font-size:15px}}
 @media(max-width:950px){.projection-grid{grid-template-columns:1fr}.projection-dashboard .page{padding:16px}.projection-dashboard .top{padding:16px}.projection-results .ballot{font-size:13px}}
 @media(max-width:550px){.projection-results{grid-template-columns:1fr}.projection-grid{display:block}.projection-city{margin-top:16px}}
+
+/* Western operator desk: walnut, ledger paper and brass, with a small team badge. */
+.western-edition{display:none}
+body[data-skin=western].family-dashboard{--gold:#c89a55;--accent:#b58243;--panel:#ecdfc5;--panel2:#dfceb0;--muted:#695747;--border:#ad9064;--paper:#38291f;background:repeating-linear-gradient(91deg,#ffffff02 0 2px,transparent 2px 58px),repeating-linear-gradient(0deg,#00000012 0 1px,transparent 1px 7px),#251a14;color:#38291f;color-scheme:light}
+body[data-skin=western].family-dashboard .top{padding:25px clamp(20px,4vw,50px);border-top:2px solid var(--team);border-bottom:3px double #a67b43;background:linear-gradient(90deg,#211710f5 0%,#211710dc 65%,#211710a6),url('/assets/western/painted/reference.jpg') center 45%/cover;color:#f2e2c5;box-shadow:0 6px 24px #0004}
+body[data-skin=western].family-dashboard .western-edition{display:block;font:700 11px Georgia,serif;letter-spacing:.18em;text-transform:uppercase;color:#d1ae77;margin-bottom:15px}
+body[data-skin=western].family-dashboard h1{color:#f7e8ca;font-size:clamp(27px,3.2vw,42px);margin-top:9px;text-shadow:0 2px 2px #0008}
+body[data-skin=western].family-dashboard .top .eyebrow{color:var(--team);letter-spacing:.12em;font-size:12px}
+body[data-skin=western].family-dashboard .top .chip{color:#f2e2c5;border-color:#9b7a50;background:#1d130d77}
+body[data-skin=western].family-dashboard .page{max-width:1360px;padding-top:24px}
+body[data-skin=western].family-dashboard .panel{border:1px solid #b49565;border-top:3px double #8e6a3e;border-radius:3px;background:radial-gradient(ellipse at 20% 0,#fff5,transparent 70%),repeating-linear-gradient(0deg,#89643d05 0 1px,transparent 1px 5px),#ecdfc5;box-shadow:0 5px 18px #0004,inset 0 0 0 4px #fff3;padding:24px;color:#38291f}
+body[data-skin=western].family-dashboard h2{color:#422d1e;font-size:22px}body[data-skin=western].family-dashboard .eyeline{color:#80572c;font-size:11px;font-weight:700;letter-spacing:.15em}
+body[data-skin=western].family-dashboard .muted,body[data-skin=western].family-dashboard .instructions,body[data-skin=western].family-dashboard .field label{color:#695747}
+body[data-skin=western].family-dashboard .card{background:#e0cdae;border:1px solid #bea078;border-radius:3px;box-shadow:inset 0 0 0 2px #ffffff20}
+body[data-skin=western].family-dashboard button:not(.secondary){background:linear-gradient(#755037,#533620);border:1px solid #4b2f1d;border-bottom:3px solid #382416;color:#fff0d1;box-shadow:inset 0 1px #e4bd7c55;border-radius:4px}
+body[data-skin=western].family-dashboard button.secondary{color:#553923;border-color:#987248;background:#f5e8ce88;border-radius:4px}
+body[data-skin=western].family-dashboard input,body[data-skin=western].family-dashboard select{background:#fbf1dc;color:#38291f;border:1px solid #ab8a5b;border-radius:3px;box-shadow:inset 0 2px 4px #6c482211}
+body[data-skin=western].family-dashboard .family-stat{background:#ddc49d;border:1px solid #b29466;border-radius:3px;padding:18px}
+body[data-skin=western].family-dashboard .family-stat strong{font:700 38px Georgia,serif;color:#56391f;margin-top:7px}
+body[data-skin=western].family-dashboard .bar{background:#98703c}body[data-skin=western].family-dashboard .track{background:#cbb998}
+body[data-skin=western].family-dashboard .dashboard-tabs{border-bottom:1px solid #80603c;padding-bottom:13px;gap:10px}
+body[data-skin=western].family-dashboard .dashboard-tabs button{padding:10px 24px}
+body[data-skin=western].family-dashboard .dashboard-tabs [aria-selected=true]{background:#d7b77f!important;color:#352215!important;border-color:#b99257!important}
+body[data-skin=western].family-dashboard .dashboard-tabs [aria-selected=false]{color:#e5d1af!important;border-color:#8d6c45!important;background:#38271b!important}
+body[data-skin=western].family-dashboard .rules-panel h3{color:#79512b}
+body[data-skin=western].family-dashboard .identity-panel{border-left:4px solid #a47a42}
+.identity-notice{min-height:1.5em;margin-bottom:0;font-weight:700;font-size:14px}
+body[data-skin=western].family-dashboard .identity-notice{color:#62401f}
+body[data-skin=western].family-dashboard #notice{color:#f0d3a0}
+body[data-skin=western].family-dashboard .identity-panel input{flex:1;min-width:180px}
+body[data-skin=western].family-dashboard .identity-panel label{font-size:14px;font-weight:700}
+@media(max-width:600px){body[data-skin=western].family-dashboard .top{padding:20px}body[data-skin=western].family-dashboard .top>.row{margin-top:16px}body[data-skin=western].family-dashboard .panel{padding:18px}body[data-skin=western].family-dashboard .identity-panel input{max-width:none;width:100%;flex-basis:100%}body[data-skin=western].family-dashboard .identity-panel button{width:100%}}

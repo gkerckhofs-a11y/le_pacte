@@ -42,7 +42,8 @@ test('Couleurs d’équipe : les six variantes restent lisibles sur les deux typ
   const values={},root={dataset:{},style:{setProperty:(k,v)=>values[k]=v}};
   applySkin(root,skin);applyTeamTheme(root,color,skin);
   assert.equal(root.dataset.skin,skin.id);
-  assert.equal(values['--team'],values['--accent']);
+  if(skin.id==='western')assert.equal(values['--accent'],SKIN_DESIGNS.western.accent);
+  else assert.equal(values['--team'],values['--accent']);
   const foreground=skin.id==='corporate'?'#ffffff':skin.theme.background;
   const a=luminance(values['--team']),b=luminance(foreground);
   const contrast=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);

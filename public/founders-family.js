@@ -1,3 +1,4 @@
+import {saveFamilyName} from './founders-name-save.js';
 import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
 import {teamCaption,teamLabel} from './founders-identity.js';
 "use strict";
@@ -7,7 +8,7 @@ const fragment=new URLSearchParams(location.hash.slice(1));
 let token=fragment.get('token')||sessionStorage.getItem(key)||'';
 if(token)sessionStorage.setItem(key,token);
 if(location.hash)history.replaceState(null,'',location.pathname+location.search);
-let current=null,busy=false;
+let current=null,busy=false,identityDirty=false;
 const nice={READY:'Préparation',COUNCIL:'Conseil',AWAITING_REVEAL:'Vote clos',REVEALED:'Révélation',FINISHED:'Terminé'};
 const resources=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
 const set=(id,v)=>$(id).textContent=String(v??'');
@@ -57,9 +58,9 @@ function render(data){
  applySkin(document.body,data.skin);applyTeamTheme(document.body,self.color,data.skin);
  set('teamIdentity',self.color.symbol+' Équipe '+self.color.label+' · Porte-parole');
  $('identityPanel').hidden=data.phase!=='READY';
- if(document.activeElement!==$('chosenName'))$('chosenName').value=self.name==='Nom à choisir'?'':self.name;
+ if(!identityDirty&&document.activeElement!==$('chosenName'))$('chosenName').value=self.name==='Nom à choisir'?'':self.name;
  set('familyName',self.name);set('phase',nice[data.phase]||data.phase);
- set('turn',data.phase==='COUNCIL'?(c.turn===self.id?'À vous !':c.turn?'À '+teamLabel(data,c.turn):c.phase==='await_moderator'?'Arbitrage':'Choix du Shérif'):'—');
+ set('turn',data.phase==='COUNCIL'?(c.turn===self.id?'À vous !':c.turn?'À '+teamLabel(data,c.turn):c.phase==='await_moderator'?'Arbitrage':'Choix du Maire'):'—');
  set('dilemmaLabel',data.dilemma?'Chapitre '+data.dilemma.chapter:'Conseil des Fondateurs');
  set('dilemmaTitle',data.dilemma?.title||(data.phase==='FINISHED'?'Fin de la campagne':'Conseil en préparation'));
  set('dilemmaText',data.dilemma?.public_text||'');
@@ -86,7 +87,7 @@ function render(data){
   set('personalScoreBreakdown','Objectif secret '+r.score.secret+' · '+data.skin.labels.currency+' '+r.score.wealth+
       ' · Votes '+r.score.council+' · Influence '+r.score.influence+' = '+r.score.total+' points');
  }
- set('familyStats',self.members+' membre(s) · Shérif : '+teamLabel(data,data.leader)+' · Maire : '+teamLabel(data,data.moderator));
+ set('familyStats',self.members+' membre(s) · Maire : '+teamLabel(data,data.leader)+' · Shérif : '+teamLabel(data,data.moderator));
  set('committed',self.choice?'Votre position : '+self.choice+' · Mise engagée : '+self.bid:'Aucun vote engagé pour ce dilemme.');
  set('voteHint',self.mayVote?'Votre famille doit décider maintenant.':data.phase==='COUNCIL'?'Vous pouvez négocier en attendant votre tour.':'Le Conseil attend la prochaine phase.');
  $('firstVote').hidden=!(self.mayVote&&self.choice===null);
@@ -109,14 +110,14 @@ function render(data){
 }
 async function refresh(){
  if(busy)return;
- try{const data=await call();if(data.revision!==current?.revision)render(data);notify('');}
+ try{const data=await call();if(busy||data.revision<(current?.revision??-1))return;if(data.revision!==current?.revision)render(data);notify('');}
  catch(e){notify(e.message);}
 }
 async function command(kind,data){
  if(!current||busy)return;
  busy=true;notify('Enregistrement…');
  try{const result=await call('POST',{kind,data,expectedRevision:current.revision});render(result);notify('Décision enregistrée.');}
- catch(e){notify(e.message);await refresh();}
+ catch(e){notify(e.message);try{const latest=await call();render(latest);}catch{ /* Keep original failure visible. */ }}
  finally{busy=false;}
 }
 document.querySelectorAll('[data-vote]').forEach(button=>{
@@ -134,7 +135,20 @@ $('offerForm').addEventListener('submit',e=>{
  const id=crypto.randomUUID();
  command('offer',{id,to:$('targetFamily').value,amount:Number($('offerAmount').value),reason:$('offerReason').value.trim()});
 });
-$('identityForm').addEventListener('submit',e=>{e.preventDefault();command('setIdentity',{name:$('chosenName').value.trim(),color:current.self.color.id});});
+$('chosenName').addEventListener('input',()=>{identityDirty=true;set('identityNotice','');});
+$('identityForm').addEventListener('submit',async event=>{
+ event.preventDefault();
+ if(busy)return;
+ if(!current){set('identityNotice','Connexion en cours. Attendez le chargement de votre équipe.');return;}
+ const name=$('chosenName').value.trim();
+ if(!name){set('identityNotice','Saisissez un nom de famille.');return;}
+ busy=true;$('saveIdentity').disabled=true;set('identityNotice','Enregistrement du nom…');
+ try{
+  const result=await saveFamilyName(current,name,call);
+  identityDirty=false;render(result);set('identityNotice','Nom enregistré : '+result.self.name+'.');
+ }catch(error){set('identityNotice',error.message);}
+ finally{busy=false;$('saveIdentity').disabled=false;}
+});
 const tabs=[$('boardTab'),$('rulesTab')];
 function selectTab(index){
  tabs.forEach((tab,i)=>{tab.setAttribute('aria-selected',String(i===index));tab.tabIndex=i===index?0:-1;$(tab.getAttribute('aria-controls')).hidden=i!==index;});
