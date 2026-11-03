@@ -84,7 +84,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
      const preview=await foundersPreviewFor(store,actor.id,d);
      const created=await store.narrative.create({
       ownerId:actor.id,preview,code:d.code,title:d.title,
-      objectives:d.objectives,names:d.names,now
+      objectives:d.objectives,names:d.names,goalCards:d.goalCards,scoreRules:d.scoreRules,now
      });
      json(201,created);return;
     }
