@@ -89,6 +89,19 @@ function render(s){
   details.textContent='Influence '+resources.power+' · Dollars '+resources.dollars;
   el.append(details);families.append(el);
  }
+ const final=$('finalPanel');final.hidden=!s.finalResults;
+ if(s.finalResults){
+  set('finalWinner',s.finalResults.ranking[0].name+' remporte la partie ('+s.finalResults.ranking[0].score.total+' pts)');
+  const root=$('ranking');root.replaceChildren();
+  for(const r of s.finalResults.ranking){
+   const el=document.createElement('div');el.className='ballot';
+   const family=document.createElement('strong');family.textContent=r.rank+'. '+r.name;
+   const detail=document.createElement('span');detail.textContent='Objectif '+r.score.secret+' · Richesse '+r.score.wealth+
+      ' · Politique '+r.score.council+' · Influence '+r.score.influence;
+   const points=document.createElement('strong');points.textContent=r.score.total;
+   el.append(family,detail,points);root.append(el);
+  }
+ }
  const history=$('history');history.replaceChildren();
  for(const item of s.history.slice(-8).reverse()){
   const el=document.createElement('div');el.className='card';
