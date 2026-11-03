@@ -1,3 +1,4 @@
+import {renderCouncilRoles,appendFamilyRoles} from './founders-role-badges.js';
 import {setupProjectionFullscreen} from './founders-fullscreen.js';
 import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
 import {mountCity,updateCity} from './founders-city-scene.js';
@@ -29,6 +30,7 @@ function drawGauges(s){
 
 }
 function render(s){
+ renderCouncilRoles($('councilRoles'),s);
  applySkin(document.body,s.skin);text('universeTitle','Le Pacte · '+s.skin.title);
  lastRevision=s.revision;
  text('pageTitle',s.story.location+' · '+s.story.year);text('phase',pretty[s.phase]||s.phase);
@@ -61,7 +63,7 @@ function render(s){
  const ballots=$('ballots');ballots.replaceChildren();
  for(const f of s.families){
   const row=document.createElement('div');row.className='ballot';
-  const n=document.createElement('span');n.textContent=f.color.symbol+' '+f.color.label;n.title=teamCaption(f);colorize(n,f);
+  const n=document.createElement('span');n.textContent=f.color.symbol+' '+f.color.label;n.title=teamCaption(f);colorize(n,f);appendFamilyRoles(n,s,f.id);
   const v=document.createElement('strong');
   const choice=s.council.choices[f.id];
   v.textContent=choice===undefined?'—':choice==='pour'?'POUR':choice==='contre'?'CONTRE':'ABSTENTION';

@@ -1,3 +1,4 @@
+import {renderCouncilRoles,appendFamilyRoles} from './founders-role-badges.js';
 import {saveFamilyName} from './founders-name-save.js';
 import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
 import {teamCaption,teamLabel} from './founders-identity.js';
@@ -54,12 +55,13 @@ function offers(data){
 }
 function render(data){
  current=data;
+ renderCouncilRoles($('councilRoles'),data);
  const self=data.self,c=data.council;
  applySkin(document.body,data.skin);applyTeamTheme(document.body,self.color,data.skin);
  set('teamIdentity',self.color.symbol+' Équipe '+self.color.label+' · Porte-parole');
  $('identityPanel').hidden=data.phase!=='READY';
  if(!identityDirty&&document.activeElement!==$('chosenName'))$('chosenName').value=self.name==='Nom à choisir'?'':self.name;
- set('familyName',self.name);set('phase',nice[data.phase]||data.phase);
+ set('familyName',self.name);appendFamilyRoles($('familyName'),data,self.id);set('phase',nice[data.phase]||data.phase);
  set('turn',data.phase==='COUNCIL'?(c.turn===self.id?'À vous !':c.turn?'À '+teamLabel(data,c.turn):c.phase==='await_moderator'?'Arbitrage':'Choix du Maire'):'—');
  set('dilemmaLabel',data.dilemma?'Chapitre '+data.dilemma.chapter:'Conseil des Fondateurs');
  set('dilemmaTitle',data.dilemma?.title||(data.phase==='FINISHED'?'Fin de la campagne':'Conseil en préparation'));

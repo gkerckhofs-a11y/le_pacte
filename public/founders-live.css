@@ -170,3 +170,13 @@ body[data-skin=western].family-dashboard .identity-panel label{font-size:14px;fo
 .council-log{max-height:220px;overflow:auto;line-height:1.8;padding-left:24px}
 @media(max-width:700px){.council-roles{grid-template-columns:1fr}.council-table{min-width:620px}}
 html:fullscreen{overflow-y:auto;background:#15191b}
+
+.council-offices{display:flex;flex-wrap:wrap;gap:12px 28px;max-width:1600px;margin:0 auto;padding:12px 24px;border-bottom:1px solid #8885}
+.council-office{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.council-office strong{overflow-wrap:anywhere}
+.council-role-badge{display:inline-flex;align-items:center;gap:5px;vertical-align:middle;font-size:13px;font-weight:700;line-height:1.3;padding:4px 7px;margin:2px 4px;border:1px solid currentColor;border-radius:6px;color:var(--ink,inherit)}
+.council-role-badge svg{width:22px;height:22px;fill:currentColor;flex:none}
+.projection-dashboard .council-offices{font-size:clamp(16px,1.5vw,24px)}
+.projection-dashboard .council-offices .council-role-badge{font-size:16px}
+.projection-dashboard .council-offices svg{width:28px;height:28px}
+@media(max-width:600px){.council-offices{padding:10px 16px;gap:8px}.council-office{width:100%}}
