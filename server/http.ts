@@ -8,6 +8,7 @@ import {accessQr,normalizeOrigin} from './qr.ts';
 import {BUILTIN_ASSETS,GOAL_RULES} from '../src/studio.ts';
 import {foundersCatalogFor,foundersPreviewFor,foundersStoryCheck,prepareFoundersSheetsImport} from './founders-catalog.ts';
 import {DEFAULT_GOAL_CARDS,analyzeFoundersGoalReachability} from '../src/founders-scoring.ts';
+import {simulateFoundersPolicies} from '../src/founders-policy-lab.ts';
 import type {Actor} from '../src/session.ts';
 export function createGameServer(store:StorePort,organizerToken:string,clock=()=>Date.now(),options:{clientAuth?:any;authEmulatorUrl?:string;apiOnly?:boolean;publicOrigin?:string;verifyOperator?:(token:string)=>Promise<Operator|null>}={}){
  const publicOrigin=options.publicOrigin?normalizeOrigin(options.publicOrigin):null;
@@ -54,9 +55,23 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
     const actor=await requireOrg(req);
     const d=await body(req,12000);
     const p=await foundersPreviewFor(store,actor.id,{
-      scenarioId:d.scenarioId,scenarioVersion:d.scenarioVersion,skinId:d.skinId
+      scenarioId:d.scenarioId,scenarioVersion:d.scenarioVersion,skinId:d.skinId,
+      calibration:d.calibration
     });
-    json(200,analyzeFoundersGoalReachability(p.scenario,d.goalCards??DEFAULT_GOAL_CARDS));return;
+    json(200,analyzeFoundersGoalReachability(p.scenario,d.goalCards??DEFAULT_GOAL_CARDS,
+      {initialCity:p.game.city}));return;
+   }
+   if(path==='/api/founders/scoring/simulate'&&req.method==='POST'){
+    const actor=await requireOrg(req);
+    const d=await body(req,12000);
+    const p=await foundersPreviewFor(store,actor.id,{
+      scenarioId:d.scenarioId,scenarioVersion:d.scenarioVersion,skinId:d.skinId,
+      calibration:d.calibration
+    });
+    json(200,simulateFoundersPolicies(p.scenario,{
+      cards:d.goalCards,rule:d.scoreRules,calibration:p.settings.calibration,
+      runs:d.runs,mode:d.mode,seed:d.seed
+    }));return;
    }
    if(path==='/api/founders/stories/check'&&req.method==='POST'){
     await requireOrg(req);json(200,foundersStoryCheck(await body(req,700000)));return;
