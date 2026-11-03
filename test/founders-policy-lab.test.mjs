@@ -52,7 +52,7 @@ test('Laboratoire déterministe : les trois comportements terminent des parties 
   assert.equal(s.failed,0);
   assert.equal(s.meanCouncils,8);
   assert.equal(Object.values(s.families).reduce((sum,f)=>sum+f.wins,0),18);
-  assert.equal(Object.values(s.families).reduce((sum,f)=>sum+f.winShare,0),1);
+  assert.ok(Math.abs(Object.values(s.families).reduce((sum,f)=>sum+f.winShare,0)-1)<1e-12);
   assert.ok(s.meanVoteActionsPerCouncil>=3);
   assert.ok(s.meanOffersAcceptedPerGame>=0);
   assert.ok(s.examples.every(x=>x.dilemmas===8));
