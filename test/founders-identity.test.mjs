@@ -24,7 +24,7 @@ test('Le porte-parole nomme sa seule famille en préparation ; identité figée 
  let s=mk();
  s=act(s,team('A'),'setIdentity',{name:'Famille Blackwood',color:'bleu'});
  assert.equal(narrativePublicView(s).families[0].name,'Famille Blackwood');
- assert.equal(narrativeFamilyView(s,'B').self.name,'Nom à choisir');
+ assert.equal(narrativeFamilyView(s,'B').self.name,'Redcreek');
  assert.equal(narrativePublicView(s).goalCards,undefined);
  assert.throws(()=>act(s,team('A'),'setIdentity',{family:'B',name:'Usurpation',color:'rouge'}),/Votre famille/);
  assert.throws(()=>act(s,team('A'),'setIdentity',{name:'Autre couleur',color:'rouge'}),/déjà/);

@@ -13,3 +13,5 @@ export function teamCaption(f){return (f.color?f.color.symbol+' Équipe '+f.colo
 export function teamLabel(data,id){const f=data.families.find(f=>f.id===id);return f?teamCaption(f):id;}
 export const TEAM_INKS=Object.freeze({bleu:'#185f9d',rouge:'#a42829',vert:'#246044',jaune:'#755300',violet:'#644295',orange:'#8e481a'});
 export function colorize(element,f){if(f?.color){element.style.setProperty('--team',document.body.dataset.skin==='corporate'?TEAM_INKS[f.color.id]:f.color.hex);element.classList.add('team-marker');}}
+
+export const DEFAULT_TEAM_NAMES=Object.freeze({bleu:'Blueberry',rouge:'Redcreek',vert:'Greenrock',jaune:'Yellowstone',violet:'Purplerain',orange:'Pumpkins'});

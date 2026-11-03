@@ -1,5 +1,5 @@
 import {mountCity,updateCity} from './founders-city-scene.js';
-import {TEAM_COLORS,DEFAULT_TEAM_COLORS,teamCaption} from './founders-identity.js';
+import {TEAM_COLORS,DEFAULT_TEAM_NAMES,DEFAULT_TEAM_COLORS,teamCaption} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id);
 let catalog=null,authSDK=null,selectedPreview=null;
@@ -121,7 +121,7 @@ function field(section,id,label,type='text',max=0){
 for(const id of FAMILY_IDS){
  const section=document.createElement('div');section.className='metric';section.style.marginTop='10px';
  const head=document.createElement('strong');head.textContent='Équipe '+TEAM_COLORS[FAMILY_IDS.indexOf(id)].label;section.append(head);
- const name=field(section,'name-'+id,'Nom de la famille','text',60);name.value='Nom à choisir';name.placeholder='Choisi par les joueurs, ex. Blackwood';
+ const name=field(section,'name-'+id,'Nom de la famille','text',60);name.value=DEFAULT_TEAM_NAMES[TEAM_COLORS[FAMILY_IDS.indexOf(id)].id];name.placeholder='Choisi par les joueurs, ex. Blackwood';
  const colorLabel=document.createElement('label');colorLabel.htmlFor='color-'+id;colorLabel.textContent='Couleur de l’équipe';
  const color=document.createElement('select');color.id='color-'+id;
  for(const c of TEAM_COLORS){const option=document.createElement('option');option.value=c.id;option.textContent=c.symbol+' '+c.label;color.append(option);}

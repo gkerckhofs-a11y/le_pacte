@@ -103,7 +103,7 @@ function render(s){
  renderCouncilMonitor($('councilMonitor'),s);
  const guidance=councilGuidance(s);step(guidance.step);set('stageTitle',guidance.title);set('stageHint',guidance.hint);
  $('preparation').hidden=s.phase!=='READY';
- const named=s.families.filter(f=>f.name&&f.name!=='Nom à choisir').length;set('teamReadyCount',named+'/6 équipes ont choisi leur nom');
+ const named=s.families.filter(f=>f.name&&f.name!=='Nom à choisir').length;set('teamReadyCount',named+'/6 équipes ont un nom');
  $('preparePublicLink').href='/founders-city.html?session='+s.id;
  set('phase',labels[s.phase]||s.phase);set('sessionCode',s.code+' · '+s.selection.scenarioVersion+' · skin '+s.selection.skinId);
  set('sessionTitle',s.title);set('revision','Révision '+s.revision);

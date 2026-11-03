@@ -1,4 +1,4 @@
-import {DEFAULT_TEAM_COLORS,teamColor} from '../public/founders-identity.js';
+import {DEFAULT_TEAM_COLORS,DEFAULT_TEAM_NAMES,teamColor} from '../public/founders-identity.js';
 import {isHybrid,narrativeReserve,chooseNarrativeNext,narrativeEpilogue} from './founders-progression.ts';
 /**
  * LE PACTE — independent narrative session domain (V2.5).
@@ -33,15 +33,16 @@ export const TEST_FAMILY_OBJECTIVES=Object.freeze([
   'Objectif de test : préserver l’autonomie des fondateurs en affaiblissant la Stabilité (voir les paliers de votre ambition).'
 ]);
 
-export function createNarrativeSession(preview,{id,ownerId,code,title,objectives=TEST_FAMILY_OBJECTIVES,names=FOUNDERS.map(()=> 'Nom à choisir'),colors=DEFAULT_TEAM_COLORS,goalCards=DEFAULT_GOAL_CARDS,scoreRules=DEFAULT_SCORE_RULES,initiativeOrder=FOUNDERS,now=Date.now()}) {
+export function createNarrativeSession(preview,{id,ownerId,code,title,objectives=TEST_FAMILY_OBJECTIVES,names,colors=DEFAULT_TEAM_COLORS,goalCards=DEFAULT_GOAL_CARDS,scoreRules=DEFAULT_SCORE_RULES,initiativeOrder=FOUNDERS,now=Date.now()}) {
  check(preview?.kind==='founders-session-preview-v2.3'&&preview.previewOnly===true,'Configuration narrative invalide');
  check(typeof id==='string'&&/^[a-f0-9]{24}$/.test(id),'Identifiant de session invalide');
  check(str(ownerId,128),'Organisateur requis');
  check(typeof code==='string'&&/^[A-Z0-9][A-Z0-9_-]{2,11}$/.test(code),'Code de session invalide');
  check(str(title,100),'Titre de partie invalide');
  check(Array.isArray(objectives)&&objectives.length===6&&objectives.every(x=>str(x,500)),'Six objectifs de famille requis');
- check(Array.isArray(names)&&names.length===6&&names.every(x=>str(x,60)),'Six noms de famille requis');
  check(Array.isArray(colors)&&colors.length===6&&new Set(colors).size===6&&colors.every(c=>teamColor(c)),'Six couleurs distinctes de la palette requises');
+ if(names===undefined)names=colors.map(c=>DEFAULT_TEAM_NAMES[c]);
+ check(Array.isArray(names)&&names.length===6&&names.every(x=>str(x,60)),'Six noms de famille requis');
  const goalErrors=validateGoalCards(goalCards);check(!goalErrors.length,goalErrors.join(' ; '));
  const scoreErrors=validateScoreRules(scoreRules);check(!scoreErrors.length,scoreErrors.join(' ; '));
  check(Array.isArray(initiativeOrder)&&initiativeOrder.length===6&&new Set(initiativeOrder).size===6&&initiativeOrder.every(id=>FOUNDERS.includes(id)),'Tirage des familles invalide');
