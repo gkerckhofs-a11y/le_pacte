@@ -4,7 +4,7 @@
  * Les six objectifs valent au maximum 8 points, plus dollars (3), Conseil (3),
  * et Influence disponible (2). Aucun barème n'est considéré équilibré sans test humain.
  */
-import {FOUNDERS} from './founders.ts';
+import {FOUNDERS,FOUNDERS_DEFAULT_CALIBRATION} from './founders.ts';
 
 const METRICS=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
 const DIRECTIONS=['at_least','at_most'];
@@ -12,13 +12,15 @@ const copy=x=>structuredClone(x);
 const check=(ok,m)=>{if(!ok)throw new Error(m);};
 const integer=(n,min,max)=>Number.isSafeInteger(n)&&n>=min&&n<=max;
 const text=(v,max=180)=>typeof v==='string'&&v.trim().length>0&&v.length<=max;
+// Hot Spring candidate calibration, 2026-11-03. See docs/fondateurs-equilibrage.md.
+// Existing sessions retain their own goalCards snapshot. Formula/version unchanged.
 const defaults=[
- ['A','Guilde des négociants','Développer les affaires et enrichir Hot Spring.','economie','at_least',6,8],
+ ['A','Guilde des négociants','Développer les affaires et enrichir Hot Spring.','economie','at_least',6,7],
  ['B','Gardes et justice','Faire de Hot Spring une place sûre pour les voyageurs.','securite','at_least',5,7],
- ['C','Voix du peuple','Gagner la confiance des habitants.','satisfaction','at_least',4,6],
+ ['C','Voix du peuple','Gagner la confiance des habitants.','satisfaction','at_least',4,7],
  ['D','Médecins et bâtisseurs','Améliorer les conditions de vie des pionniers.','bien_etre','at_least',6,8],
- ['E','La ville de demain','Faire progresser les équipements et institutions.','developpement','at_least',8,10],
- ['F','Les indépendants','Empêcher la ville de se soumettre à un pouvoir trop centralisé.','stabilite','at_most',4,3]
+ ['E','La ville de demain','Faire progresser les équipements et institutions.','developpement','at_least',7,9],
+ ['F','Les indépendants','Empêcher la ville de se soumettre à un pouvoir trop centralisé.','stabilite','at_most',4,2]
 ];
 export const DEFAULT_GOAL_CARDS=Object.freeze(Object.fromEntries(defaults.map(
  ([id,title,description,indicator,direction,firstTarget,secondTarget])=>[id,{
@@ -124,9 +126,14 @@ export function calculateFoundersFinal(s){
  * Explore both choices on each narrative branch; they are NOT empirical
  * probabilities. Bounded to prevent hang on cycles or combinatorial scenarios.
  */
-export function analyzeFoundersGoalReachability(story,cards=DEFAULT_GOAL_CARDS,{maxPaths=4096,maxDepth=40}={}){
+export function analyzeFoundersGoalReachability(story,cards=DEFAULT_GOAL_CARDS,{maxPaths=4096,maxDepth=40,initialCity=FOUNDERS_DEFAULT_CALIBRATION.city}={}){
  check(story?.scenario?.entry_dilemma&&Array.isArray(story.dilemmas),'Scénario invalide');
  const errors=validateGoalCards(cards);check(!errors.length,errors.join('; '));
+ const metrics=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
+ check(initialCity&&typeof initialCity==='object'&&!Array.isArray(initialCity)&&
+  Object.keys(initialCity).length===6&&metrics.every(k=>integer(initialCity[k],0,10)),
+  'Six indicateurs initiaux entre 0 et 10 requis');
+ check(integer(maxPaths,1,10000)&&integer(maxDepth,1,100),'Limites de simulation invalides');
  const map=new Map(story.dilemmas.map(d=>[d.id,d]));
  const endCities=[];let truncated=false,invalidPaths=0;
  const visit=(id,city,visited,depth)=>{
@@ -145,7 +152,7 @@ export function analyzeFoundersGoalReachability(story,cards=DEFAULT_GOAL_CARDS,{
    visit(output.next_id,next,new Set([...visited,id]),depth+1);
   }
  };
- visit(story.scenario.entry_dilemma,{economie:5,securite:5,satisfaction:5,bien_etre:5,developpement:5,stabilite:5},new Set(),0);
+ visit(story.scenario.entry_dilemma,copy(initialCity),new Set(),0);
  const counts=Object.fromEntries(FOUNDERS.map(id=>{
   const card=cards[id],first=endCities.filter(city=>evaluateGoal(card,city).first).length;
   const second=endCities.filter(city=>evaluateGoal(card,city).second).length;
@@ -153,6 +160,6 @@ export function analyzeFoundersGoalReachability(story,cards=DEFAULT_GOAL_CARDS,{
    firstShare:endCities.length?first/endCities.length:null,
    secondShare:endCities.length?second/endCities.length:null}];
  }));
- return {endings:endCities.length,truncated,invalidPaths,goals:counts,
+ return {endings:endCities.length,truncated,invalidPaths,goals:counts,initialCity:copy(initialCity),
   note:'Exploration combinatoire (choix 50/50 non présumé), sans négociations ni probabilité humaine.'};
 }

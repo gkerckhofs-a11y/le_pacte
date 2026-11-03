@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Le Pacte · Atelier des univers</title><link rel="stylesheet" href="/founders-live.css">
+<script type="module" src="/founders-skins.js"></script>
+<style>
+.skin-page{max-width:1480px;margin:auto;padding:28px clamp(16px,3vw,40px) 60px}.skin-intro{max-width:780px;color:var(--muted);line-height:1.7}
+.skin-picker{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:26px 0}
+.skin-option{position:relative;cursor:pointer;padding:18px 14px;border:1px solid var(--border);border-radius:8px;background:var(--panel);min-width:0}
+.skin-option:has(input:checked){outline:2px solid var(--gold);outline-offset:3px}
+.skin-option input{width:auto;position:absolute;top:15px;right:12px;accent-color:var(--gold)}
+.skin-option strong{display:block;font-size:16px;margin:12px 0 8px}.skin-option small{display:block;font-size:11px;color:var(--muted);line-height:1.6}
+.skin-swatches{display:flex;gap:4px}.skin-swatches i{display:block;width:14px;height:14px;border-radius:50%;border:1px solid #a7a7a750}
+.skin-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(290px,1fr);gap:22px}.skin-layout>*{min-width:0}
+.scene-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 16px}.scene-heading h2{margin:6px 0 0;font-size:26px}
+.skin-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 20px;margin-top:18px}
+.skin-controls label{font-size:12px;color:var(--muted)}.skin-controls input{padding:0;accent-color:var(--gold)}
+.skin-team-preview{--team:#82baff;--team-dark:#142b43;border-top:5px solid var(--team);background:linear-gradient(150deg,var(--team-dark),var(--panel) 40%);padding:24px}
+.skin-team-preview h2,.skin-team-preview .eyeline{color:var(--team)}.skin-team-preview .family-stat{background:var(--team-dark)}
+.skin-team-preview button{background:var(--team)!important;border-color:var(--team)!important;color:var(--bg)!important;width:100%;margin-top:12px}
+body[data-skin=corporate] .skin-team-preview button{color:#fff!important}
+.skin-team-preview .bar{background:var(--team)}.skin-team-preview .card{margin-top:20px}
+.skin-team-preview h2{font-size:30px;margin:8px 0 20px}.sample-label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.atelier-footer{margin-top:24px;border-top:1px solid var(--border);padding-top:20px;color:var(--muted);font-size:13px;line-height:1.7}
+#skinNotice{color:var(--gold)}
+@media(max-width:1000px){.skin-picker{grid-template-columns:repeat(3,minmax(0,1fr))}.skin-layout{grid-template-columns:1fr}.skin-team-preview{max-width:650px}}
+@media(max-width:600px){.skin-picker{grid-template-columns:repeat(2,minmax(0,1fr))}.skin-controls{grid-template-columns:repeat(2,minmax(0,1fr))}.scene-heading{align-items:flex-start;flex-direction:column}}
+</style></head><body>
+<header class="top"><div><span class="eyebrow">Ludificateur · Le Pacte</span><h1>Atelier des univers</h1></div><a class="chip" href="/founders-setup.html">Préparer une partie →</a></header>
+<main class="skin-page">
+<p class="skin-intro">Cinq ambiances pour un même moteur de négociation. Explorez les décors, faites évoluer les indicateurs et essayez les couleurs d’équipe. Cet atelier utilise des données fictives et ne crée aucune partie.</p>
+<fieldset style="border:0;padding:0;margin:0"><legend class="eyeline">Choisissez un univers</legend><div id="skinPicker" class="skin-picker"></div></fieldset>
+<div class="skin-layout">
+<section class="panel"><div class="scene-heading"><div><span class="eyeline" id="skinMood"></span><h2 id="sceneTitle">Le paysage du Conseil</h2></div><span class="chip">Décor évolutif · Prototype</span></div>
+<div id="city" aria-label="Aperçu du décor évolutif"></div>
+<p id="sceneDescription" class="small muted" aria-live="polite"></p>
+<div class="row"><button type="button" class="secondary" data-stage="2">Jauges à 2</button><button type="button" class="secondary" data-stage="5">Jauges à 5</button><button type="button" class="secondary" data-stage="8">Jauges à 8</button></div>
+<div id="skinControls" class="skin-controls"></div>
+</section>
+<aside><div class="panel" style="margin-bottom:16px"><label for="sampleColor" class="eyeline">Couleur de l’équipe</label><select id="sampleColor" style="margin-top:12px"></select><p class="small muted">La couleur de l’équipe se combine avec chaque univers.</p></div>
+<section id="teamSample" class="panel skin-team-preview"><div class="sample-label">Exemple d’espace porte-parole</div><p class="eyeline" id="sampleIdentity"></p><h2 id="sampleFamily">Famille Blackwood</h2>
+<div class="grid2"><div class="family-stat"><span class="small muted" id="sampleInfluence">Influence</span><strong>8</strong></div><div class="family-stat"><span class="small muted" id="sampleCurrency">Dollars</span><strong>10</strong></div></div>
+<div class="card"><div class="eyeline">Le Conseil</div><h3>Votre voix compte</h3><p class="small">Concertez-vous avec votre équipe, négociez puis portez votre décision au Conseil.</p><div class="gauge-head"><span>Influence engagée</span><strong>2</strong></div><div class="track"><div class="bar" style="width:25%"></div></div><button type="button" disabled>Décision · aperçu visuel</button></div>
+<p class="small muted">Votre ambition secrète reste réservée à votre famille pendant la partie.</p></section></aside>
+</div>
+<p class="atelier-footer">Ces habillages sont des prototypes visuels. Choisir un univers ne réécrit pas les dilemmes ni les objectifs : un scénario adapté reste nécessaire. Les jauges basses de Stabilité évoquent l’autonomie des groupes, sans destruction du décor.</p>
+<p id="skinNotice" role="status"></p>
+</main></body></html>

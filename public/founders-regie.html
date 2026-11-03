@@ -1,31 +1,43 @@
 <!doctype html><html lang="fr">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Le Pacte des Fondateurs — Régie narrative</title><link rel="stylesheet" href="/founders-live.css">
-<script src="/founders-regie.js" defer></script></head>
-<body>
+<script type="module" src="/founders-regie.js"></script></head>
+<body class="regie-dashboard" data-skin="western">
 <header class="top">
 <div><div class="eyebrow">Ludificateur · Le Pacte</div><h1>Régie narrative</h1></div>
-<div class="row"><a href="/founders-setup.html">Configurer une autre partie</a><span id="phase" class="chip">Chargement…</span></div>
+<div class="row"><button id="chooseSession" type="button" class="secondary" hidden>Mes parties</button><a href="/founders-setup.html">Créer une autre partie</a><span id="phase" class="chip">Connexion en cours…</span></div>
 </header><main class="page">
-<div class="panel" id="loginPanel">
- <h2>Accès organisateur</h2><p class="muted small">Connectez-vous avec votre compte organisateur, ou saisissez la clé de répétition locale.</p>
- <input id="localKey" type="password" placeholder="Clé régie locale" autocomplete="off">
- <button id="login" type="button">Se connecter / Actualiser</button><p id="loginMessage" class="small"></p>
+<ol class="regie-steps" aria-label="Étapes de la régie"><li id="step1" aria-current="step"><b>1</b> Connexion organisateur</li><li id="step2"><b>2</b> Préparer et lancer</li><li id="step3"><b>3</b> Animer le Conseil</li></ol>
+<div class="panel regie-login" id="loginPanel">
+ <div class="eyeline">Étape 1 · Accès organisateur</div><h2>Connectez la régie pour lancer votre partie</h2>
+ <p id="loginHelp">Vérification de la connexion…</p>
+ <div id="localLogin" hidden><label for="localKey">Clé organisateur de la répétition locale</label><input id="localKey" type="password" autocomplete="off"></div>
+ <div class="row"><button id="login" type="button" disabled>Connexion en cours…</button><button id="retryInit" type="button" class="secondary" hidden>Réessayer la connexion</button></div>
+ <p id="loginMessage" class="regie-message" role="status" aria-live="polite"></p>
 </div>
+<div id="accountPanel" class="regie-account" hidden><span id="signedInAs"></span><button id="changeAccount" class="secondary" type="button">Changer de compte Google</button></div>
+<section id="sessionPicker" class="panel" hidden><h2>Retrouvez votre partie</h2><p>Ouvrez la régie de la partie que vous voulez animer.</p><div id="sessionsList"></div></section>
 <div id="regieContent" hidden>
  <div class="layout">
  <section>
-  <div class="panel">
+  <div class="panel regie-control">
    <div class="row between"><div><div class="eyeline" id="sessionCode"></div><h2 id="sessionTitle" style="font-size:28px;margin-top:6px"></h2></div><span id="revision" class="chip"></span></div>
-   <p id="dilemmaInfo" class="muted"></p>
-   <p id="tiePriority" class="small muted"></p>
-   <div class="row" id="actions">
-    <button id="start" type="button" hidden>Démarrer la séance</button>
-    <button id="reveal" type="button" hidden>Révéler la décision</button>
-    <button id="next" type="button" hidden>Dilemme suivant / terminer</button>
+   <div class="regie-next-action"><h2 id="stageTitle"></h2><p id="stageHint"></p></div>
+   <div id="preparation" hidden>
+    <div class="regie-checklist"><p><strong id="teamReadyCount">Six équipes</strong><span>Chaque porte-parole choisit son nom depuis son lien privé. Vous pouvez aussi lancer avec les noms par défaut.</span></p><p><strong>Ouvrez la projection</strong><span>Laissez l’écran public ouvert sur le vidéoprojecteur : il suivra automatiquement la partie.</span></p></div>
+    <a id="preparePublicLink" class="regie-projection-link" href="#" target="_blank" rel="noopener">Ouvrir l’écran à projeter ↗</a>
+    <p class="small muted">Le lancement fige les noms des familles et ouvre le premier dilemme.</p>
    </div>
+   <p id="dilemmaInfo" class="muted"></p>
+   <details><summary class="small muted">Priorité en cas d’égalité finale</summary><p id="tiePriority" class="small muted"></p></details>
+   <div class="row" id="actions">
+    <button id="start" type="button" hidden>Lancer la partie</button>
+    <button id="reveal" type="button" hidden>Révéler la décision</button>
+    <button id="next" type="button" hidden>Dilemme suivant</button>
+   </div>
+   <p id="actionMessage" class="regie-message" role="status" aria-live="polite"></p>
    <div id="lastReveal" class="card" hidden><h3 id="outcomeHeading"></h3><p id="outcomeDetail"></p></div>
-   <p class="small muted">La régie révèle les conséquences après le vote. Les futures ramifications restent secrètes pour les familles.</p>
+   
    <div class="row"><a id="publicLink" href="#" target="_blank" rel="noopener">Ouvrir l'écran public</a></div>
   </div>
   <div class="panel" id="finalPanel" style="margin-top:16px" hidden>
@@ -34,8 +46,8 @@
    <div id="ranking"></div>
   </div>
   <div class="panel" style="margin-top:16px">
-   <h2>Familles et accès porte-parole</h2>
-   <p class="small muted">Une seule clé d'accès par famille. La régénérer désactive immédiatement l'ancienne. Les nouveaux liens contiennent la clé uniquement après le caractère #.</p>
+   <h2>Les six équipes et leurs accès</h2>
+   <p class="small muted">Un seul lien privé par équipe, à remettre à son porte-parole. Si un lien fonctionne déjà, conservez-le. Renouveler un lien désactive son ancien accès.</p>
    <div id="families"></div>
    <div id="accessOutput" class="card" hidden>
     <label for="newAccessLink">Nouveau lien privé — à remettre au porte-parole concerné</label>

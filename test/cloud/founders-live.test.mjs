@@ -38,3 +38,30 @@ test('Firestore narrative : jeu et secrets persistent, transactions anti-double 
  const list=await sessions.list(ownerId),none=await sessions.list('other-owner');
  assert.equal(list.some(x=>x.id===created.id),true);assert.equal(none.some(x=>x.id===created.id),false);
 });
+
+test('Firestore : calibrage personnalisé immuable dans la partie et conservation du Pouvoir',async()=>{
+ const now=Date.now(),code='C'+randomBytes(4).toString('hex').toUpperCase();
+ const ownerId='owner-calib-'+randomBytes(8).toString('hex');
+ const calibration={initialPower:11,initialDollars:17,initialPool:7,
+  city:{economie:4,securite:5,satisfaction:6,bien_etre:5,developpement:3,stabilite:5}};
+ const selection=foundersPreview({scenarioId:'fondateurs-hot-spring-demo',skinId:'western',calibration});
+ const result=await sessions.create({ownerId,preview:selection,code,title:'Test calibré Firestore',now});
+ calibration.city.economie=10;
+ const view=await sessions.view(result.id,{role:'public'},now);
+ assert.equal(view.city.economie,4);
+ const token=result.access.find(x=>x.family==='A').token;
+ const actor=await sessions.authenticate(result.id,token,now);
+ const before=await sessions.view(result.id,actor,now);
+ assert.equal(before.self.power,11);assert.equal(before.self.dollars,17);
+ const organizer={role:'organizer',id:ownerId};
+ await sessions.command(result.id,organizer,{kind:'start',expectedRevision:0},now+1);
+ await sessions.command(result.id,actor,{kind:'vote',expectedRevision:1,data:{kind:'pour',amount:3}},now+2);
+ const after=await sessions.view(result.id,actor,now+3);
+ assert.equal(after.self.power,8);
+ const raw=await sessions.ref(result.id).get();
+ const game=JSON.parse(raw.data().stateJson).game;
+ const total=game.pool+Object.values(game.families).reduce((n,f)=>n+f.power,0)+
+   Object.values(game.vote.bids).reduce((n,b)=>n+b,0);
+ assert.equal(total,73);
+ assert.equal(game.powerSupply,73);
+});

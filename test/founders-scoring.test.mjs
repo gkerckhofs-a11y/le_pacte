@@ -21,7 +21,7 @@ const org={role:'organizer',id:'local-organizer'},team=id=>({role:'team',family:
 test('Objectifs calibrables : six cartes, seuils stricts, même plafond de points',()=>{
  assert.deepEqual(validateGoalCards(DEFAULT_GOAL_CARDS),[]);
  assert.deepEqual(validateScoreRules(DEFAULT_SCORE_RULES),[]);
- const city={economie:8,securite:7,satisfaction:6,bien_etre:8,developpement:10,stabilite:3};
+ const city={economie:8,securite:7,satisfaction:7,bien_etre:8,developpement:10,stabilite:2};
  for(const [id,card] of Object.entries(DEFAULT_GOAL_CARDS)){
   const points=evaluateGoal(card,city);
   assert.equal(points.points,8,id);
@@ -44,7 +44,7 @@ test('Analyse intégrale de Hot Spring : 256 fins et seuils divers (hypothèses,
  assert.equal(stats.truncated,false);
  assert.equal(stats.invalidPaths,0);
  assert.deepEqual(Object.fromEntries(Object.entries(stats.goals).map(([id,g])=>[id,[g.first,g.second]])),{
-  A:[108,56],B:[192,64],C:[140,56],D:[140,68],E:[128,48],F:[144,64]
+  A:[108,84],B:[192,64],C:[140,32],D:[140,68],E:[176,80],F:[144,16]
  });
  const limited=analyzeFoundersGoalReachability(story,DEFAULT_GOAL_CARDS,{maxPaths:12});
  assert.equal(limited.endings,12);assert.equal(limited.truncated,true);
@@ -127,4 +127,24 @@ test('Barème custom figé par session et calcul cohérent',()=>{
  rules.secretFirst=999;
  assert.equal(s.scoreRules.secretFirst,2);
  assert.equal(narrativePublicView(s).finalResults,null);
+});
+
+
+test('Recalibrage : une session archivée garde les anciennes conditions de victoire',()=>{
+ const oldCards=structuredClone(DEFAULT_GOAL_CARDS);
+ oldCards.A.secondTarget=8;oldCards.C.secondTarget=6;
+ oldCards.E.firstTarget=8;oldCards.E.secondTarget=10;oldCards.F.secondTarget=3;
+ const s=createNarrativeSession(preview(),{
+  id:'123456789012123456789012',code:'OLDGOALS',ownerId:'local-organizer',
+  title:'Session antérieure',goalCards:oldCards,now:20000
+ });
+ const restored=JSON.parse(JSON.stringify(s));
+ const started=go(restored,org,'start');
+ assert.deepEqual(started.goalCards,oldCards);
+ assert.equal(narrativeFamilyView(started,'E').goalCard.secondTarget,10);
+ const city={...started.game.city,developpement:9,stabilite:3};
+ assert.equal(evaluateGoal(started.goalCards.E,city).points,3);
+ assert.equal(evaluateGoal(DEFAULT_GOAL_CARDS.E,city).points,8);
+ assert.equal(evaluateGoal(started.goalCards.F,city).points,8);
+ assert.equal(evaluateGoal(DEFAULT_GOAL_CARDS.F,city).points,3);
 });

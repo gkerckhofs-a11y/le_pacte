@@ -1,64 +1,37 @@
 <!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hot Spring · Le Pacte des Fondateurs</title><link rel="stylesheet" href="/founders-live.css">
-<script src="/founders-city.js" defer></script></head><body>
-<header class="top"><div><span class="eyebrow">Le Pacte des Fondateurs</span><h1 id="pageTitle">Hot Spring · 1876</h1></div><div class="row"><span class="chip" id="phase">En attente</span><span class="chip" id="connection">Connexion…</span></div></header>
+<script type="module" src="/founders-city.js"></script></head><body class="projection-dashboard">
+<header class="top"><div><span class="eyebrow" id="universeTitle">Le Pacte</span><h1 id="pageTitle">Hot Spring · 1876</h1></div><div class="row"><span class="chip" id="phase">En attente</span><span class="chip" id="connection">Connexion…</span></div></header>
 <main class="page">
-<div class="layout">
-<section>
-<div id="city" aria-label="Illustration évolutive de Hot Spring">
-<svg viewBox="0 0 1200 410" role="img" aria-label="Vue panoramique vectorielle de la ville Western">
-<defs>
- <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c48d62"/><stop offset="1" stop-color="#e8c49a"/></linearGradient>
- <linearGradient id="street" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c4a177"/><stop offset="1" stop-color="#8a674b"/></linearGradient>
- <pattern id="wood" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="#876347"/><path d="M0 3h24M0 16h24" stroke="#6d4c34" stroke-width="1.2"/></pattern>
-</defs>
-<rect width="1200" height="410" fill="url(#sky)"/>
-<circle cx="990" cy="74" r="43" fill="#f9dfa8" opacity=".7"/>
-<path d="M0 208 140 116 250 190 351 95 507 203 640 118 763 211 918 109 1128 181 1200 156V340H0Z" fill="#ae9580"/>
-<path d="M0 252 130 188 300 252 448 171 630 241 750 194 910 262 1055 185 1200 237V410H0Z" fill="#867966" opacity=".77"/>
-<rect y="315" width="1200" height="95" fill="url(#street)"/>
-<path d="M0 332 Q640 305 1200 331" stroke="#ecbf8a" stroke-width="12" opacity=".5" fill="none"/>
-<!-- saloon -->
-<g><rect x="72" y="220" width="230" height="115" fill="url(#wood)"/><rect x="58" y="190" width="258" height="42" fill="#6b402a"/><rect x="68" y="197" width="238" height="27" fill="#c8ad79"/>
-<text x="187" y="217" class="town-sign" font-size="23" text-anchor="middle">SALOON</text>
-<rect x="106" y="255" width="46" height="80" fill="#3c332c"/><rect x="220" y="255" width="45" height="80" fill="#3c332c"/>
-<rect x="170" y="252" width="32" height="36" fill="#b8d0d2" stroke="#513a30" stroke-width="8"/></g>
-<!-- sheriff -->
-<g><rect x="340" y="237" width="188" height="100" fill="#aa8054"/><path d="M329 234h210v24H329z" fill="#61452f"/><rect x="359" y="217" width="150" height="31" fill="#d6ba88"/><text x="434" y="239" font-family="Georgia" font-size="22" fill="#4a301d" text-anchor="middle">SHERIFF</text><rect x="405" y="279" width="56" height="58" fill="#523b2b"/><path d="M367 283h26m-18-9v38" stroke="#5a4c3a" stroke-width="6"/></g>
-<!-- bank -->
-<g><rect x="565" y="202" width="210" height="136" fill="#a48e73"/><path d="M553 198h235v16H553z" fill="#5c4b3d"/><rect x="595" y="164" width="150" height="38" fill="#bdad8a"/><text x="669" y="188" font-family="Georgia" font-size="24" fill="#4a392c" text-anchor="middle">BANK</text><rect x="630" y="248" width="73" height="90" fill="#4c413a"/><rect x="579" y="242" width="35" height="48" fill="#bcd1cd"/><rect x="718" y="242" width="35" height="48" fill="#bcd1cd"/></g>
-<!-- doctor -->
-<g><rect x="822" y="243" width="160" height="95" fill="#b59a78"/><path d="M810 242l92-60 91 60z" fill="#6e4b37"/><rect x="856" y="270" width="44" height="38" fill="#d1dcce"/><rect x="917" y="280" width="34" height="58" fill="#534238"/></g>
-<!-- build-out at high development -->
-<g id="station" opacity="0"><rect x="989" y="206" width="160" height="132" fill="#806347"/><path d="M973 206l95-49 91 49z" fill="#5e4032"/><rect x="1035" y="261" width="69" height="77" fill="#4a3c35"/><text x="1068" y="239" text-anchor="middle" fill="#eed2a6" font-family="Georgia" font-size="18">STATION</text></g>
-<g id="factory" opacity="0"><rect x="20" y="260" width="65" height="76" fill="#67584f"/><rect x="41" y="195" width="17" height="76" fill="#5e5349"/><path d="M49 188q-24-22 6-42t-1-34" fill="none" stroke="#b6b0a1" stroke-width="14" opacity=".55"/></g>
-<!-- prosperity: people market carts -->
-<g id="crowd" opacity=".5"><path d="M350 345h31v26h-31zM504 339h35v36h-35zM742 347h38v29h-38z" fill="#4b4139"/><circle cx="365" cy="335" r="11" fill="#d2b79a"/><circle cx="521" cy="331" r="10" fill="#d2b79a"/><circle cx="759" cy="337" r="10" fill="#d2b79a"/></g>
-<!-- disturbances if security or social satisfaction low -->
-<g id="disturbance" opacity="0"><path d="M780 321q-35-50 1-70m-20 78q-30-47 1-71" stroke="#6f6562" stroke-width="16" fill="none" opacity=".6"/><path d="M775 322l-16-26 9-25 25 28z" fill="#ab513d"/></g>
-<g opacity=".65"><path d="M0 382h1200" stroke="#6b5446" stroke-width="3"/><path d="M0 392h1200" stroke="#6b5446" stroke-width="3"/><path d="M62 377v19m160-19v19m160-19v19m160-19v19m160-19v19m160-19v19m160-19v19m160-19v19" stroke="#5d4a41" stroke-width="5"/></g>
-</svg>
-</div>
-<div class="panel" style="margin-top:17px">
-<div class="row between"><span class="eyeline" id="chapter">Conseil des fondateurs</span><span class="chip" id="turn">—</span></div>
-<h2 id="dilemmaTitle" style="font-size:clamp(21px,3vw,30px);margin:12px 0">Bienvenue au Conseil</h2>
-<img id="decisionImage" alt="" hidden>
-<p id="dilemmaText">Le Conseil municipal attend le signal de la régie.</p>
-<p id="question" class="big"></p>
-<div id="outcome" class="card" hidden><div class="eyeline">Décision du Conseil</div><h3 id="outcomeTitle"></h3><p id="outcomeText"></p></div>
-</div>
+<div class="projection-grid">
+<section class="panel dilemma-panel">
+ <div class="row between"><span class="eyeline" id="chapter">Conseil des fondateurs</span><span class="chip" id="turn">—</span></div>
+ <h2 id="dilemmaTitle">Bienvenue au Conseil</h2>
+ <img id="decisionImage" alt="" hidden>
+ <p id="dilemmaText">Le Conseil attend le signal de la régie.</p>
+ <p id="question" class="big"></p>
+ <div id="outcome" class="card" hidden><div class="eyeline">Décision du Conseil</div><h3 id="outcomeTitle"></h3><p id="outcomeText"></p></div>
 </section>
-<aside>
-<div class="panel"><h2>Les indicateurs de la ville</h2><div id="gauges"></div></div>
-<div class="panel" style="margin-top:16px"><h2>Le Conseil des six familles</h2>
-<p class="small muted" id="tiePriority">Priorité de départage en cas d'égalité : —</p><p class="small muted" id="councilStatus">En attente de la première délibération.</p><div id="ballots"></div></div>
-</aside>
+<section class="projection-city">
+ <div id="city" aria-label="Illustration évolutive de Hot Spring"></div>
+ <p id="cityEvolution" class="small city-evolution" role="status" aria-live="polite"></p>
+ <div class="projection-results">
+  <div class="panel"><h2>Résultat du vote</h2>
+   <div class="vote-totals"><div><span>POUR</span><strong id="voteForTotal">—</strong></div><div><span>CONTRE</span><strong id="voteAgainstTotal">—</strong></div></div>
+   <p id="voteSummary" class="small muted">Sommes de l’influence engagée</p>
+   <div id="ballots"></div>
+  </div>
+  <div class="panel"><h2>La ville après vos décisions</h2><div id="gauges"></div></div>
+ </div>
+</section>
 </div>
+<div class="projection-foot"><p class="small muted" id="councilStatus"></p>
+<details class="city-legend"><summary>Repères du Conseil et lecture du paysage</summary><p class="small muted" id="tiePriority"></p><div id="cityDetails" class="city-details"></div></details></div>
 <section id="finalResults" class="panel" style="margin-top:18px" hidden>
  <div class="eyeline">Épilogue · Conseil des Fondateurs</div>
  <h2 id="winnerTitle" style="font-size:clamp(22px,3vw,34px);margin-top:9px">La famille gagnante</h2>
- <p class="small muted">Classement final après les objectifs secrets, les dollars, les votes remportés et l’Influence restante.</p>
+ <p class="small muted">Classement final après les objectifs secrets, les ressources financières, les votes remportés et l’Influence restante.</p>
  <div id="finalRanking"></div>
 </section>
 <div id="notice" role="status" style="margin-top:15px"></div>

@@ -3,11 +3,11 @@
   "skins": [
     {
       "id": "western",
-      "version": "1.0.0",
+      "version": "1.2.0",
       "title": "Western — Hot Spring",
       "universe": "western",
       "status": "prototype",
-      "description": "Ville pionnière, poussière et boiseries",
+      "description": "Panorama peint de Hot Spring, six quartiers évolutifs selon les jauges",
       "labels": {
         "currency": "Dollars",
         "influence": "Influence politique",
@@ -33,7 +33,7 @@
     },
     {
       "id": "mafia",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "title": "Mafia — Prohibition",
       "universe": "mafia",
       "status": "prototype",
@@ -63,7 +63,7 @@
     },
     {
       "id": "corporate",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "title": "Corporate — Conseil",
       "universe": "corporate",
       "status": "prototype",
@@ -93,7 +93,7 @@
     },
     {
       "id": "medieval",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "title": "Médiéval — Royaume",
       "universe": "medieval",
       "status": "prototype",
@@ -123,7 +123,7 @@
     },
     {
       "id": "futuriste",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "title": "Futuriste — Colonie",
       "universe": "futuriste",
       "status": "prototype",

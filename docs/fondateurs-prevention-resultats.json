@@ -1,0 +1,1553 @@
+{
+  "date": "2026-11-03",
+  "runsPerConfiguration": 120,
+  "totalRuns": 3360,
+  "seedStart": 551001,
+  "seedStep": 97,
+  "assumptions": {
+    "events": {
+      "fire": {
+        "project": "pompiers",
+        "offerAt": 2,
+        "happensAt": 4,
+        "loss": {
+          "economie": -2,
+          "developpement": -2,
+          "bien_etre": -1,
+          "satisfaction": -1
+        },
+        "protectedLoss": {
+          "economie": -1
+        }
+      },
+      "epidemic": {
+        "project": "dispensaire",
+        "offerAt": 5,
+        "happensAt": 7,
+        "loss": {
+          "bien_etre": -3,
+          "satisfaction": -2,
+          "economie": -1
+        },
+        "protectedLoss": {
+          "bien_etre": -1
+        }
+      }
+    },
+    "funding": "Offers before votes 2 and 5, hazards after votes 4 and 7. Equal is a compulsory shared-payment control; voluntary uses rotating synthetic solidarity valuations. No new political council is added. Failed projects are refunded.",
+    "policies": "Immediate metric-driven votes, fixed random stream by chapter; no bribery, coalitions, learning, bluff, extra time or human enjoyment modelled.",
+    "paired": "Same seeds and hazard draws across treatments. Identical decisions are not forced when city effects change preferences. Not a controlled human trial."
+  },
+  "baseline": {
+    "runs": 120,
+    "wins": {
+      "A": 22,
+      "B": 22,
+      "C": 14,
+      "D": 17,
+      "E": 30,
+      "F": 15
+    },
+    "meanScore": {
+      "A": 7.625,
+      "B": 8.158,
+      "C": 6.667,
+      "D": 6.575,
+      "E": 8.458,
+      "F": 7.5
+    },
+    "meanCity": {
+      "economie": 5.625,
+      "securite": 5.517,
+      "satisfaction": 4.408,
+      "bien_etre": 5.542,
+      "developpement": 7.833,
+      "stabilite": 3.6
+    },
+    "meanStats": {
+      "projects": 0,
+      "failedProjects": 0,
+      "freeRiders": 0,
+      "contributors": 0,
+      "events": 0,
+      "avoided": 0,
+      "loss": 0,
+      "donations": 0,
+      "actions": 64.092,
+      "offers": 0
+    },
+    "totals": {
+      "projects": 0,
+      "failedProjects": 0,
+      "freeRiders": 0,
+      "contributors": 0,
+      "events": 0,
+      "avoided": 0,
+      "loss": 0,
+      "donations": 0,
+      "actions": 7691,
+      "offers": 0
+    },
+    "winnerChanges": 0
+  },
+  "configurations": [
+    {
+      "p": 0.25,
+      "cost": 3,
+      "modes": {
+        "unprotected": {
+          "runs": 120,
+          "wins": {
+            "A": 19,
+            "B": 29,
+            "C": 11,
+            "D": 13,
+            "E": 27,
+            "F": 21
+          },
+          "meanScore": {
+            "A": 7.2,
+            "B": 8.158,
+            "C": 5.892,
+            "D": 5.975,
+            "E": 7.942,
+            "F": 7.5
+          },
+          "meanCity": {
+            "economie": 5.058,
+            "securite": 5.517,
+            "satisfaction": 3.7,
+            "bien_etre": 4.608,
+            "developpement": 7.4,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 0,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 0.483,
+            "avoided": 0,
+            "loss": 2.8,
+            "donations": 0,
+            "actions": 64.092,
+            "offers": 0
+          },
+          "totals": {
+            "projects": 0,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 58,
+            "avoided": 0,
+            "loss": 336,
+            "donations": 0,
+            "actions": 7691,
+            "offers": 0
+          },
+          "winnerChanges": 16
+        },
+        "equal": {
+          "runs": 120,
+          "wins": {
+            "A": 19,
+            "B": 25,
+            "C": 13,
+            "D": 18,
+            "E": 29,
+            "F": 16
+          },
+          "meanScore": {
+            "A": 7.175,
+            "B": 7.842,
+            "C": 6.367,
+            "D": 6.192,
+            "E": 8.167,
+            "F": 7.225
+          },
+          "meanCity": {
+            "economie": 5.45,
+            "securite": 5.517,
+            "satisfaction": 4.408,
+            "bien_etre": 5.292,
+            "developpement": 7.833,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 2,
+            "failedProjects": 0,
+            "freeRiders": 6,
+            "contributors": 6,
+            "events": 0.483,
+            "avoided": 2.342,
+            "loss": 0.483,
+            "donations": 6,
+            "actions": 64.092,
+            "offers": 2
+          },
+          "totals": {
+            "projects": 240,
+            "failedProjects": 0,
+            "freeRiders": 720,
+            "contributors": 720,
+            "events": 58,
+            "avoided": 281,
+            "loss": 58,
+            "donations": 720,
+            "actions": 7691,
+            "offers": 240
+          },
+          "winnerChanges": 22
+        },
+        "voluntary": {
+          "runs": 120,
+          "wins": {
+            "A": 19,
+            "B": 29,
+            "C": 14,
+            "D": 15,
+            "E": 26,
+            "F": 17
+          },
+          "meanScore": {
+            "A": 7.2,
+            "B": 8.017,
+            "C": 6.058,
+            "D": 6.208,
+            "E": 7.958,
+            "F": 7.35
+          },
+          "meanCity": {
+            "economie": 5.242,
+            "securite": 5.517,
+            "satisfaction": 4.083,
+            "bien_etre": 4.992,
+            "developpement": 7.483,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 0.875,
+            "failedProjects": 1.125,
+            "freeRiders": 2.625,
+            "contributors": 2.625,
+            "events": 0.483,
+            "avoided": 1.075,
+            "loss": 1.733,
+            "donations": 2.625,
+            "actions": 64.092,
+            "offers": 2
+          },
+          "totals": {
+            "projects": 105,
+            "failedProjects": 135,
+            "freeRiders": 315,
+            "contributors": 315,
+            "events": 58,
+            "avoided": 129,
+            "loss": 208,
+            "donations": 315,
+            "actions": 7691,
+            "offers": 240
+          },
+          "winnerChanges": 21
+        }
+      }
+    },
+    {
+      "p": 0.25,
+      "cost": 6,
+      "modes": {
+        "unprotected": {
+          "runs": 120,
+          "wins": {
+            "A": 19,
+            "B": 29,
+            "C": 11,
+            "D": 13,
+            "E": 27,
+            "F": 21
+          },
+          "meanScore": {
+            "A": 7.2,
+            "B": 8.158,
+            "C": 5.892,
+            "D": 5.975,
+            "E": 7.942,
+            "F": 7.5
+          },
+          "meanCity": {
+            "economie": 5.058,
+            "securite": 5.517,
+            "satisfaction": 3.7,
+            "bien_etre": 4.608,
+            "developpement": 7.4,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 0,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 0.483,
+            "avoided": 0,
+            "loss": 2.8,
+            "donations": 0,
+            "actions": 64.092,
+            "offers": 0
+          },
+          "totals": {
+            "projects": 0,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 58,
+            "avoided": 0,
+            "loss": 336,
+            "donations": 0,
+            "actions": 7691,
+            "offers": 0
+          },
+          "winnerChanges": 16
+        },
+        "equal": {
+          "runs": 120,
+          "wins": {
+            "A": 22,
+            "B": 23,
+            "C": 14,
+            "D": 15,
+            "E": 28,
+            "F": 18
+          },
+          "meanScore": {
+            "A": 6.858,
+            "B": 7.508,
+            "C": 6.058,
+            "D": 5.875,
+            "E": 7.858,
+            "F": 6.942
+          },
+          "meanCity": {
+            "economie": 5.45,
+            "securite": 5.517,
+            "satisfaction": 4.408,
+            "bien_etre": 5.292,
+            "developpement": 7.833,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 2,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 12,
+            "events": 0.483,
+            "avoided": 2.342,
+            "loss": 0.483,
+            "donations": 12,
+            "actions": 64.092,
+            "offers": 2
+          },
+          "totals": {
+            "projects": 240,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 1440,
+            "events": 58,
+            "avoided": 281,
+            "loss": 58,
+            "donations": 1440,
+            "actions": 7691,
+            "offers": 240
+          },
+          "winnerChanges": 17
+        },
+        "voluntary": {
+          "runs": 120,
+          "wins": {
+            "A": 19,
+            "B": 29,
+            "C": 11,
+            "D": 13,
+            "E": 27,
+            "F": 21
+          },
+          "meanScore": {
+            "A": 7.2,
+            "B": 8.158,
+            "C": 5.892,
+            "D": 5.975,
+            "E": 7.942,
+            "F": 7.5
+          },
+          "meanCity": {
+            "economie": 5.058,
+            "securite": 5.517,
+            "satisfaction": 3.7,
+            "bien_etre": 4.608,
+            "developpement": 7.4,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 0,
+            "failedProjects": 2,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 0.483,
+            "avoided": 0,
+            "loss": 2.8,
+            "donations": 0,
+            "actions": 64.092,
+            "offers": 2
+          },
+          "totals": {
+            "projects": 0,
+            "failedProjects": 240,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 58,
+            "avoided": 0,
+            "loss": 336,
+            "donations": 0,
+            "actions": 7691,
+            "offers": 240
+          },
+          "winnerChanges": 16
+        }
+      }
+    },
+    {
+      "p": 0.25,
+      "cost": 9,
+      "modes": {
+        "unprotected": {
+          "runs": 120,
+          "wins": {
+            "A": 19,
+            "B": 29,
+            "C": 11,
+            "D": 13,
+            "E": 27,
+            "F": 21
+          },
+          "meanScore": {
+            "A": 7.2,
+            "B": 8.158,
+            "C": 5.892,
+            "D": 5.975,
+            "E": 7.942,
+            "F": 7.5
+          },
+          "meanCity": {
+            "economie": 5.058,
+            "securite": 5.517,
+            "satisfaction": 3.7,
+            "bien_etre": 4.608,
+            "developpement": 7.4,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 0,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 0.483,
+            "avoided": 0,
+            "loss": 2.8,
+            "donations": 0,
+            "actions": 64.092,
+            "offers": 0
+          },
+          "totals": {
+            "projects": 0,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 58,
+            "avoided": 0,
+            "loss": 336,
+            "donations": 0,
+            "actions": 7691,
+            "offers": 0
+          },
+          "winnerChanges": 16
+        },
+        "equal": {
+          "runs": 120,
+          "wins": {
+            "A": 20,
+            "B": 27,
+            "C": 14,
+            "D": 14,
+            "E": 28,
+            "F": 17
+          },
+          "meanScore": {
+            "A": 6.508,
+            "B": 7.15,
+            "C": 5.692,
+            "D": 5.533,
+            "E": 7.533,
+            "F": 6.583
+          },
+          "meanCity": {
+            "economie": 5.45,
+            "securite": 5.517,
+            "satisfaction": 4.408,
+            "bien_etre": 5.292,
+            "developpement": 7.833,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 2,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 12,
+            "events": 0.483,
+            "avoided": 2.342,
+            "loss": 0.483,
+            "donations": 18,
+            "actions": 64.092,
+            "offers": 2
+          },
+          "totals": {
+            "projects": 240,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 1440,
+            "events": 58,
+            "avoided": 281,
+            "loss": 58,
+            "donations": 2160,
+            "actions": 7691,
+            "offers": 240
+          },
+          "winnerChanges": 24
+        },
+        "voluntary": {
+          "runs": 120,
+          "wins": {
+            "A": 19,
+            "B": 28,
+            "C": 11,
+            "D": 14,
+            "E": 27,
+            "F": 21
+          },
+          "meanScore": {
+            "A": 7.192,
+            "B": 8.158,
+            "C": 5.917,
+            "D": 6.017,
+            "E": 7.942,
+            "F": 7.5
+          },
+          "meanCity": {
+            "economie": 5.067,
+            "securite": 5.517,
+            "satisfaction": 3.717,
+            "bien_etre": 4.625,
+            "developpement": 7.4,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 0.008,
+            "failedProjects": 1.992,
+            "freeRiders": 0.008,
+            "contributors": 0.042,
+            "events": 0.483,
+            "avoided": 0.042,
+            "loss": 2.758,
+            "donations": 0.075,
+            "actions": 64.092,
+            "offers": 2
+          },
+          "totals": {
+            "projects": 1,
+            "failedProjects": 239,
+            "freeRiders": 1,
+            "contributors": 5,
+            "events": 58,
+            "avoided": 5,
+            "loss": 331,
+            "donations": 9,
+            "actions": 7691,
+            "offers": 240
+          },
+          "winnerChanges": 15
+        }
+      }
+    },
+    {
+      "p": 0.5,
+      "cost": 3,
+      "modes": {
+        "unprotected": {
+          "runs": 120,
+          "wins": {
+            "A": 16,
+            "B": 36,
+            "C": 11,
+            "D": 6,
+            "E": 25,
+            "F": 26
+          },
+          "meanScore": {
+            "A": 6.65,
+            "B": 8.158,
+            "C": 5.258,
+            "D": 5.2,
+            "E": 7.467,
+            "F": 7.5
+          },
+          "meanCity": {
+            "economie": 4.533,
+            "securite": 5.517,
+            "satisfaction": 3.025,
+            "bien_etre": 3.75,
+            "developpement": 6.958,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 0,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 0.958,
+            "avoided": 0,
+            "loss": 5.425,
+            "donations": 0,
+            "actions": 64.092,
+            "offers": 0
+          },
+          "totals": {
+            "projects": 0,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 115,
+            "avoided": 0,
+            "loss": 651,
+            "donations": 0,
+            "actions": 7691,
+            "offers": 0
+          },
+          "winnerChanges": 31
+        },
+        "equal": {
+          "runs": 120,
+          "wins": {
+            "A": 17,
+            "B": 26,
+            "C": 15,
+            "D": 15,
+            "E": 30,
+            "F": 17
+          },
+          "meanScore": {
+            "A": 7.025,
+            "B": 7.842,
+            "C": 6.367,
+            "D": 5.95,
+            "E": 8.167,
+            "F": 7.225
+          },
+          "meanCity": {
+            "economie": 5.258,
+            "securite": 5.517,
+            "satisfaction": 4.408,
+            "bien_etre": 5.042,
+            "developpement": 7.833,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 2,
+            "failedProjects": 0,
+            "freeRiders": 6,
+            "contributors": 6,
+            "events": 0.958,
+            "avoided": 4.583,
+            "loss": 0.958,
+            "donations": 6,
+            "actions": 64.092,
+            "offers": 2
+          },
+          "totals": {
+            "projects": 240,
+            "failedProjects": 0,
+            "freeRiders": 720,
+            "contributors": 720,
+            "events": 115,
+            "avoided": 550,
+            "loss": 115,
+            "donations": 720,
+            "actions": 7691,
+            "offers": 240
+          },
+          "winnerChanges": 25
+        },
+        "voluntary": {
+          "runs": 120,
+          "wins": {
+            "A": 16,
+            "B": 30,
+            "C": 13,
+            "D": 14,
+            "E": 29,
+            "F": 18
+          },
+          "meanScore": {
+            "A": 7.017,
+            "B": 7.933,
+            "C": 6.117,
+            "D": 5.9,
+            "E": 8.117,
+            "F": 7.292
+          },
+          "meanCity": {
+            "economie": 5.217,
+            "securite": 5.517,
+            "satisfaction": 4.292,
+            "bien_etre": 4.925,
+            "developpement": 7.667,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 1.825,
+            "failedProjects": 0.175,
+            "freeRiders": 5.475,
+            "contributors": 5.475,
+            "events": 0.958,
+            "avoided": 4.092,
+            "loss": 1.425,
+            "donations": 5.475,
+            "actions": 64.092,
+            "offers": 2
+          },
+          "totals": {
+            "projects": 219,
+            "failedProjects": 21,
+            "freeRiders": 657,
+            "contributors": 657,
+            "events": 115,
+            "avoided": 491,
+            "loss": 171,
+            "donations": 657,
+            "actions": 7691,
+            "offers": 240
+          },
+          "winnerChanges": 24
+        }
+      }
+    },
+    {
+      "p": 0.5,
+      "cost": 6,
+      "modes": {
+        "unprotected": {
+          "runs": 120,
+          "wins": {
+            "A": 16,
+            "B": 36,
+            "C": 11,
+            "D": 6,
+            "E": 25,
+            "F": 26
+          },
+          "meanScore": {
+            "A": 6.65,
+            "B": 8.158,
+            "C": 5.258,
+            "D": 5.2,
+            "E": 7.467,
+            "F": 7.5
+          },
+          "meanCity": {
+            "economie": 4.533,
+            "securite": 5.517,
+            "satisfaction": 3.025,
+            "bien_etre": 3.75,
+            "developpement": 6.958,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 0,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 0.958,
+            "avoided": 0,
+            "loss": 5.425,
+            "donations": 0,
+            "actions": 64.092,
+            "offers": 0
+          },
+          "totals": {
+            "projects": 0,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 115,
+            "avoided": 0,
+            "loss": 651,
+            "donations": 0,
+            "actions": 7691,
+            "offers": 0
+          },
+          "winnerChanges": 31
+        },
+        "equal": {
+          "runs": 120,
+          "wins": {
+            "A": 20,
+            "B": 24,
+            "C": 14,
+            "D": 13,
+            "E": 29,
+            "F": 20
+          },
+          "meanScore": {
+            "A": 6.708,
+            "B": 7.508,
+            "C": 6.058,
+            "D": 5.633,
+            "E": 7.858,
+            "F": 6.942
+          },
+          "meanCity": {
+            "economie": 5.258,
+            "securite": 5.517,
+            "satisfaction": 4.408,
+            "bien_etre": 5.042,
+            "developpement": 7.833,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 2,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 12,
+            "events": 0.958,
+            "avoided": 4.583,
+            "loss": 0.958,
+            "donations": 12,
+            "actions": 64.092,
+            "offers": 2
+          },
+          "totals": {
+            "projects": 240,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 1440,
+            "events": 115,
+            "avoided": 550,
+            "loss": 115,
+            "donations": 1440,
+            "actions": 7691,
+            "offers": 240
+          },
+          "winnerChanges": 19
+        },
+        "voluntary": {
+          "runs": 120,
+          "wins": {
+            "A": 16,
+            "B": 37,
+            "C": 11,
+            "D": 6,
+            "E": 24,
+            "F": 26
+          },
+          "meanScore": {
+            "A": 6.683,
+            "B": 8.15,
+            "C": 5.267,
+            "D": 5.242,
+            "E": 7.45,
+            "F": 7.483
+          },
+          "meanCity": {
+            "economie": 4.55,
+            "securite": 5.517,
+            "satisfaction": 3.067,
+            "bien_etre": 3.8,
+            "developpement": 6.958,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 0.033,
+            "failedProjects": 1.967,
+            "freeRiders": 0,
+            "contributors": 0.2,
+            "events": 0.958,
+            "avoided": 0.117,
+            "loss": 5.308,
+            "donations": 0.2,
+            "actions": 64.092,
+            "offers": 2
+          },
+          "totals": {
+            "projects": 4,
+            "failedProjects": 236,
+            "freeRiders": 0,
+            "contributors": 24,
+            "events": 115,
+            "avoided": 14,
+            "loss": 637,
+            "donations": 24,
+            "actions": 7691,
+            "offers": 240
+          },
+          "winnerChanges": 32
+        }
+      }
+    },
+    {
+      "p": 0.5,
+      "cost": 9,
+      "modes": {
+        "unprotected": {
+          "runs": 120,
+          "wins": {
+            "A": 16,
+            "B": 36,
+            "C": 11,
+            "D": 6,
+            "E": 25,
+            "F": 26
+          },
+          "meanScore": {
+            "A": 6.65,
+            "B": 8.158,
+            "C": 5.258,
+            "D": 5.2,
+            "E": 7.467,
+            "F": 7.5
+          },
+          "meanCity": {
+            "economie": 4.533,
+            "securite": 5.517,
+            "satisfaction": 3.025,
+            "bien_etre": 3.75,
+            "developpement": 6.958,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 0,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 0.958,
+            "avoided": 0,
+            "loss": 5.425,
+            "donations": 0,
+            "actions": 64.092,
+            "offers": 0
+          },
+          "totals": {
+            "projects": 0,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 115,
+            "avoided": 0,
+            "loss": 651,
+            "donations": 0,
+            "actions": 7691,
+            "offers": 0
+          },
+          "winnerChanges": 31
+        },
+        "equal": {
+          "runs": 120,
+          "wins": {
+            "A": 18,
+            "B": 28,
+            "C": 14,
+            "D": 12,
+            "E": 29,
+            "F": 19
+          },
+          "meanScore": {
+            "A": 6.358,
+            "B": 7.15,
+            "C": 5.692,
+            "D": 5.292,
+            "E": 7.533,
+            "F": 6.583
+          },
+          "meanCity": {
+            "economie": 5.258,
+            "securite": 5.517,
+            "satisfaction": 4.408,
+            "bien_etre": 5.042,
+            "developpement": 7.833,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 2,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 12,
+            "events": 0.958,
+            "avoided": 4.583,
+            "loss": 0.958,
+            "donations": 18,
+            "actions": 64.092,
+            "offers": 2
+          },
+          "totals": {
+            "projects": 240,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 1440,
+            "events": 115,
+            "avoided": 550,
+            "loss": 115,
+            "donations": 2160,
+            "actions": 7691,
+            "offers": 240
+          },
+          "winnerChanges": 26
+        },
+        "voluntary": {
+          "runs": 120,
+          "wins": {
+            "A": 16,
+            "B": 36,
+            "C": 11,
+            "D": 6,
+            "E": 25,
+            "F": 26
+          },
+          "meanScore": {
+            "A": 6.658,
+            "B": 8.133,
+            "C": 5.242,
+            "D": 5.217,
+            "E": 7.475,
+            "F": 7.5
+          },
+          "meanCity": {
+            "economie": 4.55,
+            "securite": 5.517,
+            "satisfaction": 3.067,
+            "bien_etre": 3.783,
+            "developpement": 6.975,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 0.05,
+            "failedProjects": 1.95,
+            "freeRiders": 0.033,
+            "contributors": 0.267,
+            "events": 0.958,
+            "avoided": 0.125,
+            "loss": 5.308,
+            "donations": 0.45,
+            "actions": 64.092,
+            "offers": 2
+          },
+          "totals": {
+            "projects": 6,
+            "failedProjects": 234,
+            "freeRiders": 4,
+            "contributors": 32,
+            "events": 115,
+            "avoided": 15,
+            "loss": 637,
+            "donations": 54,
+            "actions": 7691,
+            "offers": 240
+          },
+          "winnerChanges": 31
+        }
+      }
+    },
+    {
+      "p": 0.75,
+      "cost": 3,
+      "modes": {
+        "unprotected": {
+          "runs": 120,
+          "wins": {
+            "A": 9,
+            "B": 45,
+            "C": 9,
+            "D": 3,
+            "E": 18,
+            "F": 36
+          },
+          "meanScore": {
+            "A": 5.975,
+            "B": 8.158,
+            "C": 4.758,
+            "D": 4.717,
+            "E": 6.767,
+            "F": 7.5
+          },
+          "meanCity": {
+            "economie": 3.917,
+            "securite": 5.517,
+            "satisfaction": 2.35,
+            "bien_etre": 2.817,
+            "developpement": 6.442,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 0,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 1.483,
+            "avoided": 0,
+            "loss": 8.35,
+            "donations": 0,
+            "actions": 64.092,
+            "offers": 0
+          },
+          "totals": {
+            "projects": 0,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 178,
+            "avoided": 0,
+            "loss": 1002,
+            "donations": 0,
+            "actions": 7691,
+            "offers": 0
+          },
+          "winnerChanges": 47
+        },
+        "equal": {
+          "runs": 120,
+          "wins": {
+            "A": 15,
+            "B": 27,
+            "C": 15,
+            "D": 14,
+            "E": 31,
+            "F": 18
+          },
+          "meanScore": {
+            "A": 6.767,
+            "B": 7.842,
+            "C": 6.367,
+            "D": 5.808,
+            "E": 8.167,
+            "F": 7.225
+          },
+          "meanCity": {
+            "economie": 5.025,
+            "securite": 5.517,
+            "satisfaction": 4.408,
+            "bien_etre": 4.792,
+            "developpement": 7.833,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 2,
+            "failedProjects": 0,
+            "freeRiders": 6,
+            "contributors": 6,
+            "events": 1.483,
+            "avoided": 7.125,
+            "loss": 1.483,
+            "donations": 6,
+            "actions": 64.092,
+            "offers": 2
+          },
+          "totals": {
+            "projects": 240,
+            "failedProjects": 0,
+            "freeRiders": 720,
+            "contributors": 720,
+            "events": 178,
+            "avoided": 855,
+            "loss": 178,
+            "donations": 720,
+            "actions": 7691,
+            "offers": 240
+          },
+          "winnerChanges": 28
+        },
+        "voluntary": {
+          "runs": 120,
+          "wins": {
+            "A": 9,
+            "B": 32,
+            "C": 12,
+            "D": 12,
+            "E": 33,
+            "F": 22
+          },
+          "meanScore": {
+            "A": 6.65,
+            "B": 7.933,
+            "C": 6.092,
+            "D": 5.742,
+            "E": 8.125,
+            "F": 7.283
+          },
+          "meanCity": {
+            "economie": 4.967,
+            "securite": 5.517,
+            "satisfaction": 4.283,
+            "bien_etre": 4.667,
+            "developpement": 7.65,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 1.875,
+            "failedProjects": 0.125,
+            "freeRiders": 5.625,
+            "contributors": 5.625,
+            "events": 1.483,
+            "avoided": 6.592,
+            "loss": 1.992,
+            "donations": 5.625,
+            "actions": 64.092,
+            "offers": 2
+          },
+          "totals": {
+            "projects": 225,
+            "failedProjects": 15,
+            "freeRiders": 675,
+            "contributors": 675,
+            "events": 178,
+            "avoided": 791,
+            "loss": 239,
+            "donations": 675,
+            "actions": 7691,
+            "offers": 240
+          },
+          "winnerChanges": 31
+        }
+      }
+    },
+    {
+      "p": 0.75,
+      "cost": 6,
+      "modes": {
+        "unprotected": {
+          "runs": 120,
+          "wins": {
+            "A": 9,
+            "B": 45,
+            "C": 9,
+            "D": 3,
+            "E": 18,
+            "F": 36
+          },
+          "meanScore": {
+            "A": 5.975,
+            "B": 8.158,
+            "C": 4.758,
+            "D": 4.717,
+            "E": 6.767,
+            "F": 7.5
+          },
+          "meanCity": {
+            "economie": 3.917,
+            "securite": 5.517,
+            "satisfaction": 2.35,
+            "bien_etre": 2.817,
+            "developpement": 6.442,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 0,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 1.483,
+            "avoided": 0,
+            "loss": 8.35,
+            "donations": 0,
+            "actions": 64.092,
+            "offers": 0
+          },
+          "totals": {
+            "projects": 0,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 178,
+            "avoided": 0,
+            "loss": 1002,
+            "donations": 0,
+            "actions": 7691,
+            "offers": 0
+          },
+          "winnerChanges": 47
+        },
+        "equal": {
+          "runs": 120,
+          "wins": {
+            "A": 16,
+            "B": 25,
+            "C": 14,
+            "D": 12,
+            "E": 31,
+            "F": 22
+          },
+          "meanScore": {
+            "A": 6.45,
+            "B": 7.508,
+            "C": 6.058,
+            "D": 5.492,
+            "E": 7.858,
+            "F": 6.942
+          },
+          "meanCity": {
+            "economie": 5.025,
+            "securite": 5.517,
+            "satisfaction": 4.408,
+            "bien_etre": 4.792,
+            "developpement": 7.833,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 2,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 12,
+            "events": 1.483,
+            "avoided": 7.125,
+            "loss": 1.483,
+            "donations": 12,
+            "actions": 64.092,
+            "offers": 2
+          },
+          "totals": {
+            "projects": 240,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 1440,
+            "events": 178,
+            "avoided": 855,
+            "loss": 178,
+            "donations": 1440,
+            "actions": 7691,
+            "offers": 240
+          },
+          "winnerChanges": 24
+        },
+        "voluntary": {
+          "runs": 120,
+          "wins": {
+            "A": 9,
+            "B": 46,
+            "C": 10,
+            "D": 2,
+            "E": 17,
+            "F": 36
+          },
+          "meanScore": {
+            "A": 5.992,
+            "B": 8.117,
+            "C": 4.75,
+            "D": 4.733,
+            "E": 6.717,
+            "F": 7.467
+          },
+          "meanCity": {
+            "economie": 3.958,
+            "securite": 5.517,
+            "satisfaction": 2.442,
+            "bien_etre": 2.917,
+            "developpement": 6.442,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 0.092,
+            "failedProjects": 1.908,
+            "freeRiders": 0,
+            "contributors": 0.55,
+            "events": 1.483,
+            "avoided": 0.242,
+            "loss": 8.108,
+            "donations": 0.55,
+            "actions": 64.092,
+            "offers": 2
+          },
+          "totals": {
+            "projects": 11,
+            "failedProjects": 229,
+            "freeRiders": 0,
+            "contributors": 66,
+            "events": 178,
+            "avoided": 29,
+            "loss": 973,
+            "donations": 66,
+            "actions": 7691,
+            "offers": 240
+          },
+          "winnerChanges": 49
+        }
+      }
+    },
+    {
+      "p": 0.75,
+      "cost": 9,
+      "modes": {
+        "unprotected": {
+          "runs": 120,
+          "wins": {
+            "A": 9,
+            "B": 45,
+            "C": 9,
+            "D": 3,
+            "E": 18,
+            "F": 36
+          },
+          "meanScore": {
+            "A": 5.975,
+            "B": 8.158,
+            "C": 4.758,
+            "D": 4.717,
+            "E": 6.767,
+            "F": 7.5
+          },
+          "meanCity": {
+            "economie": 3.917,
+            "securite": 5.517,
+            "satisfaction": 2.35,
+            "bien_etre": 2.817,
+            "developpement": 6.442,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 0,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 1.483,
+            "avoided": 0,
+            "loss": 8.35,
+            "donations": 0,
+            "actions": 64.092,
+            "offers": 0
+          },
+          "totals": {
+            "projects": 0,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 0,
+            "events": 178,
+            "avoided": 0,
+            "loss": 1002,
+            "donations": 0,
+            "actions": 7691,
+            "offers": 0
+          },
+          "winnerChanges": 47
+        },
+        "equal": {
+          "runs": 120,
+          "wins": {
+            "A": 15,
+            "B": 29,
+            "C": 14,
+            "D": 11,
+            "E": 31,
+            "F": 20
+          },
+          "meanScore": {
+            "A": 6.1,
+            "B": 7.15,
+            "C": 5.692,
+            "D": 5.15,
+            "E": 7.533,
+            "F": 6.583
+          },
+          "meanCity": {
+            "economie": 5.025,
+            "securite": 5.517,
+            "satisfaction": 4.408,
+            "bien_etre": 4.792,
+            "developpement": 7.833,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 2,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 12,
+            "events": 1.483,
+            "avoided": 7.125,
+            "loss": 1.483,
+            "donations": 18,
+            "actions": 64.092,
+            "offers": 2
+          },
+          "totals": {
+            "projects": 240,
+            "failedProjects": 0,
+            "freeRiders": 0,
+            "contributors": 1440,
+            "events": 178,
+            "avoided": 855,
+            "loss": 178,
+            "donations": 2160,
+            "actions": 7691,
+            "offers": 240
+          },
+          "winnerChanges": 30
+        },
+        "voluntary": {
+          "runs": 120,
+          "wins": {
+            "A": 9,
+            "B": 44,
+            "C": 9,
+            "D": 3,
+            "E": 19,
+            "F": 36
+          },
+          "meanScore": {
+            "A": 5.975,
+            "B": 8.117,
+            "C": 4.725,
+            "D": 4.775,
+            "E": 6.8,
+            "F": 7.492
+          },
+          "meanCity": {
+            "economie": 3.942,
+            "securite": 5.517,
+            "satisfaction": 2.425,
+            "bien_etre": 2.892,
+            "developpement": 6.475,
+            "stabilite": 3.6
+          },
+          "meanStats": {
+            "projects": 0.067,
+            "failedProjects": 1.933,
+            "freeRiders": 0.042,
+            "contributors": 0.358,
+            "events": 1.483,
+            "avoided": 0.242,
+            "loss": 8.117,
+            "donations": 0.6,
+            "actions": 64.092,
+            "offers": 2
+          },
+          "totals": {
+            "projects": 8,
+            "failedProjects": 232,
+            "freeRiders": 5,
+            "contributors": 43,
+            "events": 178,
+            "avoided": 29,
+            "loss": 974,
+            "donations": 72,
+            "actions": 7691,
+            "offers": 240
+          },
+          "winnerChanges": 47
+        }
+      }
+    }
+  ]
+}

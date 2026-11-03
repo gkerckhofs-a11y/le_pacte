@@ -80,7 +80,9 @@ test('Archive, image et statut du scénario contrôlés au prévol',()=>{
  archived.scenarios['fondateurs-hot-spring-demo'].releases['1.0.0'].payload.scenario.status='archived';
  assert.throws(()=>prepareFoundersSession(archived,{scenarioId:'fondateurs-hot-spring-demo',skinId:'western'}));
  const s=prepareFoundersSession(library,{scenarioId:'fondateurs-hot-spring-demo',skinId:'western'});
- assert.ok(s.warnings.some(x=>x.includes('Décor public')));
+ assert.equal(s.warnings.some(x=>x.includes('Décor public')),false);
+ const custom=structuredClone(library);custom.skins.western.id='western-custom';custom.skins['western-custom']=custom.skins.western;delete custom.skins.western;
+ assert.ok(prepareFoundersSession(custom,{scenarioId:'fondateurs-hot-spring-demo',skinId:'western-custom'}).warnings.some(x=>x.includes('Décor public')));
 });
 
 test('Les identifiants hérités et les entrées JSON malformées ne corrompent pas la bibliothèque',()=>{

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Le Pacte · Configuration narrative V2.3</title>
 <style>
+[hidden]{display:none!important}
 :root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#191b20;background:#f4f4f1}
 *{box-sizing:border-box}body{margin:0}header{background:#14171b;color:white;padding:26px clamp(16px,4vw,64px)}header h1{font-size:clamp(24px,4vw,38px);letter-spacing:-1px;margin:8px 0 0}header p{color:#cad0d3;margin:8px 0 0}
 main{max-width:1060px;margin:28px auto;padding:0 18px 50px;display:grid;grid-template-columns:minmax(300px,390px) 1fr;gap:20px}
@@ -24,11 +25,11 @@ button:hover{background:#32404a}button:disabled{opacity:.5;cursor:not-allowed}
 #status[data-type=error]{color:#9f3529}
 #status[data-type=success]{color:#195f45}
 h3{margin:20px 0 6px}.warn{padding:9px 12px;border-left:3px solid #b1863c;background:#faf7ee;margin-top:8px}
-#skinPreview{height:11px;border-radius:9px;margin-top:14px;background:#b4b4b4}
+#skinPreview{height:200px;overflow:hidden;border-radius:9px;margin-top:14px;background:#b4b4b4}
 small{color:#656a6e}a{color:inherit}ol{padding-left:20px;line-height:1.6}
 @media(max-width:760px){main{display:block}article{margin-bottom:16px}}
 </style>
-<script src="/founders-setup.js" defer></script>
+<script type="module" src="/founders-setup.js"></script>
 </head>
 <body>
 <header>
@@ -38,7 +39,7 @@ small{color:#656a6e}a{color:inherit}ol{padding-left:20px;line-height:1.6}
 </header>
 <main>
  <article>
-  <h2>Choix de la partie</h2><p class="note"><a href="/founders-import.html">Importer un scénario depuis Google Sheets →</a></p>
+  <h2>Choix de la partie</h2><p class="note"><a href="/founders-skins.html" target="_blank" rel="noopener">Explorer les cinq habillages et les décors →</a></p><p class="note"><a href="/founders-import.html">Importer un scénario depuis Google Sheets →</a></p>
   <label id="tokenLabel" for="token">Jeton d'accès régie</label>
   <input id="token" type="password" autocomplete="off" placeholder="Clé régie ou jeton opérateur">
   <button id="googleLogin" type="button" class="secondary" hidden>Se connecter avec Google</button>
@@ -54,6 +55,22 @@ small{color:#656a6e}a{color:inherit}ol{padding-left:20px;line-height:1.6}
    <label for="members">Participants des six familles (séparés par des virgules)</label>
    <input id="members" value="5,5,5,5,5,5" pattern="[0-9, ]+" required>
    <p class="note">Un seul porte-parole connecté par famille, quel que soit l'effectif.</p>
+   <h2 style="margin-top:24px">Ressources de départ</h2>
+   <p class="note">Calibrage de la partie, indépendant du scénario Google Sheets. Par défaut : 8 Influence, 10 dollars, 3 points dans la réserve commune et 5/10 pour les jauges.</p>
+   <div class="grid2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+     <label for="initPower">Influence par famille<input id="initPower" type="number" min="1" max="30" value="8"></label>
+     <label for="initDollars">Dollars par famille<input id="initDollars" type="number" min="0" max="100" value="10"></label>
+     <label for="initPool">Réserve politique commune<input id="initPool" type="number" min="0" max="100" value="3"></label>
+   </div>
+   <h3>Les jauges initiales (0 à 10)</h3>
+   <div class="grid2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+     <label for="city_economie">Économie<input id="city_economie" type="number" min="0" max="10" value="5"></label>
+     <label for="city_securite">Sécurité<input id="city_securite" type="number" min="0" max="10" value="5"></label>
+     <label for="city_satisfaction">Satisfaction<input id="city_satisfaction" type="number" min="0" max="10" value="5"></label>
+     <label for="city_bien_etre">Bien-être<input id="city_bien_etre" type="number" min="0" max="10" value="5"></label>
+     <label for="city_developpement">Développement<input id="city_developpement" type="number" min="0" max="10" value="5"></label>
+     <label for="city_stabilite">Stabilité<input id="city_stabilite" type="number" min="0" max="10" value="5"></label>
+   </div>
    <button type="submit">Prévisualiser la configuration</button>
   </form>
   <div id="status" role="status" aria-live="polite"></div>
@@ -93,6 +110,18 @@ small{color:#656a6e}a{color:inherit}ol{padding-left:20px;line-height:1.6}
     </div>
 
     <button type="button" id="analyzeGoals">Analyser les objectifs du scénario</button>
+    <div class="metric" style="margin-top:13px">
+      <h3>Laboratoire de négociations (hypothèses)</h3>
+      <p class="note">Simule les ressources, les votes et les marchandages de six familles artificielles. Les résultats ne prédisent pas ceux de joueurs humains.</p>
+      <label for="labMode">Style de négociation</label>
+      <select id="labMode">
+        <option value="mixte">Stratégies mixtes</option><option value="prudent">Familles prudentes</option><option value="ambitieux">Familles ambitieuses</option>
+      </select>
+      <label for="labRuns">Nombre de répétitions</label>
+      <select id="labRuns"><option value="12">12</option><option value="36" selected>36</option><option value="72">72</option></select>
+      <button type="button" id="simulatePolicies" class="secondary">Simuler les négociations et les votes</button>
+      <div id="labResults" hidden><h3>Résultat de la simulation</h3><p id="labSummary" class="note"></p><div id="labRows"></div></div>
+    </div>
     <div id="goalAnalysis" class="metric" style="margin-top:13px" hidden>
       <h3>Accessibilité des objectifs</h3>
       <p class="note">Comparaison des fins possibles, sans modéliser le comportement réel des joueurs. Ces pourcentages ne prédisent pas leur réussite.</p>

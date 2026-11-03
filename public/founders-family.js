@@ -1,3 +1,6 @@
+import {saveFamilyName} from './founders-name-save.js';
+import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
+import {teamCaption,teamLabel} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id),params=new URLSearchParams(location.search);
 const sessionId=params.get('session'),key='pacte-founder-family-'+sessionId;
@@ -5,7 +8,7 @@ const fragment=new URLSearchParams(location.hash.slice(1));
 let token=fragment.get('token')||sessionStorage.getItem(key)||'';
 if(token)sessionStorage.setItem(key,token);
 if(location.hash)history.replaceState(null,'',location.pathname+location.search);
-let current=null,busy=false;
+let current=null,busy=false,identityDirty=false;
 const nice={READY:'Préparation',COUNCIL:'Conseil',AWAITING_REVEAL:'Vote clos',REVEALED:'Révélation',FINISHED:'Terminé'};
 const resources=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
 const set=(id,v)=>$(id).textContent=String(v??'');
@@ -35,7 +38,7 @@ function offers(data){
  for(const o of data.offers.slice(-30).reverse()){
   const el=document.createElement('div');el.className='card';
   const content=document.createElement('p');
-  content.textContent=(o.from===data.self.id?'Vous proposez ':'Proposition reçue : ')+o.amount+' $ de '+o.from+' à '+o.to+' · '+o.reason+' · '+o.status;
+  content.textContent=(o.from===data.self.id?'Vous proposez ':'Proposition reçue : ')+o.amount+' '+data.skin.labels.currency+' de '+teamLabel(data,o.from)+' à '+teamLabel(data,o.to)+' · '+o.reason+' · '+o.status;
   el.append(content);
   if(o.status==='pending'&&o.to===data.self.id){
    for(const [name,kind] of [['Accepter','acceptOffer'],['Refuser','rejectOffer']]){
@@ -52,14 +55,21 @@ function offers(data){
 function render(data){
  current=data;
  const self=data.self,c=data.council;
+ applySkin(document.body,data.skin);applyTeamTheme(document.body,self.color,data.skin);
+ set('teamIdentity',self.color.symbol+' Équipe '+self.color.label+' · Porte-parole');
+ $('identityPanel').hidden=data.phase!=='READY';
+ if(!identityDirty&&document.activeElement!==$('chosenName'))$('chosenName').value=self.name==='Nom à choisir'?'':self.name;
  set('familyName',self.name);set('phase',nice[data.phase]||data.phase);
- set('turn',data.phase==='COUNCIL'?(c.turn===self.id?'À vous !':c.turn?'À '+c.turn:c.phase==='await_moderator'?'Arbitrage':'Choix du Meneur'):'—');
+ set('turn',data.phase==='COUNCIL'?(c.turn===self.id?'À vous !':c.turn?'À '+teamLabel(data,c.turn):c.phase==='await_moderator'?'Arbitrage':'Choix du Maire'):'—');
  set('dilemmaLabel',data.dilemma?'Chapitre '+data.dilemma.chapter:'Conseil des Fondateurs');
  set('dilemmaTitle',data.dilemma?.title||(data.phase==='FINISHED'?'Fin de la campagne':'Conseil en préparation'));
  set('dilemmaText',data.dilemma?.public_text||'');
  set('question',data.dilemma?.vote_question||'');
+ const image=$('familyDilemmaImage'),src=data.dilemma?.image?.url;
+ image.hidden=!(typeof src==='string'&&/^https:\/\/\S+$/.test(src));
+ if(!image.hidden){image.src=src;image.alt=data.dilemma.image.alt||data.dilemma.title;}else image.removeAttribute('src');
  set('influence',self.power);set('dollars',self.dollars);
- set('influenceLabel',data.skin.labels.influence);set('dollarLabel',data.skin.labels.currency);
+ set('influenceLabel',data.skin.labels.influence);set('dollarLabel',data.skin.labels.currency);set('offerAmountLabel',data.skin.labels.currency+' proposés');
  set('objective',self.objective);
  if(data.goalCard&&data.goalProgress){
   const card=data.goalCard,progress=data.goalProgress;
@@ -73,11 +83,11 @@ function render(data){
  const final=$('personalResult');final.hidden=!data.finalResults;
  if(data.finalResults){
   const r=data.finalResults.ranking.find(item=>item.family===self.id);
-  set('personalResultText',r.rank===1?'Votre famille remporte Le Pacte !':'Classement : '+r.rank+' / 6. Vainqueur : '+data.finalResults.ranking[0].name);
-  set('personalScoreBreakdown','Objectif secret '+r.score.secret+' · Dollars '+r.score.wealth+
+  set('personalResultText',r.rank===1?'Votre famille remporte Le Pacte !':'Classement : '+r.rank+' / 6. Vainqueur : '+teamLabel(data,data.finalResults.ranking[0].family));
+  set('personalScoreBreakdown','Objectif secret '+r.score.secret+' · '+data.skin.labels.currency+' '+r.score.wealth+
       ' · Votes '+r.score.council+' · Influence '+r.score.influence+' = '+r.score.total+' points');
  }
- set('familyStats',self.members+' membre(s) · Meneur '+data.leader+' · Modérateur '+data.moderator);
+ set('familyStats',self.members+' membre(s) · Maire : '+teamLabel(data,data.leader)+' · Shérif : '+teamLabel(data,data.moderator));
  set('committed',self.choice?'Votre position : '+self.choice+' · Mise engagée : '+self.bid:'Aucun vote engagé pour ce dilemme.');
  set('voteHint',self.mayVote?'Votre famille doit décider maintenant.':data.phase==='COUNCIL'?'Vous pouvez négocier en attendant votre tour.':'Le Conseil attend la prochaine phase.');
  $('firstVote').hidden=!(self.mayVote&&self.choice===null);
@@ -86,12 +96,12 @@ function render(data){
  $('moderatorLeader').hidden=!self.mayChooseLeader;
  const candidate=$('leaderCandidates');candidate.replaceChildren();
  if(self.mayChooseLeader)for(const id of c.pendingLeaderChoices){
-  const b=document.createElement('button');b.textContent='Désigner '+id;b.addEventListener('click',()=>command('chooseLeader',{family:id}));candidate.append(b);
+  const b=document.createElement('button');b.textContent='Désigner '+teamLabel(data,id);b.addEventListener('click',()=>command('chooseLeader',{family:id}));candidate.append(b);
  }
  $('offerForm').hidden=data.phase!=='COUNCIL';
  const target=$('targetFamily'),prev=target.value;target.replaceChildren();
  for(const f of data.families.filter(f=>f.id!==self.id)){
-  const option=document.createElement('option');option.value=f.id;option.textContent=f.name;target.append(option);
+  const option=document.createElement('option');option.value=f.id;option.textContent=teamCaption(f);target.append(option);
  }
  if(Array.from(target.options).some(x=>x.value===prev))target.value=prev;
  const reveal=$('lastReveal');reveal.hidden=!data.reveal;
@@ -100,14 +110,14 @@ function render(data){
 }
 async function refresh(){
  if(busy)return;
- try{const data=await call();if(data.revision!==current?.revision)render(data);notify('');}
+ try{const data=await call();if(busy||data.revision<(current?.revision??-1))return;if(data.revision!==current?.revision)render(data);notify('');}
  catch(e){notify(e.message);}
 }
 async function command(kind,data){
  if(!current||busy)return;
  busy=true;notify('Enregistrement…');
  try{const result=await call('POST',{kind,data,expectedRevision:current.revision});render(result);notify('Décision enregistrée.');}
- catch(e){notify(e.message);await refresh();}
+ catch(e){notify(e.message);try{const latest=await call();render(latest);}catch{ /* Keep original failure visible. */ }}
  finally{busy=false;}
 }
 document.querySelectorAll('[data-vote]').forEach(button=>{
@@ -124,5 +134,27 @@ $('offerForm').addEventListener('submit',e=>{
  e.preventDefault();
  const id=crypto.randomUUID();
  command('offer',{id,to:$('targetFamily').value,amount:Number($('offerAmount').value),reason:$('offerReason').value.trim()});
+});
+$('chosenName').addEventListener('input',()=>{identityDirty=true;set('identityNotice','');});
+$('identityForm').addEventListener('submit',async event=>{
+ event.preventDefault();
+ if(busy)return;
+ if(!current){set('identityNotice','Connexion en cours. Attendez le chargement de votre équipe.');return;}
+ const name=$('chosenName').value.trim();
+ if(!name){set('identityNotice','Saisissez un nom de famille.');return;}
+ busy=true;$('saveIdentity').disabled=true;set('identityNotice','Enregistrement du nom…');
+ try{
+  const result=await saveFamilyName(current,name,call);
+  identityDirty=false;render(result);set('identityNotice','Nom enregistré : '+result.self.name+'.');
+ }catch(error){set('identityNotice',error.message);}
+ finally{busy=false;$('saveIdentity').disabled=false;}
+});
+const tabs=[$('boardTab'),$('rulesTab')];
+function selectTab(index){
+ tabs.forEach((tab,i)=>{tab.setAttribute('aria-selected',String(i===index));tab.tabIndex=i===index?0:-1;$(tab.getAttribute('aria-controls')).hidden=i!==index;});
+}
+tabs.forEach((tab,i)=>{
+ tab.addEventListener('click',()=>selectTab(i));
+ tab.addEventListener('keydown',event=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(event.key)){event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?1:1-i;selectTab(next);tabs[next].focus();}});
 });
 refresh();setInterval(refresh,2500);

@@ -1,3 +1,5 @@
+import {mountCity,updateCity} from './founders-city-scene.js';
+import {TEAM_COLORS,DEFAULT_TEAM_COLORS,teamCaption} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id);
 let catalog=null,authSDK=null,selectedPreview=null;
@@ -26,7 +28,7 @@ $("load").addEventListener("click",async()=>{
  $("load").disabled=true;state("Chargement des catalogues…");
  try{
   catalog=await api("/api/founders/catalog");
-  loadGoalPresets(catalog.goalCardPresets,catalog.scoreRulesPreset);
+  loadGoalPresets(catalog.goalCardPresets,catalog.scoreRulesPreset,catalog.calibrationPreset);
   fill($("scenario"),catalog.scenarios,"Aucun scénario");
   fill($("skin"),catalog.skins,"Aucune skin");
   $("config").hidden=!(catalog.scenarios.length&&catalog.skins.length);
@@ -59,7 +61,7 @@ $("config").addEventListener("submit",async event=>{
  if(members.length!==6||members.some(n=>!Number.isInteger(n)||n<1||n>300)){
   state("Indiquer exactement six effectifs entiers (1 à 300).","error");return;
  }
- const payload={scenarioId:$("scenario").value,scenarioVersion:$("scenarioVersion").value,skinId:$("skin").value,members};
+ const payload={scenarioId:$("scenario").value,scenarioVersion:$("scenarioVersion").value,skinId:$("skin").value,members,calibration:collectCalibration()};
  state("Vérification de la configuration…");
  try{
   const p=await api("/api/founders/preview","POST",payload);
@@ -70,7 +72,8 @@ $("config").addEventListener("submit",async event=>{
   $("storyInfo").textContent=p.scenario.scenario.location+" · "+p.scenario.scenario.year+" · version "+p.selection.scenarioVersion;
   $("skinTitle").textContent=p.skin.title;
   $("skinInfo").textContent=p.skin.description+" · version "+p.selection.skinVersion;
-  $("skinPreview").style.background=p.skin.theme.accent;
+  mountCity($('skinPreview'),p.skin.id);updateCity($('skinPreview'),p.game.city,p.skin.id,p.skin.labels.resources);
+  $('skinPreview').querySelector('svg').style.cssText='width:100%;height:100%;object-fit:contain';
   $("countDilemmas").textContent=String(p.scenario.dilemmas.length);
   $("countMembers").textContent=String(p.settings.members.reduce((a,b)=>a+b,0));
   $("warnings").replaceChildren();
@@ -117,8 +120,14 @@ function field(section,id,label,type='text',max=0){
 }
 for(const id of FAMILY_IDS){
  const section=document.createElement('div');section.className='metric';section.style.marginTop='10px';
- const head=document.createElement('strong');head.textContent='Famille '+id;section.append(head);
- const name=field(section,'name-'+id,'Nom de la famille','text',60);name.value='Famille '+id;
+ const head=document.createElement('strong');head.textContent='Équipe '+TEAM_COLORS[FAMILY_IDS.indexOf(id)].label;section.append(head);
+ const name=field(section,'name-'+id,'Nom de la famille','text',60);name.value='Nom à choisir';name.placeholder='Choisi par les joueurs, ex. Blackwood';
+ const colorLabel=document.createElement('label');colorLabel.htmlFor='color-'+id;colorLabel.textContent='Couleur de l’équipe';
+ const color=document.createElement('select');color.id='color-'+id;
+ for(const c of TEAM_COLORS){const option=document.createElement('option');option.value=c.id;option.textContent=c.symbol+' '+c.label;color.append(option);}
+ color.value=DEFAULT_TEAM_COLORS[FAMILY_IDS.indexOf(id)];section.append(colorLabel,color);
+ color.addEventListener('change',()=>{head.textContent='Équipe '+TEAM_COLORS.find(c=>c.id===color.value).label;section.style.borderLeft='4px solid '+TEAM_COLORS.find(c=>c.id===color.value).hex;});
+ section.style.borderLeft='4px solid '+TEAM_COLORS[FAMILY_IDS.indexOf(id)].hex;
  field(section,'goalTitle-'+id,'Titre de l’ambition secrète','text',120);
  field(section,'goal-'+id,'Contexte secret de la famille','textarea',500);
  const metricLabel=document.createElement('label');metricLabel.htmlFor='goalIndicator-'+id;metricLabel.textContent='Indicateur à influencer';
@@ -135,7 +144,7 @@ for(const id of FAMILY_IDS){
  field(section,'secondTarget-'+id,'Seuil du palier 2, plus exigeant (0 à 10)','number');
  $('familySettings').append(section);
 }
-function loadGoalPresets(cards,rules){
+function loadGoalPresets(cards,rules,calibration){
  if(!cards||!rules)return;
  for(const id of FAMILY_IDS){
   const card=cards[id];if(!card)continue;
@@ -151,6 +160,16 @@ function loadGoalPresets(cards,rules){
   money1:rules.wealthTiers[0][0],money2:rules.wealthTiers[1][0],money3:rules.wealthTiers[2][0],
   power1:rules.influenceTiers[0][0],power2:rules.influenceTiers[1][0]};
  for(const [id,value] of Object.entries(settings))$(id).value=value;
+ if(calibration){$('initPower').value=calibration.initialPower;$('initDollars').value=calibration.initialDollars;$('initPool').value=calibration.initialPool;
+  for(const [k,value] of Object.entries(calibration.city))$('city_'+k).value=value;
+ }
+}
+function collectCalibration(){
+ const city={};
+ for(const k of ['economie','securite','satisfaction','bien_etre','developpement','stabilite'])city[k]=Number($('city_'+k).value);
+ return {initialPower:Number($('initPower').value),
+  initialDollars:Number($('initDollars').value),
+  initialPool:Number($('initPool').value),city};
 }
 function collectGoalCards(){
  return Object.fromEntries(FAMILY_IDS.map(id=>[id,{
@@ -172,7 +191,8 @@ function collectScoreRules(){
  };
 }
 
-for(const el of ['scenario','scenarioVersion','skin','members']){
+for(const el of ['scenario','scenarioVersion','skin','members','initPower','initDollars','initPool',
+ ...['economie','securite','satisfaction','bien_etre','developpement','stabilite'].map(k=>'city_'+k)]){
  $(el).addEventListener('change',()=>{
   selectedPreview=null;$('preview').hidden=true;$('empty').hidden=false;
  });
@@ -180,12 +200,14 @@ for(const el of ['scenario','scenarioVersion','skin','members']){
 $('createNarrative').addEventListener('click',async()=>{
  if(!selectedPreview){state('Prévisualisez la sélection avant de créer la partie.','error');return;}
  const names=[...'ABCDEF'].map(id=>$('name-'+id).value.trim());
+ const colors=FAMILY_IDS.map(id=>$('color-'+id).value);
+ if(new Set(colors).size!==6){state('Choisissez une couleur différente pour chaque équipe.','error');return;}
  const objectives=[...'ABCDEF'].map(id=>$('goal-'+id).value.trim());
  const goalCards=collectGoalCards(),scoreRules=collectScoreRules();
  const code=$('gameCode').value.trim(),title=$('gameTitle').value.trim();
  const button=$('createNarrative');button.disabled=true;state('Création de la session…');
  try{
-  const result=await api('/api/founders/sessions','POST',{...selectedPreview,code,title,names,objectives,goalCards,scoreRules});
+  const result=await api('/api/founders/sessions','POST',{...selectedPreview,code,title,names,colors,objectives,goalCards,scoreRules});
   if(!authSDK)sessionStorage.setItem('pacte-founder-organizer-key',$('token').value.trim());
   const links=$('createdLinks');links.replaceChildren();
   const append=(label,path)=>{
@@ -198,12 +220,43 @@ $('createNarrative').addEventListener('click',async()=>{
   append('Ouvrir la projection publique','/founders-city.html?session='+result.id);
   for(const a of result.access){
    const path='/founders-family.html?session='+result.id+'#token='+encodeURIComponent(a.token);
-   append('Accès privé porte-parole : Famille '+a.family,path);
+   const i=FAMILY_IDS.indexOf(a.family);append('Accès privé porte-parole : '+teamCaption({name:names[i],color:TEAM_COLORS.find(c=>c.id===colors[i])}),path);
   }
   $('createdGame').hidden=false;
   button.disabled=true;
   state('Session '+result.code+' créée : six liens privés prêts à être distribués.','success');
  }catch(e){state(e.message,'error');button.disabled=false;}
+});
+
+
+$('simulatePolicies').addEventListener('click',async()=>{
+ if(!selectedPreview){state('Prévisualisez le scénario avant de lancer le laboratoire.','error');return;}
+ const button=$('simulatePolicies');button.disabled=true;
+ state('Simulation des décisions, des mises et des transactions financières…');
+ try{
+  const data=await api('/api/founders/scoring/simulate','POST',{
+   ...selectedPreview,goalCards:collectGoalCards(),scoreRules:collectScoreRules(),
+   runs:Number($('labRuns').value),mode:$('labMode').value,seed:20261103
+  });
+  const panel=$('labRows');panel.replaceChildren();
+  for(const id of FAMILY_IDS){
+   const f=data.families[id];
+   const row=document.createElement('div');row.className='metric';row.style.marginTop='7px';
+   const title=document.createElement('strong');title.textContent='Famille '+id;
+   const body=document.createElement('p');body.className='note';
+   body.textContent=f.wins+' victoire(s) sur '+data.completed+' parties terminées · '+
+     'score moyen '+f.meanPoints+' pts · objectifs '+f.meanGoalPoints+
+     ' pts · dollars finaux '+f.meanFinalDollars+' · Influence finale '+f.meanFinalInfluence;
+   row.append(title,body);panel.append(row);
+  }
+  $('labSummary').textContent='Répétitions : '+data.attempts+' ; terminées : '+data.completed+
+    ' ; bloquées/incomplètes : '+data.failed+'. Moyenne : '+data.meanCouncils+
+    ' dilemmes, '+data.meanVoteActionsPerCouncil+' actions par vote, '+data.meanOffersAcceptedPerGame+
+    ' transactions simulées. Résultats de stratégies artificielles uniquement — aucun pronostic humain.';
+  $('labResults').hidden=false;
+  state('Simulation terminée. Résultats exploratoires à comparer aux tests humains.','success');
+ }catch(e){state('Laboratoire : '+e.message,'error');}
+ finally{button.disabled=false;}
 });
 
 $('analyzeGoals').addEventListener('click',async()=>{

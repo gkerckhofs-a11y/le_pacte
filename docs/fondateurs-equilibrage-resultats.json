@@ -1,0 +1,419 @@
+{
+  "scenario": "fondateurs-hot-spring-demo",
+  "seeds": [
+    44009,
+    77123,
+    180031,
+    900001,
+    314159
+  ],
+  "runsPerSeed": 120,
+  "calibration": "Default: influence 8, dollars 10, pool 3, all city gauges 5",
+  "caution": "Artificial policies only. Thresholds do not affect these agents’ choices; they only change final scoring. No human equity guarantee.",
+  "presets": {
+    "v27": {
+      "targets": {
+        "A": [
+          6,
+          8
+        ],
+        "B": [
+          5,
+          7
+        ],
+        "C": [
+          4,
+          6
+        ],
+        "D": [
+          6,
+          8
+        ],
+        "E": [
+          8,
+          10
+        ],
+        "F": [
+          4,
+          3
+        ]
+      },
+      "reachability": {
+        "endings": 256,
+        "truncated": false,
+        "invalidPaths": 0,
+        "goals": {
+          "A": {
+            "title": "Guilde des négociants",
+            "indicator": "economie",
+            "first": 108,
+            "second": 56,
+            "firstShare": 0.421875,
+            "secondShare": 0.21875
+          },
+          "B": {
+            "title": "Gardes et justice",
+            "indicator": "securite",
+            "first": 192,
+            "second": 64,
+            "firstShare": 0.75,
+            "secondShare": 0.25
+          },
+          "C": {
+            "title": "Voix du peuple",
+            "indicator": "satisfaction",
+            "first": 140,
+            "second": 56,
+            "firstShare": 0.546875,
+            "secondShare": 0.21875
+          },
+          "D": {
+            "title": "Médecins et bâtisseurs",
+            "indicator": "bien_etre",
+            "first": 140,
+            "second": 68,
+            "firstShare": 0.546875,
+            "secondShare": 0.265625
+          },
+          "E": {
+            "title": "La ville de demain",
+            "indicator": "developpement",
+            "first": 128,
+            "second": 48,
+            "firstShare": 0.5,
+            "secondShare": 0.1875
+          },
+          "F": {
+            "title": "Les indépendants",
+            "indicator": "stabilite",
+            "first": 144,
+            "second": 64,
+            "firstShare": 0.5625,
+            "secondShare": 0.25
+          }
+        },
+        "initialCity": {
+          "economie": 5,
+          "securite": 5,
+          "satisfaction": 5,
+          "bien_etre": 5,
+          "developpement": 5,
+          "stabilite": 5
+        },
+        "note": "Exploration combinatoire (choix 50/50 non présumé), sans négociations ni probabilité humaine."
+      },
+      "modes": {
+        "prudent": {
+          "completed": 600,
+          "failed": 0,
+          "families": {
+            "A": {
+              "wins": 77,
+              "meanPoints": 7.34,
+              "meanGoalPoints": 3.38
+            },
+            "B": {
+              "wins": 97,
+              "meanPoints": 8.4,
+              "meanGoalPoints": 3.88
+            },
+            "C": {
+              "wins": 100,
+              "meanPoints": 8.82,
+              "meanGoalPoints": 4.63
+            },
+            "D": {
+              "wins": 72,
+              "meanPoints": 7.7,
+              "meanGoalPoints": 3.38
+            },
+            "E": {
+              "wins": 40,
+              "meanPoints": 6.59,
+              "meanGoalPoints": 2.35
+            },
+            "F": {
+              "wins": 214,
+              "meanPoints": 10.73,
+              "meanGoalPoints": 6.23
+            }
+          }
+        },
+        "ambitieux": {
+          "completed": 600,
+          "failed": 0,
+          "families": {
+            "A": {
+              "wins": 79,
+              "meanPoints": 6.52,
+              "meanGoalPoints": 3.02
+            },
+            "B": {
+              "wins": 112,
+              "meanPoints": 7.92,
+              "meanGoalPoints": 3.73
+            },
+            "C": {
+              "wins": 91,
+              "meanPoints": 8.12,
+              "meanGoalPoints": 4.34
+            },
+            "D": {
+              "wins": 86,
+              "meanPoints": 7.39,
+              "meanGoalPoints": 3.42
+            },
+            "E": {
+              "wins": 70,
+              "meanPoints": 7.09,
+              "meanGoalPoints": 2.88
+            },
+            "F": {
+              "wins": 162,
+              "meanPoints": 9.22,
+              "meanGoalPoints": 5.07
+            }
+          }
+        },
+        "mixte": {
+          "completed": 600,
+          "failed": 0,
+          "families": {
+            "A": {
+              "wins": 73,
+              "meanPoints": 6.89,
+              "meanGoalPoints": 3.21
+            },
+            "B": {
+              "wins": 97,
+              "meanPoints": 7.91,
+              "meanGoalPoints": 3.7
+            },
+            "C": {
+              "wins": 99,
+              "meanPoints": 8.54,
+              "meanGoalPoints": 4.56
+            },
+            "D": {
+              "wins": 70,
+              "meanPoints": 7.44,
+              "meanGoalPoints": 3.34
+            },
+            "E": {
+              "wins": 63,
+              "meanPoints": 7.02,
+              "meanGoalPoints": 2.95
+            },
+            "F": {
+              "wins": 198,
+              "meanPoints": 9.61,
+              "meanGoalPoints": 5.27
+            }
+          }
+        }
+      }
+    },
+    "candidate": {
+      "targets": {
+        "A": [
+          6,
+          7
+        ],
+        "B": [
+          5,
+          7
+        ],
+        "C": [
+          4,
+          7
+        ],
+        "D": [
+          6,
+          8
+        ],
+        "E": [
+          7,
+          9
+        ],
+        "F": [
+          4,
+          2
+        ]
+      },
+      "reachability": {
+        "endings": 256,
+        "truncated": false,
+        "invalidPaths": 0,
+        "goals": {
+          "A": {
+            "title": "Guilde des négociants",
+            "indicator": "economie",
+            "first": 108,
+            "second": 84,
+            "firstShare": 0.421875,
+            "secondShare": 0.328125
+          },
+          "B": {
+            "title": "Gardes et justice",
+            "indicator": "securite",
+            "first": 192,
+            "second": 64,
+            "firstShare": 0.75,
+            "secondShare": 0.25
+          },
+          "C": {
+            "title": "Voix du peuple",
+            "indicator": "satisfaction",
+            "first": 140,
+            "second": 32,
+            "firstShare": 0.546875,
+            "secondShare": 0.125
+          },
+          "D": {
+            "title": "Médecins et bâtisseurs",
+            "indicator": "bien_etre",
+            "first": 140,
+            "second": 68,
+            "firstShare": 0.546875,
+            "secondShare": 0.265625
+          },
+          "E": {
+            "title": "La ville de demain",
+            "indicator": "developpement",
+            "first": 176,
+            "second": 80,
+            "firstShare": 0.6875,
+            "secondShare": 0.3125
+          },
+          "F": {
+            "title": "Les indépendants",
+            "indicator": "stabilite",
+            "first": 144,
+            "second": 16,
+            "firstShare": 0.5625,
+            "secondShare": 0.0625
+          }
+        },
+        "initialCity": {
+          "economie": 5,
+          "securite": 5,
+          "satisfaction": 5,
+          "bien_etre": 5,
+          "developpement": 5,
+          "stabilite": 5
+        },
+        "note": "Exploration combinatoire (choix 50/50 non présumé), sans négociations ni probabilité humaine."
+      },
+      "modes": {
+        "prudent": {
+          "completed": 600,
+          "failed": 0,
+          "families": {
+            "A": {
+              "wins": 111,
+              "meanPoints": 7.78,
+              "meanGoalPoints": 3.82
+            },
+            "B": {
+              "wins": 118,
+              "meanPoints": 8.4,
+              "meanGoalPoints": 3.88
+            },
+            "C": {
+              "wins": 103,
+              "meanPoints": 8.03,
+              "meanGoalPoints": 3.85
+            },
+            "D": {
+              "wins": 104,
+              "meanPoints": 7.7,
+              "meanGoalPoints": 3.38
+            },
+            "E": {
+              "wins": 78,
+              "meanPoints": 7.9,
+              "meanGoalPoints": 3.67
+            },
+            "F": {
+              "wins": 86,
+              "meanPoints": 8.71,
+              "meanGoalPoints": 4.21
+            }
+          }
+        },
+        "ambitieux": {
+          "completed": 600,
+          "failed": 0,
+          "families": {
+            "A": {
+              "wins": 101,
+              "meanPoints": 6.96,
+              "meanGoalPoints": 3.46
+            },
+            "B": {
+              "wins": 117,
+              "meanPoints": 7.92,
+              "meanGoalPoints": 3.73
+            },
+            "C": {
+              "wins": 89,
+              "meanPoints": 7.4,
+              "meanGoalPoints": 3.61
+            },
+            "D": {
+              "wins": 113,
+              "meanPoints": 7.39,
+              "meanGoalPoints": 3.42
+            },
+            "E": {
+              "wins": 120,
+              "meanPoints": 8.43,
+              "meanGoalPoints": 4.22
+            },
+            "F": {
+              "wins": 60,
+              "meanPoints": 7.58,
+              "meanGoalPoints": 3.43
+            }
+          }
+        },
+        "mixte": {
+          "completed": 600,
+          "failed": 0,
+          "families": {
+            "A": {
+              "wins": 94,
+              "meanPoints": 7.27,
+              "meanGoalPoints": 3.59
+            },
+            "B": {
+              "wins": 112,
+              "meanPoints": 7.91,
+              "meanGoalPoints": 3.7
+            },
+            "C": {
+              "wins": 99,
+              "meanPoints": 7.7,
+              "meanGoalPoints": 3.73
+            },
+            "D": {
+              "wins": 97,
+              "meanPoints": 7.44,
+              "meanGoalPoints": 3.34
+            },
+            "E": {
+              "wins": 113,
+              "meanPoints": 8.32,
+              "meanGoalPoints": 4.25
+            },
+            "F": {
+              "wins": 85,
+              "meanPoints": 8.02,
+              "meanGoalPoints": 3.68
+            }
+          }
+        }
+      }
+    }
+  }
+}
