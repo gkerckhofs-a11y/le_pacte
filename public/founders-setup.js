@@ -35,7 +35,16 @@ $("load").addEventListener("click",async()=>{
  }catch(e){state(e.message,"error");}
  finally{$("load").disabled=false;}
 });
+function versionsForSelectedStory(){
+ const story=catalog?.scenarios?.find(s=>s.id===$('scenario').value);
+ const select=$('scenarioVersion');select.replaceChildren();
+ for(const version of story?.releases??[]){
+  const opt=document.createElement('option');opt.value=version;opt.textContent='Version '+version;select.append(opt);
+ }
+ if(story?.version)select.value=story.version;
+}
 function autoSkin(){
+ versionsForSelectedStory();
  if(!catalog)return;
  const story=catalog.scenarios.find(s=>s.id===$("scenario").value);
  const matching=catalog.skins.find(s=>s.universe===story?.universe);
@@ -48,7 +57,7 @@ $("config").addEventListener("submit",async event=>{
  if(members.length!==6||members.some(n=>!Number.isInteger(n)||n<1||n>300)){
   state("Indiquer exactement six effectifs entiers (1 à 300).","error");return;
  }
- const payload={scenarioId:$("scenario").value,skinId:$("skin").value,members};
+ const payload={scenarioId:$("scenario").value,scenarioVersion:$("scenarioVersion").value,skinId:$("skin").value,members};
  state("Vérification de la configuration…");
  try{
   const p=await api("/api/founders/preview","POST",payload);
