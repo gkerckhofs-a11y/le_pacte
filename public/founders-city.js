@@ -15,11 +15,13 @@ function drawGauges(s){
   const g=document.createElement('div');g.className='gauge';
   const row=document.createElement('div');row.className='gauge-head';
   const label=document.createElement('span');label.textContent=s.skin.labels.resources[key]||key;
-  const score=document.createElement('strong');score.textContent=s.city[key]+'/10';
+  const score=document.createElement('strong'),before=s.reveal?.cityBefore?.[key],delta=Number.isFinite(before)?s.city[key]-before:0;
+  score.textContent=(delta?before+' → ':'')+s.city[key]+'/10'+(delta?' ('+(delta>0?'+':'')+delta+')':'');
   row.append(label,score);g.append(row);
   const track=document.createElement('div');track.className='track';
   const bar=document.createElement('div');bar.className='bar';
-  bar.style.width=(s.city[key]*10)+'%';bar.style.background=key==='stabilite'?'#85b4a1':s.skin.theme.accent;
+  bar.style.width=((Number.isFinite(before)?before:s.city[key])*10)+'%';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{bar.style.width=(s.city[key]*10)+'%';}));bar.style.background=key==='stabilite'?'#85b4a1':s.skin.theme.accent;
   track.append(bar);g.append(track);root.append(g);
  }
 
@@ -30,7 +32,7 @@ function render(s){
  text('pageTitle',s.story.location+' · '+s.story.year);text('phase',pretty[s.phase]||s.phase);
  text('chapter',s.dilemma?'Chapitre '+s.dilemma.chapter:'Le Conseil des Fondateurs');
  text('tiePriority','Départage final si égalité parfaite : '+s.finalTieOrder.map(id=>teamLabel(s,id)).join(' → '));
- text('turn',s.council.turn?'Tour de '+teamLabel(s,s.council.turn):'Meneur '+teamLabel(s,s.leader));
+ text('turn',s.council.turn?'Tour de '+teamLabel(s,s.council.turn):'Shérif '+teamLabel(s,s.leader));
  text('dilemmaTitle',s.dilemma?.title||(s.phase==='FINISHED'?'La ville entre dans l’histoire':'Bienvenue au Conseil'));
  text('dilemmaText',s.dilemma?.public_text||(s.phase==='FINISHED'?'Les délibérations sont terminées.':'Le Conseil attend le signal de la régie.'));
  text('question',s.dilemma?.vote_question||'');
@@ -51,10 +53,12 @@ function render(s){
  else {image.hidden=true;image.removeAttribute('src');}
  const out=$('outcome');out.hidden=!s.reveal;
  if(s.reveal){text('outcomeTitle',s.reveal.winner==='pour'?'PROPOSITION ADOPTÉE':'PROPOSITION REJETÉE');text('outcomeText',s.reveal.narration);}
+ text('voteForTotal',s.reveal?.yes??'—');text('voteAgainstTotal',s.reveal?.no??'—');
+ text('voteSummary',s.reveal?'Influence engagée · '+s.reveal.yes+' POUR / '+s.reveal.no+' CONTRE':'Influence engagée · résultat disponible après révélation');
  const ballots=$('ballots');ballots.replaceChildren();
  for(const f of s.families){
   const row=document.createElement('div');row.className='ballot';
-  const n=document.createElement('span');n.textContent=teamCaption(f);colorize(n,f);
+  const n=document.createElement('span');n.textContent=f.color.symbol+' '+f.color.label;n.title=teamCaption(f);colorize(n,f);
   const v=document.createElement('strong');
   const choice=s.council.choices[f.id];
   v.textContent=choice===undefined?'—':choice==='pour'?'POUR':choice==='contre'?'CONTRE':'ABSTENTION';
@@ -62,7 +66,7 @@ function render(s){
   row.append(n,v,amount);ballots.append(row);
  }
  text('councilStatus',s.phase==='COUNCIL'?
-  'Meneur : '+teamLabel(s,s.leader)+' · Modérateur : '+teamLabel(s,s.moderator)+' · '+(s.council.turn?'Au tour de '+teamLabel(s,s.council.turn):'Arbitrage en cours'):
+  'Shérif : '+teamLabel(s,s.leader)+' · Maire : '+teamLabel(s,s.moderator)+' · '+(s.council.turn?'Au tour de '+teamLabel(s,s.council.turn):'Arbitrage en cours'):
   s.phase==='AWAITING_REVEAL'?'Résultat sous scellés : la régie doit le révéler.':
   s.phase==='REVEALED'?'Le Conseil attend le prochain dilemme.':
   s.phase==='FINISHED'?'Les décisions finales ont été proclamées.':'La séance n’a pas encore commencé.');

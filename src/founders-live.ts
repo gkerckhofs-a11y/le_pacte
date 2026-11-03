@@ -107,14 +107,14 @@ export function applyNarrativeCommand(input,actor,command,now){
    if(!s.game.vote)s.phase='AWAITING_REVEAL';
    break;
   case 'chooseLeader':
-   team();check(s.phase==='COUNCIL'&&s.game.vote?.phase==='await_leader','Aucun Meneur à départager');
+   team();check(s.phase==='COUNCIL'&&s.game.vote?.phase==='await_leader','Aucun Shérif à départager');
    s.game=moderatorChooseFoundersLeader(s.game,actor.family,data.family);
    if(!s.game.vote)s.phase='AWAITING_REVEAL';
    break;
   case 'reveal': {
    org();check(s.phase==='AWAITING_REVEAL','Aucun résultat à révéler');
    const result=s.game.history.at(-1);check(result?.id===s.currentDilemmaId,'Résultat du vote introuvable');
-   const d=dilemma(s),outcome=d.outcomes[result.winner];
+   const d=dilemma(s),outcome=d.outcomes[result.winner],cityBefore=copy(s.game.city);
    check(outcome&&Array.isArray(outcome.effects),'Issue narrative invalide');
    s.game=applyFoundersCityEffects(s.game,outcome.effects.map(e=>({
     resource:e.indicator,kind:e.operation,...(e.operation==='delta'?{amount:e.value}:{})
@@ -122,7 +122,7 @@ export function applyNarrativeCommand(input,actor,command,now){
    // Offers are scoped to the council; unaccepted negotiations expire after resolution.
    for(const offer of Object.values(s.offers))if(offer.status==='pending')offer.status='expired';
    s.lastReveal={id:d.id,title:d.title,winner:result.winner,yes:result.yes,no:result.no,
-    narration:outcome.narration,effects:copy(outcome.effects),nextId:outcome.next_id};
+    narration:outcome.narration,effects:copy(outcome.effects),cityBefore,cityAfter:copy(s.game.city),nextId:outcome.next_id};
    s.revealedHistory.push({...copy(s.lastReveal),city:copy(s.game.city)});
    s.phase='REVEALED';break;
   }
@@ -171,7 +171,7 @@ function publicDilemma(s){
 }
 export function narrativePublicView(s){
  check(s?.kind==='founders-live-session-v2.5','Partie inconnue');
- const v=s.game.vote;
+ const v=s.game.vote,resolved=(s.phase==='REVEALED'||s.phase==='FINISHED')?s.game.history.at(-1):null;
  // No secrets, unrevealed outcomes, future branches, or source Sheets IDs.
  return {
   kind:s.kind,id:s.id,code:s.code,title:s.title,phase:s.phase,revision:s.revision,
@@ -182,7 +182,7 @@ export function narrativePublicView(s){
   dilemma:publicDilemma(s),
   council:v?{phase:v.phase,turn:v.turn,bids:copy(v.bids),choices:copy(v.choices),
     pendingLeaderChoices:v.pendingLeaderChoices?copy(v.pendingLeaderChoices):[]}:
-    {phase:s.phase==='AWAITING_REVEAL'?'closed':'inactive',turn:null,bids:{},choices:{},pendingLeaderChoices:[]},
+    {phase:resolved?'revealed':s.phase==='AWAITING_REVEAL'?'closed':'inactive',turn:null,bids:resolved?copy(resolved.bids):{},choices:resolved?copy(resolved.choices):{},pendingLeaderChoices:[]},
   reveal:s.phase==='REVEALED'||s.phase==='FINISHED'?copy(s.lastReveal):null,
   history:copy(s.revealedHistory),
   finalTieOrder:copy(s.initiativeOrder??FOUNDERS),

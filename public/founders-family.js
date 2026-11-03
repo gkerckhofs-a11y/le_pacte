@@ -59,11 +59,14 @@ function render(data){
  $('identityPanel').hidden=data.phase!=='READY';
  if(document.activeElement!==$('chosenName'))$('chosenName').value=self.name==='Nom à choisir'?'':self.name;
  set('familyName',self.name);set('phase',nice[data.phase]||data.phase);
- set('turn',data.phase==='COUNCIL'?(c.turn===self.id?'À vous !':c.turn?'À '+teamLabel(data,c.turn):c.phase==='await_moderator'?'Arbitrage':'Choix du Meneur'):'—');
+ set('turn',data.phase==='COUNCIL'?(c.turn===self.id?'À vous !':c.turn?'À '+teamLabel(data,c.turn):c.phase==='await_moderator'?'Arbitrage':'Choix du Shérif'):'—');
  set('dilemmaLabel',data.dilemma?'Chapitre '+data.dilemma.chapter:'Conseil des Fondateurs');
  set('dilemmaTitle',data.dilemma?.title||(data.phase==='FINISHED'?'Fin de la campagne':'Conseil en préparation'));
  set('dilemmaText',data.dilemma?.public_text||'');
  set('question',data.dilemma?.vote_question||'');
+ const image=$('familyDilemmaImage'),src=data.dilemma?.image?.url;
+ image.hidden=!(typeof src==='string'&&/^https:\/\/\S+$/.test(src));
+ if(!image.hidden){image.src=src;image.alt=data.dilemma.image.alt||data.dilemma.title;}else image.removeAttribute('src');
  set('influence',self.power);set('dollars',self.dollars);
  set('influenceLabel',data.skin.labels.influence);set('dollarLabel',data.skin.labels.currency);set('offerAmountLabel',data.skin.labels.currency+' proposés');
  set('objective',self.objective);
@@ -83,7 +86,7 @@ function render(data){
   set('personalScoreBreakdown','Objectif secret '+r.score.secret+' · '+data.skin.labels.currency+' '+r.score.wealth+
       ' · Votes '+r.score.council+' · Influence '+r.score.influence+' = '+r.score.total+' points');
  }
- set('familyStats',self.members+' membre(s) · Meneur : '+teamLabel(data,data.leader)+' · Modérateur : '+teamLabel(data,data.moderator));
+ set('familyStats',self.members+' membre(s) · Shérif : '+teamLabel(data,data.leader)+' · Maire : '+teamLabel(data,data.moderator));
  set('committed',self.choice?'Votre position : '+self.choice+' · Mise engagée : '+self.bid:'Aucun vote engagé pour ce dilemme.');
  set('voteHint',self.mayVote?'Votre famille doit décider maintenant.':data.phase==='COUNCIL'?'Vous pouvez négocier en attendant votre tour.':'Le Conseil attend la prochaine phase.');
  $('firstVote').hidden=!(self.mayVote&&self.choice===null);
@@ -132,4 +135,12 @@ $('offerForm').addEventListener('submit',e=>{
  command('offer',{id,to:$('targetFamily').value,amount:Number($('offerAmount').value),reason:$('offerReason').value.trim()});
 });
 $('identityForm').addEventListener('submit',e=>{e.preventDefault();command('setIdentity',{name:$('chosenName').value.trim(),color:current.self.color.id});});
+const tabs=[$('boardTab'),$('rulesTab')];
+function selectTab(index){
+ tabs.forEach((tab,i)=>{tab.setAttribute('aria-selected',String(i===index));tab.tabIndex=i===index?0:-1;$(tab.getAttribute('aria-controls')).hidden=i!==index;});
+}
+tabs.forEach((tab,i)=>{
+ tab.addEventListener('click',()=>selectTab(i));
+ tab.addEventListener('keydown',event=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(event.key)){event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?1:1-i;selectTab(next);tabs[next].focus();}});
+});
 refresh();setInterval(refresh,2500);

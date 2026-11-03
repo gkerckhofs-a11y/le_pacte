@@ -1,31 +1,33 @@
 <!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hot Spring · Le Pacte des Fondateurs</title><link rel="stylesheet" href="/founders-live.css">
-<script type="module" src="/founders-city.js"></script></head><body>
+<script type="module" src="/founders-city.js"></script></head><body class="projection-dashboard">
 <header class="top"><div><span class="eyebrow" id="universeTitle">Le Pacte</span><h1 id="pageTitle">Hot Spring · 1876</h1></div><div class="row"><span class="chip" id="phase">En attente</span><span class="chip" id="connection">Connexion…</span></div></header>
 <main class="page">
-<div class="layout">
-<section>
-<div id="city" aria-label="Illustration évolutive de Hot Spring">
-
-</div>
-<p id="cityEvolution" class="small city-evolution" role="status" aria-live="polite"></p>
-<details class="city-legend"><summary>Lire le paysage de la ville</summary><div id="cityDetails" class="city-details"></div></details>
-<div class="panel" style="margin-top:17px">
-<div class="row between"><span class="eyeline" id="chapter">Conseil des fondateurs</span><span class="chip" id="turn">—</span></div>
-<h2 id="dilemmaTitle" style="font-size:clamp(21px,3vw,30px);margin:12px 0">Bienvenue au Conseil</h2>
-<img id="decisionImage" alt="" hidden>
-<p id="dilemmaText">Le Conseil municipal attend le signal de la régie.</p>
-<p id="question" class="big"></p>
-<div id="outcome" class="card" hidden><div class="eyeline">Décision du Conseil</div><h3 id="outcomeTitle"></h3><p id="outcomeText"></p></div>
-</div>
+<div class="projection-grid">
+<section class="panel dilemma-panel">
+ <div class="row between"><span class="eyeline" id="chapter">Conseil des fondateurs</span><span class="chip" id="turn">—</span></div>
+ <h2 id="dilemmaTitle">Bienvenue au Conseil</h2>
+ <img id="decisionImage" alt="" hidden>
+ <p id="dilemmaText">Le Conseil attend le signal de la régie.</p>
+ <p id="question" class="big"></p>
+ <div id="outcome" class="card" hidden><div class="eyeline">Décision du Conseil</div><h3 id="outcomeTitle"></h3><p id="outcomeText"></p></div>
 </section>
-<aside>
-<div class="panel"><h2>Les indicateurs de la ville</h2><div id="gauges"></div></div>
-<div class="panel" style="margin-top:16px"><h2>Le Conseil des six familles</h2>
-<p class="small muted" id="tiePriority">Priorité de départage en cas d'égalité : —</p><p class="small muted" id="councilStatus">En attente de la première délibération.</p><div id="ballots"></div></div>
-</aside>
+<section class="projection-city">
+ <div id="city" aria-label="Illustration évolutive de Hot Spring"></div>
+ <p id="cityEvolution" class="small city-evolution" role="status" aria-live="polite"></p>
+ <div class="projection-results">
+  <div class="panel"><h2>Résultat du vote</h2>
+   <div class="vote-totals"><div><span>POUR</span><strong id="voteForTotal">—</strong></div><div><span>CONTRE</span><strong id="voteAgainstTotal">—</strong></div></div>
+   <p id="voteSummary" class="small muted">Sommes de l’influence engagée</p>
+   <div id="ballots"></div>
+  </div>
+  <div class="panel"><h2>La ville après vos décisions</h2><div id="gauges"></div></div>
+ </div>
+</section>
 </div>
+<div class="projection-foot"><p class="small muted" id="councilStatus"></p>
+<details class="city-legend"><summary>Repères du Conseil et lecture du paysage</summary><p class="small muted" id="tiePriority"></p><div id="cityDetails" class="city-details"></div></details></div>
 <section id="finalResults" class="panel" style="margin-top:18px" hidden>
  <div class="eyeline">Épilogue · Conseil des Fondateurs</div>
  <h2 id="winnerTitle" style="font-size:clamp(22px,3vw,34px);margin-top:9px">La famille gagnante</h2>

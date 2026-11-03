@@ -70,8 +70,8 @@ function render(s){
  $('publicLink').href='/founders-city.html?session='+s.id;
  gauge(s);
  set('votePhase',s.council.turn?'Au tour de '+teamLabel(s,s.council.turn):
-  s.council.phase==='await_moderator'?'Le Modérateur arbitre':
-  s.council.phase==='await_leader'?'Le Modérateur désigne un Meneur':
+  s.council.phase==='await_moderator'?'Le Maire arbitre':
+  s.council.phase==='await_leader'?'Le Maire désigne un Shérif':
   s.phase==='AWAITING_REVEAL'?'Vote clos':'');
  const votes=$('ballots');votes.replaceChildren();
  for(const f of s.families){

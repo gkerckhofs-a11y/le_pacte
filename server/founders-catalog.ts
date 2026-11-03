@@ -3,6 +3,7 @@ import {DEFAULT_GOAL_CARDS,DEFAULT_SCORE_RULES} from '../src/founders-scoring.ts
 import {FOUNDERS_DEFAULT_CALIBRATION} from '../src/founders.ts';
 import {parseFoundersSheets} from '../src/founders-sheet-import.ts';
 import skins from '../content/founders-skins-v1.json' with {type:'json'};
+import illustrations from '../content/founders-dilemma-illustrations-v1.json' with {type:'json'};
 import story from '../content/fondateurs-sheet-sample-v1.json' with {type:'json'};
 import {createFoundersLibrary,registerFoundersSkin,publishFoundersScenario,listFoundersLibrary,prepareFoundersSession,validateFoundersStory} from '../src/founders-library.ts';
 
@@ -14,6 +15,10 @@ library=publishFoundersScenario(library,{
  payload:story,version:'1.0.0',
  source:{type:'bundled_fixture',label:'Exemple narratif intégré (sans synchronisation Google Sheets)'}
 });
+const illustratedStory=structuredClone(story);
+for(const d of illustratedStory.dilemmas)d.image=structuredClone(illustrations[d.id]);
+library=publishFoundersScenario(library,{payload:illustratedStory,version:'1.1.0',
+ source:{type:'bundled_fixture',label:'Hot Spring illustré — dix scènes avant décision'}});
 export const foundersLibrary=library;
 export const foundersCatalog=()=>listFoundersLibrary(foundersLibrary);
 export const foundersPreview=selection=>prepareFoundersSession(foundersLibrary,selection);
