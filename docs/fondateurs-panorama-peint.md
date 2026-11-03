@@ -2,6 +2,8 @@
 
 3 novembre 2026 — skin Western 1.2.0, prototype visuel.
 
+Publié sur Firebase : voir le [compte rendu de publication](deploiement-panorama-peint.md).
+
 ## Périmètre
 
 Intégration des treize illustrations approuvées : une référence et deux variantes (basse/haute) pour chacune des six jauges. Les deux illustrations de catastrophes, incendie et épidémie, sont exclues. Les événements fortuits, financements de prévention et résultats de l’expérience hors production ne sont pas reliés à la partie. Les règles, scores, objectifs et données de sessions ne sont pas modifiés.
