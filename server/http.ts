@@ -6,12 +6,13 @@ import {tokenHash} from './security.ts';
 import type {StorePort,Operator} from './ports.ts';
 import {accessQr,normalizeOrigin} from './qr.ts';
 import {BUILTIN_ASSETS,GOAL_RULES} from '../src/studio.ts';
+import {foundersCatalog,foundersPreview,foundersStoryCheck} from './founders-catalog.ts';
 import type {Actor} from '../src/session.ts';
 export function createGameServer(store:StorePort,organizerToken:string,clock=()=>Date.now(),options:{clientAuth?:any;authEmulatorUrl?:string;apiOnly?:boolean;publicOrigin?:string;verifyOperator?:(token:string)=>Promise<Operator|null>}={}){
  const publicOrigin=options.publicOrigin?normalizeOrigin(options.publicOrigin):null;
  if(!/^[A-Za-z0-9_-]{32,128}$/.test(organizerToken))throw new Error('Clé régie : au moins 32 caractères');
  const tokenDigest=Buffer.from(tokenHash(organizerToken),'hex');
- const staticFiles:Record<string,[string,string]>={ '/western-board.js':['western-board.js','text/javascript; charset=utf-8'],'/western-territories.js':['western-territories.js','text/javascript; charset=utf-8'],'/far-west.html':['far-west.html','text/html; charset=utf-8'],'/western-preview.js':['western-preview.js','text/javascript; charset=utf-8'],'/assets/western/frontier-terrain-v1.webp':['assets/western/frontier-terrain-v1.webp','image/webp'], '/':['index.html','text/html; charset=utf-8'],'/app.js':['app.js','text/javascript; charset=utf-8'],'/studio.js':['studio.js','text/javascript; charset=utf-8'],'/animation.js':['animation.js','text/javascript; charset=utf-8'],'/style.css':['style.css','text/css; charset=utf-8']};
+ const staticFiles:Record<string,[string,string]>={ '/founders-setup.html':['founders-setup.html','text/html; charset=utf-8'], '/founders-setup.js':['founders-setup.js','text/javascript; charset=utf-8'], '/western-board.js':['western-board.js','text/javascript; charset=utf-8'],'/western-territories.js':['western-territories.js','text/javascript; charset=utf-8'],'/far-west.html':['far-west.html','text/html; charset=utf-8'],'/western-preview.js':['western-preview.js','text/javascript; charset=utf-8'],'/assets/western/frontier-terrain-v1.webp':['assets/western/frontier-terrain-v1.webp','image/webp'], '/':['index.html','text/html; charset=utf-8'],'/app.js':['app.js','text/javascript; charset=utf-8'],'/studio.js':['studio.js','text/javascript; charset=utf-8'],'/animation.js':['animation.js','text/javascript; charset=utf-8'],'/style.css':['style.css','text/css; charset=utf-8']};
  const limiter=new Map<string,{until:number;count:number}>();
  function bearer(req:any){const h=req.headers.authorization;if(!h)return null;if(!/^Bearer [A-Za-z0-9_.-]{32,8192}$/.test(h))throw new Error('Accès invalide');return h.slice(7);}
  function isOrg(t:string|null){return t!==null&&timingSafeEqual(tokenDigest,Buffer.from(tokenHash(t),'hex'));}
@@ -41,6 +42,16 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
    if(!bucket||bucket.until<now){bucket={until:now+60000,count:0};limiter.set(bucketKey,bucket);}
    if(++bucket.count>1200){json(429,{error:'Trop de requêtes, réessayez dans une minute'});return;}
    if(limiter.size>1000)for(const [k,b] of limiter)if(b.until<now)limiter.delete(k);
+   // Isolated narrative preview API. Operator-only and read-only: never mutates live territorial sessions.
+   if(path==='/api/founders/catalog'&&req.method==='GET'){
+    await requireOrg(req);json(200,foundersCatalog());return;
+   }
+   if(path==='/api/founders/preview'&&req.method==='POST'){
+    await requireOrg(req);json(200,foundersPreview(await body(req,4096)));return;
+   }
+   if(path==='/api/founders/stories/check'&&req.method==='POST'){
+    await requireOrg(req);json(200,foundersStoryCheck(await body(req,262144)));return;
+   }
    if(path==='/api/catalog'&&req.method==='GET'){json(200,{editions:catalog,map,goalRules:GOAL_RULES,authMode:options.verifyOperator?'firebase':'local',...(options.clientAuth?{firebaseConfig:options.clientAuth}:{}),...(options.authEmulatorUrl?{authEmulatorUrl:options.authEmulatorUrl}:{}),serverNow:now});return;}
    if(path==='/api/editions'&&req.method==='GET'){const actor=await requireOrg(req);const list=await store.studio.list((actor as {id:string}).id);json(200,{releases:list.releases,canEdit:(actor as {editor?:boolean}).editor===true});return;}
    if(path.startsWith('/api/studio')){

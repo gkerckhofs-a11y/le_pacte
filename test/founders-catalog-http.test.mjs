@@ -1,0 +1,32 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {createGameServer} from '../server/http.ts';
+const KEY='v23_test_organizer_012345678901234567890123456789';
+const setup=async()=>{
+ const server=createGameServer({},KEY);
+ await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(0,'127.0.0.1',resolve);});
+ const origin='http://127.0.0.1:'+server.address().port;
+ return {server,origin};
+};
+test('API V2.3 : endpoints protégés, aperçu non persistant et page de régie',async t=>{
+ const {server,origin}=await setup();t.after(()=>new Promise(r=>server.close(r)));
+ const html=await fetch(origin+'/founders-setup.html');
+ assert.equal(html.status,200);
+ assert.match(await html.text(),/Configurer une expérience narrative/);
+ const js=await fetch(origin+'/founders-setup.js');
+ assert.equal(js.status,200);
+ const anonymous=await fetch(origin+'/api/founders/catalog');
+ assert.equal(anonymous.status,403);
+ const auth={Authorization:'Bearer '+KEY};
+ const catalog=await fetch(origin+'/api/founders/catalog',{headers:auth});
+ assert.equal(catalog.status,200);
+ const items=await catalog.json();
+ assert.equal(items.scenarios.length,1);assert.equal(items.skins.length,5);
+ const body=JSON.stringify({scenarioId:items.scenarios[0].id,skinId:'western',members:[5,5,5,5,5,9]});
+ const preview=await fetch(origin+'/api/founders/preview',{method:'POST',headers:{...auth,'Content-Type':'application/json'},body});
+ assert.equal(preview.status,200);
+ const result=await preview.json();
+ assert.equal(result.previewOnly,true);assert.equal(result.settings.members[5],9);
+ const rejected=await fetch(origin+'/api/founders/preview',{method:'POST',headers:{...auth,'Content-Type':'application/json'},body:JSON.stringify({scenarioId:'unknown',skinId:'western'})});
+ assert.equal(rejected.status,400);
+});
