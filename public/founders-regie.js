@@ -1,3 +1,4 @@
+import {renderCouncilMonitor} from './founders-council-monitor.js';
 import {councilGuidance,startCouncil,organizerError,validNarrativeSession} from './founders-regie-flow.js';
 import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
 import {teamCaption,teamLabel,colorize} from './founders-identity.js';
@@ -62,6 +63,7 @@ function connected(){
  set('signedInAs',cloud?'Connecté : '+account():'Régie locale connectée');
 }
 function connectionFailure(error){
+ set('monitorConnection','○ Actualisation interrompue : les informations affichées peuvent être anciennes.');
  set('loginMessage',organizerError(error));$('loginPanel').hidden=false;
  if(!current)set('phase','Connexion requise');
  if(error.status===403||/organisateur Google|Clé régie requise/.test(error.message)){
@@ -81,7 +83,7 @@ async function refresh(){
   const s=await api('');
   if(busy||authenticating||waitingForLogin||s.revision<(current?.revision??-1))return;
   if(current?.revision!==s.revision)render(s);
-  connected();$('regieContent').hidden=false;
+  connected();$('regieContent').hidden=false;set('monitorConnection','● Synchronisé · actualisation automatique');
  }catch(error){connectionFailure(error);}
 }
 function gauge(s){
@@ -98,6 +100,7 @@ function gauge(s){
 function render(s){
  applySkin(document.body,s.skin);
  current=s;
+ renderCouncilMonitor($('councilMonitor'),s);
  const guidance=councilGuidance(s);step(guidance.step);set('stageTitle',guidance.title);set('stageHint',guidance.hint);
  $('preparation').hidden=s.phase!=='READY';
  const named=s.families.filter(f=>f.name&&f.name!=='Nom à choisir').length;set('teamReadyCount',named+'/6 équipes ont choisi leur nom');
@@ -123,18 +126,6 @@ function render(s){
  if(s.reveal){set('outcomeHeading',s.reveal.winner==='pour'?'POUR l’emporte':'CONTRE l’emporte');set('outcomeDetail',s.reveal.narration);}
  $('publicLink').href='/founders-city.html?session='+s.id;
  gauge(s);
- set('votePhase',s.council.turn?'Au tour de '+teamLabel(s,s.council.turn):
-  s.council.phase==='await_moderator'?'Le Shérif arbitre':
-  s.council.phase==='await_leader'?'Le Shérif désigne un Maire':
-  s.phase==='AWAITING_REVEAL'?'Vote clos':'');
- const votes=$('ballots');votes.replaceChildren();
- for(const f of s.families){
-  const card=document.createElement('div');card.className='ballot';
-  const a=document.createElement('span');a.textContent=teamCaption(f);colorize(a,f);
-  const b=document.createElement('span');b.textContent=s.council.choices[f.id]||'—';
-  const c=document.createElement('strong');c.textContent=s.council.bids[f.id]||0;
-  card.append(a,b,c);votes.append(card);
- }
  const families=$('families');families.replaceChildren();
  for(const family of s.families){
   const el=document.createElement('div');el.className='card';

@@ -18,6 +18,8 @@
 <div id="accountPanel" class="regie-account" hidden><span id="signedInAs"></span><button id="changeAccount" class="secondary" type="button">Changer de compte Google</button></div>
 <section id="sessionPicker" class="panel" hidden><h2>Retrouvez votre partie</h2><p>Ouvrez la régie de la partie que vous voulez animer.</p><div id="sessionsList"></div></section>
 <div id="regieContent" hidden>
+ <p id="monitorConnection" class="small" role="status"></p>
+ <section id="councilMonitor" class="panel council-monitor" aria-label="Suivi du Conseil"></section>
  <div class="layout">
  <section>
   <div class="panel regie-control">
@@ -63,9 +65,6 @@
  </section>
  <aside>
   <div class="panel"><h2>Indicateurs de la ville</h2><div id="gauges"></div></div>
-  <div class="panel" style="margin-top:16px"><h2>Déroulement des votes</h2>
-   <p id="votePhase" class="small muted"></p><div id="ballots"></div>
-  </div>
   <div class="panel" style="margin-top:16px"><h2>Historique révélé</h2><div id="history"></div></div>
  </aside>
  </div>

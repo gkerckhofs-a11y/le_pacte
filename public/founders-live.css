@@ -155,3 +155,18 @@ body[data-skin=western].family-dashboard .identity-panel label{font-size:14px;fo
 .chronicle-changes{display:flex;flex-wrap:wrap;gap:8px 20px;padding-left:20px;line-height:1.6}.chronicle-changes li{padding-right:8px}
 @media(max-width:760px){.city-chronicle:not([hidden]){grid-template-columns:1fr}.chronicle-image{max-height:260px}.chronicle-changes{display:block}}
 .chronicle-history{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.chronicle-history [aria-pressed="true"]{outline:2px solid currentColor;outline-offset:2px}.city-chronicle.chronicle-compact{grid-template-columns:130px minmax(0,1fr);gap:20px}.chronicle-compact .chronicle-image{max-height:130px}.chronicle-compact .chronicle-narration{font-size:17px}.chronicle-compact h2{font-size:22px}.chronicle-body{animation:chronicle-appear .35s ease-out}@keyframes chronicle-appear{from{opacity:.25;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion:reduce){.chronicle-body{animation:none}}@media(max-width:600px){.city-chronicle.chronicle-compact{grid-template-columns:1fr}.chronicle-compact .chronicle-image{max-width:200px}}
+
+/* Organizer's live council desk. */
+.council-monitor{margin-bottom:20px}
+.council-roles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.council-roles strong{display:block;font-size:clamp(18px,2vw,26px);margin-top:8px;overflow-wrap:anywhere}
+.council-prompt{font-size:20px;font-weight:650;border-left:4px solid var(--accent,#d7af68);padding:12px}
+.council-totals{display:flex;gap:16px;flex-wrap:wrap;font-size:24px}
+.council-table-scroll{overflow-x:auto}
+.council-table{width:100%;border-collapse:collapse;text-align:left}
+.council-table th,.council-table td{padding:12px;border-bottom:1px solid #7775}
+.council-table th small{display:block;margin-top:6px}
+.council-current{outline:2px solid var(--accent,#d7af68);outline-offset:-2px;background:#b58a2420}
+.council-log{max-height:220px;overflow:auto;line-height:1.8;padding-left:24px}
+@media(max-width:700px){.council-roles{grid-template-columns:1fr}.council-table{min-width:620px}}
+html:fullscreen{overflow-y:auto;background:#15191b}

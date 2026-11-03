@@ -1,3 +1,4 @@
+import {setupProjectionFullscreen} from './founders-fullscreen.js';
 import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
 import {mountCity,updateCity} from './founders-city-scene.js';
 import {teamCaption,teamLabel,colorize} from './founders-identity.js';
@@ -101,4 +102,5 @@ async function tick(){
   text('connection','● Synchronisé');text('notice','');
  }catch(e){text('connection','○ Hors ligne');text('notice',e.message);}
 }
+setupProjectionFullscreen($('projectionFullscreen'),$('notice'));
 tick();setInterval(tick,2500);
