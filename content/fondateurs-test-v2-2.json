@@ -1,0 +1,186 @@
+{
+  "schema_version": "founders-test-v2.2",
+  "title": "Le Pacte des Fondateurs",
+  "year": 1876,
+  "city": "Hot Spring",
+  "family_ids": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+  ],
+  "resources": [
+    "economie",
+    "securite",
+    "satisfaction",
+    "bien_etre",
+    "developpement"
+  ],
+  "stability": {
+    "start": 5,
+    "center": 5
+  },
+  "dilemmas": [
+    {
+      "id": "D1",
+      "title": "Le monopole du chemin de fer",
+      "public_question": "Une compagnie veut relier Hot Spring au réseau ferroviaire contre vingt ans d'exclusivité commerciale. Le Conseil accepte-t-il ?",
+      "outcomes": {
+        "pour": {
+          "narration": "La gare ouvre et les commerçants protestent contre les tarifs.",
+          "effects": [
+            {
+              "resource": "economie",
+              "kind": "delta",
+              "amount": 1
+            },
+            {
+              "resource": "developpement",
+              "kind": "delta",
+              "amount": 2
+            },
+            {
+              "resource": "satisfaction",
+              "kind": "delta",
+              "amount": -1
+            },
+            {
+              "resource": "stabilite",
+              "kind": "delta",
+              "amount": 1
+            }
+          ]
+        },
+        "contre": {
+          "narration": "Le monopole est refusé ; des investissements sont reportés.",
+          "effects": [
+            {
+              "resource": "economie",
+              "kind": "delta",
+              "amount": -1
+            },
+            {
+              "resource": "developpement",
+              "kind": "delta",
+              "amount": -1
+            },
+            {
+              "resource": "satisfaction",
+              "kind": "delta",
+              "amount": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "D2",
+      "title": "Les hommes de la compagnie",
+      "public_question": "Une agence de gardes privés demande l'autorisation de patrouiller armée sur les routes de Hot Spring. Le Conseil accepte-t-il ?",
+      "outcomes": {
+        "pour": {
+          "narration": "Les routes deviennent plus sûres, mais les méthodes des gardes inquiètent.",
+          "effects": [
+            {
+              "resource": "securite",
+              "kind": "delta",
+              "amount": 2
+            },
+            {
+              "resource": "satisfaction",
+              "kind": "delta",
+              "amount": -1
+            },
+            {
+              "resource": "economie",
+              "kind": "delta",
+              "amount": -1
+            },
+            {
+              "resource": "stabilite",
+              "kind": "delta",
+              "amount": 1
+            }
+          ]
+        },
+        "contre": {
+          "narration": "Les gardes sont écartés ; les vols se poursuivent.",
+          "effects": [
+            {
+              "resource": "securite",
+              "kind": "delta",
+              "amount": -1
+            },
+            {
+              "resource": "satisfaction",
+              "kind": "delta",
+              "amount": 1
+            },
+            {
+              "resource": "stabilite",
+              "kind": "delta",
+              "amount": -1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "D3",
+      "title": "L'eau de Hot Spring",
+      "public_question": "Le médecin demande de financer immédiatement un puits pour stopper des maladies. Le Conseil accepte-t-il ?",
+      "outcomes": {
+        "pour": {
+          "narration": "La santé s'améliore grâce au nouveau puits.",
+          "effects": [
+            {
+              "resource": "bien_etre",
+              "kind": "delta",
+              "amount": 2
+            },
+            {
+              "resource": "satisfaction",
+              "kind": "delta",
+              "amount": 1
+            },
+            {
+              "resource": "economie",
+              "kind": "delta",
+              "amount": -1
+            },
+            {
+              "resource": "stabilite",
+              "kind": "toward_center"
+            }
+          ]
+        },
+        "contre": {
+          "narration": "Les travaux sont reportés ; la contestation gagne la ville.",
+          "effects": [
+            {
+              "resource": "bien_etre",
+              "kind": "delta",
+              "amount": -2
+            },
+            {
+              "resource": "satisfaction",
+              "kind": "delta",
+              "amount": -2
+            },
+            {
+              "resource": "economie",
+              "kind": "delta",
+              "amount": 1
+            },
+            {
+              "resource": "stabilite",
+              "kind": "away_from_center"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
