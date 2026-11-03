@@ -46,6 +46,8 @@ export function createFoundersGame({members=[5,5,5,5,5,5],leader='A',moderator='
  };
 }
 export function totalPower(s) {return s.pool+FOUNDERS.reduce((n,id)=>n+s.families[id].power,0)+(s.vote?FOUNDERS.reduce((n,id)=>n+(s.vote.bids[id]||0),0):0);}
+/** V2.6 sessions created before configurable supplies used exactly 51 Influence. */
+export function expectedFoundersPowerSupply(s){return Number.isSafeInteger(s.powerSupply)?s.powerSupply:51;}
 export function totalDollars(s) {return FOUNDERS.reduce((n,id)=>n+s.families[id].dollars,0);}
 export function openFoundersDilemma(input,id) {
  requireThat(input.vote===null&&typeof id==='string'&&/^[A-Z0-9_-]{1,40}$/.test(id),'Dilemme invalide ou vote actif');
@@ -90,7 +92,7 @@ function complete(s,winner,leaderChoice=null) {
  const result={id:v.id,winner,yes,no,poolBefore:oldPool,poolAfter:s.pool,recapturedPerPassingTeam:each,
   leader:s.leader,moderator:s.moderator,choices:clone(v.choices),bids:clone(v.bids),steps:clone(v.steps)};
  s.history.push(result);s.vote=null;
- requireThat(totalPower(s)===s.powerSupply,'Invariant Influence violé');
+ requireThat(totalPower(s)===expectedFoundersPowerSupply(s),'Invariant Influence violé');
  return s;
 }
 export function castFoundersAction(input,id,action) {
@@ -128,7 +130,7 @@ export function castFoundersAction(input,id,action) {
   return complete(s,yes>no?'pour':'contre');
  }
  v.turn=next(id);
- requireThat(totalPower(s)===s.powerSupply,'Invariant Influence violé');
+ requireThat(totalPower(s)===expectedFoundersPowerSupply(s),'Invariant Influence violé');
  return s;
 }
 export function moderatorResolveFoundersTie(input,id,winner) {
