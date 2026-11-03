@@ -82,3 +82,14 @@ test('Archive, image et statut du scénario contrôlés au prévol',()=>{
  const s=prepareFoundersSession(library,{scenarioId:'fondateurs-hot-spring-demo',skinId:'western'});
  assert.ok(s.warnings.some(x=>x.includes('Décor public')));
 });
+
+test('Les identifiants hérités et les entrées JSON malformées ne corrompent pas la bibliothèque',()=>{
+ const catalog=seed();
+ const story=sample();story.scenario.id='constructor';
+ const updated=publishFoundersScenario(catalog,{payload:story,source:source(),version:'1.0.0'});
+ assert.equal(updated.scenarios.constructor.id,'constructor');
+ assert.equal(listFoundersLibrary(updated).scenarios.length,2);
+ const bad=sample();bad.dilemmas.push(null);
+ assert.ok(validateFoundersStory(bad).length>0);
+ assert.throws(()=>publishFoundersScenario(catalog,{payload:bad,source:source(),version:'1.1.0'}));
+});
