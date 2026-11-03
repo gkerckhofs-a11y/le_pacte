@@ -127,6 +127,7 @@ export function calculateFoundersFinal(s){
  * probabilities. Bounded to prevent hang on cycles or combinatorial scenarios.
  */
 export function analyzeFoundersGoalReachability(story,cards=DEFAULT_GOAL_CARDS,{maxPaths=4096,maxDepth=40,initialCity=FOUNDERS_DEFAULT_CALIBRATION.city}={}){
+ check(story?.scenario?.progression?.mode!=='hybrid','Analyse exhaustive non disponible pour la réserve hybride ; ne pas utiliser les résultats des branches fixes.');
  check(story?.scenario?.entry_dilemma&&Array.isArray(story.dilemmas),'Scénario invalide');
  const errors=validateGoalCards(cards);check(!errors.length,errors.join('; '));
  const metrics=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];

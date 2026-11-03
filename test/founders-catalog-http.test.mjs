@@ -21,7 +21,8 @@ test('API V2.3 : endpoints protégés, aperçu non persistant et page de régie'
  const catalog=await fetch(origin+'/api/founders/catalog',{headers:auth});
  assert.equal(catalog.status,200);
  const items=await catalog.json();
- assert.equal(items.scenarios.length,1);assert.equal(items.skins.length,5);
+ assert.equal(items.scenarios.length,2);assert.equal(items.skins.length,5);
+ assert.ok(items.scenarios.some(s=>s.id==='hot-spring-reserve-hybride'));
  const body=JSON.stringify({scenarioId:items.scenarios[0].id,skinId:'western',members:[5,5,5,5,5,9]});
  const preview=await fetch(origin+'/api/founders/preview',{method:'POST',headers:{...auth,'Content-Type':'application/json'},body});
  assert.equal(preview.status,200);

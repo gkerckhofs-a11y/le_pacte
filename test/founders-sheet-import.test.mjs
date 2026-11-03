@@ -105,3 +105,14 @@ test('Sheets : six optional chronicle columns import chosen titles, summaries an
  tabs.Dilemmes[1][16]='https://example.org/pour.jpg';tabs.Dilemmes[1][20]='a'.repeat(601);assert.equal(parseFoundersSheets(tabs).valid,false);
  assert.deepEqual(parseFoundersSheets(makeSheetsTabs()).story,fixture());
 });
+
+test('Sheets : hybrid reserve, conditions, unlocks, budget and ending fragments round-trip without eval',()=>{
+ const story=JSON.parse(readFileSync(new URL('../content/founders-hybrid-demo-v1.json',import.meta.url),'utf8'));
+ const tabs=makeSheetsTabs(story),p=story.scenario.progression;
+ tabs.Parametres.push(['mode_progression','hybride',''],['reserve_initiale',p.initial_dilemmas.join(';'),''],['finale_id',p.finale_id,''],['min_conseils',p.min_councils,''],['max_conseils',p.max_councils,''],['epilogue_fragments',JSON.stringify(p.ending_fragments),'']);
+ const columns=['image_resolution_pour','image_resolution_contre','titre_chronique_pour','titre_chronique_contre','resume_chronique_pour','resume_chronique_contre','categorie_narrative','priorite_narrative','conditions_acces','debloque_pour','debloque_contre'];
+ tabs.Dilemmes[0].push(...columns);
+ story.dilemmas.forEach((d,i)=>tabs.Dilemmes[i+1].push('','',d.outcomes.pour.chronicle.title,d.outcomes.contre.chronicle.title,d.outcomes.pour.chronicle.summary,d.outcomes.contre.chronicle.summary,d.access.category,d.access.priority,JSON.stringify(d.access.conditions),d.outcomes.pour.unlocks.join(';'),d.outcomes.contre.unlocks.join(';')));
+ const result=parseFoundersSheets(tabs);assert.deepEqual(result.errors,[]);assert.deepEqual(result.story,story);
+ tabs.Dilemmes[1][24]='(()=>alert(1))()';assert.equal(parseFoundersSheets(tabs).valid,false);
+});

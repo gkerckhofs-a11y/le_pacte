@@ -1,4 +1,5 @@
 import {nativeSkinScene} from '../public/founders-skin-theme.js';
+import {validateHybridStory,isHybrid} from './founders-progression.ts';
 /**
  * LE PACTE V2.3 — narrative catalogue domain, deliberately independent
  * from the legacy 33-territory edition/studio modules.
@@ -28,7 +29,7 @@ export function validateFoundersStory(payload) {
  if(!keys(payload,['schema_version','scenario','dilemmas']))return ['Objet de scénario invalide'];
  error(payload.schema_version==='1.0.0','schema_version incompatible',errors);
  const s=payload.scenario;
- if(!keys(s,['id','title','universe','location','year','entry_dilemma','status']))errors.push('scenario : structure');
+ if(!keys(s,['id','title','universe','location','year','entry_dilemma','status','progression']))errors.push('scenario : structure');
  else {
   error(STORY_RE.test(s.id),'scenario.id',errors);
   error(txt(s.title,1,200),'scenario.title',errors);
@@ -43,7 +44,7 @@ export function validateFoundersStory(payload) {
  const ids=new Set(),nexts=[];
  for(const [i,d] of ds.entries()){
   const where='dilemmas['+i+']';
-  if(!keys(d,['id','chapter','title','public_text','vote_question','labels','outcomes','image','status','tags'])){errors.push(where+' : structure');continue;}
+  if(!keys(d,['id','chapter','title','public_text','vote_question','labels','outcomes','image','status','tags','access'])){errors.push(where+' : structure');continue;}
   error(DILEMMA_RE.test(d.id),where+'.id',errors);
   if(ids.has(d.id))errors.push(where+'.id dupliqué');
   ids.add(d.id);
@@ -64,7 +65,7 @@ export function validateFoundersStory(payload) {
   if(!keys(d.outcomes,OUTCOMES)){errors.push(where+'.outcomes : structure');continue;}
   for(const outcome of OUTCOMES){
    const o=d.outcomes[outcome],path=where+'.outcomes.'+outcome;
-   if(!keys(o,['narration','effects','next_id','chronicle'])){errors.push(path+' : structure');continue;}
+   if(!keys(o,['narration','effects','next_id','chronicle','unlocks'])){errors.push(path+' : structure');continue;}
    if(o.chronicle!==undefined){
     const c=o.chronicle;
     if(!keys(c,['title','summary','image']))errors.push(path+'.chronicle : structure');
@@ -93,8 +94,9 @@ export function validateFoundersStory(payload) {
  }
  if(s&&DILEMMA_RE.test(s.entry_dilemma))error(ids.has(s.entry_dilemma),'scenario.entry_dilemma absent',errors);
  for(const [path,id] of nexts)error(ids.has(id),path+' référence manquante '+id,errors);
- const graph=new Map(ds.filter(d=>isObj(d)&&DILEMMA_RE.test(d.id)&&isObj(d.outcomes)).map(d=>[d.id,OUTCOMES.map(x=>d.outcomes[x]?.next_id)]));
- const visited=new Set(),todo=[s?.entry_dilemma];
+ errors.push(...validateHybridStory(payload));
+ const graph=new Map(ds.filter(d=>isObj(d)&&DILEMMA_RE.test(d.id)&&isObj(d.outcomes)).map(d=>[d.id,OUTCOMES.flatMap(x=>[d.outcomes[x]?.next_id,...(Array.isArray(d.outcomes[x]?.unlocks)?d.outcomes[x].unlocks:[])])]));
+ const visited=new Set(),todo=[s?.entry_dilemma,...(Array.isArray(s?.progression?.initial_dilemmas)?s.progression.initial_dilemmas:[]),...(isHybrid(payload)?[s.progression.finale_id]:[])];
  while(todo.length){
   const id=todo.shift();if(!id||visited.has(id)||!graph.has(id))continue;
   visited.add(id);for(const x of graph.get(id))if(x!==null)todo.push(x);
@@ -192,6 +194,7 @@ export function prepareFoundersSession(input,{scenarioId,scenarioVersion,skinId,
  if(skin.status==='prototype')warnings.push('Skin en cours de conception, affichage non final.');
  if(!skin.publicScene.baseImageUrl&&!nativeSkinScene(skin.id))warnings.push('Décor public à créer : aucune image de ville disponible.');
  if(release.payload.scenario.status==='prototype')warnings.push('Scénario de test non validé.');
+ if(isHybrid(release.payload))warnings.push('Parcours hybride expérimental : ordre variable, objectifs et durée à recalibrer en test humain.');
  return {
   kind:'founders-session-preview-v2.3',
   previewOnly:true,

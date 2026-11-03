@@ -1,0 +1,954 @@
+{
+  "schema_version": "1.0.0",
+  "scenario": {
+    "id": "hot-spring-reserve-hybride",
+    "title": "Hot Spring — Réserve narrative (prototype)",
+    "universe": "western",
+    "location": "Hot Spring",
+    "year": 1876,
+    "entry_dilemma": "D01",
+    "status": "prototype",
+    "progression": {
+      "mode": "hybrid",
+      "initial_dilemmas": [
+        "D01",
+        "D04",
+        "D05",
+        "D08",
+        "D09",
+        "D11"
+      ],
+      "finale_id": "D10",
+      "min_councils": 8,
+      "max_councils": 10,
+      "ending_fragments": [
+        {
+          "text": "La compagnie ferroviaire a obtenu son monopole. Son contrat reste l’un des actes fondateurs de ce Conseil.",
+          "conditions": [
+            {
+              "type": "decision",
+              "dilemma_id": "D01",
+              "winner": "pour"
+            }
+          ]
+        },
+        {
+          "text": "Le Conseil a refusé le monopole ferroviaire. Hot Spring a conservé son indépendance face à cette compagnie.",
+          "conditions": [
+            {
+              "type": "decision",
+              "dilemma_id": "D01",
+              "winner": "contre"
+            }
+          ]
+        },
+        {
+          "text": "La concession de charbon a été accordée : la vallée porte désormais la marque des décisions industrielles.",
+          "conditions": [
+            {
+              "type": "decision",
+              "dilemma_id": "D05",
+              "winner": "pour"
+            }
+          ]
+        },
+        {
+          "text": "La concession minière a été refusée. La vallée a été préservée, malgré le retrait des investisseurs.",
+          "conditions": [
+            {
+              "type": "decision",
+              "dilemma_id": "D05",
+              "winner": "contre"
+            }
+          ]
+        },
+        {
+          "text": "Les habitants terminent ces délibérations avec une faible Satisfaction. Le Conseil laisse derrière lui une ville divisée sur ses choix.",
+          "conditions": [
+            {
+              "type": "indicator",
+              "indicator": "satisfaction",
+              "operator": "lte",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "text": "La Satisfaction finale est élevée. Une large adhésion des habitants accompagne les dernières décisions du Conseil.",
+          "conditions": [
+            {
+              "type": "indicator",
+              "indicator": "satisfaction",
+              "operator": "gte",
+              "value": 7
+            }
+          ]
+        },
+        {
+          "text": "La protection reste insuffisante au terme de la séance : la Sécurité finale est basse.",
+          "conditions": [
+            {
+              "type": "indicator",
+              "indicator": "securite",
+              "operator": "lte",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "text": "La ville clôt cette séance avec une Sécurité élevée, reflet des moyens consacrés à sa protection.",
+          "conditions": [
+            {
+              "type": "indicator",
+              "indicator": "securite",
+              "operator": "gte",
+              "value": 7
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "dilemmas": [
+    {
+      "id": "D01",
+      "chapter": 1,
+      "title": "Le monopole du chemin de fer",
+      "public_text": "Une compagnie propose de relier Hot Spring au réseau ferroviaire. En échange, elle exige vingt ans d'exclusivité sur le transport des marchandises.",
+      "vote_question": "Le Conseil accorde-t-il l'exclusivité à la compagnie ?",
+      "labels": {
+        "pour": "Accorder le monopole",
+        "contre": "Refuser le monopole"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le Conseil signe les vingt années d’exclusivité. Ouvriers, machines et marchandises commencent à rejoindre Hot Spring : l’activité gagne un point et les équipements deux points. Mais les commerçants découvrent les tarifs de la compagnie. Leur colère fait reculer la Satisfaction d’un point.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "developpement",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Le prix du rail",
+            "summary": "Le chantier avance ; les tarifs exclusifs divisent la ville."
+          },
+          "unlocks": [
+            "D02",
+            "D06"
+          ]
+        },
+        "contre": {
+          "narration": "Le Conseil refuse l’exclusivité. Les artisans accueillent la décision avec soulagement : la Satisfaction gagne un point. La compagnie suspend ses investissements et les équipements attendus tardent à arriver. L’Économie et le Développement perdent chacun un point.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "developpement",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Une piste sans monopole",
+            "summary": "Les artisans saluent leur indépendance, mais les investissements ralentissent."
+          },
+          "unlocks": [
+            "D03"
+          ]
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d01.jpg",
+        "alt": "Un représentant du chemin de fer présente un contrat au Conseil.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "rail",
+        "commerce"
+      ],
+      "access": {
+        "category": "required",
+        "priority": 50,
+        "conditions": []
+      }
+    },
+    {
+      "id": "D02",
+      "chapter": 1,
+      "title": "Les hommes de la compagnie",
+      "public_text": "À la suite de vols sur la piste des convois, une agence privée offre de patrouiller armée. Son contrat lui accorderait une large autonomie.",
+      "vote_question": "Le Conseil autorise-t-il les gardes privés ?",
+      "labels": {
+        "pour": "Autoriser les patrouilles",
+        "contre": "Refuser les patrouilles"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les gardes de la compagnie prennent position sur la piste et devant les entrepôts. Les convois circulent sous escorte : la Sécurité gagne deux points. Les contrôles et les abus dénoncés par les habitants dégradent toutefois leur adhésion. La Satisfaction perd un point.",
+          "effects": [
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Des fusils sous contrat",
+            "summary": "Les convois sont mieux protégés ; les contrôles privés irritent les habitants."
+          },
+          "unlocks": []
+        },
+        "contre": {
+          "narration": "Le Conseil refuse de déléguer les patrouilles à une agence privée. Les habitants saluent le maintien du contrôle public : la Satisfaction gagne un point. Sans renfort immédiat sur les pistes, les convois restent vulnérables. La Sécurité perd un point.",
+          "effects": [
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "La force reste publique",
+            "summary": "La ville garde le contrôle des armes, mais les convois restent exposés."
+          },
+          "unlocks": []
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d02.jpg",
+        "alt": "Des gardes privés proposent de protéger les convois.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "securite",
+        "justice"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": []
+      }
+    },
+    {
+      "id": "D03",
+      "chapter": 1,
+      "title": "Le puits des fermiers",
+      "public_text": "Les familles installées hors de la ville accusent le propriétaire d'une source de détourner l'eau au profit de ses terres. Un nouveau puits collectif pourrait apaiser les tensions.",
+      "vote_question": "Le Conseil finance-t-il un puits collectif ?",
+      "labels": {
+        "pour": "Financer le puits",
+        "contre": "Reporter les travaux"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le nouveau puits est creusé. Les fermiers accèdent de nouveau à l’eau : le Bien-être gagne deux points et la Satisfaction un point. La dépense mobilise les moyens de la ville au détriment d’autres activités. L’Économie perd un point.",
+          "effects": [
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "L’eau mise en commun",
+            "summary": "Les fermiers retrouvent de l’eau ; la dépense pèse sur l’activité municipale."
+          },
+          "unlocks": []
+        },
+        "contre": {
+          "narration": "Le Conseil reporte le puits collectif. Les fermiers continuent de subir le manque d’eau : le Bien-être perd un point. Le sentiment d’être laissés à l’écart attise leur colère et la Satisfaction perd deux points. Ce report n’ajoute aucun point à l’Économie.",
+          "effects": [
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "L’attente des fermiers",
+            "summary": "Les travaux sont reportés ; les conditions de vie et la confiance se dégradent."
+          },
+          "unlocks": []
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d03.jpg",
+        "alt": "Des fermiers discutent d’un projet de puits près des canaux d’irrigation.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "eau",
+        "fermes"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": []
+      }
+    },
+    {
+      "id": "D04",
+      "chapter": 2,
+      "title": "L'école sur la colline",
+      "public_text": "Les nouveaux arrivants réclament une école. Les familles aisées préfèrent une institution privée, moins coûteuse pour la ville, mais inaccessible à certains enfants.",
+      "vote_question": "Le Conseil ouvre-t-il une école publique ?",
+      "labels": {
+        "pour": "Créer l'école publique",
+        "contre": "Laisser l'initiative au privé"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le chantier de l’école publique commence sur la colline. L’accès à l’instruction renforce les équipements de la ville et la vie des familles : le Développement et le Bien-être gagnent chacun un point. Le financement des locaux et des enseignants pèse sur les moyens disponibles. L’Économie perd un point.",
+          "effects": [
+            {
+              "indicator": "developpement",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Une classe pour Hot Spring",
+            "summary": "L’école ouvre aux familles ; son financement réduit les moyens des affaires."
+          },
+          "unlocks": []
+        },
+        "contre": {
+          "narration": "Le Conseil laisse l’école à l’initiative privée. La ville préserve ses moyens pour l’activité et l’Économie gagne un point. L’instruction reste cependant inaccessible à certains enfants. Les familles exclues dénoncent cette différence de traitement : la Satisfaction perd un point.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "L’école des privilégiés",
+            "summary": "L’initiative privée allège la charge publique, mais creuse la fracture sociale."
+          },
+          "unlocks": []
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d04.jpg",
+        "alt": "Une enseignante présente le projet d’école sur la colline.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "education",
+        "population"
+      ],
+      "access": {
+        "category": "required",
+        "priority": 50,
+        "conditions": []
+      }
+    },
+    {
+      "id": "D05",
+      "chapter": 2,
+      "title": "La concession de charbon",
+      "public_text": "Une société minière promet des salaires et des recettes à condition d'exploiter une vallée boisée. Des riverains craignent pour leurs habitations.",
+      "vote_question": "Le Conseil délivre-t-il la concession minière ?",
+      "labels": {
+        "pour": "Accorder la concession",
+        "contre": "Protéger la vallée"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "La concession est accordée et la mine entre en activité. Les salaires et les recettes font gagner deux points à l’Économie ; les nouveaux équipements ajoutent un point au Développement. Mais les conditions de travail et les nuisances pèsent sur les habitants. Le Bien-être perd un point.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "developpement",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Le charbon et la poussière",
+            "summary": "La mine apporte emplois et équipements, au prix de conditions de vie plus difficiles."
+          },
+          "unlocks": [
+            "D06"
+          ]
+        },
+        "contre": {
+          "narration": "Le Conseil protège la vallée et refuse la concession. Les riverains accueillent cette décision favorablement : la Satisfaction gagne un point. Les investisseurs détournent leurs fonds de Hot Spring. L’Économie perd un point, sans autre variation de jauge.",
+          "effects": [
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "La vallée préservée",
+            "summary": "Les riverains sont soulagés ; les investisseurs se retirent."
+          },
+          "unlocks": [
+            "D07"
+          ]
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d05.jpg",
+        "alt": "Des habitants et un arpenteur discutent d’une concession de charbon.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "mine",
+        "industrie"
+      ],
+      "access": {
+        "category": "required",
+        "priority": 50,
+        "conditions": []
+      }
+    },
+    {
+      "id": "D06",
+      "chapter": 3,
+      "title": "La banque des pionniers",
+      "public_text": "Un banquier propose d'ouvrir une caisse de crédit pour les commerces. En contrepartie, la ville garantirait une partie des pertes éventuelles.",
+      "vote_question": "Le Conseil garantit-il les prêts ?",
+      "labels": {
+        "pour": "Garantir les prêts",
+        "contre": "Refuser la garantie"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "La banque ouvre ses prêts avec la garantie de la ville. Les commerces empruntent et investissent : l’Économie gagne deux points. En acceptant de couvrir d’éventuelles pertes, le Conseil expose les finances communes et accentue le déséquilibre institutionnel. La Stabilité s’éloigne d’un point de son centre.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "stabilite",
+              "operation": "away_from_center"
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "La ville se porte garante",
+            "summary": "Le crédit soutient les commerces ; les engagements publics accentuent le déséquilibre."
+          },
+          "unlocks": []
+        },
+        "contre": {
+          "narration": "Le Conseil refuse de garantir les prêts. Les engagements publics restent limités et la Stabilité se rapproche d’un point de son centre ; elle ne bouge pas si elle vaut déjà cinq. Les commerçants accèdent plus difficilement au crédit. L’Économie perd un point.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "stabilite",
+              "operation": "toward_center"
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Le crédit sous réserve",
+            "summary": "La prudence protège les finances communes, mais freine les affaires."
+          },
+          "unlocks": []
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d06.jpg",
+        "alt": "Un banquier présente des prêts aux commerçants de Hot Spring.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "finance",
+        "commerce"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": []
+      }
+    },
+    {
+      "id": "D07",
+      "chapter": 3,
+      "title": "La grève des journaliers",
+      "public_text": "Les ouvriers de plusieurs chantiers exigent une journée de travail plus courte. Les entrepreneurs menacent de suspendre leurs investissements.",
+      "vote_question": "Le Conseil soutient-il les revendications des ouvriers ?",
+      "labels": {
+        "pour": "Soutenir les ouvriers",
+        "contre": "Soutenir les entrepreneurs"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le Conseil soutient les revendications des journaliers. Les concessions obtenues améliorent leurs conditions de vie : le Bien-être gagne deux points. Le ralentissement des chantiers réduit l’activité immédiate. L’Économie perd un point.",
+          "effects": [
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Le repos obtenu",
+            "summary": "Les travailleurs obtiennent des concessions ; les chantiers ralentissent."
+          },
+          "unlocks": []
+        },
+        "contre": {
+          "narration": "Le Conseil soutient les entrepreneurs. Les chantiers poursuivent leur activité et l’Économie gagne un point. Les journaliers voient leurs demandes écartées et la colère se propage. La Satisfaction perd deux points.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Les chantiers avant tout",
+            "summary": "Les investissements continuent, mais la colère des travailleurs grandit."
+          },
+          "unlocks": []
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d07.jpg",
+        "alt": "Des journaliers en grève négocient sur un chantier.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "travail",
+        "conflit_social"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": []
+      }
+    },
+    {
+      "id": "D08",
+      "chapter": 3,
+      "title": "La presse de Hot Spring",
+      "public_text": "Une journaliste veut publier des documents mettant en cause plusieurs notables. Certains conseillers demandent une censure temporaire pour éviter une crise politique.",
+      "vote_question": "Le Conseil protège-t-il la publication ?",
+      "labels": {
+        "pour": "Garantir la liberté de publier",
+        "contre": "Suspendre la publication"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les documents paraissent dans le journal de Hot Spring. La protection de la publication fait gagner un point à la Satisfaction. Mais les accusations divisent les notables et ouvrent une crise politique. La Stabilité s’éloigne d’un point de son centre.",
+          "effects": [
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "stabilite",
+              "operation": "away_from_center"
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "L’encre du scandale",
+            "summary": "La publication est protégée ; la liberté de la presse accompagne une crise politique."
+          },
+          "unlocks": []
+        },
+        "contre": {
+          "narration": "Le Conseil suspend la publication. Les tensions institutionnelles s’apaisent provisoirement et la Stabilité se rapproche d’un point de son centre, sans bouger si elle vaut déjà cinq. Les habitants apprennent que des documents ont été retenus. La Satisfaction perd deux points.",
+          "effects": [
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -2
+            },
+            {
+              "indicator": "stabilite",
+              "operation": "toward_center"
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Le journal suspendu",
+            "summary": "Le scandale est contenu pour un temps ; la confiance des habitants s’érode."
+          },
+          "unlocks": []
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d08.jpg",
+        "alt": "Une journaliste débat avec les notables près de la presse.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "presse",
+        "scandale"
+      ],
+      "access": {
+        "category": "required",
+        "priority": 50,
+        "conditions": [
+          {
+            "type": "resolved",
+            "minimum": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "D09",
+      "chapter": 4,
+      "title": "La fièvre du campement",
+      "public_text": "Une maladie se répand parmi les nouveaux arrivants. Le médecin demande d'isoler le campement pendant quelques jours, au risque de bloquer le commerce.",
+      "vote_question": "Le Conseil impose-t-il une quarantaine ?",
+      "labels": {
+        "pour": "Décréter la quarantaine",
+        "contre": "Maintenir les échanges"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le campement est placé en quarantaine. La propagation ralentit et le Bien-être gagne deux points. Les échanges sont interrompus et les marchands subissent des pertes. L’Économie perd deux points. Les familles attendent maintenant la reprise des échanges.",
+          "effects": [
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Les portes du camp se ferment",
+            "summary": "L’isolement freine la maladie et bloque une partie du commerce."
+          },
+          "unlocks": []
+        },
+        "contre": {
+          "narration": "Le Conseil maintient les échanges avec le campement. Les marchands continuent de travailler et l’Économie gagne un point. La circulation des personnes favorise toutefois la propagation de la maladie. Le Bien-être perd deux points. Les soignants font face à davantage de malades.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Le marché reste ouvert",
+            "summary": "Les échanges continuent ; la maladie touche davantage d’habitants."
+          },
+          "unlocks": []
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d09.jpg",
+        "alt": "Un médecin et des délégués discutent de la fièvre au campement.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "sante",
+        "commerce"
+      ],
+      "access": {
+        "category": "required",
+        "priority": 50,
+        "conditions": [
+          {
+            "type": "resolved",
+            "minimum": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "D10",
+      "chapter": 4,
+      "title": "La charte de Hot Spring",
+      "public_text": "La ville peut désormais obtenir un statut municipal reconnu, à condition d'adopter une charte, de financer des services communs et de répartir publiquement les responsabilités.",
+      "vote_question": "Le Conseil adopte-t-il la charte municipale ?",
+      "labels": {
+        "pour": "Adopter la charte",
+        "contre": "Reporter la charte"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "La charte est adoptée. Hot Spring se dote d’institutions reconnues et le Développement gagne deux points. Le financement des services communs pèse sur l’activité : l’Économie perd un point. La Stabilité se rapproche d’un point de son centre, sans bouger si elle vaut déjà cinq.",
+          "effects": [
+            {
+              "indicator": "developpement",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "stabilite",
+              "operation": "toward_center"
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Une municipalité reconnue",
+            "summary": "La charte structure la ville et impose de nouvelles charges communes."
+          },
+          "unlocks": []
+        },
+        "contre": {
+          "narration": "Le Conseil reporte la charte. Les familles conservent davantage de moyens pour leurs activités et l’Économie gagne un point. Les responsabilités communes restent disputées et les institutions fragiles. La Stabilité s’éloigne d’un point de son centre.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "stabilite",
+              "operation": "away_from_center"
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Les familles gardent la main",
+            "summary": "L’autonomie préserve des moyens immédiats, mais laisse les institutions fragiles."
+          },
+          "unlocks": []
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d10.jpg",
+        "alt": "Les six familles discutent d’une charte encore non signée.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "charte",
+        "finale"
+      ],
+      "access": {
+        "category": "finale",
+        "priority": 50,
+        "conditions": []
+      }
+    },
+    {
+      "id": "D11",
+      "chapter": 3,
+      "title": "Les commerçants font front",
+      "public_text": "Des commerçants mécontents ferment leurs boutiques pour réclamer une révision des contrats municipaux. Le Conseil peut réunir une médiation et interrompre provisoirement les livraisons, ou protéger leur poursuite sous escorte. Les premiers veulent rétablir la confiance ; les seconds craignent de nouvelles pertes.",
+      "vote_question": "Le Conseil suspend-il les livraisons le temps d’une médiation ?",
+      "labels": {
+        "pour": "Médiation et suspension",
+        "contre": "Livraisons sous escorte"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "La médiation redonne une voix aux commerçants et apaise une partie de la colère : la Satisfaction gagne deux points. L’arrêt des livraisons coûte un point à l’Économie.",
+          "effects": [
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "Une table pour négocier",
+            "summary": "La médiation apaise les commerçants, mais ralentit les livraisons."
+          }
+        },
+        "contre": {
+          "narration": "Les convois reprennent sous escorte : la Sécurité gagne un point et l’Économie un point. Les commerçants qui demandent à être entendus dénoncent la décision : la Satisfaction perd deux points.",
+          "effects": [
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "Les convois passent",
+            "summary": "Les échanges sont protégés ; la contestation s’amplifie."
+          }
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d08.jpg",
+        "alt": "Une journaliste débat avec les notables près de la presse.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "commerce",
+        "contestation"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": [
+          {
+            "type": "resolved",
+            "minimum": 3
+          },
+          {
+            "type": "indicator",
+            "indicator": "satisfaction",
+            "operator": "lte",
+            "value": 4
+          }
+        ]
+      }
+    }
+  ]
+}

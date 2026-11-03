@@ -152,6 +152,7 @@ export function simulateFoundersPolicies(story,{
  calibration=FOUNDERS_DEFAULT_CALIBRATION,
  runs=36,seed=20261103,mode='mixte',maxDilemmas=30
 }={}){
+ check(story?.scenario?.progression?.mode!=='hybrid','Le laboratoire de politiques ne prend pas encore en charge la réserve hybride.');
  check(story?.scenario?.entry_dilemma&&Array.isArray(story.dilemmas)&&story.dilemmas.length>=1,'Scénario invalide');
  check(!validateGoalCards(cards).length,'Objectifs invalides');
  check(!validateScoreRules(rule).length,'Barème invalide');

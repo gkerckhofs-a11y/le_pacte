@@ -1,7 +1,7 @@
 let authSDK=null;
 const $=id=>document.getElementById(id);
 const NAMES=['Parametres','Dilemmes','Effets','Branches'];
-const RANGES=['Parametres!A1:C50','Dilemmes!A1:V550','Effets!A1:F10500','Branches!A1:E1100'];
+const RANGES=['Parametres!A1:C50','Dilemmes!A1:AA550','Effets!A1:F10500','Branches!A1:E1100'];
 let runtime='local',googleAccess=null,current=null;
 function status(msg,type=''){const e=$('state');e.textContent=msg;e.className=type;}
 async function init(){

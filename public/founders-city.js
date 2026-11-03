@@ -31,7 +31,7 @@ function render(s){
  applySkin(document.body,s.skin);text('universeTitle','Le Pacte · '+s.skin.title);
  lastRevision=s.revision;
  text('pageTitle',s.story.location+' · '+s.story.year);text('phase',pretty[s.phase]||s.phase);
- text('chapter',s.dilemma?'Chapitre '+s.dilemma.chapter:'Le Conseil des Fondateurs');
+ text('chapter',s.dilemma?(s.dilemma.sequence?'Conseil '+s.dilemma.sequence:'Chapitre '+s.dilemma.chapter):'Le Conseil des Fondateurs');
  text('tiePriority','Départage final si égalité parfaite : '+s.finalTieOrder.map(id=>teamLabel(s,id)).join(' → '));
  text('turn',s.council.turn?'Tour de '+teamLabel(s,s.council.turn):'Maire '+teamLabel(s,s.leader));
  text('dilemmaTitle',s.dilemma?.title||(s.phase==='FINISHED'?'La ville entre dans l’histoire':'Bienvenue au Conseil'));
@@ -73,6 +73,11 @@ function render(s){
   s.phase==='REVEALED'?'Le Conseil attend le prochain dilemme.':
   s.phase==='FINISHED'?'Les décisions finales ont été proclamées.':'La séance n’a pas encore commencé.');
  const final=$('finalResults');final.hidden=!s.finalResults;
+ const epilogue=$('narrativeEnding');epilogue.hidden=!s.narrativeEnding;epilogue.replaceChildren();
+ if(s.narrativeEnding){
+  const title=document.createElement('h3');title.textContent=s.narrativeEnding.title;epilogue.append(title);
+  for(const paragraph of s.narrativeEnding.paragraphs){const p=document.createElement('p');p.textContent=paragraph;epilogue.append(p);}
+ }
  if(s.finalResults){
   const ranking=s.finalResults.ranking;
   text('winnerTitle','Victoire de '+teamLabel(s,ranking[0].family)+' · '+ranking[0].score.total+' points');

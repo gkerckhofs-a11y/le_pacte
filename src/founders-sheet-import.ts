@@ -13,6 +13,7 @@ const HEADER={
 };
 const sizes={Parametres:50,Dilemmes:501,Effets:10001,Branches:1001};
 const CHRONICLE_COLUMNS=['image_resolution_pour','image_resolution_contre','titre_chronique_pour','titre_chronique_contre','resume_chronique_pour','resume_chronique_contre'];
+const PROGRESSION_COLUMNS=['categorie_narrative','priorite_narrative','conditions_acces','debloque_pour','debloque_contre'];
 const isObject=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
 const blank=x=>x===undefined||x===null||x==='';
 const value=x=>blank(x)?'':String(x).trim();
@@ -25,13 +26,13 @@ export function parseFoundersSheets(tabs){
  const rows={};
  for(const [name,headers] of Object.entries(HEADER)){
   const all=tabs[name];
-  if(!Array.isArray(all)||all.length<1||all.length>sizes[name]||all.some(r=>!Array.isArray(r)||r.length>headers.length+(name==='Dilemmes'?CHRONICLE_COLUMNS.length:0)+3||r.some(c=>typeof c!=='string'&&typeof c!=='number'&&typeof c!=='boolean'&&c!==null))){
+  if(!Array.isArray(all)||all.length<1||all.length>sizes[name]||all.some(r=>!Array.isArray(r)||r.length>headers.length+(name==='Dilemmes'?CHRONICLE_COLUMNS.length+PROGRESSION_COLUMNS.length:0)+3||r.some(c=>typeof c!=='string'&&typeof c!=='number'&&typeof c!=='boolean'&&c!==null))){
    errors.push(name+': plage absente, trop grande ou valeur invalide');continue;
   }
   const first=all[0].map(value);
   for(const h of headers)if(!first.includes(h))errors.push(name+': colonne manquante '+h);
   if(new Set(first.filter(Boolean)).size!==first.filter(Boolean).length)errors.push(name+': colonnes dupliquées');
-  const readable=name==='Dilemmes'?[...headers,...CHRONICLE_COLUMNS]:headers;
+  const readable=name==='Dilemmes'?[...headers,...CHRONICLE_COLUMNS,...PROGRESSION_COLUMNS]:headers;
   const positions=Object.fromEntries(readable.map(h=>[h,first.indexOf(h)]));
   rows[name]=all.slice(1).map((r,i)=>{
    const obj={_row:i+2};
@@ -48,6 +49,10 @@ export function parseFoundersSheets(tabs){
   params[key]=r['valeur'];
  }
  const requiredParams=['schema_version','scenario_id','titre','univers','lieu','annee','point_entree','statut'];
+ const hybrid=value(params.mode_progression)==='hybride';
+ if(!blank(params.mode_progression)&&!['hybride','direct'].includes(value(params.mode_progression)))errors.push('Parametres : mode_progression direct/hybride requis');
+ const parseJson=(raw,where,fallback)=>{try{return value(raw)?JSON.parse(value(raw)):fallback;}catch{errors.push(where+': JSON invalide');return fallback;}};
+ const list=raw=>value(raw).split(';').map(s=>s.trim()).filter(Boolean);
  for(const p of requiredParams)if(blank(params[p]))errors.push('Parametres: valeur manquante '+p);
  const effects=new Map(),branches=new Map();
  for(const r of rows.Effets){
@@ -99,6 +104,7 @@ export function parseFoundersSheets(tabs){
     if(imageUrl)c.image={url:imageUrl,alt:title||value(r.titre),credit:value(r.credit_image)||null,license:value(r.licence_image)||null};
     notes.at(-1)[1].chronicle=c;
    }
+   if(hybrid)notes.at(-1)[1].unlocks=list(r['debloque_'+side]);
   }
   const statusTags=value(r.tags).split(';').map(s=>s.trim()).filter(Boolean);
   const d={
@@ -108,6 +114,8 @@ export function parseFoundersSheets(tabs){
    image:{url:u||null,alt:value(r.image_alt),credit:value(r.credit_image)||null,license:value(r.licence_image)||null},
    status,tags:statusTags
   };
+  if(hybrid)d.access={category:({obligatoire:'required',optionnel:'optional',finale:'finale'})[value(r.categorie_narrative)]??value(r.categorie_narrative),priority:blank(r.priorite_narrative)?50:Number(r.priorite_narrative),conditions:parseJson(r.conditions_acces,row+' conditions_acces',[])};
+  else if(PROGRESSION_COLUMNS.some(k=>!blank(r[k])))errors.push(row+': colonnes narratives réservées au mode hybride');
   for(const [k,limit] of [['title',200],['public_text',5000],['vote_question',1000]])
    if(!stringSafe(d[k],limit))errors.push(row+': '+k+' dépasse '+limit+' caractères');
   dilemmas.push(d);
@@ -124,6 +132,7 @@ export function parseFoundersSheets(tabs){
   },
   dilemmas
  };
+ if(hybrid)story.scenario.progression={mode:'hybrid',initial_dilemmas:list(params.reserve_initiale),finale_id:value(params.finale_id),min_councils:Number(value(params.min_conseils)),max_councils:Number(value(params.max_conseils)),ending_fragments:parseJson(params.epilogue_fragments,'Parametres epilogue_fragments',[])};
  for(const problem of validateFoundersStory(story))errors.push('Scénario: '+problem);
  const uniqueErrors=[...new Set(errors)];
  return {valid:uniqueErrors.length===0,errors:uniqueErrors,warnings,story:uniqueErrors.length?null:story,
@@ -132,3 +141,4 @@ export function parseFoundersSheets(tabs){
 export const FOUNDERS_SHEETS_TABS=Object.freeze(Object.keys(HEADER));
 export const FOUNDERS_SHEETS_HEADERS=Object.freeze(HEADER);
 export const FOUNDERS_CHRONICLE_COLUMNS=Object.freeze(CHRONICLE_COLUMNS);
+export const FOUNDERS_PROGRESSION_COLUMNS=Object.freeze(PROGRESSION_COLUMNS);

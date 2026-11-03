@@ -5,7 +5,11 @@ export function councilGuidance(s){
  if(s.phase==='READY')return {step:2,title:'Votre partie est prête à être lancée',hint:'Distribuez les accès aux six porte-paroles et ouvrez l’écran à projeter. Cliquez ensuite sur « Lancer la partie » : le premier dilemme s’affichera et le Maire pourra voter.'};
  if(s.phase==='COUNCIL')return {step:3,title:'La partie est lancée',hint:s.council.turn?'Le vote se fait sur les écrans des équipes. C’est au tour de '+name(s.council.turn)+'.':s.council.phase==='await_moderator'?'Le Shérif doit départager le vote sur son écran d’équipe.':'Le Shérif doit choisir le nouveau Maire sur son écran d’équipe.'};
  if(s.phase==='AWAITING_REVEAL')return {step:3,title:'Le vote est terminé : révélez la décision',hint:'Cliquez sur « Révéler la décision ». Les conséquences et l’évolution des indicateurs seront affichées sur la projection.'};
- if(s.phase==='REVEALED')return {step:3,title:s.reveal?.nextId===null?'Le dernier résultat est affiché':'Le résultat est affiché',hint:s.reveal?.nextId===null?'Cliquez sur « Terminer la partie » pour afficher le classement final.':'Laissez les équipes découvrir les conséquences, puis cliquez sur « Dilemme suivant ».'};
+ if(s.phase==='REVEALED'){
+  if(s.progression?.blocked)return {step:3,title:'La réserve narrative nécessite une vérification',hint:s.progression.blocked};
+  const terminal=s.progression?s.progression.terminal:s.reveal?.nextId===null;
+  return {step:3,title:terminal?'Le dernier résultat est affiché':'Le résultat est affiché',hint:terminal?'Cliquez sur « Terminer la partie » pour afficher le classement final.':s.progression?'Lisez la chronique, puis laissez le moteur choisir ou sélectionnez un chapitre admissible dans la réserve.':'Laissez les équipes découvrir les conséquences, puis cliquez sur « Dilemme suivant ».'};
+ }
  return {step:3,title:'La partie est terminée',hint:'Le classement final est affiché sur la projection. Retrouvez une autre partie avec « Mes parties ».'};
 }
 // Names may change while the organizer presses Start. Re-read state and retry

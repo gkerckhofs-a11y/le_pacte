@@ -109,7 +109,16 @@ function render(s){
  $('start').hidden=s.phase!=='READY';
  $('reveal').hidden=s.phase!=='AWAITING_REVEAL';
  $('next').hidden=s.phase!=='REVEALED';
- $('next').textContent=s.reveal?.nextId===null?'Terminer la partie':'Dilemme suivant';
+ $('next').textContent=(s.progression?s.progression.terminal:s.reveal?.nextId===null)?'Terminer la partie':'Dilemme suivant';
+ $('next').disabled=Boolean(s.progression?.blocked);
+ $('reservePanel').hidden=!s.progression||s.progression.terminal;
+ const choice=$('nextDilemma'),previousChoice=choice.value;choice.replaceChildren();
+ const auto=document.createElement('option');auto.value='';auto.textContent='Laisser le moteur choisir';choice.append(auto);
+ for(const c of s.progression?.candidates??[]){
+  const option=document.createElement('option');option.value=c.id;option.textContent=c.title+' · '+({required:'obligatoire',optional:'optionnel',finale:'finale'}[c.category]??c.category);choice.append(option);
+ }
+ choice.value=[...choice.options].some(o=>o.value===previousChoice)?previousChoice:'';
+ set('reserveStatus',s.progression?s.progression.blocked??s.progression.resolved+' Conseils résolus · objectif '+s.progression.min+' à '+s.progression.max+', finale comprise.':'');
  $('lastReveal').hidden=!s.reveal;
  if(s.reveal){set('outcomeHeading',s.reveal.winner==='pour'?'POUR l’emporte':'CONTRE l’emporte');set('outcomeDetail',s.reveal.narration);}
  $('publicLink').href='/founders-city.html?session='+s.id;
@@ -152,7 +161,7 @@ function render(s){
   }
  }
  const history=$('history');history.replaceChildren();
- for(const item of s.history.slice(-8).reverse()){
+ for(const item of [...s.history].reverse()){
   const el=document.createElement('div');el.className='card';
   const title=document.createElement('strong');title.textContent=item.title+' · '+(item.winner==='pour'?'Adopté':'Refusé');
   const desc=document.createElement('p');desc.className='small';desc.textContent=item.narration;
@@ -166,7 +175,7 @@ async function command(kind,data={}){
   const s=await api('/commands','POST',{kind,data,expectedRevision:current.revision});
   render(s);set('actionMessage',kind==='reveal'?'Décision révélée sur la projection.':s.phase==='FINISHED'?'Partie terminée : classement affiché.':'Le prochain dilemme est ouvert.');
  }catch(e){set('actionMessage',e.message);try{render(await api(''));}catch{}}
- finally{busy=false;$('actions').querySelectorAll('button').forEach(b=>b.disabled=false);}
+ finally{busy=false;$('actions').querySelectorAll('button').forEach(b=>b.disabled=false);$('next').disabled=Boolean(current?.progression?.blocked);}
 }
 async function rotate(family){
  if(busy)return;busy=true;set('notice','Renouvellement du jeton…');
@@ -189,7 +198,7 @@ $('start').addEventListener('click',async()=>{
  finally{busy=false;$('start').disabled=false;}
 });
 $('reveal').addEventListener('click',()=>command('reveal'));
-$('next').addEventListener('click',()=>command('next'));
+$('next').addEventListener('click',()=>command('next',current?.progression&&$('nextDilemma').value?{dilemmaId:$('nextDilemma').value}:{}));
 $('copyAccess').addEventListener('click',async()=>{
  try{await navigator.clipboard.writeText($('newAccessLink').value);set('notice','Lien copié.');}
  catch{set('notice','Sélectionnez et copiez le lien dans le champ.');}

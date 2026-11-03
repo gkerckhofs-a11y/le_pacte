@@ -62,3 +62,10 @@ Le JSON conserve `schema_version: 1.0.0` avec un objet optionnel
 et/ou `image`. Les versions précédentes de l’application n’acceptent pas cette
 extension ; déployer le lecteur mis à jour avant de publier un scénario enrichi.
 Seule l’issue révélée entre dans la vue publique et dans l’historique.
+
+## Extension optionnelle : réserve narrative hybride
+
+Les scénarios à embranchements directs restent compatibles. Une réserve avec
+conditions et déblocages peut être importée via des paramètres et cinq colonnes
+supplémentaires de `Dilemmes`, lus jusqu’à AA. Le contrat et les exemples sont
+détaillés dans [fondateurs-reserve-hybride.md](fondateurs-reserve-hybride.md).

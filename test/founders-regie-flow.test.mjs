@@ -63,3 +63,10 @@ test('HTTP : lancer malgré un nom enregistré simultanément ouvre D01 et donne
  assert.equal((await startCouncil(api)).started,false);
  assert.equal((await fetch(origin+'/founders-regie-flow.js')).status,200);
 });
+
+test('Régie hybride : une branche FIN ne termine pas la partie avant la finale admissible',()=>{
+ const base={phase:'REVEALED',reveal:{nextId:null},progression:{terminal:false,blocked:null,candidates:[{id:'D04'}]}};
+ assert.match(councilGuidance(base).hint,/chapitre admissible/);
+ assert.match(councilGuidance({...base,progression:{terminal:true}}).hint,/Terminer la partie/);
+ assert.match(councilGuidance({...base,progression:{blocked:'Aucun dilemme admissible'}}).hint,/Aucun dilemme/);
+});

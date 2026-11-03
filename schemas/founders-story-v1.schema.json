@@ -58,6 +58,69 @@
             "active",
             "archived"
           ]
+        },
+        "progression": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "initial_dilemmas",
+            "finale_id",
+            "min_councils",
+            "max_councils"
+          ],
+          "properties": {
+            "mode": {
+              "const": "hybrid"
+            },
+            "initial_dilemmas": {
+              "type": "array",
+              "maxItems": 500,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/dilemmaId"
+              }
+            },
+            "finale_id": {
+              "$ref": "#/$defs/dilemmaId"
+            },
+            "min_councils": {
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 50
+            },
+            "max_councils": {
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 50
+            },
+            "ending_fragments": {
+              "type": "array",
+              "maxItems": 20,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "text",
+                  "conditions"
+                ],
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1500
+                  },
+                  "conditions": {
+                    "type": "array",
+                    "maxItems": 20,
+                    "items": {
+                      "$ref": "#/$defs/condition"
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -230,6 +293,14 @@
               }
             }
           }
+        },
+        "unlocks": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/dilemmaId"
+          }
         }
       }
     },
@@ -366,8 +437,120 @@
             "type": "string",
             "pattern": "^[a-z0-9_-]+$"
           }
+        },
+        "access": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "category",
+            "priority",
+            "conditions"
+          ],
+          "properties": {
+            "category": {
+              "enum": [
+                "required",
+                "optional",
+                "finale"
+              ]
+            },
+            "priority": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "conditions": {
+              "type": "array",
+              "maxItems": 20,
+              "items": {
+                "$ref": "#/$defs/condition"
+              }
+            }
+          }
         }
       }
+    },
+    "condition": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "dilemma_id",
+            "winner"
+          ],
+          "properties": {
+            "type": {
+              "const": "decision"
+            },
+            "dilemma_id": {
+              "$ref": "#/$defs/dilemmaId"
+            },
+            "winner": {
+              "enum": [
+                "pour",
+                "contre"
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "indicator",
+            "operator",
+            "value"
+          ],
+          "properties": {
+            "type": {
+              "const": "indicator"
+            },
+            "indicator": {
+              "enum": [
+                "economie",
+                "securite",
+                "satisfaction",
+                "bien_etre",
+                "developpement",
+                "stabilite"
+              ]
+            },
+            "operator": {
+              "enum": [
+                "lte",
+                "gte",
+                "eq"
+              ]
+            },
+            "value": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "minimum"
+          ],
+          "properties": {
+            "type": {
+              "const": "resolved"
+            },
+            "minimum": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50
+            }
+          }
+        }
+      ]
     }
   }
 }

@@ -1,4 +1,5 @@
 import {DEFAULT_TEAM_COLORS,teamColor} from '../public/founders-identity.js';
+import {isHybrid,narrativeReserve,chooseNarrativeNext,narrativeEpilogue} from './founders-progression.ts';
 /**
  * LE PACTE — independent narrative session domain (V2.5).
  *
@@ -129,9 +130,10 @@ export function applyNarrativeCommand(input,actor,command,now){
   }
   case 'next': {
    org();check(s.phase==='REVEALED','Révéler le résultat avant de poursuivre');
-   if(s.lastReveal.nextId===null){s.phase='FINISHED';s.finalResults=calculateFoundersFinal(s);break;}
+   const next=isHybrid(s.scenario)?chooseNarrativeNext(s,data.dilemmaId):s.lastReveal.nextId;
+   if(next===null){s.phase='FINISHED';s.finalResults=calculateFoundersFinal(s);s.narrativeEnding=narrativeEpilogue(s);break;}
    check(s.revealedHistory.length<=s.scenario.dilemmas.length*3,'Nombre maximal de dilemmes atteint');
-   s.currentDilemmaId=s.lastReveal.nextId;s.lastReveal=null;
+   s.currentDilemmaId=next;s.lastReveal=null;
    s.game=openFoundersDilemma(s.game,s.currentDilemmaId);s.phase='COUNCIL';
    break;
   }
@@ -168,6 +170,7 @@ function publicDilemma(s){
  if(s.phase==='READY'||s.phase==='FINISHED')return null;
  const d=dilemma(s);
  return {id:d.id,chapter:d.chapter,title:d.title,public_text:d.public_text,
+  ...(isHybrid(s.scenario)?{sequence:s.revealedHistory.length+(s.phase==='REVEALED'?0:1)}:{}),
   vote_question:d.vote_question,labels:copy(d.labels),image:copy(d.image)};
 }
 export function narrativePublicView(s){
@@ -185,6 +188,7 @@ export function narrativePublicView(s){
     pendingLeaderChoices:v.pendingLeaderChoices?copy(v.pendingLeaderChoices):[]}:
     {phase:resolved?'revealed':s.phase==='AWAITING_REVEAL'?'closed':'inactive',turn:null,bids:resolved?copy(resolved.bids):{},choices:resolved?copy(resolved.choices):{},pendingLeaderChoices:[]},
   reveal:s.phase==='REVEALED'||s.phase==='FINISHED'?copy(s.lastReveal):null,
+  narrativeEnding:s.phase==='FINISHED'?copy(s.narrativeEnding??null):null,
   // Enrich only already revealed chapters. Never send the other outcome.
   // Resolve illustrations from the frozen scenario, including older sessions
   // whose stored history predates the illustrated chronicle.
@@ -214,6 +218,7 @@ export function narrativeFamilyView(s,family){
 }
 export function narrativeOrganizerView(s){
  return {...narrativePublicView(s),familyGoals:copy(s.goals),familyResources:copy(s.game.families),
+  progression:s.phase==='REVEALED'?narrativeReserve(s):null,
   source:copy(s.source),selection:copy(s.selection),offers:copy(s.offers),
   goalCards:copy(s.goalCards??DEFAULT_GOAL_CARDS),scoreRules:copy(s.scoreRules??DEFAULT_SCORE_RULES),initiativeOrder:copy(s.initiativeOrder??FOUNDERS),
   game:copy(s.game),scenario:copy(s.scenario)};
