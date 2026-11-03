@@ -132,9 +132,10 @@ export function publishFoundersScenario(input,{payload,source,version}){
  if(input.kind!=='founders-library-v2.3')throw new Error('Catalogue invalide');
  requireValid(validateFoundersStory(payload),'Scénario invalide');
  if(!VERSION_RE.test(version))throw new Error('Numéro de version sémantique requis');
- if(!keys(source,['type','spreadsheetId','label'])||source.type!=='google_sheets'||
-    typeof source.spreadsheetId!=='string'||!/^[A-Za-z0-9_-]{15,160}$/.test(source.spreadsheetId)||
-    !txt(source.label,1,160))throw new Error('Source Google Sheets invalide');
+ const sheetSource=keys(source,['type','spreadsheetId','label'])&&source.type==='google_sheets'&&
+    typeof source.spreadsheetId==='string'&&/^[A-Za-z0-9_-]{15,160}$/.test(source.spreadsheetId);
+ const demoSource=keys(source,['type','label'])&&source.type==='bundled_fixture';
+ if(!(sheetSource||demoSource)||!txt(source.label,1,160))throw new Error('Source de scénario invalide');
  const library=clone(input),id=payload.scenario.id;
  const record=library.scenarios[id]??{id,releases:{}};
  if(record.releases[version])throw new Error('Version de scénario déjà publiée : '+id+'@'+version);
@@ -150,7 +151,7 @@ export function listFoundersLibrary(input){
    const latest=s.releases[versions.at(-1)];
    return {id:s.id,title:latest.payload.scenario.title,universe:latest.payload.scenario.universe,
      status:latest.payload.scenario.status,version:latest.version,
-     releases:versions,spreadsheetId:latest.source.spreadsheetId,dilemmas:latest.payload.dilemmas.length};
+     releases:versions,sourceType:latest.source.type,dilemmas:latest.payload.dilemmas.length};
   }).sort((a,b)=>a.title.localeCompare(b.title,'fr')),
   skins:Object.values(input.skins).map(s=>({
    id:s.id,title:s.title,universe:s.universe,status:s.status,version:s.version,
