@@ -63,7 +63,7 @@ function render(s){
  const ballots=$('ballots');ballots.replaceChildren();
  for(const f of s.families){
   const row=document.createElement('div');row.className='ballot';
-  const n=document.createElement('span');n.textContent=f.color.symbol+' '+f.color.label;n.title=teamCaption(f);colorize(n,f);appendFamilyRoles(n,s,f.id);
+  const n=document.createElement('span');n.textContent=f.name;n.title=teamCaption(f);colorize(n,f);appendFamilyRoles(n,s,f.id);
   const v=document.createElement('strong');
   const choice=s.council.choices[f.id];
   v.textContent=choice===undefined?'—':choice==='pour'?'POUR':choice==='contre'?'CONTRE':'ABSTENTION';
