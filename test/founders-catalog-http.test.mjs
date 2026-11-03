@@ -12,7 +12,7 @@ test('API V2.3 : endpoints protégés, aperçu non persistant et page de régie'
  const {server,origin}=await setup();t.after(()=>new Promise(r=>server.close(r)));
  const html=await fetch(origin+'/founders-setup.html');
  assert.equal(html.status,200);
- assert.match(await html.text(),/Configurer une expérience narrative/);
+ assert.match(await html.text(),/Créer une partie narrative/);
  const js=await fetch(origin+'/founders-setup.js');
  assert.equal(js.status,200);
  const anonymous=await fetch(origin+'/api/founders/catalog');
