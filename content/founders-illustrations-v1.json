@@ -1,0 +1,502 @@
+{
+  "d01-pour": {
+    "path": "public/assets/western/resolutions/d01-pour.webp",
+    "sha256": "af17190e4971631230cbc8343925f38837626c51bc845877bb541d9a06a9c9b3",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d01-pour.webp",
+      "alt": "Le chantier avance ; les tarifs exclusifs divisent la ville.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d01-contre": {
+    "path": "public/assets/western/resolutions/d01-contre.webp",
+    "sha256": "f8f9c888c722513837926382e2f7a0cd435463a263e330b6fca70dc391135120",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d01-contre.webp",
+      "alt": "Les artisans saluent leur indépendance, mais les investissements ralentissent.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d02-pour": {
+    "path": "public/assets/western/resolutions/d02-pour.webp",
+    "sha256": "8346315b9b2760b8758ecabdbe5a2433b1201251e6beeed5d5359874010516f9",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d02-pour.webp",
+      "alt": "Les convois sont mieux protégés ; les contrôles privés irritent les habitants.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d02-contre": {
+    "path": "public/assets/western/resolutions/d02-contre.webp",
+    "sha256": "e8927652d7bbc9f5e8640a5167a1afa837c441887832f74d2124e6a83bea3e8e",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d02-contre.webp",
+      "alt": "La ville garde le contrôle des armes, mais les convois restent exposés.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d03-pour": {
+    "path": "public/assets/western/resolutions/d03-pour.webp",
+    "sha256": "7ecb3f000018d72cc5b4b57f1d65f97ee76b7d59db00d7182c0c68a60215cc51",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d03-pour.webp",
+      "alt": "Les fermiers retrouvent de l’eau ; la dépense pèse sur l’activité municipale.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d03-contre": {
+    "path": "public/assets/western/resolutions/d03-contre.webp",
+    "sha256": "fca23a74dafc90918f6d19170ec5afaf49321e0c0121134465240ad83d789db0",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d03-contre.webp",
+      "alt": "Les travaux sont reportés ; les conditions de vie et la confiance se dégradent.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d04-pour": {
+    "path": "public/assets/western/resolutions/d04-pour.webp",
+    "sha256": "4bc08ad5fe3442ad900c374a5523cb109db72d3db3d1db63e889626312e849e5",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d04-pour.webp",
+      "alt": "L’école ouvre aux familles ; son financement réduit les moyens des affaires.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d04-contre": {
+    "path": "public/assets/western/resolutions/d04-contre.webp",
+    "sha256": "7550842e36afd528b4281ff232e60cf95b2848fbbf75c61525fab5743cb78a43",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d04-contre.webp",
+      "alt": "L’initiative privée allège la charge publique, mais creuse la fracture sociale.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d05-pour": {
+    "path": "public/assets/western/resolutions/d05-pour.webp",
+    "sha256": "f8fbdd8ceaa7d66439813b0d63e79ad97273bbe8a5bd5292c62cfeb41ab62746",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d05-pour.webp",
+      "alt": "La mine apporte emplois et équipements, au prix de conditions de vie plus difficiles.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d05-contre": {
+    "path": "public/assets/western/resolutions/d05-contre.webp",
+    "sha256": "2a3871a9217cd6e496c3d01fe51c960b5662ae9a75d91aeb31a421873ee20fdb",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d05-contre.webp",
+      "alt": "Les riverains sont soulagés ; les investisseurs se retirent.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d06-pour": {
+    "path": "public/assets/western/resolutions/d06-pour.webp",
+    "sha256": "9192eb18766274140d4dfa867c9ac3722bd27efeb88b6db02ae34bdd7f038748",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d06-pour.webp",
+      "alt": "Le crédit soutient les commerces ; les engagements publics accentuent le déséquilibre.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d06-contre": {
+    "path": "public/assets/western/resolutions/d06-contre.webp",
+    "sha256": "8ee2b36e1f192e1c2ac6ee56e53c839030b367432078d0df4354cdfab6b5b9d0",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d06-contre.webp",
+      "alt": "La prudence protège les finances communes, mais freine les affaires.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d07-pour": {
+    "path": "public/assets/western/resolutions/d07-pour.webp",
+    "sha256": "623450d3242fb609bcf82e73978f88b225e4540a9bddcf7fc7a74476218f7de2",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d07-pour.webp",
+      "alt": "Les travailleurs obtiennent des concessions ; les chantiers ralentissent.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d07-contre": {
+    "path": "public/assets/western/resolutions/d07-contre.webp",
+    "sha256": "098a91101784de874fc5f7f74435422c5df13756ba5f37ef653409462a1fda70",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d07-contre.webp",
+      "alt": "Les investissements continuent, mais la colère des travailleurs grandit.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d08-pour": {
+    "path": "public/assets/western/resolutions/d08-pour.webp",
+    "sha256": "bf24134b4456674f345f9b8bd9bd775e9de468e259e2efb30f3ffcea59b78907",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d08-pour.webp",
+      "alt": "La publication est protégée ; la liberté de la presse accompagne une crise politique.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d08-contre": {
+    "path": "public/assets/western/resolutions/d08-contre.webp",
+    "sha256": "a46ff86d89bb0c70406acb34c1b2bb5bd3d23d0ba400449fbce351f9b22aff26",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d08-contre.webp",
+      "alt": "Le scandale est contenu pour un temps ; la confiance des habitants s’érode.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d09-pour": {
+    "path": "public/assets/western/resolutions/d09-pour.webp",
+    "sha256": "4112760efe46b5daa4d6b67e0f693b9f7079ff9582cf2f5278d34f81ae447fba",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d09-pour.webp",
+      "alt": "L’isolement freine la maladie et bloque une partie du commerce.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d09-contre": {
+    "path": "public/assets/western/resolutions/d09-contre.webp",
+    "sha256": "0edf04480728e5ce3762361f6968478325a9171def2ddf666f27aa2624904115",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d09-contre.webp",
+      "alt": "Les échanges continuent ; la maladie touche davantage d’habitants.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d10-pour": {
+    "path": "public/assets/western/resolutions/d10-pour.webp",
+    "sha256": "1877d5a5d26db0580c294aa293cb970913dede31b2ce42fa933f97a076b02201",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d10-pour.webp",
+      "alt": "La charte structure la ville et impose de nouvelles charges communes.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d10-contre": {
+    "path": "public/assets/western/resolutions/d10-contre.webp",
+    "sha256": "04041514414c1bf2d39154044db63b8cdf8ea89d487c108790676ce7e2db3c8b",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d10-contre.webp",
+      "alt": "L’autonomie préserve des moyens immédiats, mais laisse les institutions fragiles.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d11": {
+    "path": "public/assets/western/dilemmas/d11.webp",
+    "sha256": "45f0e814c1631ce871428ca3aacab0ec445faae9c8462da33da97be6444c6e4d",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d11.webp",
+      "alt": "Les commerçants font front : débat avant la décision.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d11-pour": {
+    "path": "public/assets/western/resolutions/d11-pour.webp",
+    "sha256": "88182a57b21c9150468cad6eb4877360d4fdc65eaeefabb4da9b6baf8a394fbb",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d11-pour.webp",
+      "alt": "La médiation apaise les commerçants, mais ralentit les livraisons.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d11-contre": {
+    "path": "public/assets/western/resolutions/d11-contre.webp",
+    "sha256": "fedb9c81a469679d985e00be6780bfca1813c2f125e3e671fd99a791465a739a",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d11-contre.webp",
+      "alt": "Les échanges sont protégés ; la contestation s’amplifie.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d12": {
+    "path": "public/assets/western/dilemmas/d12.webp",
+    "sha256": "3449f0df057d69fa8ab080f6b369ede9734c709a1ed24bb8c1df282cbdc9bc0a",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d12.webp",
+      "alt": "Les tarifs du rail : débat avant la décision.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d12-pour": {
+    "path": "public/assets/western/resolutions/d12-pour.webp",
+    "sha256": "70b3c6e69c5c6a945863498655361b3e05d293cde34c668fd0b7f0f3e5eaaf06",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d12-pour.webp",
+      "alt": "Les recettes financent les travaux, mais les marchands dénoncent la hausse.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d12-contre": {
+    "path": "public/assets/western/resolutions/d12-contre.webp",
+    "sha256": "41964058dc71a6c42dbf5d854426481a7114063de4c1503a89b04e94c1edbabb",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d12-contre.webp",
+      "alt": "Les marchands conservent leurs marges ; les travaux sont ralentis.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d13": {
+    "path": "public/assets/western/dilemmas/d13.webp",
+    "sha256": "c3377e61cb13c8fcfbf4ddb1895ae6eed3f01b59730448d9cc9878149fa290e9",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d13.webp",
+      "alt": "Le serment des gardes : débat avant la décision.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d13-pour": {
+    "path": "public/assets/western/resolutions/d13-pour.webp",
+    "sha256": "916cbcd47e4480bc47d6064aef5c84f692a5cf9653f4bed35d0ebbe6ae5e75df",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d13-pour.webp",
+      "alt": "Les accès sont mieux surveillés ; les habitants supportent des contrôles intrusifs.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d13-contre": {
+    "path": "public/assets/western/resolutions/d13-contre.webp",
+    "sha256": "d1a37bef4778ed4ce698fb8c6e4059eb7183612494125cec8cb7a3f6a3143e72",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d13-contre.webp",
+      "alt": "Les habitants retrouvent leur liberté de circulation, mais les patrouilles couvrent moins de terrain.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d14": {
+    "path": "public/assets/western/dilemmas/d14.webp",
+    "sha256": "f78ce9b24da9c95c87b3d0969d463928bd35161a42c56c566f903161c6f253b3",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d14.webp",
+      "alt": "Le partage de l’eau : débat avant la décision.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d14-pour": {
+    "path": "public/assets/western/resolutions/d14-pour.webp",
+    "sha256": "c1e6030ac251d61b81b511376e902a840a9bded004d5a53063ec829741e2233f",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d14-pour.webp",
+      "alt": "Les fermes disposent de davantage d’eau ; les ateliers doivent ralentir leur activité.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d14-contre": {
+    "path": "public/assets/western/resolutions/d14-contre.webp",
+    "sha256": "22ce5a56f60859a37daea586fda9705236c9094d01adf4b65848e5d0f944d7a5",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d14-contre.webp",
+      "alt": "Les ateliers produisent davantage, mais les familles rurales subissent les restrictions.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d15": {
+    "path": "public/assets/western/dilemmas/d15.webp",
+    "sha256": "fc87aed1894a03dc4d424f2552d7234bdff737400dec2e8dc6e328434eb9cfc0",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d15.webp",
+      "alt": "Les bancs de l’école : débat avant la décision.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d15-pour": {
+    "path": "public/assets/western/resolutions/d15-pour.webp",
+    "sha256": "e25157dbb419f7cd640edb7cfa58e57e785f894bb6ff828d34ac25193c13d164",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d15-pour.webp",
+      "alt": "Une salle supplémentaire améliore l’accueil et l’équipement, mais mobilise les moyens de la ville.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d15-contre": {
+    "path": "public/assets/western/resolutions/d15-contre.webp",
+    "sha256": "aba7f68f4794e19321dc6c2143b52f87236933dfc307e574180e6d5a1e01f9d1",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d15-contre.webp",
+      "alt": "Les horaires alternés préservent des moyens pour les affaires ; les parents protestent contre les journées raccourcies.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d16": {
+    "path": "public/assets/western/dilemmas/d16.webp",
+    "sha256": "51370e17988c3a19aa615ce34723deb8304f7b5f5a0934597284545733753884",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d16.webp",
+      "alt": "Les étais de la mine : débat avant la décision.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d16-pour": {
+    "path": "public/assets/western/resolutions/d16-pour.webp",
+    "sha256": "a4cbed5bd2a8b7863f14916af222502bd6f37942f3b2ad258d0d00b20e04cade",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d16-pour.webp",
+      "alt": "Les galeries consolidées améliorent les conditions de travail ; l’arrêt coûte des recettes.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d16-contre": {
+    "path": "public/assets/western/resolutions/d16-contre.webp",
+    "sha256": "978529a76980e5c904b2ee5f2b85383aa66f47a16f361dccc72f512aba1172d8",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d16-contre.webp",
+      "alt": "L’extraction maintient les recettes, mais les ouvriers restent exposés à des conditions difficiles.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d17": {
+    "path": "public/assets/western/dilemmas/d17.webp",
+    "sha256": "4070fd21aa87f139c8d9238c0d4639f42d59c756bf35b8e14279cb7ed2c8133b",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d17.webp",
+      "alt": "Les comptes de la banque : débat avant la décision.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d17-pour": {
+    "path": "public/assets/western/resolutions/d17-pour.webp",
+    "sha256": "4495ea0e3157d3f272731aa3a66f0d4a7ec96aa9905b0bd7e035589b6697a537",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d17-pour.webp",
+      "alt": "Les contrôles rassurent les habitants, mais ralentissent les nouveaux prêts.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d17-contre": {
+    "path": "public/assets/western/resolutions/d17-contre.webp",
+    "sha256": "b623854e8f14b07af25797849c73ae265d78deb01b12666b57dee663009e29a7",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d17-contre.webp",
+      "alt": "Les prêts restent rapides ; les habitants dénoncent l’absence de contrôle public.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d18": {
+    "path": "public/assets/western/dilemmas/d18.webp",
+    "sha256": "990e7f516c30d48af843b09771f6e2d33f2c007b89f22166e265fe6299dfe9b0",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d18.webp",
+      "alt": "La commission des horaires : débat avant la décision.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d18-pour": {
+    "path": "public/assets/western/resolutions/d18-pour.webp",
+    "sha256": "57e0658b088faffd1f5531c1d4f4539ba49eb08a4685d33c91b63d66a13be70d",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d18-pour.webp",
+      "alt": "Le contrôle commun protège les conditions de travail et rassure les ouvriers ; son financement pèse sur l’activité.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d18-contre": {
+    "path": "public/assets/western/resolutions/d18-contre.webp",
+    "sha256": "f5fab968754218669a41e2a679742f348d70ec4075cfc203f83e0d4dc3dd4feb",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d18-contre.webp",
+      "alt": "Les ateliers disposent de plus de souplesse ; les protections deviennent inégales.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d19": {
+    "path": "public/assets/western/dilemmas/d19.webp",
+    "sha256": "ec244f25bde4dfe93a4ec2f03f64cf9835489339f482825ed38f1d63ed845682",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d19.webp",
+      "alt": "Les rues sans patrouille : débat avant la décision.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d19-pour": {
+    "path": "public/assets/western/resolutions/d19-pour.webp",
+    "sha256": "4b45563c37c4c134752984ba748b12ba8ae920477bc4f8f527ff0ea353bd172d",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d19-pour.webp",
+      "alt": "Les patrouilles renforcent la protection, mais leur financement réduit les moyens des affaires.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d19-contre": {
+    "path": "public/assets/western/resolutions/d19-contre.webp",
+    "sha256": "75050942c07271f005f802bf17e3e7e3b19f8b38807b0dbafb630edcc4e11258",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d19-contre.webp",
+      "alt": "Les rues fréquentées sont mieux équipées ; les quartiers éloignés dénoncent leur mise à l’écart.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d20": {
+    "path": "public/assets/western/dilemmas/d20.webp",
+    "sha256": "11af42148096c90fb513455daa98ecafa551f6c111451831ba6736e094c9125c",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d20.webp",
+      "alt": "La place du marché : débat avant la décision.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d20-pour": {
+    "path": "public/assets/western/resolutions/d20-pour.webp",
+    "sha256": "aed297df7fc40bb938136b341d768033b33dd65af51c2a111c37981e63938e2f",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d20-pour.webp",
+      "alt": "La place favorise les rencontres et l’adhésion ; la ville renonce à des recettes commerciales.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  },
+  "d20-contre": {
+    "path": "public/assets/western/resolutions/d20-contre.webp",
+    "sha256": "4b8d35148eb84621437ec067ec5670606459b68c38b6d270bcd76c3aca66fef7",
+    "image": {
+      "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d20-contre.webp",
+      "alt": "Les entrepôts soutiennent les échanges, mais les habitants regrettent la disparition du lieu de rencontre.",
+      "credit": "Illustration générée avec OpenAI, novembre 2026",
+      "license": null
+    }
+  }
+}

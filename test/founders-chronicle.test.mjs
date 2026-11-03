@@ -59,3 +59,14 @@ test('Chronicle: authored titles and summaries cover all 20 outcomes, effects re
  const broken=structuredClone(after);broken.dilemmas[0].outcomes.pour.chronicle.image={url:'javascript:alert(1)',alt:'X',credit:null,license:null};
  assert.ok(validateFoundersStory(broken).some(x=>x.includes('chronicle.image')));
 });
+test('Chronicle: bundled resolution art is concealed before reveal and survives next chapter',()=>{
+ let s=fixture('1.3.0');
+ assert.equal(JSON.stringify(narrativePublicView(s)).includes('/resolutions/'),false);
+ s=run(s,org,'start');s=vote(s);
+ assert.equal(JSON.stringify(narrativePublicView(s)).includes('/resolutions/'),false);
+ s=run(s,org,'reveal');
+ assert.match(latestChronicle(narrativePublicView(s)).image.url,/d01-pour.webp$/);
+ assert.equal(JSON.stringify(narrativePublicView(s)).includes('d01-contre.webp'),false);
+ s=run(s,org,'next');
+ assert.match(latestChronicle(narrativePublicView(JSON.parse(JSON.stringify(s)))).image.url,/d01-pour.webp$/);
+});

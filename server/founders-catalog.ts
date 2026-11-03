@@ -4,7 +4,9 @@ import {FOUNDERS_DEFAULT_CALIBRATION} from '../src/founders.ts';
 import {parseFoundersSheets} from '../src/founders-sheet-import.ts';
 import skins from '../content/founders-skins-v1.json' with {type:'json'};
 import illustrations from '../content/founders-dilemma-illustrations-v1.json' with {type:'json'};
+import fullArtwork from '../content/founders-illustrations-v1.json' with {type:'json'};
 import chronicles from '../content/founders-chronicles-v1.json' with {type:'json'};
+import hybridIllustrated from '../content/founders-hybrid-demo-v1-3.json' with {type:'json'};
 import hybridBalanced from '../content/founders-hybrid-demo-v1-2.json' with {type:'json'};
 import hybridExpanded from '../content/founders-hybrid-demo-v1-1.json' with {type:'json'};
 import hybridDemo from '../content/founders-hybrid-demo-v1.json' with {type:'json'};
@@ -31,10 +33,15 @@ for(const d of chronicledStory.dilemmas)for(const side of ['pour','contre']){
 }
 library=publishFoundersScenario(library,{payload:chronicledStory,version:'1.2.0',
  source:{type:'bundled_fixture',label:'Hot Spring — chroniques des vingt issues (règles inchangées)'}});
+const fullyIllustratedClassic=structuredClone(chronicledStory);
+for(const d of fullyIllustratedClassic.dilemmas)for(const side of ['pour','contre'])
+ d.outcomes[side].chronicle.image=structuredClone(fullArtwork[d.id.toLowerCase()+'-'+side].image);
+library=publishFoundersScenario(library,{payload:fullyIllustratedClassic,version:'1.3.0',source:{type:'bundled_fixture',label:'Hot Spring — dix scènes et vingt résolutions illustrées'}});
 library=publishFoundersScenario(library,{payload:hybridDemo,version:'1.0.0',
  source:{type:'bundled_fixture',label:'Prototype hybride — réserve de onze dilemmes, finale comprise'}});
 library=publishFoundersScenario(library,{payload:hybridExpanded,version:'1.1.0',source:{type:'bundled_fixture',label:'Prototype hybride — vingt dilemmes'}});
 library=publishFoundersScenario(library,{payload:hybridBalanced,version:'1.2.0',source:{type:'bundled_fixture',label:'Hot Spring hybride — calibration des vingt dilemmes'}});
+library=publishFoundersScenario(library,{payload:hybridIllustrated,version:'1.3.0',source:{type:'bundled_fixture',label:'Hot Spring hybride — vingt scènes et quarante résolutions illustrées'}});
 export const foundersLibrary=library;
 export const foundersCatalog=()=>listFoundersLibrary(foundersLibrary);
 export const foundersPreview=selection=>prepareFoundersSession(foundersLibrary,selection);

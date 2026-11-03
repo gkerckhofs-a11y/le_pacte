@@ -1,0 +1,1975 @@
+{
+  "schema_version": "1.0.0",
+  "scenario": {
+    "id": "hot-spring-reserve-hybride",
+    "title": "Hot Spring — Réserve narrative (prototype)",
+    "universe": "western",
+    "location": "Hot Spring",
+    "year": 1876,
+    "entry_dilemma": "D01",
+    "status": "prototype",
+    "progression": {
+      "mode": "hybrid",
+      "initial_dilemmas": [
+        "D01",
+        "D04",
+        "D05",
+        "D08",
+        "D09",
+        "D11",
+        "D19",
+        "D20"
+      ],
+      "finale_id": "D10",
+      "min_councils": 8,
+      "max_councils": 10,
+      "ending_fragments": [
+        {
+          "text": "La compagnie ferroviaire a obtenu son monopole. Son contrat reste l’un des actes fondateurs de ce Conseil.",
+          "conditions": [
+            {
+              "type": "decision",
+              "dilemma_id": "D01",
+              "winner": "pour"
+            }
+          ]
+        },
+        {
+          "text": "Le Conseil a refusé le monopole ferroviaire. Hot Spring a conservé son indépendance face à cette compagnie.",
+          "conditions": [
+            {
+              "type": "decision",
+              "dilemma_id": "D01",
+              "winner": "contre"
+            }
+          ]
+        },
+        {
+          "text": "La concession de charbon a été accordée : la vallée porte désormais la marque des décisions industrielles.",
+          "conditions": [
+            {
+              "type": "decision",
+              "dilemma_id": "D05",
+              "winner": "pour"
+            }
+          ]
+        },
+        {
+          "text": "La concession minière a été refusée. La vallée a été préservée, malgré le retrait des investisseurs.",
+          "conditions": [
+            {
+              "type": "decision",
+              "dilemma_id": "D05",
+              "winner": "contre"
+            }
+          ]
+        },
+        {
+          "text": "Les habitants terminent ces délibérations avec une faible Satisfaction. Le Conseil laisse derrière lui une ville divisée sur ses choix.",
+          "conditions": [
+            {
+              "type": "indicator",
+              "indicator": "satisfaction",
+              "operator": "lte",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "text": "La Satisfaction finale est élevée. Une large adhésion des habitants accompagne les dernières décisions du Conseil.",
+          "conditions": [
+            {
+              "type": "indicator",
+              "indicator": "satisfaction",
+              "operator": "gte",
+              "value": 7
+            }
+          ]
+        },
+        {
+          "text": "La protection reste insuffisante au terme de la séance : la Sécurité finale est basse.",
+          "conditions": [
+            {
+              "type": "indicator",
+              "indicator": "securite",
+              "operator": "lte",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "text": "La ville clôt cette séance avec une Sécurité élevée, reflet des moyens consacrés à sa protection.",
+          "conditions": [
+            {
+              "type": "indicator",
+              "indicator": "securite",
+              "operator": "gte",
+              "value": 7
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "dilemmas": [
+    {
+      "id": "D01",
+      "chapter": 1,
+      "title": "Le monopole du chemin de fer",
+      "public_text": "Une compagnie propose de relier Hot Spring au réseau ferroviaire. En échange, elle exige vingt ans d'exclusivité sur le transport des marchandises.",
+      "vote_question": "Le Conseil accorde-t-il l'exclusivité à la compagnie ?",
+      "labels": {
+        "pour": "Accorder le monopole",
+        "contre": "Refuser le monopole"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le Conseil signe vingt années d’exclusivité. Les capitaux et les chantiers font progresser l’Économie et le Développement de deux points chacun. Les tarifs imposés soulèvent les commerçants : la Satisfaction perd deux points. Les patrouilles municipales peinent à couvrir les nouveaux chantiers ; la Sécurité recule d’un point.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "developpement",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -2
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Le prix du rail",
+            "summary": "Le chantier avance ; les tarifs exclusifs divisent la ville.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d01-pour.webp",
+              "alt": "Le chantier avance ; les tarifs exclusifs divisent la ville.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": [
+            "D02",
+            "D06",
+            "D12"
+          ]
+        },
+        "contre": {
+          "narration": "Le Conseil refuse l’exclusivité et conserve le contrôle des pistes. Les commerçants saluent cette autonomie : la Satisfaction gagne un point. Les patrouilles restent concentrées sur les routes existantes : la Sécurité gagne un point. La compagnie retire ses capitaux, ce qui coûte un point d’Économie ; le Développement reste inchangé.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Une piste sans monopole",
+            "summary": "Les artisans saluent leur indépendance, mais les investissements ralentissent.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d01-contre.webp",
+              "alt": "Les artisans saluent leur indépendance, mais les investissements ralentissent.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": [
+            "D03"
+          ]
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d01.jpg",
+        "alt": "Un représentant du chemin de fer présente un contrat au Conseil.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "rail",
+        "commerce"
+      ],
+      "access": {
+        "category": "required",
+        "priority": 50,
+        "conditions": []
+      }
+    },
+    {
+      "id": "D02",
+      "chapter": 1,
+      "title": "Les hommes de la compagnie",
+      "public_text": "À la suite de vols sur la piste des convois, une agence privée offre de patrouiller armée. Son contrat lui accorderait une large autonomie.",
+      "vote_question": "Le Conseil autorise-t-il les gardes privés ?",
+      "labels": {
+        "pour": "Autoriser les patrouilles",
+        "contre": "Refuser les patrouilles"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les gardes de la compagnie prennent position sur la piste et devant les entrepôts. Les convois circulent sous escorte : la Sécurité gagne deux points. Les contrôles et les abus dénoncés par les habitants dégradent toutefois leur adhésion. La Satisfaction perd un point.",
+          "effects": [
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Des fusils sous contrat",
+            "summary": "Les convois sont mieux protégés ; les contrôles privés irritent les habitants.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d02-pour.webp",
+              "alt": "Les convois sont mieux protégés ; les contrôles privés irritent les habitants.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": [
+            "D13"
+          ]
+        },
+        "contre": {
+          "narration": "Le Conseil refuse de déléguer les patrouilles à une agence privée. Les habitants saluent le maintien du contrôle public : la Satisfaction gagne un point. Sans renfort immédiat sur les pistes, les convois restent vulnérables. La Sécurité perd un point.",
+          "effects": [
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "La force reste publique",
+            "summary": "La ville garde le contrôle des armes, mais les convois restent exposés.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d02-contre.webp",
+              "alt": "La ville garde le contrôle des armes, mais les convois restent exposés.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": []
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d02.jpg",
+        "alt": "Des gardes privés proposent de protéger les convois.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "securite",
+        "justice"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": []
+      }
+    },
+    {
+      "id": "D03",
+      "chapter": 1,
+      "title": "Le puits des fermiers",
+      "public_text": "Les familles installées hors de la ville accusent le propriétaire d'une source de détourner l'eau au profit de ses terres. Un nouveau puits collectif pourrait apaiser les tensions.",
+      "vote_question": "Le Conseil finance-t-il un puits collectif ?",
+      "labels": {
+        "pour": "Financer le puits",
+        "contre": "Reporter les travaux"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le nouveau puits est creusé. Les fermiers accèdent de nouveau à l’eau : le Bien-être gagne deux points et la Satisfaction un point. La dépense mobilise les moyens de la ville au détriment d’autres activités. L’Économie perd un point.",
+          "effects": [
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "L’eau mise en commun",
+            "summary": "Les fermiers retrouvent de l’eau ; la dépense pèse sur l’activité municipale.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d03-pour.webp",
+              "alt": "Les fermiers retrouvent de l’eau ; la dépense pèse sur l’activité municipale.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": [
+            "D14"
+          ]
+        },
+        "contre": {
+          "narration": "Le Conseil maintient les achats d’eau auprès des fournisseurs privés. Leurs affaires font gagner un point à l’Économie, mais l’accès reste inégal : le Bien-être et la Satisfaction perdent chacun un point.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "L’attente des fermiers",
+            "summary": "Les travaux sont reportés ; les conditions de vie et la confiance se dégradent.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d03-contre.webp",
+              "alt": "Les travaux sont reportés ; les conditions de vie et la confiance se dégradent.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": []
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d03.jpg",
+        "alt": "Des fermiers discutent d’un projet de puits près des canaux d’irrigation.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "eau",
+        "fermes"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": []
+      }
+    },
+    {
+      "id": "D04",
+      "chapter": 2,
+      "title": "L'école sur la colline",
+      "public_text": "Les nouveaux arrivants réclament une école. Les familles aisées préfèrent une institution privée, moins coûteuse pour la ville, mais inaccessible à certains enfants.",
+      "vote_question": "Le Conseil ouvre-t-il une école publique ?",
+      "labels": {
+        "pour": "Créer l'école publique",
+        "contre": "Laisser l'initiative au privé"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le chantier de l’école publique commence sur la colline. L’accès à l’instruction renforce les équipements de la ville et la vie des familles : le Développement et le Bien-être gagnent chacun un point. Le financement des locaux et des enseignants pèse sur les moyens disponibles. L’Économie perd un point.",
+          "effects": [
+            {
+              "indicator": "developpement",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Une classe pour Hot Spring",
+            "summary": "L’école ouvre aux familles ; son financement réduit les moyens des affaires.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d04-pour.webp",
+              "alt": "L’école ouvre aux familles ; son financement réduit les moyens des affaires.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": [
+            "D15"
+          ]
+        },
+        "contre": {
+          "narration": "Le Conseil laisse l’école à l’initiative privée. La ville préserve ses moyens pour l’activité et l’Économie gagne un point. L’instruction reste cependant inaccessible à certains enfants. Les familles exclues dénoncent cette différence de traitement : la Satisfaction perd un point.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "L’école des privilégiés",
+            "summary": "L’initiative privée allège la charge publique, mais creuse la fracture sociale.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d04-contre.webp",
+              "alt": "L’initiative privée allège la charge publique, mais creuse la fracture sociale.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": []
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d04.jpg",
+        "alt": "Une enseignante présente le projet d’école sur la colline.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "education",
+        "population"
+      ],
+      "access": {
+        "category": "required",
+        "priority": 50,
+        "conditions": []
+      }
+    },
+    {
+      "id": "D05",
+      "chapter": 2,
+      "title": "La concession de charbon",
+      "public_text": "Une société minière promet des salaires et des recettes à condition d'exploiter une vallée boisée. Des riverains craignent pour leurs habitations.",
+      "vote_question": "Le Conseil délivre-t-il la concession minière ?",
+      "labels": {
+        "pour": "Accorder la concession",
+        "contre": "Protéger la vallée"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "La concession est accordée et la mine entre en activité. Les salaires et les recettes font gagner deux points à l’Économie ; les nouveaux équipements ajoutent un point au Développement. Mais les conditions de travail et les nuisances pèsent sur les habitants. Le Bien-être perd un point.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "developpement",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Le charbon et la poussière",
+            "summary": "La mine apporte emplois et équipements, au prix de conditions de vie plus difficiles.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d05-pour.webp",
+              "alt": "La mine apporte emplois et équipements, au prix de conditions de vie plus difficiles.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": [
+            "D06",
+            "D16"
+          ]
+        },
+        "contre": {
+          "narration": "Le Conseil protège la vallée et refuse la concession. Les riverains accueillent cette décision favorablement : la Satisfaction gagne un point. Les investisseurs détournent leurs fonds de Hot Spring. L’Économie perd un point, sans autre variation de jauge.",
+          "effects": [
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "La vallée préservée",
+            "summary": "Les riverains sont soulagés ; les investisseurs se retirent.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d05-contre.webp",
+              "alt": "Les riverains sont soulagés ; les investisseurs se retirent.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": [
+            "D07"
+          ]
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d05.jpg",
+        "alt": "Des habitants et un arpenteur discutent d’une concession de charbon.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "mine",
+        "industrie"
+      ],
+      "access": {
+        "category": "required",
+        "priority": 50,
+        "conditions": []
+      }
+    },
+    {
+      "id": "D06",
+      "chapter": 3,
+      "title": "La banque des pionniers",
+      "public_text": "Un banquier propose d'ouvrir une caisse de crédit pour les commerces. En contrepartie, la ville garantirait une partie des pertes éventuelles.",
+      "vote_question": "Le Conseil garantit-il les prêts ?",
+      "labels": {
+        "pour": "Garantir les prêts",
+        "contre": "Refuser la garantie"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "La banque ouvre ses prêts avec la garantie de la ville. Les commerces empruntent et investissent : l’Économie gagne deux points. En acceptant de couvrir d’éventuelles pertes, le Conseil expose les finances communes et accentue le déséquilibre institutionnel. La Stabilité s’éloigne d’un point de son centre.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "stabilite",
+              "operation": "away_from_center"
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "La ville se porte garante",
+            "summary": "Le crédit soutient les commerces ; les engagements publics accentuent le déséquilibre.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d06-pour.webp",
+              "alt": "Le crédit soutient les commerces ; les engagements publics accentuent le déséquilibre.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": [
+            "D17"
+          ]
+        },
+        "contre": {
+          "narration": "Le Conseil refuse de garantir les prêts. Les engagements publics restent limités et la Stabilité se rapproche d’un point de son centre ; elle ne bouge pas si elle vaut déjà cinq. Les commerçants accèdent plus difficilement au crédit. L’Économie perd un point.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "stabilite",
+              "operation": "toward_center"
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Le crédit sous réserve",
+            "summary": "La prudence protège les finances communes, mais freine les affaires.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d06-contre.webp",
+              "alt": "La prudence protège les finances communes, mais freine les affaires.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": []
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d06.jpg",
+        "alt": "Un banquier présente des prêts aux commerçants de Hot Spring.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "finance",
+        "commerce"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": []
+      }
+    },
+    {
+      "id": "D07",
+      "chapter": 3,
+      "title": "La grève des journaliers",
+      "public_text": "Les ouvriers de plusieurs chantiers exigent une journée de travail plus courte. Les entrepreneurs menacent de suspendre leurs investissements.",
+      "vote_question": "Le Conseil soutient-il les revendications des ouvriers ?",
+      "labels": {
+        "pour": "Soutenir les ouvriers",
+        "contre": "Soutenir les entrepreneurs"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le Conseil soutient les revendications des journaliers. Les concessions obtenues améliorent leurs conditions de vie : le Bien-être gagne deux points. Le ralentissement des chantiers réduit l’activité immédiate. L’Économie perd un point.",
+          "effects": [
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Le repos obtenu",
+            "summary": "Les travailleurs obtiennent des concessions ; les chantiers ralentissent.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d07-pour.webp",
+              "alt": "Les travailleurs obtiennent des concessions ; les chantiers ralentissent.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": [
+            "D18"
+          ]
+        },
+        "contre": {
+          "narration": "Le Conseil soutient les entrepreneurs. Les chantiers poursuivent leur activité et l’Économie gagne un point. Les journaliers voient leurs demandes écartées et la colère se propage. La Satisfaction perd deux points.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Les chantiers avant tout",
+            "summary": "Les investissements continuent, mais la colère des travailleurs grandit.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d07-contre.webp",
+              "alt": "Les investissements continuent, mais la colère des travailleurs grandit.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": []
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d07.jpg",
+        "alt": "Des journaliers en grève négocient sur un chantier.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "travail",
+        "conflit_social"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": []
+      }
+    },
+    {
+      "id": "D08",
+      "chapter": 3,
+      "title": "La presse de Hot Spring",
+      "public_text": "Une journaliste veut publier des documents mettant en cause plusieurs notables. Certains conseillers demandent une censure temporaire pour éviter une crise politique.",
+      "vote_question": "Le Conseil protège-t-il la publication ?",
+      "labels": {
+        "pour": "Garantir la liberté de publier",
+        "contre": "Suspendre la publication"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les documents paraissent dans le journal de Hot Spring. La protection de la publication fait gagner un point à la Satisfaction. Mais les accusations divisent les notables et ouvrent une crise politique. La Stabilité s’éloigne d’un point de son centre. Les menaces entre factions mobilisent les patrouilles et font perdre un point à la Sécurité.",
+          "effects": [
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "stabilite",
+              "operation": "away_from_center"
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "L’encre du scandale",
+            "summary": "La publication est protégée ; la liberté de la presse accompagne une crise politique.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d08-pour.webp",
+              "alt": "La publication est protégée ; la liberté de la presse accompagne une crise politique.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": []
+        },
+        "contre": {
+          "narration": "Le Conseil suspend la publication. Les tensions institutionnelles s’apaisent provisoirement et la Stabilité se rapproche d’un point de son centre, sans bouger si elle vaut déjà cinq. Les habitants apprennent que des documents ont été retenus. La Satisfaction perd deux points. Le répit permet de rétablir les patrouilles : la Sécurité gagne deux points.",
+          "effects": [
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -2
+            },
+            {
+              "indicator": "stabilite",
+              "operation": "toward_center"
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 2
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Le journal suspendu",
+            "summary": "Le scandale est contenu pour un temps ; la confiance des habitants s’érode.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d08-contre.webp",
+              "alt": "Le scandale est contenu pour un temps ; la confiance des habitants s’érode.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": []
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d08.jpg",
+        "alt": "Une journaliste débat avec les notables près de la presse.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "presse",
+        "scandale"
+      ],
+      "access": {
+        "category": "required",
+        "priority": 50,
+        "conditions": [
+          {
+            "type": "resolved",
+            "minimum": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "D09",
+      "chapter": 4,
+      "title": "La fièvre du campement",
+      "public_text": "Une maladie se répand parmi les nouveaux arrivants. Le médecin demande d'isoler le campement pendant quelques jours, au risque de bloquer le commerce.",
+      "vote_question": "Le Conseil impose-t-il une quarantaine ?",
+      "labels": {
+        "pour": "Décréter la quarantaine",
+        "contre": "Maintenir les échanges"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le campement est placé en quarantaine. La propagation ralentit et le Bien-être gagne deux points. Les échanges sont interrompus et les marchands subissent des pertes. L’Économie perd deux points. Les familles attendent maintenant la reprise des échanges.",
+          "effects": [
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Les portes du camp se ferment",
+            "summary": "L’isolement freine la maladie et bloque une partie du commerce.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d09-pour.webp",
+              "alt": "L’isolement freine la maladie et bloque une partie du commerce.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": []
+        },
+        "contre": {
+          "narration": "Le Conseil maintient les échanges avec le campement. Les marchands continuent de travailler et l’Économie gagne un point. La circulation des personnes favorise toutefois la propagation de la maladie. Le Bien-être perd deux points. Les soignants font face à davantage de malades.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Le marché reste ouvert",
+            "summary": "Les échanges continuent ; la maladie touche davantage d’habitants.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d09-contre.webp",
+              "alt": "Les échanges continuent ; la maladie touche davantage d’habitants.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": []
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d09.jpg",
+        "alt": "Un médecin et des délégués discutent de la fièvre au campement.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "sante",
+        "commerce"
+      ],
+      "access": {
+        "category": "required",
+        "priority": 50,
+        "conditions": [
+          {
+            "type": "resolved",
+            "minimum": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "D10",
+      "chapter": 4,
+      "title": "La charte de Hot Spring",
+      "public_text": "La ville peut désormais obtenir un statut municipal reconnu, à condition d'adopter une charte, de financer des services communs et de répartir publiquement les responsabilités.",
+      "vote_question": "Le Conseil adopte-t-il la charte municipale ?",
+      "labels": {
+        "pour": "Adopter la charte",
+        "contre": "Reporter la charte"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "La charte est adoptée. Hot Spring se dote d’institutions reconnues et le Développement gagne un point. Le financement des services communs pèse sur l’activité : l’Économie perd un point. La Stabilité se rapproche d’un point de son centre, sans bouger si elle vaut déjà cinq. La coordination des patrouilles et de la justice fait gagner deux points à la Sécurité.",
+          "effects": [
+            {
+              "indicator": "developpement",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "stabilite",
+              "operation": "toward_center"
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 2
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Une municipalité reconnue",
+            "summary": "La charte structure la ville et impose de nouvelles charges communes.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d10-pour.webp",
+              "alt": "La charte structure la ville et impose de nouvelles charges communes.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": []
+        },
+        "contre": {
+          "narration": "Le Conseil reporte la charte. Les familles conservent davantage de moyens pour leurs activités et l’Économie gagne un point. Les responsabilités communes restent disputées et les institutions fragiles. La Stabilité s’éloigne d’un point de son centre. Faute de coordination entre les patrouilles, la Sécurité perd un point.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "stabilite",
+              "operation": "away_from_center"
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "chronicle": {
+            "title": "Les familles gardent la main",
+            "summary": "L’autonomie préserve des moyens immédiats, mais laisse les institutions fragiles.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d10-contre.webp",
+              "alt": "L’autonomie préserve des moyens immédiats, mais laisse les institutions fragiles.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          },
+          "unlocks": []
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d10.jpg",
+        "alt": "Les six familles discutent d’une charte encore non signée.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "charte",
+        "finale"
+      ],
+      "access": {
+        "category": "finale",
+        "priority": 50,
+        "conditions": []
+      }
+    },
+    {
+      "id": "D11",
+      "chapter": 3,
+      "title": "Les commerçants font front",
+      "public_text": "Des commerçants mécontents ferment leurs boutiques pour réclamer une révision des contrats municipaux. Le Conseil peut réunir une médiation et interrompre provisoirement les livraisons, ou protéger leur poursuite sous escorte. Les premiers veulent rétablir la confiance ; les seconds craignent de nouvelles pertes.",
+      "vote_question": "Le Conseil suspend-il les livraisons le temps d’une médiation ?",
+      "labels": {
+        "pour": "Médiation et suspension",
+        "contre": "Livraisons sous escorte"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "La médiation redonne une voix aux commerçants et apaise une partie de la colère : la Satisfaction gagne deux points. L’arrêt des livraisons coûte un point à l’Économie.",
+          "effects": [
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "Une table pour négocier",
+            "summary": "La médiation apaise les commerçants, mais ralentit les livraisons.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d11-pour.webp",
+              "alt": "La médiation apaise les commerçants, mais ralentit les livraisons.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        },
+        "contre": {
+          "narration": "Les convois reprennent sous escorte : la Sécurité gagne un point et l’Économie un point. Les commerçants qui demandent à être entendus dénoncent la décision : la Satisfaction perd deux points.",
+          "effects": [
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "Les convois passent",
+            "summary": "Les échanges sont protégés ; la contestation s’amplifie.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d11-contre.webp",
+              "alt": "Les échanges sont protégés ; la contestation s’amplifie.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d11.webp",
+        "alt": "Les commerçants font front : débat avant la décision.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "commerce",
+        "contestation"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": [
+          {
+            "type": "resolved",
+            "minimum": 3
+          },
+          {
+            "type": "indicator",
+            "indicator": "satisfaction",
+            "operator": "lte",
+            "value": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "D12",
+      "chapter": 3,
+      "title": "Les tarifs du rail",
+      "public_text": "La compagnie veut relever ses tarifs pour entretenir la voie. Les marchands demandent un tarif plafonné, quitte à différer des travaux.",
+      "vote_question": "Autoriser la hausse des tarifs ?",
+      "labels": {
+        "pour": "Financer la voie par les tarifs",
+        "contre": "Plafonner les tarifs"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les recettes financent les travaux, mais les marchands dénoncent la hausse.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "developpement",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "Les tarifs du rail — Financer la voie par les tarifs",
+            "summary": "Les recettes financent les travaux, mais les marchands dénoncent la hausse.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d12-pour.webp",
+              "alt": "Les recettes financent les travaux, mais les marchands dénoncent la hausse.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        },
+        "contre": {
+          "narration": "Les marchands conservent leurs marges ; les travaux sont ralentis.",
+          "effects": [
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "developpement",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "Les tarifs du rail — Plafonner les tarifs",
+            "summary": "Les marchands conservent leurs marges ; les travaux sont ralentis.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d12-contre.webp",
+              "alt": "Les marchands conservent leurs marges ; les travaux sont ralentis.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d12.webp",
+        "alt": "Les tarifs du rail : débat avant la décision.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "suite_narrative"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": [
+          {
+            "type": "resolved",
+            "minimum": 2
+          },
+          {
+            "type": "decision",
+            "dilemma_id": "D01",
+            "winner": "pour"
+          }
+        ]
+      }
+    },
+    {
+      "id": "D13",
+      "chapter": 3,
+      "title": "Le serment des gardes",
+      "public_text": "Les gardes privés demandent à contrôler les voyageurs aux portes de la ville. Le shérif propose de limiter leurs pouvoirs aux entrepôts.",
+      "vote_question": "Étendre les contrôles des gardes ?",
+      "labels": {
+        "pour": "Contrôler les accès",
+        "contre": "Limiter les pouvoirs privés"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les accès sont mieux surveillés ; les habitants supportent des contrôles intrusifs.",
+          "effects": [
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "Le serment des gardes — Contrôler les accès",
+            "summary": "Les accès sont mieux surveillés ; les habitants supportent des contrôles intrusifs.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d13-pour.webp",
+              "alt": "Les accès sont mieux surveillés ; les habitants supportent des contrôles intrusifs.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        },
+        "contre": {
+          "narration": "Les habitants retrouvent leur liberté de circulation, mais les patrouilles couvrent moins de terrain.",
+          "effects": [
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "Le serment des gardes — Limiter les pouvoirs privés",
+            "summary": "Les habitants retrouvent leur liberté de circulation, mais les patrouilles couvrent moins de terrain.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d13-contre.webp",
+              "alt": "Les habitants retrouvent leur liberté de circulation, mais les patrouilles couvrent moins de terrain.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d13.webp",
+        "alt": "Le serment des gardes : débat avant la décision.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "suite_narrative"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": [
+          {
+            "type": "resolved",
+            "minimum": 2
+          },
+          {
+            "type": "decision",
+            "dilemma_id": "D02",
+            "winner": "pour"
+          }
+        ]
+      }
+    },
+    {
+      "id": "D14",
+      "chapter": 3,
+      "title": "Le partage de l’eau",
+      "public_text": "Le puits communal est ouvert. Les fermiers veulent réserver des créneaux d’irrigation ; les ateliers réclament un accès prioritaire pour leur production.",
+      "vote_question": "Donner priorité aux fermiers ?",
+      "labels": {
+        "pour": "Réserver l’eau aux fermes",
+        "contre": "Donner priorité aux ateliers"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les fermes disposent de davantage d’eau ; les ateliers doivent ralentir leur activité.",
+          "effects": [
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "Le partage de l’eau — Réserver l’eau aux fermes",
+            "summary": "Les fermes disposent de davantage d’eau ; les ateliers doivent ralentir leur activité.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d14-pour.webp",
+              "alt": "Les fermes disposent de davantage d’eau ; les ateliers doivent ralentir leur activité.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        },
+        "contre": {
+          "narration": "Les ateliers produisent davantage, mais les familles rurales subissent les restrictions.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "Le partage de l’eau — Donner priorité aux ateliers",
+            "summary": "Les ateliers produisent davantage, mais les familles rurales subissent les restrictions.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d14-contre.webp",
+              "alt": "Les ateliers produisent davantage, mais les familles rurales subissent les restrictions.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d14.webp",
+        "alt": "Le partage de l’eau : débat avant la décision.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "suite_narrative"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": [
+          {
+            "type": "resolved",
+            "minimum": 2
+          },
+          {
+            "type": "decision",
+            "dilemma_id": "D03",
+            "winner": "pour"
+          }
+        ]
+      }
+    },
+    {
+      "id": "D15",
+      "chapter": 3,
+      "title": "Les bancs de l’école",
+      "public_text": "L’école publique accueille plus d’enfants que prévu. Une nouvelle salle permettrait de recevoir tous les élèves ; des horaires alternés coûteraient moins cher.",
+      "vote_question": "Construire une salle supplémentaire ?",
+      "labels": {
+        "pour": "Agrandir l’école",
+        "contre": "Alterner les horaires"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Une salle supplémentaire améliore l’accueil et l’équipement, mais mobilise les moyens de la ville.",
+          "effects": [
+            {
+              "indicator": "developpement",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "Les bancs de l’école — Agrandir l’école",
+            "summary": "Une salle supplémentaire améliore l’accueil et l’équipement, mais mobilise les moyens de la ville.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d15-pour.webp",
+              "alt": "Une salle supplémentaire améliore l’accueil et l’équipement, mais mobilise les moyens de la ville.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        },
+        "contre": {
+          "narration": "Les horaires alternés préservent des moyens pour les affaires ; les parents protestent contre les journées raccourcies.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "Les bancs de l’école — Alterner les horaires",
+            "summary": "Les horaires alternés préservent des moyens pour les affaires ; les parents protestent contre les journées raccourcies.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d15-contre.webp",
+              "alt": "Les horaires alternés préservent des moyens pour les affaires ; les parents protestent contre les journées raccourcies.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d15.webp",
+        "alt": "Les bancs de l’école : débat avant la décision.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "suite_narrative"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": [
+          {
+            "type": "resolved",
+            "minimum": 2
+          },
+          {
+            "type": "decision",
+            "dilemma_id": "D04",
+            "winner": "pour"
+          }
+        ]
+      }
+    },
+    {
+      "id": "D16",
+      "chapter": 3,
+      "title": "Les étais de la mine",
+      "public_text": "Les ouvriers de la mine réclament une consolidation des galeries. L’entreprise propose de poursuivre l’extraction pendant des travaux plus limités.",
+      "vote_question": "Suspendre l’extraction pour consolider les galeries ?",
+      "labels": {
+        "pour": "Consolider avant de reprendre",
+        "contre": "Maintenir une extraction réduite"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les galeries consolidées améliorent les conditions de travail ; l’arrêt coûte des recettes.",
+          "effects": [
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "Les étais de la mine — Consolider avant de reprendre",
+            "summary": "Les galeries consolidées améliorent les conditions de travail ; l’arrêt coûte des recettes.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d16-pour.webp",
+              "alt": "Les galeries consolidées améliorent les conditions de travail ; l’arrêt coûte des recettes.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        },
+        "contre": {
+          "narration": "L’extraction maintient les recettes, mais les ouvriers restent exposés à des conditions difficiles.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "Les étais de la mine — Maintenir une extraction réduite",
+            "summary": "L’extraction maintient les recettes, mais les ouvriers restent exposés à des conditions difficiles.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d16-contre.webp",
+              "alt": "L’extraction maintient les recettes, mais les ouvriers restent exposés à des conditions difficiles.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d16.webp",
+        "alt": "Les étais de la mine : débat avant la décision.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "suite_narrative"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": [
+          {
+            "type": "resolved",
+            "minimum": 2
+          },
+          {
+            "type": "decision",
+            "dilemma_id": "D05",
+            "winner": "pour"
+          }
+        ]
+      }
+    },
+    {
+      "id": "D17",
+      "chapter": 3,
+      "title": "Les comptes de la banque",
+      "public_text": "Les prêts garantis par la ville se multiplient. Le Conseil peut exiger un audit public ou laisser la banque gérer les dossiers sans nouveau contrôle.",
+      "vote_question": "Imposer un audit public ?",
+      "labels": {
+        "pour": "Publier les comptes",
+        "contre": "Laisser la banque gérer"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les contrôles rassurent les habitants, mais ralentissent les nouveaux prêts.",
+          "effects": [
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "Les comptes de la banque — Publier les comptes",
+            "summary": "Les contrôles rassurent les habitants, mais ralentissent les nouveaux prêts.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d17-pour.webp",
+              "alt": "Les contrôles rassurent les habitants, mais ralentissent les nouveaux prêts.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        },
+        "contre": {
+          "narration": "Les prêts restent rapides ; les habitants dénoncent l’absence de contrôle public.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "Les comptes de la banque — Laisser la banque gérer",
+            "summary": "Les prêts restent rapides ; les habitants dénoncent l’absence de contrôle public.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d17-contre.webp",
+              "alt": "Les prêts restent rapides ; les habitants dénoncent l’absence de contrôle public.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d17.webp",
+        "alt": "Les comptes de la banque : débat avant la décision.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "suite_narrative"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": [
+          {
+            "type": "resolved",
+            "minimum": 2
+          },
+          {
+            "type": "decision",
+            "dilemma_id": "D06",
+            "winner": "pour"
+          }
+        ]
+      }
+    },
+    {
+      "id": "D18",
+      "chapter": 3,
+      "title": "La commission des horaires",
+      "public_text": "Les journaliers ont obtenu des concessions. Ils demandent une commission chargée de les faire respecter ; les entrepreneurs préfèrent des accords atelier par atelier.",
+      "vote_question": "Créer une commission commune ?",
+      "labels": {
+        "pour": "Contrôler les horaires",
+        "contre": "Négocier dans chaque atelier"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le contrôle commun protège les conditions de travail et rassure les ouvriers ; son financement pèse sur l’activité.",
+          "effects": [
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "La commission des horaires — Contrôler les horaires",
+            "summary": "Le contrôle commun protège les conditions de travail et rassure les ouvriers ; son financement pèse sur l’activité.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d18-pour.webp",
+              "alt": "Le contrôle commun protège les conditions de travail et rassure les ouvriers ; son financement pèse sur l’activité.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        },
+        "contre": {
+          "narration": "Les ateliers disposent de plus de souplesse ; les protections deviennent inégales.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "bien_etre",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "La commission des horaires — Négocier dans chaque atelier",
+            "summary": "Les ateliers disposent de plus de souplesse ; les protections deviennent inégales.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d18-contre.webp",
+              "alt": "Les ateliers disposent de plus de souplesse ; les protections deviennent inégales.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d18.webp",
+        "alt": "La commission des horaires : débat avant la décision.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "suite_narrative"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": [
+          {
+            "type": "resolved",
+            "minimum": 2
+          },
+          {
+            "type": "decision",
+            "dilemma_id": "D07",
+            "winner": "pour"
+          }
+        ]
+      }
+    },
+    {
+      "id": "D19",
+      "chapter": 3,
+      "title": "Les rues sans patrouille",
+      "public_text": "Les habitants demandent davantage de patrouilles. Les commerçants proposent plutôt de consacrer les mêmes moyens à éclairer et aménager les axes fréquentés.",
+      "vote_question": "Recruter des patrouilleurs ?",
+      "labels": {
+        "pour": "Recruter des patrouilleurs",
+        "contre": "Aménager les rues fréquentées"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les patrouilles renforcent la protection, mais leur financement réduit les moyens des affaires.",
+          "effects": [
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "Les rues sans patrouille — Recruter des patrouilleurs",
+            "summary": "Les patrouilles renforcent la protection, mais leur financement réduit les moyens des affaires.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d19-pour.webp",
+              "alt": "Les patrouilles renforcent la protection, mais leur financement réduit les moyens des affaires.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        },
+        "contre": {
+          "narration": "Les rues fréquentées sont mieux équipées ; les quartiers éloignés dénoncent leur mise à l’écart.",
+          "effects": [
+            {
+              "indicator": "developpement",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "Les rues sans patrouille — Aménager les rues fréquentées",
+            "summary": "Les rues fréquentées sont mieux équipées ; les quartiers éloignés dénoncent leur mise à l’écart.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d19-contre.webp",
+              "alt": "Les rues fréquentées sont mieux équipées ; les quartiers éloignés dénoncent leur mise à l’écart.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d19.webp",
+        "alt": "Les rues sans patrouille : débat avant la décision.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "suite_narrative"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": [
+          {
+            "type": "resolved",
+            "minimum": 2
+          },
+          {
+            "type": "indicator",
+            "indicator": "securite",
+            "operator": "lte",
+            "value": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "D20",
+      "chapter": 3,
+      "title": "La place du marché",
+      "public_text": "Les habitants souhaitent une place pour se réunir. Les négociants préfèrent consacrer ce terrain à des entrepôts qui faciliteraient les échanges.",
+      "vote_question": "Réserver le terrain à une place publique ?",
+      "labels": {
+        "pour": "Créer la place publique",
+        "contre": "Construire les entrepôts"
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "La place favorise les rencontres et l’adhésion ; la ville renonce à des recettes commerciales.",
+          "effects": [
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "La place du marché — Créer la place publique",
+            "summary": "La place favorise les rencontres et l’adhésion ; la ville renonce à des recettes commerciales.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d20-pour.webp",
+              "alt": "La place favorise les rencontres et l’adhésion ; la ville renonce à des recettes commerciales.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        },
+        "contre": {
+          "narration": "Les entrepôts soutiennent les échanges, mais les habitants regrettent la disparition du lieu de rencontre.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "satisfaction",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": null,
+          "unlocks": [],
+          "chronicle": {
+            "title": "La place du marché — Construire les entrepôts",
+            "summary": "Les entrepôts soutiennent les échanges, mais les habitants regrettent la disparition du lieu de rencontre.",
+            "image": {
+              "url": "https://le-pacte-ludificateur.web.app/assets/western/resolutions/d20-contre.webp",
+              "alt": "Les entrepôts soutiennent les échanges, mais les habitants regrettent la disparition du lieu de rencontre.",
+              "credit": "Illustration générée avec OpenAI, novembre 2026",
+              "license": null
+            }
+          }
+        }
+      },
+      "image": {
+        "url": "https://le-pacte-ludificateur.web.app/assets/western/dilemmas/d20.webp",
+        "alt": "La place du marché : débat avant la décision.",
+        "credit": "Illustration générée avec OpenAI, novembre 2026",
+        "license": null
+      },
+      "status": "prototype",
+      "tags": [
+        "suite_narrative"
+      ],
+      "access": {
+        "category": "optional",
+        "priority": 50,
+        "conditions": [
+          {
+            "type": "resolved",
+            "minimum": 2
+          },
+          {
+            "type": "indicator",
+            "indicator": "satisfaction",
+            "operator": "lte",
+            "value": 4
+          }
+        ]
+      }
+    }
+  ]
+}
