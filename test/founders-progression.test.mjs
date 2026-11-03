@@ -39,7 +39,7 @@ test('Hybrid: only revealed decisions unlock arcs; low gauges make events eligib
  assert.ok(!reserve.candidates.some(c=>c.id==='D02'));
 });
 test('Hybrid: 120 complete sessions respect 8–10 councils, play all required chapters once and produce distinct orders',()=>{
- const paths=new Set();let min=99,max=0;
+ const paths=new Set(),encountered=new Set();let min=99,max=0;
  for(let seed=1;seed<=120;seed++){
   let s=cmd(fixture(seed),org,'start'),steps=0;
   while(s.phase!=='FINISHED'){
@@ -48,18 +48,18 @@ test('Hybrid: 120 complete sessions respect 8–10 councils, play all required c
    const reserve=narrativeReserve(s);assert.equal(reserve.blocked,null);
    s=cmd(JSON.parse(JSON.stringify(s)),org,'next');
   }
-  const ids=s.revealedHistory.map(h=>h.id);assert.equal(new Set(ids).size,ids.length);
+  const ids=s.revealedHistory.map(h=>h.id);ids.forEach(id=>encountered.add(id));assert.equal(new Set(ids).size,ids.length);
   assert.equal(ids[0],'D01');assert.equal(ids.at(-1),'D10');
   for(const id of ['D04','D05','D08','D09'])assert.ok(ids.includes(id));
   assert.ok(ids.length>=8&&ids.length<=10);min=Math.min(min,ids.length);max=Math.max(max,ids.length);
   assert.ok(s.narrativeEnding.paragraphs.length>=2);
   assert.deepEqual(narrativePublicView(s).narrativeEnding.city,s.game.city);
   const rail=s.revealedHistory[0].winner;
-  assert.equal(ids.includes('D03'),rail==='contre');
+  if(ids.includes('D03'))assert.equal(rail,'contre');
   if(rail==='contre')assert.equal(ids.includes('D02'),false);
   paths.add(ids.join('>'));
  }
- assert.ok(paths.size>4);console.log(JSON.stringify({sessions:120,distinctOrders:paths.size,minCouncils:min,maxCouncils:max}));
+ assert.equal(encountered.size,20);assert.ok(paths.size>4);console.log(JSON.stringify({sessions:120,distinctOrders:paths.size,minCouncils:min,maxCouncils:max}));
 });
 test('Hybrid: manual finale is unavailable too early, mandatory chapters and budget cannot be bypassed',()=>{
  let s=cmd(fixture(),org,'start');s=resolve(s);

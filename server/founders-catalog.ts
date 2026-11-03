@@ -5,6 +5,7 @@ import {parseFoundersSheets} from '../src/founders-sheet-import.ts';
 import skins from '../content/founders-skins-v1.json' with {type:'json'};
 import illustrations from '../content/founders-dilemma-illustrations-v1.json' with {type:'json'};
 import chronicles from '../content/founders-chronicles-v1.json' with {type:'json'};
+import hybridExpanded from '../content/founders-hybrid-demo-v1-1.json' with {type:'json'};
 import hybridDemo from '../content/founders-hybrid-demo-v1.json' with {type:'json'};
 import story from '../content/fondateurs-sheet-sample-v1.json' with {type:'json'};
 import {createFoundersLibrary,registerFoundersSkin,publishFoundersScenario,listFoundersLibrary,prepareFoundersSession,validateFoundersStory} from '../src/founders-library.ts';
@@ -31,6 +32,7 @@ library=publishFoundersScenario(library,{payload:chronicledStory,version:'1.2.0'
  source:{type:'bundled_fixture',label:'Hot Spring — chroniques des vingt issues (règles inchangées)'}});
 library=publishFoundersScenario(library,{payload:hybridDemo,version:'1.0.0',
  source:{type:'bundled_fixture',label:'Prototype hybride — réserve de onze dilemmes, finale comprise'}});
+library=publishFoundersScenario(library,{payload:hybridExpanded,version:'1.1.0',source:{type:'bundled_fixture',label:'Prototype hybride — vingt dilemmes'}});
 export const foundersLibrary=library;
 export const foundersCatalog=()=>listFoundersLibrary(foundersLibrary);
 export const foundersPreview=selection=>prepareFoundersSession(foundersLibrary,selection);
