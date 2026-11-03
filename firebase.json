@@ -67,7 +67,7 @@
           },
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self' https://apis.google.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://sheets.googleapis.com; frame-src https://le-pacte-ludificateur.firebaseapp.com https://accounts.google.com; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
+            "value": "default-src 'self'; script-src 'self' https://apis.google.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://sheets.googleapis.com; frame-src https://le-pacte-ludificateur.firebaseapp.com https://accounts.google.com; img-src 'self' data: https:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
           }
         ]
       }
