@@ -1,3 +1,4 @@
+import {FirestoreFoundersReleases} from './founders-releases.ts';
 import {randomBytes} from 'node:crypto';
 import {Pipelines} from '@google-cloud/firestore';
 import {ARCHETYPES} from '../src/map.ts';
@@ -11,7 +12,9 @@ import {FirestoreStudio} from './studio.ts';
 import {check,data,owned,rows,jsonData} from './data.ts';
 export class FirestoreStore {
  db:any;studio:FirestoreStudio;
- constructor(db:any){this.db=db;this.studio=new FirestoreStudio(db);}
+ founders:FirestoreFoundersReleases;
+ constructor(db:any){this.db=db;this.studio=new FirestoreStudio(db);
+  this.founders=new FirestoreFoundersReleases(db);}
  ref(id:string){check(/^[a-f0-9]{24}$/.test(id),'Session introuvable');return this.db.doc(`pacteSessions/${id}`);}
  accessRef(id:string,team:TeamId){check(ARCHETYPES.includes(team),'Équipe inconnue');return this.ref(id).collection('access').doc(team);}
  parse(r:any):Session{return JSON.parse(r.json);}
