@@ -1,6 +1,7 @@
 import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
 import {mountCity,updateCity} from './founders-city-scene.js';
 import {teamCaption,teamLabel,colorize} from './founders-identity.js';
+import {renderChronicle} from './founders-chronicle.js';
 "use strict";
 const $=id=>document.getElementById(id),param=new URLSearchParams(location.search);
 const sessionId=param.get('session');
@@ -37,6 +38,7 @@ function render(s){
  text('dilemmaText',s.dilemma?.public_text||(s.phase==='FINISHED'?'Les délibérations sont terminées.':'Le Conseil attend le signal de la régie.'));
  text('question',s.dilemma?.vote_question||'');
  drawGauges(s);
+ renderChronicle($('cityChronicle'),s);
  if(mountedSkin!==s.skin.id){mountCity($('city'),s.skin.id);mountedSkin=s.skin.id;previousCityStates=null;}
  const cityStates=updateCity($('city'),s.city,s.skin.id,s.skin.labels.resources);
  const changes=Object.entries(cityStates).filter(([key,state])=>previousCityStates&&state.level!==previousCityStates[key].level).map(([,state])=>state.description);

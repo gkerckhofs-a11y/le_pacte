@@ -4,6 +4,7 @@ import {FOUNDERS_DEFAULT_CALIBRATION} from '../src/founders.ts';
 import {parseFoundersSheets} from '../src/founders-sheet-import.ts';
 import skins from '../content/founders-skins-v1.json' with {type:'json'};
 import illustrations from '../content/founders-dilemma-illustrations-v1.json' with {type:'json'};
+import chronicles from '../content/founders-chronicles-v1.json' with {type:'json'};
 import story from '../content/fondateurs-sheet-sample-v1.json' with {type:'json'};
 import {createFoundersLibrary,registerFoundersSkin,publishFoundersScenario,listFoundersLibrary,prepareFoundersSession,validateFoundersStory} from '../src/founders-library.ts';
 
@@ -19,6 +20,14 @@ const illustratedStory=structuredClone(story);
 for(const d of illustratedStory.dilemmas)d.image=structuredClone(illustrations[d.id]);
 library=publishFoundersScenario(library,{payload:illustratedStory,version:'1.1.0',
  source:{type:'bundled_fixture',label:'Hot Spring illustré — dix scènes avant décision'}});
+const chronicledStory=structuredClone(illustratedStory);
+for(const d of chronicledStory.dilemmas)for(const side of ['pour','contre']){
+ const c=chronicles[d.id][side];
+ d.outcomes[side].narration=c.narration;
+ d.outcomes[side].chronicle={title:c.title,summary:c.summary};
+}
+library=publishFoundersScenario(library,{payload:chronicledStory,version:'1.2.0',
+ source:{type:'bundled_fixture',label:'Hot Spring — chroniques des vingt issues (règles inchangées)'}});
 export const foundersLibrary=library;
 export const foundersCatalog=()=>listFoundersLibrary(foundersLibrary);
 export const foundersPreview=selection=>prepareFoundersSession(foundersLibrary,selection);

@@ -89,3 +89,19 @@ test('SQLite : versions immuables, sources séparées, persistance après redém
   assert.equal(studio.list('local-organizer')[0].source.spreadsheetId,source.spreadsheetId);
  }finally{db?.close();rmSync(dir,{recursive:true,force:true});}
 });
+
+test('Sheets : six optional chronicle columns import chosen titles, summaries and HTTPS artwork; old sheets stay valid',()=>{
+ const tabs=makeSheetsTabs();
+ const fields=['image_resolution_pour','image_resolution_contre','titre_chronique_pour','titre_chronique_contre','resume_chronique_pour','resume_chronique_contre'];
+ tabs.Dilemmes[0].push(...fields);
+ tabs.Dilemmes[1].push('https://example.org/pour.jpg','https://example.org/contre.jpg','Le contrat signé','Les pistes libres','Le rail commence.','Les pistes restent ouvertes.');
+ const parsed=parseFoundersSheets(tabs);assert.deepEqual(parsed.errors,[]);
+ const d=parsed.story.dilemmas[0];
+ assert.equal(d.outcomes.pour.chronicle.title,'Le contrat signé');
+ assert.equal(d.outcomes.contre.chronicle.summary,'Les pistes restent ouvertes.');
+ assert.equal(d.outcomes.pour.chronicle.image.url,'https://example.org/pour.jpg');
+ assert.equal(parsed.story.dilemmas[1].outcomes.pour.chronicle,undefined);
+ tabs.Dilemmes[1][16]='javascript:alert(1)';assert.equal(parseFoundersSheets(tabs).valid,false);
+ tabs.Dilemmes[1][16]='https://example.org/pour.jpg';tabs.Dilemmes[1][20]='a'.repeat(601);assert.equal(parseFoundersSheets(tabs).valid,false);
+ assert.deepEqual(parseFoundersSheets(makeSheetsTabs()).story,fixture());
+});

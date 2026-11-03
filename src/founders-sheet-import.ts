@@ -12,6 +12,7 @@ const HEADER={
  Branches:['dilemme_id','issue','suivant_id','priorite','note_interne']
 };
 const sizes={Parametres:50,Dilemmes:501,Effets:10001,Branches:1001};
+const CHRONICLE_COLUMNS=['image_resolution_pour','image_resolution_contre','titre_chronique_pour','titre_chronique_contre','resume_chronique_pour','resume_chronique_contre'];
 const isObject=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
 const blank=x=>x===undefined||x===null||x==='';
 const value=x=>blank(x)?'':String(x).trim();
@@ -24,16 +25,17 @@ export function parseFoundersSheets(tabs){
  const rows={};
  for(const [name,headers] of Object.entries(HEADER)){
   const all=tabs[name];
-  if(!Array.isArray(all)||all.length<1||all.length>sizes[name]||all.some(r=>!Array.isArray(r)||r.length>headers.length+3||r.some(c=>typeof c!=='string'&&typeof c!=='number'&&typeof c!=='boolean'&&c!==null))){
+  if(!Array.isArray(all)||all.length<1||all.length>sizes[name]||all.some(r=>!Array.isArray(r)||r.length>headers.length+(name==='Dilemmes'?CHRONICLE_COLUMNS.length:0)+3||r.some(c=>typeof c!=='string'&&typeof c!=='number'&&typeof c!=='boolean'&&c!==null))){
    errors.push(name+': plage absente, trop grande ou valeur invalide');continue;
   }
   const first=all[0].map(value);
   for(const h of headers)if(!first.includes(h))errors.push(name+': colonne manquante '+h);
   if(new Set(first.filter(Boolean)).size!==first.filter(Boolean).length)errors.push(name+': colonnes dupliquées');
-  const positions=Object.fromEntries(headers.map(h=>[h,first.indexOf(h)]));
+  const readable=name==='Dilemmes'?[...headers,...CHRONICLE_COLUMNS]:headers;
+  const positions=Object.fromEntries(readable.map(h=>[h,first.indexOf(h)]));
   rows[name]=all.slice(1).map((r,i)=>{
    const obj={_row:i+2};
-   for(const h of headers)obj[h]=positions[h]===-1?'':r[positions[h]]??'';
+   for(const h of readable)obj[h]=positions[h]===-1?'':r[positions[h]]??'';
    return obj;
   }).filter(o=>headers.some(h=>!blank(o[h])&&value(o[h])!==''));
  }
@@ -91,6 +93,12 @@ export function parseFoundersSheets(tabs){
      effects:effects.get(k)||[],
      next_id:next==='FIN'?null:next
    }]);
+   const title=value(r['titre_chronique_'+side]),summary=value(r['resume_chronique_'+side]),imageUrl=value(r['image_resolution_'+side]);
+   if(title||summary||imageUrl){
+    const c={};if(title)c.title=title;if(summary)c.summary=summary;
+    if(imageUrl)c.image={url:imageUrl,alt:title||value(r.titre),credit:value(r.credit_image)||null,license:value(r.licence_image)||null};
+    notes.at(-1)[1].chronicle=c;
+   }
   }
   const statusTags=value(r.tags).split(';').map(s=>s.trim()).filter(Boolean);
   const d={
@@ -123,3 +131,4 @@ export function parseFoundersSheets(tabs){
 }
 export const FOUNDERS_SHEETS_TABS=Object.freeze(Object.keys(HEADER));
 export const FOUNDERS_SHEETS_HEADERS=Object.freeze(HEADER);
+export const FOUNDERS_CHRONICLE_COLUMNS=Object.freeze(CHRONICLE_COLUMNS);

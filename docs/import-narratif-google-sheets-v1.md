@@ -35,3 +35,30 @@ Le premier vote mène à D02 (pour) ou D03 (contre) ; D05 mène à D06 (pour) ou
 
 ## Cohabitation avec la V1 territoriale
 Ne pas modifier `src/engine.ts` ni `src/session.ts`. À ce stade, le prototype Founders `src/founders.ts` utilise une autre représentation des effets de jauges. Prévoir un adaptateur explicite lors du branchement futur ; ne pas insérer directement le JSON narratif dans les commandes territoriales.
+
+## Extension optionnelle : chroniques après résolution
+
+Les 16 colonnes historiques de `Dilemmes` restent valides. Ajouter à leur suite,
+par exemple en Q–V, les six en-têtes optionnels suivants :
+
+| En-tête | Usage |
+| --- | --- |
+| `image_resolution_pour` | URL HTTPS de l’image de l’issue POUR |
+| `image_resolution_contre` | URL HTTPS de l’image de l’issue CONTRE |
+| `titre_chronique_pour` | Titre du chapitre après POUR (200 caractères maximum) |
+| `titre_chronique_contre` | Titre du chapitre après CONTRE |
+| `resume_chronique_pour` | Résumé compact après POUR (600 caractères maximum) |
+| `resume_chronique_contre` | Résumé compact après CONTRE |
+
+`consequence_pour` / `consequence_contre` restent les récits complets (3 000
+caractères maximum). Les variations restent dans `Effets`. L’image de résolution
+hérite du crédit et de la licence de la ligne ; son texte alternatif reprend le
+titre de chronique ou, à défaut, le titre du dilemme. Une image de résolution
+absente réutilise l’illustration du dilemme. Les anciens fichiers et versions de
+scénario ne sont pas réécrits.
+
+Le JSON conserve `schema_version: 1.0.0` avec un objet optionnel
+`outcomes.pour.chronicle` / `outcomes.contre.chronicle` contenant `title`, `summary`
+et/ou `image`. Les versions précédentes de l’application n’acceptent pas cette
+extension ; déployer le lecteur mis à jour avant de publier un scénario enrichi.
+Seule l’issue révélée entre dans la vue publique et dans l’historique.

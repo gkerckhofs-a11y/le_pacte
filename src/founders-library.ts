@@ -64,7 +64,19 @@ export function validateFoundersStory(payload) {
   if(!keys(d.outcomes,OUTCOMES)){errors.push(where+'.outcomes : structure');continue;}
   for(const outcome of OUTCOMES){
    const o=d.outcomes[outcome],path=where+'.outcomes.'+outcome;
-   if(!keys(o,['narration','effects','next_id'])){errors.push(path+' : structure');continue;}
+   if(!keys(o,['narration','effects','next_id','chronicle'])){errors.push(path+' : structure');continue;}
+   if(o.chronicle!==undefined){
+    const c=o.chronicle;
+    if(!keys(c,['title','summary','image']))errors.push(path+'.chronicle : structure');
+    else {
+     if(c.title!==undefined)error(txt(c.title,1,200),path+'.chronicle.title',errors);
+     if(c.summary!==undefined)error(txt(c.summary,1,600),path+'.chronicle.summary',errors);
+     if(c.image!==undefined){
+      const i=c.image;
+      error(keys(i,['url','alt','credit','license'])&&typeof i.url==='string'&&i.url.length<=2048&&/^https:\/\/[^<>\s]+$/i.test(i.url)&&txt(i.alt,1,300)&&[i.credit,i.license].every(v=>v===null||(typeof v==='string'&&v.length<=300)),path+'.chronicle.image',errors);
+     }
+    }
+   }
    error(txt(o.narration,1,3000),path+'.narration',errors);
    error(o.next_id===null||DILEMMA_RE.test(o.next_id),path+'.next_id',errors);
    if(o.next_id!==null)nexts.push([path+'.next_id',o.next_id]);

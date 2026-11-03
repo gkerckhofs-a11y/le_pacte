@@ -177,6 +177,59 @@
               "type": "null"
             }
           ]
+        },
+        "chronicle": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "summary": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 600
+            },
+            "image": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "url",
+                "alt",
+                "credit",
+                "license"
+              ],
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https://",
+                  "maxLength": 2048
+                },
+                "alt": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "credit": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 300
+                },
+                "license": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 300
+                }
+              }
+            }
+          }
         }
       }
     },

@@ -27,7 +27,7 @@ test('Projection: result ballots survive reveal, snapshots reflect clipped chang
 });
 test('Illustrated release has ten images; historical 1.0.0 stays unchanged',()=>{
  const latest=foundersPreview(selection),old=foundersPreview({...selection,scenarioVersion:'1.0.0'});
- assert.equal(latest.selection.scenarioVersion,'1.1.0');
+ assert.equal(latest.selection.scenarioVersion,'1.2.0');
  for(const d of latest.scenario.dilemmas){assert.match(d.image.url,new RegExp('/dilemmas/'+d.id.toLowerCase()+'\\.jpg$'));assert.ok(d.image.alt);}
  for(const d of old.scenario.dilemmas)assert.equal(d.image.url,null);
 });

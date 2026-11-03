@@ -123,6 +123,7 @@ export function applyNarrativeCommand(input,actor,command,now){
    for(const offer of Object.values(s.offers))if(offer.status==='pending')offer.status='expired';
    s.lastReveal={id:d.id,title:d.title,winner:result.winner,yes:result.yes,no:result.no,
     narration:outcome.narration,effects:copy(outcome.effects),cityBefore,cityAfter:copy(s.game.city),nextId:outcome.next_id};
+   if(outcome.chronicle)s.lastReveal.chronicle=copy(outcome.chronicle);
    s.revealedHistory.push({...copy(s.lastReveal),city:copy(s.game.city)});
    s.phase='REVEALED';break;
   }
@@ -184,7 +185,15 @@ export function narrativePublicView(s){
     pendingLeaderChoices:v.pendingLeaderChoices?copy(v.pendingLeaderChoices):[]}:
     {phase:resolved?'revealed':s.phase==='AWAITING_REVEAL'?'closed':'inactive',turn:null,bids:resolved?copy(resolved.bids):{},choices:resolved?copy(resolved.choices):{},pendingLeaderChoices:[]},
   reveal:s.phase==='REVEALED'||s.phase==='FINISHED'?copy(s.lastReveal):null,
-  history:copy(s.revealedHistory),
+  // Enrich only already revealed chapters. Never send the other outcome.
+  // Resolve illustrations from the frozen scenario, including older sessions
+  // whose stored history predates the illustrated chronicle.
+  history:s.revealedHistory.map(h=>{
+   const d=s.scenario.dilemmas.find(d=>d.id===h.id);
+   const c=h.chronicle??d?.outcomes?.[h.winner]?.chronicle;
+   return {...copy(h),...(c?{chronicle:copy(c)}:{}),image:c?.image?copy(c.image):d?copy(d.image):null,
+    decisionLabel:d?.labels?.[h.winner]??h.winner};
+  }),
   finalTieOrder:copy(s.initiativeOrder??FOUNDERS),
   finalResults:s.phase==='FINISHED'?copy(s.finalResults):null
  };

@@ -1,0 +1,122 @@
+{
+  "D01": {
+    "pour": {
+      "title": "Le prix du rail",
+      "summary": "Le chantier avance ; les tarifs exclusifs divisent la ville.",
+      "narration": "Le Conseil signe les vingt années d’exclusivité. Ouvriers, machines et marchandises commencent à rejoindre Hot Spring : l’activité gagne un point et les équipements deux points. Mais les commerçants découvrent les tarifs de la compagnie. Leur colère fait reculer la Satisfaction d’un point."
+    },
+    "contre": {
+      "title": "Une piste sans monopole",
+      "summary": "Les artisans saluent leur indépendance, mais les investissements ralentissent.",
+      "narration": "Le Conseil refuse l’exclusivité. Les artisans accueillent la décision avec soulagement : la Satisfaction gagne un point. La compagnie suspend ses investissements et les équipements attendus tardent à arriver. L’Économie et le Développement perdent chacun un point."
+    }
+  },
+  "D02": {
+    "pour": {
+      "title": "Des fusils sous contrat",
+      "summary": "Les convois sont mieux protégés ; les contrôles privés irritent les habitants.",
+      "narration": "Les gardes de la compagnie prennent position sur la piste et devant les entrepôts. Les convois circulent sous escorte : la Sécurité gagne deux points. Les contrôles et les abus dénoncés par les habitants dégradent toutefois leur adhésion. La Satisfaction perd un point."
+    },
+    "contre": {
+      "title": "La force reste publique",
+      "summary": "La ville garde le contrôle des armes, mais les convois restent exposés.",
+      "narration": "Le Conseil refuse de déléguer les patrouilles à une agence privée. Les habitants saluent le maintien du contrôle public : la Satisfaction gagne un point. Sans renfort immédiat sur les pistes, les convois restent vulnérables. La Sécurité perd un point."
+    }
+  },
+  "D03": {
+    "pour": {
+      "title": "L’eau mise en commun",
+      "summary": "Les fermiers retrouvent de l’eau ; la dépense pèse sur l’activité municipale.",
+      "narration": "Le nouveau puits est creusé. Les fermiers accèdent de nouveau à l’eau : le Bien-être gagne deux points et la Satisfaction un point. La dépense mobilise les moyens de la ville au détriment d’autres activités. L’Économie perd un point."
+    },
+    "contre": {
+      "title": "L’attente des fermiers",
+      "summary": "Les travaux sont reportés ; les conditions de vie et la confiance se dégradent.",
+      "narration": "Le Conseil reporte le puits collectif. Les fermiers continuent de subir le manque d’eau : le Bien-être perd un point. Le sentiment d’être laissés à l’écart attise leur colère et la Satisfaction perd deux points. Ce report n’ajoute aucun point à l’Économie."
+    }
+  },
+  "D04": {
+    "pour": {
+      "title": "Une classe pour Hot Spring",
+      "summary": "L’école ouvre aux familles ; son financement réduit les moyens des affaires.",
+      "narration": "Le chantier de l’école publique commence sur la colline. L’accès à l’instruction renforce les équipements de la ville et la vie des familles : le Développement et le Bien-être gagnent chacun un point. Le financement des locaux et des enseignants pèse sur les moyens disponibles. L’Économie perd un point."
+    },
+    "contre": {
+      "title": "L’école des privilégiés",
+      "summary": "L’initiative privée allège la charge publique, mais creuse la fracture sociale.",
+      "narration": "Le Conseil laisse l’école à l’initiative privée. La ville préserve ses moyens pour l’activité et l’Économie gagne un point. L’instruction reste cependant inaccessible à certains enfants. Les familles exclues dénoncent cette différence de traitement : la Satisfaction perd un point."
+    }
+  },
+  "D05": {
+    "pour": {
+      "title": "Le charbon et la poussière",
+      "summary": "La mine apporte emplois et équipements, au prix de conditions de vie plus difficiles.",
+      "narration": "La concession est accordée et la mine entre en activité. Les salaires et les recettes font gagner deux points à l’Économie ; les nouveaux équipements ajoutent un point au Développement. Mais les conditions de travail et les nuisances pèsent sur les habitants. Le Bien-être perd un point."
+    },
+    "contre": {
+      "title": "La vallée préservée",
+      "summary": "Les riverains sont soulagés ; les investisseurs se retirent.",
+      "narration": "Le Conseil protège la vallée et refuse la concession. Les riverains accueillent cette décision favorablement : la Satisfaction gagne un point. Les investisseurs détournent leurs fonds de Hot Spring. L’Économie perd un point, sans autre variation de jauge."
+    }
+  },
+  "D06": {
+    "pour": {
+      "title": "La ville se porte garante",
+      "summary": "Le crédit soutient les commerces ; les engagements publics accentuent le déséquilibre.",
+      "narration": "La banque ouvre ses prêts avec la garantie de la ville. Les commerces empruntent et investissent : l’Économie gagne deux points. En acceptant de couvrir d’éventuelles pertes, le Conseil expose les finances communes et accentue le déséquilibre institutionnel. La Stabilité s’éloigne d’un point de son centre."
+    },
+    "contre": {
+      "title": "Le crédit sous réserve",
+      "summary": "La prudence protège les finances communes, mais freine les affaires.",
+      "narration": "Le Conseil refuse de garantir les prêts. Les engagements publics restent limités et la Stabilité se rapproche d’un point de son centre ; elle ne bouge pas si elle vaut déjà cinq. Les commerçants accèdent plus difficilement au crédit. L’Économie perd un point."
+    }
+  },
+  "D07": {
+    "pour": {
+      "title": "Le repos obtenu",
+      "summary": "Les travailleurs obtiennent des concessions ; les chantiers ralentissent.",
+      "narration": "Le Conseil soutient les revendications des journaliers. Les concessions obtenues améliorent leurs conditions de vie : le Bien-être gagne deux points. Le ralentissement des chantiers réduit l’activité immédiate. L’Économie perd un point."
+    },
+    "contre": {
+      "title": "Les chantiers avant tout",
+      "summary": "Les investissements continuent, mais la colère des travailleurs grandit.",
+      "narration": "Le Conseil soutient les entrepreneurs. Les chantiers poursuivent leur activité et l’Économie gagne un point. Les journaliers voient leurs demandes écartées et la colère se propage. La Satisfaction perd deux points."
+    }
+  },
+  "D08": {
+    "pour": {
+      "title": "L’encre du scandale",
+      "summary": "La publication est protégée ; la liberté de la presse accompagne une crise politique.",
+      "narration": "Les documents paraissent dans le journal de Hot Spring. La protection de la publication fait gagner un point à la Satisfaction. Mais les accusations divisent les notables et ouvrent une crise politique. La Stabilité s’éloigne d’un point de son centre."
+    },
+    "contre": {
+      "title": "Le journal suspendu",
+      "summary": "Le scandale est contenu pour un temps ; la confiance des habitants s’érode.",
+      "narration": "Le Conseil suspend la publication. Les tensions institutionnelles s’apaisent provisoirement et la Stabilité se rapproche d’un point de son centre, sans bouger si elle vaut déjà cinq. Les habitants apprennent que des documents ont été retenus. La Satisfaction perd deux points."
+    }
+  },
+  "D09": {
+    "pour": {
+      "title": "Les portes du camp se ferment",
+      "summary": "L’isolement freine la maladie et bloque une partie du commerce.",
+      "narration": "Le campement est placé en quarantaine. La propagation ralentit et le Bien-être gagne deux points. Les échanges sont interrompus et les marchands subissent des pertes. L’Économie perd deux points. Les familles attendent maintenant la reprise des échanges."
+    },
+    "contre": {
+      "title": "Le marché reste ouvert",
+      "summary": "Les échanges continuent ; la maladie touche davantage d’habitants.",
+      "narration": "Le Conseil maintient les échanges avec le campement. Les marchands continuent de travailler et l’Économie gagne un point. La circulation des personnes favorise toutefois la propagation de la maladie. Le Bien-être perd deux points. Les soignants font face à davantage de malades."
+    }
+  },
+  "D10": {
+    "pour": {
+      "title": "Une municipalité reconnue",
+      "summary": "La charte structure la ville et impose de nouvelles charges communes.",
+      "narration": "La charte est adoptée. Hot Spring se dote d’institutions reconnues et le Développement gagne deux points. Le financement des services communs pèse sur l’activité : l’Économie perd un point. La Stabilité se rapproche d’un point de son centre, sans bouger si elle vaut déjà cinq."
+    },
+    "contre": {
+      "title": "Les familles gardent la main",
+      "summary": "L’autonomie préserve des moyens immédiats, mais laisse les institutions fragiles.",
+      "narration": "Le Conseil reporte la charte. Les familles conservent davantage de moyens pour leurs activités et l’Économie gagne un point. Les responsabilités communes restent disputées et les institutions fragiles. La Stabilité s’éloigne d’un point de son centre."
+    }
+  }
+}
