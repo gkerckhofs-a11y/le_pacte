@@ -26,7 +26,7 @@
   <div id="lastReveal" class="card" hidden><strong id="resultTitle"></strong><p id="resultNarration"></p></div>
  </section>
  <section class="panel" style="margin-top:16px">
-  <h2>Votre décision politique</h2><p class="instructions" id="voteHint">Le porte-parole vote au nom de toute sa famille, après concertation.</p>
+  <h2>Votre décision politique</h2><p id="voteCommitment" class="instructions" hidden></p><p class="instructions" id="voteHint">Le porte-parole vote au nom de toute sa famille, après concertation.</p>
   <div id="firstVote" hidden>
    <div class="field"><label for="voteAmount">Influence engagée</label><input type="number" min="1" max="500" id="voteAmount" value="1"></div>
    <div class="row"><button data-vote="pour">Voter POUR</button><button data-vote="contre" class="secondary">Voter CONTRE</button></div>
@@ -47,8 +47,13 @@
     <div class="field"><label for="targetFamily">Famille destinataire</label><select id="targetFamily" required></select></div>
     <div class="field"><label for="offerAmount" id="offerAmountLabel">Somme proposée</label><input id="offerAmount" type="number" min="1" value="1" required></div>
    </div>
-   <div class="field"><label for="offerReason">Objet de l'accord</label><input id="offerReason" maxlength="300" required placeholder="Soutien au vote, abstention, arbitrage…"></div>
-   <button type="submit">Proposer le transfert</button>
+   <div class="grid2">
+    <div class="field"><label for="offerCommitment">Contrepartie contraignante sur ce Conseil</label><select id="offerCommitment"><option value="pour">Voter POUR</option><option value="contre">Voter CONTRE</option><option value="passe_pouvoir">Passer · récupérer l’influence</option><option value="gift">Transfert sans contrepartie</option></select></div>
+    <div class="field" id="offerMinimumField"><label for="offerMinimum">Influence minimale promise</label><input id="offerMinimum" type="number" min="1" max="500" value="1"></div>
+   </div>
+   <p class="small">Accepter verse les dollars et engage votre choix pour ce Conseil. Vous pouvez miser davantage. Le commentaire ne crée aucune obligation supplémentaire.</p>
+   <div class="field"><label for="offerReason">Commentaire de l’accord</label><input id="offerReason" maxlength="300" required placeholder="Précisions pour l’autre famille…"></div>
+   <button type="submit">Proposer l’accord</button>
   </form>
   <div id="offers"></div>
  </section>
@@ -82,7 +87,7 @@
  <p>Les points d’influence engagés déterminent le résultat, pas le nombre d’équipes. Les mises du camp gagnant vont à la réserve commune ; les mises du camp perdant sont rendues. Le Maire reste en place s’il appartient au camp gagnant ; sinon, la plus forte mise gagnante prend le rôle. Si tout le monde passe, le Shérif devient Maire.</p>
  <p>La régie révèle ensuite les conséquences. L’écran projeté montre le dilemme, les votes et l’évolution des indicateurs de la ville. Votre influence disponible, vos dollars et votre objectif secret sont dans « Ma table ».</p>
  <h3>Négocier et gagner</h3>
- <p>Vous pouvez proposer un transfert de dollars pendant le Conseil. Il n’est exécuté qu’après acceptation de la famille destinataire. Les offres encore en attente expirent à la révélation.</p>
+ <p>Vous pouvez proposer un transfert de dollars pendant le Conseil. Il n’est exécuté qu’après acceptation de la famille destinataire. Les offres encore en attente expirent à la révélation. Accepter un accord de vote verse les dollars et vous oblige à respecter le camp et la mise minimale indiqués sur ce Conseil. Un transfert sans contrepartie ne vous engage pas à voter.</p>
  <p>Votre objectif secret indique vos deux paliers et vos points provisoires. Le classement final additionne objectif secret, richesse, votes remportés et influence restante. La priorité de départage finale est annoncée sur l’écran projeté.</p>
 </section>
 <div id="notice" role="status" style="margin-top:16px"></div>

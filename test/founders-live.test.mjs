@@ -61,7 +61,7 @@ test('Vote complet à six familles → résultat réservé à la régie → rév
 test('Offres financières : propositions privées, confirmation bilatérale, anti-double transfert',()=>{
  let s=run(make(),organizer,'start');
  const id='trade_123456789';
- s=run(s,team('A'),'offer',{id,to:'B',amount:3,reason:'Soutien au rail'});
+ s=run(s,team('A'),'offer',{id,to:'B',amount:3,reason:'Soutien au rail',commitment:{choice:'gift'}});
  const p=narrativePublicView(s);
  assert.equal(JSON.stringify(p).includes('Soutien au rail'),false);
  assert.equal(narrativeFamilyView(s,'C').offers.length,0);
@@ -104,4 +104,56 @@ test('SQLite : sauvegarde redémarrable, accès famille révocable, accès publi
   assert.equal(store.view(result.id,{role:'public'},now+3).phase,'COUNCIL');
   assert.throws(()=>store.view(result.id,{role:'organizer',id:'other'},now+3),/Accès organisateur/);
  }finally{db?.close();rmSync(dir,{recursive:true,force:true});}
+});
+
+test('Accord payé : choix et mise minimale imposés, offres privées et incompatibilités refusées',()=>{
+ let s=run(make(),organizer,'start');
+ const promise={id:'promise_12345678',to:'B',amount:3,reason:'Vote rail',commitment:{choice:'pour',minInfluence:3}};
+ s=run(s,team('A'),'offer',promise);
+ s=run(s,team('B'),'acceptOffer',{id:promise.id});
+ assert.equal(s.game.families.A.dollars,7);assert.equal(s.game.families.B.dollars,13);
+ assert.deepEqual(narrativeFamilyView(s,'B').voteCommitment,{choice:'pour',minInfluence:3});
+ assert.equal(narrativePublicView(s).voteCommitment,undefined);
+ assert.equal(narrativeFamilyView(s,'C').voteCommitment,null);
+ assert.throws(()=>run(s,team('C'),'offer',{...promise,id:'opposite_12345678',commitment:{choice:'contre',minInfluence:1}}),/incompatible/);
+ s=run(s,team('A'),'vote',{kind:'contre',amount:1});
+ for(const action of [{kind:'contre',amount:3},{kind:'passe_pouvoir'},{kind:'passe_moderateur'},{kind:'pour',amount:2}]){
+  const before=JSON.stringify(s);assert.throws(()=>run(s,team('B'),'vote',action),/Accord accepté/);assert.equal(JSON.stringify(s),before);
+ }
+ s=run(s,team('B'),'vote',{kind:'pour',amount:4});assert.equal(s.game.vote.bids.B,4);
+ assert.throws(()=>run(s,team('C'),'offer',{...promise,id:'late_123456789'}),/déjà voté/);
+});
+test('Acceptation : revérifie influence, vote déjà joué, engagements concurrents et dollars',()=>{
+ let s=run(make(),organizer,'start');
+ const offer=(id,choice='pour',amount=3)=>({id,to:'B',amount,reason:'Accord',commitment:{choice,minInfluence:2}});
+ s=run(s,team('A'),'offer',offer('first_12345678'));
+ s=run(s,team('C'),'offer',offer('second_12345678','contre'));
+ s=run(s,team('B'),'acceptOffer',{id:'first_12345678'});
+ const cash=s.game.families.B.dollars;
+ assert.throws(()=>run(s,team('B'),'acceptOffer',{id:'second_12345678'}),/incompatible/);
+ assert.equal(s.game.families.B.dollars,cash);
+ let late=run(make(),organizer,'start');
+ late=run(late,team('C'),'offer',offer('late_12345678'));
+ late=run(late,team('A'),'vote',{kind:'pour',amount:1});late=run(late,team('B'),'vote',{kind:'pour',amount:1});
+ assert.throws(()=>run(late,team('B'),'acceptOffer',{id:'late_12345678'}),/déjà voté/);
+ let poor=run(make(),organizer,'start');
+ poor=run(poor,team('A'),'offer',offer('cash_12345678','pour',10));
+ poor=run(poor,team('A'),'offer',{id:'gift_12345678',to:'C',amount:1,reason:'Don',commitment:{choice:'gift'}});
+ poor=run(poor,team('C'),'acceptOffer',{id:'gift_12345678'});
+ assert.throws(()=>run(poor,team('B'),'acceptOffer',{id:'cash_12345678'}),/Fonds insuffisants/);
+});
+test('Abstention contractuelle puis liberté au prochain Conseil ; champ explicite obligatoire',()=>{
+ let s=run(make(),organizer,'start');
+ assert.throws(()=>run(s,team('A'),'offer',{id:'missing_12345678',to:'B',amount:1,reason:'Promesse'}),/engagement précis/);
+ s=run(s,team('A'),'offer',{id:'pass_12345678',to:'B',amount:1,reason:'Abstention',commitment:{choice:'passe_pouvoir',minInfluence:0}});
+ s=run(s,team('B'),'acceptOffer',{id:'pass_12345678'});
+ s=run(s,team('A'),'vote',{kind:'pour',amount:1});
+ assert.throws(()=>run(s,team('B'),'vote',{kind:'pour',amount:1}),/Accord accepté/);
+ s=run(s,team('B'),'vote',{kind:'passe_pouvoir'});
+ for(const id of ['C','D','E','F'])s=run(s,team(id),'vote',{kind:'passe_pouvoir'});
+ assert.equal(s.phase,'AWAITING_REVEAL');
+ s=run(s,organizer,'reveal');s=run(s,organizer,'next');
+ assert.equal(narrativeFamilyView(s,'B').voteCommitment,null);
+ s=run(s,team('A'),'vote',{kind:'pour',amount:1});
+ s=run(s,team('B'),'vote',{kind:'contre',amount:1});assert.equal(s.game.vote.choices.B,'contre');
 });

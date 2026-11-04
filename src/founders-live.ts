@@ -73,6 +73,25 @@ const validateActor=(s,actor)=>{
  else check(familyId(actor.family),'Famille inconnue');
 };
 const activeOffers=s=>Object.values(s.offers).filter(o=>o.status==='pending').length;
+export function acceptedVoteCommitment(s,family){
+ const offers=Object.values(s.offers).filter(o=>o.status==='accepted'&&o.to===family&&o.councilNumber===s.game.history.length&&o.commitment?.choice);
+ if(!offers.length)return null;
+ return {choice:offers[0].commitment.choice,minInfluence:Math.max(...offers.map(o=>o.commitment.minInfluence))};
+}
+function validateOfferCommitment(s,to,commitment){
+ check(commitment&&typeof commitment==='object'&&!Array.isArray(commitment),'Choisissez un engagement précis ou un transfert sans contrepartie');
+ if(commitment.choice==='gift'){
+  check(Object.keys(commitment).every(k=>k==='choice'),'Transfert sans contrepartie invalide');return;
+ }
+ check(['pour','contre','passe_pouvoir'].includes(commitment.choice),'Engagement de vote invalide');
+ check(Object.keys(commitment).every(k=>['choice','minInfluence'].includes(k)),'Champ d’engagement invalide');
+ const minimum=commitment.minInfluence;
+ check(Number.isSafeInteger(minimum)&&(commitment.choice==='passe_pouvoir'?minimum===0:minimum>=1&&minimum<=s.game.families[to].power),'Influence insuffisante pour cet engagement');
+ check(s.game.vote?.phase==='voting'&&s.game.vote.choices[to]===undefined,'Cette famille a déjà voté ou le vote est clos');
+ const prior=acceptedVoteCommitment(s,to);
+ check(!prior||prior.choice===commitment.choice,'Cette famille a déjà accepté un engagement incompatible');
+}
+
 export function applyNarrativeCommand(input,actor,command,now){
  check(input?.kind==='founders-live-session-v2.5','Partie narrative invalide');
  validateActor(input,actor);
@@ -100,7 +119,14 @@ export function applyNarrativeCommand(input,actor,command,now){
    s.game=openFoundersDilemma(s.game,s.currentDilemmaId);s.phase='COUNCIL';break;
   case 'vote':
    team();check(s.phase==='COUNCIL','Conseil fermé');
-   s.game=castFoundersAction(s.game,actor.family,data);
+   {
+    const commitment=acceptedVoteCommitment(s,actor.family),prior=s.game.vote?.choices[actor.family];
+    if(commitment){
+     check(prior===undefined?data.kind===commitment.choice:prior===commitment.choice,'Accord accepté : votre position de vote est engagée');
+     if(prior===undefined&&commitment.minInfluence>0)check(Number.isSafeInteger(data.amount)&&data.amount>=commitment.minInfluence,'Accord accepté : mise minimale de '+commitment.minInfluence+' Influence');
+    }
+    s.game=castFoundersAction(s.game,actor.family,data);
+   }
    if(!s.game.vote)s.phase='AWAITING_REVEAL';
    break;
   case 'resolveTie':
@@ -144,14 +170,19 @@ export function applyNarrativeCommand(input,actor,command,now){
    check(familyId(data.to)&&data.to!==actor.family,'Destinataire invalide');
    check(Number.isSafeInteger(data.amount)&&data.amount>=1&&data.amount<=s.game.families[actor.family].dollars,'Dollars insuffisants');
    check(str(data.reason,300),'Motif de proposition requis');
+   validateOfferCommitment(s,data.to,data.commitment);
    check(typeof data.id==='string'&&/^[A-Za-z0-9_-]{8,80}$/.test(data.id)&&!has(s.offers,data.id),'Identifiant d’offre déjà utilisé');
-   s.offers[data.id]={id:data.id,from:actor.family,to:data.to,amount:data.amount,reason:data.reason,status:'pending'};
+   s.offers[data.id]={id:data.id,from:actor.family,to:data.to,amount:data.amount,reason:data.reason,commitment:copy(data.commitment),councilNumber:s.game.history.length,status:'pending'};
    break;
   }
   case 'acceptOffer': {
    team();check(s.phase==='COUNCIL','Négociations fermées');
    const offer=has(s.offers,data.id)?s.offers[data.id]:null;
    check(offer&&offer.status==='pending'&&offer.to===actor.family,'Offre non destinée à votre famille');
+   if(offer.commitment){
+    check(offer.councilNumber===s.game.history.length,'Cette offre concerne un autre Conseil');
+    validateOfferCommitment(s,offer.to,offer.commitment);
+   }
    s.game=transferFoundersDollars(s.game,offer.from,offer.to,offer.amount,offer.reason);
    offer.status='accepted';break;
   }
@@ -215,7 +246,7 @@ export function narrativeFamilyView(s,family){
   mayVote:s.phase==='COUNCIL'&&v?.phase==='voting'&&v?.turn===family,
   mayResolve:s.phase==='COUNCIL'&&v?.phase==='await_moderator'&&s.game.moderator===family,
   mayChooseLeader:s.phase==='COUNCIL'&&v?.phase==='await_leader'&&s.game.moderator===family},
-  goalCard:copy(card),goalProgress:progress,offers};
+  goalCard:copy(card),goalProgress:progress,offers,voteCommitment:acceptedVoteCommitment(s,family)};
 }
 export function narrativeOrganizerView(s){
  return {...narrativePublicView(s),familyGoals:copy(s.goals),familyResources:copy(s.game.families),

@@ -1,3 +1,4 @@
+import {commitmentLabel} from './founders-agreements.js';
 import {renderCouncilRoles,appendFamilyRoles} from './founders-role-badges.js';
 import {saveFamilyName} from './founders-name-save.js';
 import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
@@ -39,11 +40,11 @@ function offers(data){
  for(const o of data.offers.slice(-30).reverse()){
   const el=document.createElement('div');el.className='card';
   const content=document.createElement('p');
-  content.textContent=(o.from===data.self.id?'Vous proposez ':'Proposition reçue : ')+o.amount+' '+data.skin.labels.currency+' de '+teamLabel(data,o.from)+' à '+teamLabel(data,o.to)+' · '+o.reason+' · '+o.status;
+  content.textContent=(o.from===data.self.id?'Vous proposez ':'Proposition reçue : ')+o.amount+' '+data.skin.labels.currency+' de '+teamLabel(data,o.from)+' à '+teamLabel(data,o.to)+' · '+o.reason+' · '+o.status+' · '+commitmentLabel(o.commitment);
   el.append(content);
   if(o.status==='pending'&&o.to===data.self.id){
    for(const [name,kind] of [['Accepter','acceptOffer'],['Refuser','rejectOffer']]){
-    const b=document.createElement('button');b.className=kind==='rejectOffer'?'secondary':'';b.textContent=name;
+    const b=document.createElement('button');b.className=kind==='rejectOffer'?'secondary':'';b.textContent=kind==='acceptOffer'&&o.commitment?.choice!=='gift'&&o.commitment?'Accepter et s’engager':name;
     b.addEventListener('click',()=>command(kind,{id:o.id}));el.append(b);
    }
   }
@@ -94,6 +95,13 @@ function render(data){
  set('voteHint',self.mayVote?'Votre famille doit décider maintenant.':data.phase==='COUNCIL'?'Vous pouvez négocier en attendant votre tour.':'Le Conseil attend la prochaine phase.');
  $('firstVote').hidden=!(self.mayVote&&self.choice===null);
  $('raiseVote').hidden=!(self.mayVote&&self.choice!==null);
+ const lock=data.voteCommitment;
+ $('voteCommitment').hidden=!lock||data.phase!=='COUNCIL';
+ set('voteCommitment',lock?'Accord accepté : '+commitmentLabel(lock)+'. Ce choix est obligatoire pour ce Conseil.':'');
+ for(const button of $('firstVote').querySelectorAll('[data-vote]'))button.disabled=Boolean(lock&&button.dataset.vote!==lock.choice);
+ $('voteAmount').min=lock?.minInfluence||1;
+ if(lock?.minInfluence&&Number($('voteAmount').value)<lock.minInfluence)$('voteAmount').value=lock.minInfluence;
+
  $('moderatorTie').hidden=!self.mayResolve;
  $('moderatorLeader').hidden=!self.mayChooseLeader;
  const candidate=$('leaderCandidates');candidate.replaceChildren();
@@ -135,7 +143,7 @@ document.querySelectorAll('[data-tie]').forEach(button=>button.addEventListener(
 $('offerForm').addEventListener('submit',e=>{
  e.preventDefault();
  const id=crypto.randomUUID();
- command('offer',{id,to:$('targetFamily').value,amount:Number($('offerAmount').value),reason:$('offerReason').value.trim()});
+ command('offer',{id,to:$('targetFamily').value,amount:Number($('offerAmount').value),reason:$('offerReason').value.trim(),commitment:{choice:$('offerCommitment').value,...($('offerCommitment').value==='gift'?{}:{minInfluence:['pour','contre'].includes($('offerCommitment').value)?Number($('offerMinimum').value):0})}});
 });
 $('chosenName').addEventListener('input',()=>{identityDirty=true;set('identityNotice','');});
 $('identityForm').addEventListener('submit',async event=>{
@@ -160,3 +168,5 @@ tabs.forEach((tab,i)=>{
  tab.addEventListener('keydown',event=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(event.key)){event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?1:1-i;selectTab(next);tabs[next].focus();}});
 });
 refresh();setInterval(refresh,2500);
+
+$('offerCommitment').addEventListener('change',()=>{$('offerMinimumField').hidden=!['pour','contre'].includes($('offerCommitment').value);});
