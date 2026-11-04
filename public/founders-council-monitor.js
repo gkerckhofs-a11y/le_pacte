@@ -1,3 +1,4 @@
+import {renderVoteProgress} from './founders-vote-progress.js';
 import {teamLabel,teamCaption,colorize} from './founders-identity.js';
 const choices={pour:'POUR',contre:'CONTRE',passe_pouvoir:'Passe · récupération',passe_moderateur:'Passe · Shérif'};
 export function councilMonitor(s){
@@ -29,6 +30,7 @@ export function renderCouncilMonitor(root,s){
   const card=el('div',null,'card');card.append(el('span',label,'eyeline'),el('strong',id?teamLabel(s,id):'Régie'));roles.append(card);
  }
  root.append(roles,el('p',m.action,'council-prompt'));
+ const progress=el('div',null,'vote-progress');renderVoteProgress(progress,s);root.append(progress);
  const totals=el('div',null,'council-totals');
  for(const t of [`POUR : ${m.yes}`,`CONTRE : ${m.no}`,`Réserve : ${m.pool}`])totals.append(el('strong',t));
  root.append(totals,el('p',m.balance+(m.closed?' · Mises du vote terminé':' · Mises cumulées, résultat encore provisoire'),'small'));

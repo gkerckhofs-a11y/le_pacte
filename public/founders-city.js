@@ -1,3 +1,4 @@
+import {renderVoteProgress} from './founders-vote-progress.js';
 import {renderCouncilRoles,appendFamilyRoles} from './founders-role-badges.js';
 import {setupProjectionFullscreen} from './founders-fullscreen.js';
 import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
@@ -30,6 +31,7 @@ function drawGauges(s){
 
 }
 function render(s){
+ renderVoteProgress($('voteProgress'),s);
  renderCouncilRoles($('councilRoles'),s);
  applySkin(document.body,s.skin);text('universeTitle','Le Pacte · '+s.skin.title);
  lastRevision=s.revision;

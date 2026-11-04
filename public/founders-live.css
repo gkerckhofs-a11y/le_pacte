@@ -180,3 +180,8 @@ html:fullscreen{overflow-y:auto;background:#15191b}
 .projection-dashboard .council-offices .council-role-badge{font-size:16px}
 .projection-dashboard .council-offices svg{width:28px;height:28px}
 @media(max-width:600px){.council-offices{padding:10px 16px;gap:8px}.council-office{width:100%}}
+
+.vote-progress{margin:14px auto;padding:14px 20px;max-width:1350px;border-left:4px solid var(--accent);background:var(--panel);color:var(--paper);border-radius:6px}
+.vote-progress strong{font-size:clamp(17px,1.5vw,24px);line-height:1.5;display:block}
+.vote-progress p{margin:6px 0 0}
+.projection-dashboard .vote-progress p{font-size:clamp(15px,1.2vw,20px)}

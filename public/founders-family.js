@@ -1,3 +1,4 @@
+import {renderVoteProgress} from './founders-vote-progress.js';
 import {commitmentLabel} from './founders-agreements.js';
 import {renderCouncilRoles,appendFamilyRoles} from './founders-role-badges.js';
 import {saveFamilyName} from './founders-name-save.js';
@@ -55,6 +56,7 @@ function offers(data){
  }
 }
 function render(data){
+ renderVoteProgress($('voteProgress'),data);
  current=data;
  renderCouncilRoles($('councilRoles'),data);
  const self=data.self,c=data.council;
@@ -95,6 +97,8 @@ function render(data){
  set('voteHint',self.mayVote?'Votre famille doit décider maintenant.':data.phase==='COUNCIL'?'Vous pouvez négocier en attendant votre tour.':'Le Conseil attend la prochaine phase.');
  $('firstVote').hidden=!(self.mayVote&&self.choice===null);
  $('raiseVote').hidden=!(self.mayVote&&self.choice!==null);
+ $('raiseAmount').closest('.field').hidden=!['pour','contre'].includes(self.choice);
+ $('raiseVote').querySelector('[data-vote="augmenter"]').hidden=!['pour','contre'].includes(self.choice);
  const lock=data.voteCommitment;
  $('voteCommitment').hidden=!lock||data.phase!=='COUNCIL';
  set('voteCommitment',lock?'Accord accepté : '+commitmentLabel(lock)+'. Ce choix est obligatoire pour ce Conseil.':'');
