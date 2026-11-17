@@ -28,8 +28,14 @@ Trois tests supplémentaires couvrent les modèles cinq/six familles enregistré
 
 Validation finale : `npm test` → 214 tests réussis ; compilation Firebase et contrôle des bundles réussis. Le blocage de source est levé.
 
-## Publication
+## Publication du 17 novembre 2026
 
-Aucune publication effectuée à ce stade : l’outil local ne dispose pas d’un compte Firebase connecté et le navigateur distant ne peut pas joindre Google Cloud, Cloud Shell ou le callback local de connexion.
+La connexion Firebase de l’organisateur a été rétablie. Le déploiement `functions:pacte,hosting` sur `le-pacte-ludificateur` a réussi : les fonctions `api` et `tick` sont mises à jour, et Hosting confirme la nouvelle publication.
 
-Le script `scripts/publish-founders.sh` prépare, vérifie et publie uniquement le codebase de fonctions `pacte` et Hosting dans `le-pacte-ludificateur`. Il peut être lancé depuis un terminal Google Cloud Shell ou un poste disposant de Node.js 24, avec une connexion Firebase réalisée directement dans ce terminal. Il ne publie ni règles Firestore, ni index, ni changements de droits. Après succès, vérifier les modèles cinq/six, les QR et créer la session de test à cinq joueurs depuis la configuration.
+Les sept fichiers d’accueil, préparation, modèles, impressions, régie et progression de vote contrôlés en HTTP 200 correspondent exactement aux fichiers compilés (comparaison SHA-256).
+
+Une session distincte a été créée pour le test humain : `TEST5NOV17`, « Le Pacte — Test cinq joueurs », cinq familles d’un joueur, scénario hybride 1.3.0, habillage Western. Elle appartient au compte organisateur existant et reste en phase READY. Aucun vote n’a été saisi. Les anciennes parties sont conservées.
+
+Les lectures HTTP de la projection publique et des cinq accès privés ont été vérifiées : cinq familles, phase READY, chaque accès limité à la famille attendue. Les liens privés ne sont pas enregistrés dans le dépôt ; leur validité reste de 24 heures après création ou renouvellement.
+
+Le script `scripts/publish-founders.sh` reste disponible pour une publication depuis un terminal connecté. Il ne publie ni règles Firestore, ni index, ni changements de droits.
