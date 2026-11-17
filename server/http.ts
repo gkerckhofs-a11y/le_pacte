@@ -1,3 +1,5 @@
+import qrcode from 'qrcode-generator';
+import {checkedConfiguration} from './founders-configurations.ts';
 import {createServer} from 'node:http';
 import {readFileSync} from 'node:fs';
 import {timingSafeEqual} from 'node:crypto';
@@ -15,6 +17,8 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
  if(!/^[A-Za-z0-9_-]{32,128}$/.test(organizerToken))throw new Error('Clé régie : au moins 32 caractères');
  const tokenDigest=Buffer.from(tokenHash(organizerToken),'hex');
  const staticFiles:Record<string,[string,string]>={ '/founders-regie-flow.js':['founders-regie-flow.js','text/javascript; charset=utf-8'], '/founders-name-save.js':['founders-name-save.js','text/javascript; charset=utf-8'], '/founders-painted-western.js':['founders-painted-western.js','text/javascript; charset=utf-8'], '/founders-skins.json':['../content/founders-skins-v1.json','application/json; charset=utf-8'], '/founders-skins.html':['founders-skins.html','text/html; charset=utf-8'], '/founders-skins.js':['founders-skins.js','text/javascript; charset=utf-8'], '/founders-skin-theme.js':['founders-skin-theme.js','text/javascript; charset=utf-8'], '/founders-skin-scenes.js':['founders-skin-scenes.js','text/javascript; charset=utf-8'], '/founders-identity.js':['founders-identity.js','text/javascript; charset=utf-8'], '/founders-city-scene.js':['founders-city-scene.js','text/javascript; charset=utf-8'], '/founders-live.css':['founders-live.css','text/css; charset=utf-8'], '/founders-city.html':['founders-city.html','text/html; charset=utf-8'], '/founders-city.js':['founders-city.js','text/javascript; charset=utf-8'], '/founders-family.html':['founders-family.html','text/html; charset=utf-8'], '/founders-family.js':['founders-family.js','text/javascript; charset=utf-8'], '/founders-regie.html':['founders-regie.html','text/html; charset=utf-8'], '/founders-regie.js':['founders-regie.js','text/javascript; charset=utf-8'], '/founders-import.html':['founders-import.html','text/html; charset=utf-8'], '/founders-import.js':['founders-import.js','text/javascript; charset=utf-8'], '/founders-setup.html':['founders-setup.html','text/html; charset=utf-8'], '/founders-setup.js':['founders-setup.js','text/javascript; charset=utf-8'], '/western-board.js':['western-board.js','text/javascript; charset=utf-8'],'/western-territories.js':['western-territories.js','text/javascript; charset=utf-8'],'/far-west.html':['far-west.html','text/html; charset=utf-8'],'/western-preview.js':['western-preview.js','text/javascript; charset=utf-8'],'/assets/western/frontier-terrain-v1.webp':['assets/western/frontier-terrain-v1.webp','image/webp'], '/':['index.html','text/html; charset=utf-8'],'/app.js':['app.js','text/javascript; charset=utf-8'],'/studio.js':['studio.js','text/javascript; charset=utf-8'],'/animation.js':['animation.js','text/javascript; charset=utf-8'],'/style.css':['style.css','text/css; charset=utf-8']};
+ for(const name of ['pacte-entry','founders-workspace','founders-print','founders-council-monitor','founders-vote-progress','founders-role-badges','founders-chronicle','founders-agreements','founders-fullscreen'])staticFiles['/'+name+'.js']=[name+'.js','text/javascript; charset=utf-8'];
+ staticFiles['/territorial.html']=['territorial.html','text/html; charset=utf-8'];
  for(let i=1;i<=10;i++){const path='/assets/western/dilemmas/d'+String(i).padStart(2,'0')+'.jpg';staticFiles[path]=[path.slice(1),'image/jpeg'];}
  for(const name of ['reference',...['economie','securite','satisfaction','bien_etre','developpement','stabilite'].flatMap(k=>[k+'-low',k+'-high'])]){
   const path='/assets/western/painted/'+name+'.jpg';staticFiles[path]=[path.slice(1),'image/jpeg'];
@@ -49,6 +53,33 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
    if(++bucket.count>1200){json(429,{error:'Trop de requêtes, réessayez dans une minute'});return;}
    if(limiter.size>1000)for(const [k,b] of limiter)if(b.until<now)limiter.delete(k);
    // Narrative studio : authenticated organizer only. Does not mutate territorial sessions.
+      if (path === "/api/founders/configurations") {
+        const actor = await requireOrg(req);
+        if (req.method === "GET") {
+          json(200, { configurations: await store.narrative.listConfigurations(actor.id) });
+          return;
+        }
+        if (req.method === "POST") {
+          const d = await body(req, 24e3), preview = await foundersPreviewFor(store, actor.id, d.config);
+          const config = checkedConfiguration(preview, d, actor.id, now);
+          json(201, await store.narrative.saveConfiguration(actor.id, config, now));
+          return;
+        }
+        json(405, { error: "M\xE9thode refus\xE9e" });
+        return;
+      }
+      if (path === "/api/founders/access-qr" && req.method === "POST") {
+        const actor = await requireOrg(req), d = await body(req, 1e3);
+        await store.narrative.view(d.session, actor, now);
+        const team3 = await store.narrative.authenticate(d.session, d.token, now);
+        const origin = publicOrigin ?? normalizeOrigin(d.origin);
+        const link2 = origin + "/founders-family.html?session=" + d.session + "#token=" + encodeURIComponent(d.token);
+        const qr2 = qrcode(0, "M");
+        qr2.addData(link2, "Byte");
+        qr2.make();
+        json(200, { family: team3.family, link: link2, svg: qr2.createSvgTag({ cellSize: 4, margin: 16, scalable: true }) });
+        return;
+      }
    if(path==='/api/founders/catalog'&&req.method==='GET'){
     const actor=await requireOrg(req);json(200,await foundersCatalogFor(store,actor.id));return;
    }

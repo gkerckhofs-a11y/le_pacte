@@ -8,6 +8,15 @@ const check=(ok,m)=>{if(!ok)throw new Error(m);};
 const familyIds=['A','B','C','D','E','F'];
 export class FirestoreNarrativeSessions{
  constructor(db){this.db=db;}
+  async listConfigurations(ownerId) {
+    const q = await this.db.pipeline().collection("pacteNarrativeConfigurations").where(Pipelines.field("ownerId").equal(ownerId)).sort(Pipelines.descending("updated")).limit(100).execute();
+    return q.results.map((d) => ({ id: d.data().id, ...JSON.parse(d.data().dataJson) }));
+  }
+  async saveConfiguration(ownerId, data2, now) {
+    const id = randomBytes(12).toString("hex");
+    await this.db.doc("pacteNarrativeConfigurations/" + id).create({ id, ownerId, updated: now, dataJson: JSON.stringify(data2) });
+    return { id, ...data2 };
+  }
  ref(id){
   check(typeof id==='string'&&/^[a-f0-9]{24}$/.test(id),'Partie introuvable');
   return this.db.doc('pacteNarrativeSessions/'+id);

@@ -8,7 +8,18 @@ const familyIds=['A','B','C','D','E','F'];
 export class LocalNarrativeSessions{
  constructor(db){
   this.db=db;
+  db.exec('CREATE TABLE IF NOT EXISTS founders_configurations(id TEXT PRIMARY KEY,owner_id TEXT NOT NULL,data_json TEXT NOT NULL,updated INTEGER NOT NULL)');
   db.exec('CREATE TABLE IF NOT EXISTS founders_sessions(id TEXT PRIMARY KEY,code TEXT UNIQUE NOT NULL,owner_id TEXT NOT NULL,state_json TEXT NOT NULL,updated INTEGER NOT NULL); CREATE TABLE IF NOT EXISTS founders_access(session_id TEXT NOT NULL,family TEXT NOT NULL,hash TEXT NOT NULL UNIQUE,expires INTEGER NOT NULL,PRIMARY KEY(session_id,family));');
+ }
+ listConfigurations(ownerId){
+  check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
+  return this.db.prepare('SELECT id,data_json FROM founders_configurations WHERE owner_id=? ORDER BY updated DESC LIMIT 100').all(ownerId).map(row=>({id:row.id,...JSON.parse(row.data_json)}));
+ }
+ saveConfiguration(ownerId,data,now){
+  check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
+  const id=randomBytes(12).toString('hex');
+  this.db.prepare('INSERT INTO founders_configurations(id,owner_id,data_json,updated) VALUES(?,?,?,?)').run(id,ownerId,JSON.stringify(data),now);
+  return {id,...data};
  }
  transaction(fn){
   this.db.exec('BEGIN IMMEDIATE');

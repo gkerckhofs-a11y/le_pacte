@@ -8,20 +8,28 @@ Le moteur utilise les familles réellement présentes pour le Maire, le Shérif,
 
 Les champs de Pumpkins sont masqués et désactivés à cinq familles. Revenir à six conserve les valeurs déjà saisies. La liste des effectifs sauvegardée par le client contient le nombre choisi ; le rechargement client déduit le sélecteur de cette longueur. Les modèles conservent six cartes d’ambitions configurables, dont seules celles des familles actives sont utilisées en jeu.
 
-Les cartes de familles, rôles et QR parcourent `view.families` ; le compteur de QR suit cette longueur. La vérification serveur de l’enregistrement/rechargement des modèles et celle de l’encodage QR restent à faire dans la dernière source déployée.
+Les cartes de familles, rôles et QR parcourent `view.families` ; le compteur de QR suit cette longueur. Les vérifications HTTP de l’enregistrement/rechargement des modèles et de l’autorisation des QR passent dans les deux formats.
 
 ## Vérifications
 
-- `npm test` : 211 tests réussis.
+- `npm test` : 214 tests réussis.
 - Neuf nouveaux tests : finales complètes à cinq/six familles, surenchères avec second passage, clôture, conservation des ressources, accès privés, refus d’une famille absente, formats invalides, laboratoire hybride à cinq, bascule du sélecteur avec conservation des saisies.
 - `npm run build:firebase` : compilation réussie.
 - `node --check public/founders-setup.js` et `git diff --check` : réussis.
 - Correction d’une assertion historique de version illustrée : la dernière version de ce scénario est 1.3.0.
 
-## Blocage de publication — ne pas déployer ce checkout
+## Récupération de la source publiée
 
-Le clone GitHub a retrouvé la branche narrative `feat/chroniques-ville-20261103` à `5f9d093`. Elle contient les accords contraignants et les repères de vote, mais pas le dernier chantier « modèles de configuration et supports imprimables » déjà publié.
+L’archive `api_function-source.zip` fournie par l’organisateur a permis de récupérer le 17 novembre 2026 la validation des modèles, les méthodes Firestore et les routes `/api/founders/configurations` et `/api/founders/access-qr`. SHA-256 de l’archive : `44105d7ff41df8d9ee021442306a8a859b492aaa49cb793a2eea9df0969c6400`.
 
-Les fichiers publics récents de configuration et de régie ont été récupérés depuis le site publié pour intégrer le sélecteur sans effacer ce travail visuel. Cela restaure notamment `founders-workspace.js` et `founders-print.js`. En revanche, les sources des routes serveur `/api/founders/configurations` et `/api/founders/access-qr` n’ont pas été retrouvées. Les anciens espaces de travail ont été nettoyés et la recherche dans les fichiers persistants n’a pas retrouvé de sauvegarde exploitable.
+Le stockage Firestore utilise toujours la collection `pacteNarrativeConfigurations`, les champs `id`, `ownerId`, `updated`, `dataJson` et la même isolation par organisateur. La projection sauvegardée utilise désormais les familles actives. L’adaptateur SQLite équivalent a été rétabli pour les tests et les répétitions locales.
 
-Il faut récupérer la dernière archive de sources du déploiement Firebase, ou le checkout complet qui l’a produit, puis y reporter les changements de cette branche et tester les modèles/QR en cinq et six familles avant publication. Cette branche n’a pas été déployée et aucune session de test utilisateur n’a été créée.
+Trois tests supplémentaires couvrent les modèles cinq/six familles enregistrés puis utilisés pour créer une partie, l’absence de données d’accès dans les modèles, les QR privés, leur origine canonique et le refus d’un accès révoqué. Les fichiers publics récemment publiés ont également été récupérés, dont l’accueil narratif et la page territoriale historique.
+
+Validation finale : `npm test` → 214 tests réussis ; compilation Firebase et contrôle des bundles réussis. Le blocage de source est levé.
+
+## Publication
+
+Aucune publication effectuée à ce stade : l’outil local ne dispose pas d’un compte Firebase connecté et le navigateur distant ne peut pas joindre Google Cloud, Cloud Shell ou le callback local de connexion.
+
+Le script `scripts/publish-founders.sh` prépare, vérifie et publie uniquement le codebase de fonctions `pacte` et Hosting dans `le-pacte-ludificateur`. Il peut être lancé depuis un terminal Google Cloud Shell ou un poste disposant de Node.js 24, avec une connexion Firebase réalisée directement dans ce terminal. Il ne publie ni règles Firestore, ni index, ni changements de droits. Après succès, vérifier les modèles cinq/six, les QR et créer la session de test à cinq joueurs depuis la configuration.
