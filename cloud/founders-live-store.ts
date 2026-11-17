@@ -1,3 +1,4 @@
+import {activeFounders} from '../src/founders.ts';
 import {randomBytes} from 'node:crypto';
 import {tokenHash,shuffle} from '../server/security.ts';
 import {createNarrativeSession,applyNarrativeCommand,narrativeView} from '../src/founders-live.ts';
@@ -29,8 +30,8 @@ export class FirestoreNarrativeSessions{
  async create({ownerId,preview,code,title,objectives,names,colors,goalCards,scoreRules,now}){
   check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
   const id=randomBytes(12).toString('hex');
-  const s=createNarrativeSession(preview,{id,ownerId,code,title,objectives,names,colors,goalCards,scoreRules,initiativeOrder:shuffle(['A','B','C','D','E','F']),now});
-  const access=familyIds.map(family=>({family,token:randomBytes(32).toString('base64url')}));
+  const s=createNarrativeSession(preview,{id,ownerId,code,title,objectives,names,colors,goalCards,scoreRules,initiativeOrder:shuffle(activeFounders(preview.game)),now});
+  const access=activeFounders(s.game).map(family=>({family,token:randomBytes(32).toString('base64url')}));
   const ref=this.ref(id),codeRef=this.db.doc('pacteNarrativeCodes/'+code);
   await this.db.runTransaction(async tx=>{
    const existing=await tx.get(codeRef);

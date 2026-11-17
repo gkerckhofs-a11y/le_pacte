@@ -1,3 +1,4 @@
+import {mountWorkspace,rememberAccess} from './founders-workspace.js';
 import {mountCity,updateCity} from './founders-city-scene.js';
 import {TEAM_COLORS,DEFAULT_TEAM_NAMES,DEFAULT_TEAM_COLORS,teamCaption} from './founders-identity.js';
 "use strict";
@@ -36,6 +37,8 @@ $("load").addEventListener("click",async()=>{
   selectedPreview=null;
   state(catalog.scenarios.length+" scénario(s), "+catalog.skins.length+" skin(s).","success");
   autoSkin();
+  $('load').textContent='Actualiser mon espace';
+  await workspace.refresh();
  }catch(e){state(e.message,"error");}
  finally{$("load").disabled=false;}
 });
@@ -58,14 +61,15 @@ $("scenario").addEventListener("change",autoSkin);
 $("config").addEventListener("submit",async event=>{
  event.preventDefault();
  const members=$("members").value.split(",").map(n=>Number(n.trim()));
- if(members.length!==6||members.some(n=>!Number.isInteger(n)||n<1||n>300)){
-  state("Indiquer exactement six effectifs entiers (1 à 300).","error");return;
+ if(members.length!==Number($("familyCount").value)||members.some(n=>!Number.isInteger(n)||n<1||n>300)){
+  state("Indiquer un effectif entier par famille active (1 à 300).","error");return;
  }
  const payload={scenarioId:$("scenario").value,scenarioVersion:$("scenarioVersion").value,skinId:$("skin").value,members,calibration:collectCalibration()};
  state("Vérification de la configuration…");
  try{
   const p=await api("/api/founders/preview","POST",payload);
   selectedPreview=payload;
+  $('createNarrative').disabled=false;
   $('createdGame').hidden=true;
   $("empty").hidden=true;$("preview").hidden=false;
   $("storyTitle").textContent=p.scenario.scenario.title;
@@ -104,6 +108,7 @@ initFirebaseAuth();
 
 
 const FAMILY_IDS=[...'ABCDEF'];
+const activeFamilyIds=()=>FAMILY_IDS.slice(0,Number($('familyCount').value));
 const INDICATORS=[
  ['economie','Économie'],['securite','Sécurité'],['satisfaction','Satisfaction populaire'],
  ['bien_etre','Bien-être'],['developpement','Développement'],['stabilite','Stabilité']
@@ -119,8 +124,8 @@ function field(section,id,label,type='text',max=0){
  return input;
 }
 for(const id of FAMILY_IDS){
- const section=document.createElement('div');section.className='metric';section.style.marginTop='10px';
- const head=document.createElement('strong');head.textContent='Équipe '+TEAM_COLORS[FAMILY_IDS.indexOf(id)].label;section.append(head);
+ const section=document.createElement('details');section.dataset.family=id;section.className='metric';section.style.marginTop='10px';
+ const head=document.createElement('summary');head.textContent='Équipe '+TEAM_COLORS[FAMILY_IDS.indexOf(id)].label;section.append(head);
  const name=field(section,'name-'+id,'Nom de la famille','text',60);name.value=DEFAULT_TEAM_NAMES[TEAM_COLORS[FAMILY_IDS.indexOf(id)].id];name.placeholder='Choisi par les joueurs, ex. Blackwood';
  const colorLabel=document.createElement('label');colorLabel.htmlFor='color-'+id;colorLabel.textContent='Couleur de l’équipe';
  const color=document.createElement('select');color.id='color-'+id;
@@ -128,6 +133,11 @@ for(const id of FAMILY_IDS){
  color.value=DEFAULT_TEAM_COLORS[FAMILY_IDS.indexOf(id)];section.append(colorLabel,color);
  color.addEventListener('change',()=>{head.textContent='Équipe '+TEAM_COLORS.find(c=>c.id===color.value).label;section.style.borderLeft='4px solid '+TEAM_COLORS.find(c=>c.id===color.value).hex;});
  section.style.borderLeft='4px solid '+TEAM_COLORS[FAMILY_IDS.indexOf(id)].hex;
+ const updateHeading=()=>{head.textContent=(name.value.trim()||'Famille '+id)+' · '+TEAM_COLORS.find(c=>c.id===color.value).label;};
+ name.addEventListener('input',updateHeading);color.addEventListener('change',updateHeading);updateHeading();
+ const countLabel=document.createElement('label');countLabel.htmlFor='memberCount-'+id;countLabel.textContent=DEFAULT_TEAM_NAMES[TEAM_COLORS[FAMILY_IDS.indexOf(id)].id];
+ const count=document.createElement('input');count.id='memberCount-'+id;count.type='number';count.min='1';count.max='300';count.required=true;count.value='5';countLabel.append(count);$('memberCounts').append(countLabel);
+ count.addEventListener('input',()=>{$('members').value=activeFamilyIds().map(f=>$('memberCount-'+f).value).join(',');$('members').dispatchEvent(new Event('change'));});
  field(section,'goalTitle-'+id,'Titre de l’ambition secrète','text',120);
  field(section,'goal-'+id,'Contexte secret de la famille','textarea',500);
  const metricLabel=document.createElement('label');metricLabel.htmlFor='goalIndicator-'+id;metricLabel.textContent='Indicateur à influencer';
@@ -144,6 +154,21 @@ for(const id of FAMILY_IDS){
  field(section,'secondTarget-'+id,'Seuil du palier 2, plus exigeant (0 à 10)','number');
  $('familySettings').append(section);
 }
+
+function syncFamilyCount(){
+ const ids=activeFamilyIds();
+ for(const id of FAMILY_IDS){
+  const active=ids.includes(id),count=$('memberCount-'+id);
+  count.parentElement.hidden=!active;count.disabled=!active;
+  const section=$('familySettings').querySelector('[data-family="'+id+'"]');section.hidden=!active;
+  for(const input of section.querySelectorAll('input,select,textarea'))input.disabled=!active;
+ }
+ $('members').value=ids.map(id=>$('memberCount-'+id).value).join(',');
+ selectedPreview=null;$('preview').hidden=true;$('empty').hidden=false;$('createdGame').hidden=true;
+ $('createNarrative').disabled=false;
+}
+$('familyCount').addEventListener('change',syncFamilyCount);
+syncFamilyCount();
 function loadGoalPresets(cards,rules,calibration){
  if(!cards||!rules)return;
  for(const id of FAMILY_IDS){
@@ -199,21 +224,22 @@ for(const el of ['scenario','scenarioVersion','skin','members','initPower','init
 }
 $('createNarrative').addEventListener('click',async()=>{
  if(!selectedPreview){state('Prévisualisez la sélection avant de créer la partie.','error');return;}
- const names=[...'ABCDEF'].map(id=>$('name-'+id).value.trim());
- const colors=FAMILY_IDS.map(id=>$('color-'+id).value);
- if(new Set(colors).size!==6){state('Choisissez une couleur différente pour chaque équipe.','error');return;}
- const objectives=[...'ABCDEF'].map(id=>$('goal-'+id).value.trim());
+ const names=activeFamilyIds().map(id=>$('name-'+id).value.trim());
+ const colors=activeFamilyIds().map(id=>$('color-'+id).value);
+ if(new Set(colors).size!==activeFamilyIds().length){state('Choisissez une couleur différente pour chaque équipe.','error');return;}
+ const objectives=activeFamilyIds().map(id=>$('goal-'+id).value.trim());
  const goalCards=collectGoalCards(),scoreRules=collectScoreRules();
  const code=$('gameCode').value.trim(),title=$('gameTitle').value.trim();
  const button=$('createNarrative');button.disabled=true;state('Création de la session…');
  try{
   const result=await api('/api/founders/sessions','POST',{...selectedPreview,code,title,names,colors,objectives,goalCards,scoreRules});
+  rememberAccess(result);
   if(!authSDK)sessionStorage.setItem('pacte-founder-organizer-key',$('token').value.trim());
   const links=$('createdLinks');links.replaceChildren();
   const append=(label,path)=>{
    const url=new URL(path,location.origin);
    const el=document.createElement('div');el.className='card';el.style.padding='9px';
-   const a=document.createElement('a');a.href=url.href;a.textContent=label;a.target='_blank';a.rel='noopener';
+   const a=document.createElement('a');a.href=url.href;a.textContent=label;a.target=path.startsWith('/founders-regie.html')?'_self':'_blank';a.rel='noopener';
    el.append(a);links.append(el);
   };
   append('Ouvrir la régie de la partie','/founders-regie.html?session='+result.id);
@@ -223,8 +249,10 @@ $('createNarrative').addEventListener('click',async()=>{
    const i=FAMILY_IDS.indexOf(a.family);append('Accès privé porte-parole : '+teamCaption({name:names[i],color:TEAM_COLORS.find(c=>c.id===colors[i])}),path);
   }
   $('createdGame').hidden=false;
+  $('createdGame').scrollIntoView({behavior:'smooth',block:'center'});
+  await workspace.refresh();
   button.disabled=true;
-  state('Session '+result.code+' créée : six liens privés prêts à être distribués.','success');
+  state('Session '+result.code+' créée : '+result.access.length+' liens privés prêts à être distribués.','success');
  }catch(e){state(e.message,'error');button.disabled=false;}
 });
 
@@ -239,7 +267,7 @@ $('simulatePolicies').addEventListener('click',async()=>{
    runs:Number($('labRuns').value),mode:$('labMode').value,seed:20261103
   });
   const panel=$('labRows');panel.replaceChildren();
-  for(const id of FAMILY_IDS){
+  for(const id of activeFamilyIds()){
    const f=data.families[id];
    const row=document.createElement('div');row.className='metric';row.style.marginTop='7px';
    const title=document.createElement('strong');title.textContent='Famille '+id;
@@ -268,7 +296,7 @@ $('analyzeGoals').addEventListener('click',async()=>{
    ...selectedPreview,goalCards:collectGoalCards()
   });
   const area=$('goalAnalysisRows');area.replaceChildren();
-  for(const id of FAMILY_IDS){
+  for(const id of activeFamilyIds()){
    const g=result.goals[id];
    const row=document.createElement('div');row.className='metric';row.style.marginTop='8px';
    const title=document.createElement('strong');title.textContent=id+' · '+g.title;
@@ -287,3 +315,17 @@ $('analyzeGoals').addEventListener('click',async()=>{
  }catch(e){state(e.message,'error');}
  finally{button.disabled=false;}
 });
+
+const workspace=mountWorkspace({api,getCatalog:()=>catalog,
+ collect:()=>({scenarioId:$('scenario').value,scenarioVersion:$('scenarioVersion').value,skinId:$('skin').value,
+ members:$('members').value.split(',').map(Number),calibration:collectCalibration(),
+ names:activeFamilyIds().map(id=>$('name-'+id).value.trim()),colors:activeFamilyIds().map(id=>$('color-'+id).value),
+ objectives:activeFamilyIds().map(id=>$('goal-'+id).value.trim()),goalCards:collectGoalCards(),scoreRules:collectScoreRules()}),
+ apply:config=>{
+  $('scenario').value=config.scenarioId;autoSkin();$('scenarioVersion').value=config.scenarioVersion;$('skin').value=config.skinId;
+  $('familyCount').value=String(config.members.length);syncFamilyCount();$('members').value=config.members.join(',');activeFamilyIds().forEach((id,i)=>$('memberCount-'+id).value=config.members[i]);loadGoalPresets(config.goalCards,config.scoreRules,config.calibration);
+  activeFamilyIds().forEach((id,i)=>{$('name-'+id).value=config.names[i];$('color-'+id).value=config.colors[i];$('color-'+id).dispatchEvent(new Event('change'));$('goal-'+id).value=config.objectives[i];});
+  selectedPreview=null;$('preview').hidden=true;$('empty').hidden=false;$('gameCode').value='P'+crypto.randomUUID().replaceAll('-','').slice(0,7).toUpperCase();
+  $('createNarrative').disabled=false;$('config').requestSubmit();
+ }});
+$('gameCode').value='P'+crypto.randomUUID().replaceAll('-','').slice(0,7).toUpperCase();

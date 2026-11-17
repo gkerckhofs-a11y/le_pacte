@@ -10,7 +10,7 @@ import {isHybrid,narrativeReserve,chooseNarrativeNext,narrativeEpilogue} from '.
 import {
   createFoundersGame,openFoundersDilemma,castFoundersAction,
   moderatorResolveFoundersTie,moderatorChooseFoundersLeader,
-  applyFoundersCityEffects,transferFoundersDollars,FOUNDERS,totalPower,expectedFoundersPowerSupply
+  applyFoundersCityEffects,transferFoundersDollars,activeFounders,totalPower,expectedFoundersPowerSupply
 } from './founders.ts';
 import {
   DEFAULT_GOAL_CARDS,DEFAULT_SCORE_RULES,validateGoalCards,validateScoreRules,
@@ -19,7 +19,6 @@ import {
 
 const copy=x=>structuredClone(x);
 const check=(ok,message)=>{if(!ok)throw new Error(message);};
-const familyId=id=>FOUNDERS.includes(id);
 const str=(v,max)=>typeof v==='string'&&v.trim().length>0&&v.length<=max;
 const has=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
 const maxOffers=60;
@@ -33,19 +32,23 @@ export const TEST_FAMILY_OBJECTIVES=Object.freeze([
   'Objectif de test : préserver l’autonomie des fondateurs en affaiblissant la Stabilité (voir les paliers de votre ambition).'
 ]);
 
-export function createNarrativeSession(preview,{id,ownerId,code,title,objectives=TEST_FAMILY_OBJECTIVES,names,colors=DEFAULT_TEAM_COLORS,goalCards=DEFAULT_GOAL_CARDS,scoreRules=DEFAULT_SCORE_RULES,initiativeOrder=FOUNDERS,now=Date.now()}) {
+export function createNarrativeSession(preview,{id,ownerId,code,title,objectives=TEST_FAMILY_OBJECTIVES,names,colors=DEFAULT_TEAM_COLORS,goalCards=DEFAULT_GOAL_CARDS,scoreRules=DEFAULT_SCORE_RULES,initiativeOrder,now=Date.now()}) {
  check(preview?.kind==='founders-session-preview-v2.3'&&preview.previewOnly===true,'Configuration narrative invalide');
  check(typeof id==='string'&&/^[a-f0-9]{24}$/.test(id),'Identifiant de session invalide');
  check(str(ownerId,128),'Organisateur requis');
  check(typeof code==='string'&&/^[A-Z0-9][A-Z0-9_-]{2,11}$/.test(code),'Code de session invalide');
  check(str(title,100),'Titre de partie invalide');
- check(Array.isArray(objectives)&&objectives.length===6&&objectives.every(x=>str(x,500)),'Six objectifs de famille requis');
- check(Array.isArray(colors)&&colors.length===6&&new Set(colors).size===6&&colors.every(c=>teamColor(c)),'Six couleurs distinctes de la palette requises');
+ const ids=activeFounders(preview.game);
+ objectives=objectives===TEST_FAMILY_OBJECTIVES?objectives.slice(0,ids.length):objectives;
+ colors=colors===DEFAULT_TEAM_COLORS?colors.slice(0,ids.length):colors;
+ initiativeOrder??=ids;
+ check(Array.isArray(objectives)&&objectives.length===ids.length&&objectives.every(x=>str(x,500)),'Un objectif par famille active requis');
+ check(Array.isArray(colors)&&colors.length===ids.length&&new Set(colors).size===ids.length&&colors.every(c=>teamColor(c)),'Des couleurs distinctes de la palette sont requises pour les familles actives');
  if(names===undefined)names=colors.map(c=>DEFAULT_TEAM_NAMES[c]);
- check(Array.isArray(names)&&names.length===6&&names.every(x=>str(x,60)),'Six noms de famille requis');
+ check(Array.isArray(names)&&names.length===ids.length&&names.every(x=>str(x,60)),'Un nom par famille active requis');
  const goalErrors=validateGoalCards(goalCards);check(!goalErrors.length,goalErrors.join(' ; '));
  const scoreErrors=validateScoreRules(scoreRules);check(!scoreErrors.length,scoreErrors.join(' ; '));
- check(Array.isArray(initiativeOrder)&&initiativeOrder.length===6&&new Set(initiativeOrder).size===6&&initiativeOrder.every(id=>FOUNDERS.includes(id)),'Tirage des familles invalide');
+ check(Array.isArray(initiativeOrder)&&initiativeOrder.length===ids.length&&new Set(initiativeOrder).size===ids.length&&initiativeOrder.every(id=>ids.includes(id)),'Tirage des familles invalide');
  check(Number.isSafeInteger(now)&&now>=0,'Horodatage invalide');
  check(preview.scenario?.dilemmas?.some(d=>d.id===preview.scenario?.scenario?.entry_dilemma),'Dilemme de départ introuvable');
  check(preview.game?.ruleset==='founders-v2-prototype','Moteur de votes incompatible');
@@ -53,9 +56,9 @@ export function createNarrativeSession(preview,{id,ownerId,code,title,objectives
   kind:'founders-live-session-v2.5',id,ownerId,code,title,
   selection:copy(preview.selection),scenario:copy(preview.scenario),skin:copy(preview.skin),
   source:copy(preview.source),game:copy(preview.game),
-  names:Object.fromEntries(FOUNDERS.map((id,i)=>[id,names[i]])),
-  colors:Object.fromEntries(FOUNDERS.map((id,i)=>[id,colors[i]])),
-  goals:Object.fromEntries(FOUNDERS.map((id,i)=>[id,objectives[i]])),
+  names:Object.fromEntries(ids.map((id,i)=>[id,names[i]])),
+  colors:Object.fromEntries(ids.map((id,i)=>[id,colors[i]])),
+  goals:Object.fromEntries(ids.map((id,i)=>[id,objectives[i]])),
   goalCards:copy(goalCards),scoreRules:copy(scoreRules),initiativeOrder:copy(initiativeOrder),finalResults:null,
   phase:'READY',currentDilemmaId:preview.scenario.scenario.entry_dilemma,
   lastReveal:null,revealedHistory:[],offers:{},revision:0,createdAt:now,updatedAt:now
@@ -70,7 +73,7 @@ const dilemma=s=>{
 const validateActor=(s,actor)=>{
  check(actor&&['organizer','team'].includes(actor.role),'Identité requise');
  if(actor.role==='organizer')check(actor.id===s.ownerId,'Accès régie refusé');
- else check(familyId(actor.family),'Famille inconnue');
+ else check(activeFounders(s.game).includes(actor.family),'Famille inconnue');
 };
 const activeOffers=s=>Object.values(s.offers).filter(o=>o.status==='pending').length;
 export function acceptedVoteCommitment(s,family){
@@ -105,12 +108,12 @@ export function applyNarrativeCommand(input,actor,command,now){
   case 'setIdentity': {
    check(s.phase==='READY','Identité figée après le lancement');
    const fid=actor.role==='team'?actor.family:data.family;
-   check(familyId(fid),'Famille inconnue');
+   check(activeFounders(s.game).includes(fid),'Famille inconnue');
    if(actor.role==='team')check(data.family===undefined||data.family===fid,'Votre famille uniquement');
    check(str(data.name,60),'Nom de famille requis (60 caractères maximum)');
    check(teamColor(data.color),'Couleur inconnue');
-   const currentColors=s.colors??Object.fromEntries(FOUNDERS.map((id,i)=>[id,DEFAULT_TEAM_COLORS[i]]));
-   check(!FOUNDERS.some(id=>id!==fid&&currentColors[id]===data.color),'Cette couleur appartient déjà à une autre équipe');
+   const currentColors=s.colors??Object.fromEntries(activeFounders(s.game).map((id,i)=>[id,DEFAULT_TEAM_COLORS[i]]));
+   check(!activeFounders(s.game).some(id=>id!==fid&&currentColors[id]===data.color),'Cette couleur appartient déjà à une autre équipe');
    s.names[fid]=data.name.trim();s.colors={...currentColors,[fid]:data.color};break;
   }
 
@@ -167,7 +170,7 @@ export function applyNarrativeCommand(input,actor,command,now){
   case 'offer': {
    team();check(s.phase==='COUNCIL','Négociations fermées');
    check(activeOffers(s)<maxOffers,'Trop d’offres en attente');
-   check(familyId(data.to)&&data.to!==actor.family,'Destinataire invalide');
+   check(activeFounders(s.game).includes(data.to)&&data.to!==actor.family,'Destinataire invalide');
    check(Number.isSafeInteger(data.amount)&&data.amount>=1&&data.amount<=s.game.families[actor.family].dollars,'Dollars insuffisants');
    check(str(data.reason,300),'Motif de proposition requis');
    validateOfferCommitment(s,data.to,data.commitment);
@@ -213,7 +216,7 @@ export function narrativePublicView(s){
   kind:s.kind,id:s.id,code:s.code,title:s.title,phase:s.phase,revision:s.revision,
   story:{id:s.scenario.scenario.id,title:s.scenario.scenario.title,location:s.scenario.scenario.location,year:s.scenario.scenario.year},
   skin:{id:s.skin.id,title:s.skin.title,labels:copy(s.skin.labels),theme:copy(s.skin.theme),publicScene:copy(s.skin.publicScene)},
-  city:copy(s.game.city),families:FOUNDERS.map((id,i)=>({id,name:s.names[id],color:copy(teamColor(s.colors?.[id]??DEFAULT_TEAM_COLORS[i])),members:s.game.families[id].members})),
+  city:copy(s.game.city),families:activeFounders(s.game).map((id,i)=>({id,name:s.names[id],color:copy(teamColor(s.colors?.[id]??DEFAULT_TEAM_COLORS[i])),members:s.game.families[id].members})),
   leader:s.game.leader,moderator:s.game.moderator,
   dilemma:publicDilemma(s),
   council:v?{phase:v.phase,turn:v.turn,bids:copy(v.bids),choices:copy(v.choices),
@@ -230,12 +233,12 @@ export function narrativePublicView(s){
    return {...copy(h),...(c?{chronicle:copy(c)}:{}),image:c?.image?copy(c.image):d?copy(d.image):null,
     decisionLabel:d?.labels?.[h.winner]??h.winner};
   }),
-  finalTieOrder:copy(s.initiativeOrder??FOUNDERS),
+  finalTieOrder:copy(s.initiativeOrder??activeFounders(s.game)),
   finalResults:s.phase==='FINISHED'?copy(s.finalResults):null
  };
 }
 export function narrativeFamilyView(s,family){
- check(familyId(family),'Famille inconnue');
+ check(activeFounders(s.game).includes(family),'Famille inconnue');
  const view=narrativePublicView(s),v=s.game.vote;
  const card=s.goalCards?.[family]??DEFAULT_GOAL_CARDS[family];
  const progress=evaluateGoal(card,s.game.city,s.scoreRules??DEFAULT_SCORE_RULES);
@@ -252,7 +255,7 @@ export function narrativeOrganizerView(s){
  return {...narrativePublicView(s),familyGoals:copy(s.goals),familyResources:copy(s.game.families),
   progression:s.phase==='REVEALED'?narrativeReserve(s):null,
   source:copy(s.source),selection:copy(s.selection),offers:copy(s.offers),
-  goalCards:copy(s.goalCards??DEFAULT_GOAL_CARDS),scoreRules:copy(s.scoreRules??DEFAULT_SCORE_RULES),initiativeOrder:copy(s.initiativeOrder??FOUNDERS),
+  goalCards:copy(s.goalCards??DEFAULT_GOAL_CARDS),scoreRules:copy(s.scoreRules??DEFAULT_SCORE_RULES),initiativeOrder:copy(s.initiativeOrder??activeFounders(s.game)),
   game:copy(s.game),scenario:copy(s.scenario)};
 }
 export function narrativeView(s,actor){

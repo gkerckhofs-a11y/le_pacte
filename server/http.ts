@@ -59,7 +59,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
     const actor=await requireOrg(req);
     const d=await body(req,12000);
     const p=await foundersPreviewFor(store,actor.id,{
-      scenarioId:d.scenarioId,scenarioVersion:d.scenarioVersion,skinId:d.skinId,
+      scenarioId:d.scenarioId,scenarioVersion:d.scenarioVersion,skinId:d.skinId,members:d.members,
       calibration:d.calibration
     });
     json(200,analyzeFoundersGoalReachability(p.scenario,d.goalCards??DEFAULT_GOAL_CARDS,
@@ -69,11 +69,11 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
     const actor=await requireOrg(req);
     const d=await body(req,12000);
     const p=await foundersPreviewFor(store,actor.id,{
-      scenarioId:d.scenarioId,scenarioVersion:d.scenarioVersion,skinId:d.skinId,
+      scenarioId:d.scenarioId,scenarioVersion:d.scenarioVersion,skinId:d.skinId,members:d.members,
       calibration:d.calibration
     });
     json(200,simulateFoundersPolicies(p.scenario,{
-      cards:d.goalCards,rule:d.scoreRules,calibration:p.settings.calibration,
+      cards:d.goalCards,rule:d.scoreRules,calibration:p.settings.calibration,members:p.settings.members,
       runs:d.runs,mode:d.mode,seed:d.seed
     }));return;
    }

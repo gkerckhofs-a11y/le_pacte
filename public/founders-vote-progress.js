@@ -1,6 +1,7 @@
 import {teamLabel} from './founders-identity.js';
-const order=['A','B','C','D','E','F'];
+
 export function voteProgress(state){
+ const order=state.families.map(f=>f.id);
  const c=state.council;
  if(state.phase!=='COUNCIL')return null;
  if(c.phase==='await_moderator')return {title:'Égalité : le Shérif doit départager',hint:teamLabel(state,state.moderator)+' doit choisir POUR ou CONTRE sur son terminal.'};

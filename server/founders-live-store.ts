@@ -1,3 +1,4 @@
+import {activeFounders} from '../src/founders.ts';
 import {randomBytes} from 'node:crypto';
 import {tokenHash,shuffle} from './security.ts';
 import {createNarrativeSession,applyNarrativeCommand,narrativeView} from '../src/founders-live.ts';
@@ -31,8 +32,8 @@ export class LocalNarrativeSessions{
   check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
   return this.transaction(()=>{
    const id=randomBytes(12).toString('hex');
-   const s=createNarrativeSession(preview,{id,ownerId,code,title,objectives,names,colors,goalCards,scoreRules,initiativeOrder:shuffle(['A','B','C','D','E','F']),now});
-   const access=familyIds.map(family=>({family,token:randomBytes(32).toString('base64url')}));
+   const s=createNarrativeSession(preview,{id,ownerId,code,title,objectives,names,colors,goalCards,scoreRules,initiativeOrder:shuffle(activeFounders(preview.game)),now});
+   const access=activeFounders(s.game).map(family=>({family,token:randomBytes(32).toString('base64url')}));
    this.db.prepare('INSERT INTO founders_sessions(id,code,owner_id,state_json,updated) VALUES(?,?,?,?,?)')
     .run(id,code,ownerId,JSON.stringify(s),now);
    const stmt=this.db.prepare('INSERT INTO founders_access(session_id,family,hash,expires) VALUES(?,?,?,?)');
@@ -74,6 +75,7 @@ export class LocalNarrativeSessions{
   check(familyIds.includes(family),'Famille invalide');
   return this.transaction(()=>{
    const s=this.get(id);
+   check(activeFounders(s.game).includes(family),'Famille inactive');
    check(s.ownerId===ownerId,'Accès organisateur refusé');
    const token=randomBytes(32).toString('base64url');
    this.db.prepare('UPDATE founders_access SET hash=?,expires=? WHERE session_id=? AND family=?')

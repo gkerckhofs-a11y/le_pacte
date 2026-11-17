@@ -2,16 +2,15 @@
  * LE PACTE — isolated Founders voting-domain prototype.
  * No imports from the territorial engine; no persistence, HTTP or authorization here.
  * All functions are pure and validate their inputs.
- * Test-only ruleset: 6 families, one political vote per family, variable team size.
+ * Test-only ruleset: 5 or 6 families, one political vote per family, variable team size.
  */
 export const FOUNDERS = Object.freeze(['A', 'B', 'C', 'D', 'E', 'F']);
 const fail = (m) => {throw new Error(m);};
 const requireThat = (ok,m) => { if (!ok) fail(m); };
 const clone = (x) => structuredClone(x);
-const validFamily = (id) => FOUNDERS.includes(id);
-const at = (id) => FOUNDERS.indexOf(id);
-const prev = (id) => FOUNDERS[(at(id)+FOUNDERS.length-1)%FOUNDERS.length];
-const next = (id) => FOUNDERS[(at(id)+1)%FOUNDERS.length];
+export const activeFounders = game => FOUNDERS.filter(id=>Object.hasOwn(game.families,id));
+const prev = (game,id) => {const ids=activeFounders(game);return ids[(ids.indexOf(id)+ids.length-1)%ids.length];};
+const next = (game,id) => {const ids=activeFounders(game);return ids[(ids.indexOf(id)+1)%ids.length];};
 const integer = (n,min,max=Number.MAX_SAFE_INTEGER) => Number.isSafeInteger(n)&&n>=min&&n<=max;
 const selections = new Set(['pour','contre','passe_pouvoir','passe_moderateur']);
 
@@ -32,23 +31,25 @@ export function validateFoundersCalibration(settings){
  else for(const name of names)if(!integer(settings.city[name],0,10))errors.push('Jauge '+name+' : 0 à 10');
  return errors;
 }
-export function createFoundersGame({members=[5,5,5,5,5,5],leader='A',moderator='F',calibration=FOUNDERS_DEFAULT_CALIBRATION}={}) {
- requireThat(Array.isArray(members)&&members.length===6&&members.every(n=>integer(n,1,300)), 'Six effectifs positifs obligatoires');
- requireThat(validFamily(leader)&&validFamily(moderator),'Maire ou shérif inconnu');
+export function createFoundersGame({members=[5,5,5,5,5,5],leader='A',moderator,calibration=FOUNDERS_DEFAULT_CALIBRATION}={}) {
+ requireThat(Array.isArray(members)&&[5,6].includes(members.length)&&members.every(n=>integer(n,1,300)), 'Cinq ou six effectifs positifs obligatoires');
+ const ids=FOUNDERS.slice(0,members.length);
+ moderator??=ids.at(-1);
+ requireThat(ids.includes(leader)&&ids.includes(moderator),'Maire ou shérif inconnu');
  const errors=validateFoundersCalibration(calibration);
  requireThat(!errors.length,errors.join(' ; '));
- const powerSupply=6*calibration.initialPower+calibration.initialPool;
+ const powerSupply=ids.length*calibration.initialPower+calibration.initialPool;
  return {
   ruleset:'founders-v2-prototype',
-  families:Object.fromEntries(FOUNDERS.map((id,i)=>[id,{members:members[i],power:calibration.initialPower,dollars:calibration.initialDollars}])),
+  families:Object.fromEntries(ids.map((id,i)=>[id,{members:members[i],power:calibration.initialPower,dollars:calibration.initialDollars}])),
   pool:calibration.initialPool,powerSupply,leader,moderator,vote:null,
   history:[],transactions:[],city:clone(calibration.city)
  };
 }
-export function totalPower(s) {return s.pool+FOUNDERS.reduce((n,id)=>n+s.families[id].power,0)+(s.vote?FOUNDERS.reduce((n,id)=>n+(s.vote.bids[id]||0),0):0);}
+export function totalPower(s) {return s.pool+activeFounders(s).reduce((n,id)=>n+s.families[id].power,0)+(s.vote?activeFounders(s).reduce((n,id)=>n+(s.vote.bids[id]||0),0):0);}
 /** V2.6 sessions created before configurable supplies used exactly 51 Influence. */
 export function expectedFoundersPowerSupply(s){return Number.isSafeInteger(s.powerSupply)?s.powerSupply:51;}
-export function totalDollars(s) {return FOUNDERS.reduce((n,id)=>n+s.families[id].dollars,0);}
+export function totalDollars(s) {return activeFounders(s).reduce((n,id)=>n+s.families[id].dollars,0);}
 export function openFoundersDilemma(input,id) {
  requireThat(input.vote===null&&typeof id==='string'&&/^[A-Z0-9_-]{1,40}$/.test(id),'Dilemme invalide ou vote actif');
  const s=clone(input);
@@ -56,7 +57,7 @@ export function openFoundersDilemma(input,id) {
  return s;
 }
 export function transferFoundersDollars(input,from,to,amount,reason) {
- requireThat(validFamily(from)&&validFamily(to)&&from!==to,'Familles invalides');
+ requireThat(activeFounders(input).includes(from)&&activeFounders(input).includes(to)&&from!==to,'Familles invalides');
  requireThat(integer(amount,1)&&amount<=input.families[from].dollars,'Fonds insuffisants');
  requireThat(typeof reason==='string'&&reason.trim().length>=1&&reason.length<=300,'Objet de transaction obligatoire');
  // Caller must only invoke this AFTER bilateral confirmation in authenticated app layer.
@@ -67,8 +68,8 @@ function complete(s,winner,leaderChoice=null) {
  const v=s.vote;
  requireThat(v.phase==='await_moderator'||v.phase==='voting'||v.phase==='await_leader','Vote non résoluble');
  requireThat(['pour','contre'].includes(winner),'Décision invalide');
- const passes=FOUNDERS.filter(id=>v.choices[id]==='passe_pouvoir');
- const candidates=FOUNDERS.filter(id=>v.choices[id]===winner);
+ const passes=activeFounders(s).filter(id=>v.choices[id]==='passe_pouvoir');
+ const candidates=activeFounders(s).filter(id=>v.choices[id]===winner);
  let newLeader=s.leader;
  if(candidates.length===0) newLeader=s.moderator; // all passed: moderator bears responsibility
  else if(v.choices[newLeader]!==winner) {
@@ -81,14 +82,14 @@ function complete(s,winner,leaderChoice=null) {
  const oldPool=s.pool;const each=passes.length?Math.floor(oldPool/passes.length):0;
  s.pool-=each*passes.length;
  for(const id of passes)s.families[id].power+=each;
- for(const id of FOUNDERS){
+ for(const id of activeFounders(s)){
   const choice=v.choices[id];const wager=v.bids[id]||0;
   if(choice===winner)s.pool+=wager;
   else if(choice==='pour'||choice==='contre')s.families[id].power+=wager;
  }
  s.leader=newLeader;
- const yes=FOUNDERS.reduce((n,id)=>n+(v.choices[id]==='pour'?(v.bids[id]||0):0),0);
- const no=FOUNDERS.reduce((n,id)=>n+(v.choices[id]==='contre'?(v.bids[id]||0):0),0);
+ const yes=activeFounders(s).reduce((n,id)=>n+(v.choices[id]==='pour'?(v.bids[id]||0):0),0);
+ const no=activeFounders(s).reduce((n,id)=>n+(v.choices[id]==='contre'?(v.bids[id]||0):0),0);
  const result={id:v.id,winner,yes,no,poolBefore:oldPool,poolAfter:s.pool,recapturedPerPassingTeam:each,
   leader:s.leader,moderator:s.moderator,choices:clone(v.choices),bids:clone(v.bids),steps:clone(v.steps)};
  s.history.push(result);s.vote=null;
@@ -97,7 +98,7 @@ function complete(s,winner,leaderChoice=null) {
 }
 export function castFoundersAction(input,id,action) {
  const s=clone(input),v=s.vote;
- requireThat(v&&v.phase==='voting'&&v.turn===id,'Ce porte-parole n’a pas la main');
+ requireThat(activeFounders(s).includes(id)&&v&&v.phase==='voting'&&v.turn===id,'Ce porte-parole n’a pas la main');
  requireThat(action&&typeof action==='object'&&typeof action.kind==='string','Action invalide');
  const prior=v.choices[id];const kind=action.kind;
  if(prior===undefined){
@@ -121,15 +122,15 @@ export function castFoundersAction(input,id,action) {
   s.families[id].power-=action.amount;v.bids[id]+=action.amount;
  } else fail('Un vote est définitif : seule une surenchère dans le même camp est admise');
  const current=v.bids[id]||0;
- if(current>0&&FOUNDERS.every(other=>other===id||current>(v.bids[other]||0)))s.leader=id;
+ if(current>0&&activeFounders(s).every(other=>other===id||current>(v.bids[other]||0)))s.leader=id;
  v.steps.push({family:id,kind,amount:action.amount||0,leaderAfter:s.leader});
- if(id===prev(s.leader)) {
-  const yes=FOUNDERS.reduce((n,f)=>n+(v.choices[f]==='pour'?(v.bids[f]||0):0),0);
-  const no=FOUNDERS.reduce((n,f)=>n+(v.choices[f]==='contre'?(v.bids[f]||0):0),0);
+ if(id===prev(s,s.leader)) {
+  const yes=activeFounders(s).reduce((n,f)=>n+(v.choices[f]==='pour'?(v.bids[f]||0):0),0);
+  const no=activeFounders(s).reduce((n,f)=>n+(v.choices[f]==='contre'?(v.bids[f]||0):0),0);
   if(yes===no) {v.phase='await_moderator';v.turn=null;return s;}
   return complete(s,yes>no?'pour':'contre');
  }
- v.turn=next(id);
+ v.turn=next(s,id);
  requireThat(totalPower(s)===expectedFoundersPowerSupply(s),'Invariant Influence violé');
  return s;
 }

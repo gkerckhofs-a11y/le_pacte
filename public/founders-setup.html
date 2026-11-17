@@ -28,34 +28,40 @@ h3{margin:20px 0 6px}.warn{padding:9px 12px;border-left:3px solid #b1863c;backgr
 #skinPreview{height:200px;overflow:hidden;border-radius:9px;margin-top:14px;background:#b4b4b4}
 small{color:#656a6e}a{color:inherit}ol{padding-left:20px;line-height:1.6}
 @media(max-width:760px){main{display:block}article{margin-bottom:16px}}
+.workspace-nav{max-width:1160px;margin:20px auto;display:flex;gap:20px;flex-wrap:wrap;padding:0 18px;font-weight:700}.advanced{margin:22px 0;padding:16px;border:1px solid #ddd;border-radius:10px}.advanced summary{cursor:pointer;font-weight:700}.advanced h2{margin-top:20px}.save-config{background:#edf3ef;border-radius:10px;padding:16px;margin-top:20px}.save-config button{margin-top:12px}textarea{width:100%;min-height:90px;font:inherit;padding:10px;border:1px solid #bbb;border-radius:6px}#recentGamesList a{display:block;padding:10px 0;border-bottom:1px solid #ddd}#createdGame{border:2px solid #195f45;padding:16px;border-radius:10px;margin-top:20px}#config>button{margin-top:22px}summary:focus-visible,a:focus-visible,button:focus-visible{outline:3px solid #bb7b24;outline-offset:3px}main{max-width:1160px;grid-template-columns:minmax(300px,380px) minmax(0,1fr)}#familySettings details>summary{font-size:17px}
 </style>
 <script type="module" src="/founders-setup.js"></script>
 </head>
 <body>
 <header>
- <div class="note" style="color:#c1c8cc">LUDIFICATEUR / LE PACTE · RÉGIE DE CONCEPTION</div>
+ <div class="note" style="color:#c1c8cc">LUDIFICATEUR / LE PACTE · ESPACE ORGANISATEUR</div>
  <h1>Créer une partie narrative</h1>
- <p>Scénario indépendant de la skin. Configure les six familles et lance une répétition narrative.</p>
+ <p>Préparez vos familles, enregistrez vos réglages et retrouvez vos parties.</p>
 </header>
+<nav class="workspace-nav"><a href="/founders-regie.html">Mes parties · ouvrir un tableau de bord →</a><a href="#config">Nouvelle partie</a><a href="#savedConfigurations">Mes configurations</a></nav>
 <main>
  <article>
-  <h2>Choix de la partie</h2><p class="note"><a href="/founders-skins.html" target="_blank" rel="noopener">Explorer les cinq habillages et les décors →</a></p><p class="note"><a href="/founders-import.html">Importer un scénario depuis Google Sheets →</a></p>
+  <h2>1 · Connexion et bibliothèque</h2><p class="note"><a href="/founders-skins.html" target="_blank" rel="noopener">Explorer les cinq habillages et les décors →</a></p><p class="note"><a href="/founders-import.html">Importer un scénario depuis Google Sheets →</a></p>
   <label id="tokenLabel" for="token">Jeton d'accès régie</label>
   <input id="token" type="password" autocomplete="off" placeholder="Clé régie ou jeton opérateur">
   <button id="googleLogin" type="button" class="secondary" hidden>Se connecter avec Google</button>
   <div class="button-row"><button id="load" type="button">Charger les bibliothèques</button></div>
-  <p class="note">Le jeton reste dans cette page pendant son ouverture. Aucun stockage local n'est effectué.</p>
-  <form id="config" hidden>
+  <p class="note">Connectez-vous puis chargez la bibliothèque pour retrouver vos configurations et vos parties.</p>
+  <section id="savedConfigurations" hidden><h3>Rejouer une configuration</h3><p class="note">Réglages enregistrés dans votre compte. Charger un modèle prépare une nouvelle partie ; aucune partie existante n’est modifiée.</p><label for="savedConfig">Configuration enregistrée</label><select id="savedConfig"></select><div class="button-row"><button id="useConfiguration" type="button">Charger ce modèle</button></div></section>
+<section id="recentGames" hidden><h3>Mes parties récentes</h3><div id="recentGamesList"></div><a href="/founders-regie.html">Voir toutes mes parties →</a></section>
+<form id="config" hidden><h2 style="margin-top:28px">2 · Histoire et participants</h2>
    <label for="scenario">Scénario narratif</label>
    <select id="scenario" required></select>
    <label for="scenarioVersion">Version publiée</label>
    <select id="scenarioVersion" required></select>
    <label for="skin">Skin graphique</label>
    <select id="skin" required></select>
-   <label for="members">Participants des six familles (séparés par des virgules)</label>
-   <input id="members" value="5,5,5,5,5,5" pattern="[0-9, ]+" required>
+   <label for="familyCount">Nombre de familles</label>
+   <select id="familyCount"><option value="5">5 familles</option><option value="6" selected>6 familles</option></select>
+   <p class="note">Un joueur minimum par famille. À cinq familles, Pumpkins (orange) ne participe pas ; aucun tour ne lui est réservé.</p>
+   <h3>Participants par famille</h3><input id="members" type="hidden" value="5,5,5,5,5,5"><div id="memberCounts" class="grid2" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
    <p class="note">Un seul porte-parole connecté par famille, quel que soit l'effectif.</p>
-   <h2 style="margin-top:24px">Ressources de départ</h2>
+   <details class="advanced"><summary>Réglages avancés · ressources et jauges</summary><h3>Ressources de départ</h3>
    <p class="note">Calibrage de la partie, indépendant du scénario Google Sheets. Par défaut : 8 Influence, 10 dollars, 3 points dans la réserve commune et 5/10 pour les jauges.</p>
    <div class="grid2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
      <label for="initPower">Influence par famille<input id="initPower" type="number" min="1" max="30" value="8"></label>
@@ -71,14 +77,14 @@ small{color:#656a6e}a{color:inherit}ol{padding-left:20px;line-height:1.6}
      <label for="city_developpement">Développement<input id="city_developpement" type="number" min="0" max="10" value="5"></label>
      <label for="city_stabilite">Stabilité<input id="city_stabilite" type="number" min="0" max="10" value="5"></label>
    </div>
-   <button type="submit">Prévisualiser la configuration</button>
+   </details><button type="submit">Vérifier et préparer les familles →</button>
   </form>
   <div id="status" role="status" aria-live="polite"></div>
  </article>
  <article>
   <h2>Prévisualisation</h2>
   <div id="empty"><p class="note">Charge d'abord les bibliothèques, puis choisis un scénario et un habillage pour afficher leur compatibilité.</p>
-  <ol><li>Choisir l'histoire issue d'un Sheets.</li><li>Choisir la skin, sans réécrire les dilemmes.</li><li>Contrôler les six effectifs avant de créer une session dans une tranche future.</li></ol></div>
+  <ol><li>Choisir l'histoire issue d'un Sheets.</li><li>Choisir la skin, sans réécrire les dilemmes.</li><li>Vérifier les familles, enregistrer vos réglages puis créer la partie.</li></ol></div>
   <div id="preview" hidden>
     <span class="pill">APERÇU DE CONFIGURATION</span>
     <h3 id="storyTitle"></h3><p id="storyInfo"></p>
@@ -90,12 +96,12 @@ small{color:#656a6e}a{color:inherit}ol{padding-left:20px;line-height:1.6}
       <div class="metric"><span>Connexions de vote</span><strong>6</strong></div>
     </div>
     <div id="warnings"></div>
-    <hr><h2>Paramétrer cette partie</h2>
-    <p class="note">Les objectifs ci-dessous sont des exemples de test, à personnaliser avant de lancer une vraie animation. Ils ne constituent pas encore un barème de victoire.</p>
+    <hr><h2>3 · Familles et création</h2>
+    <p class="note">Les six familles ont chacune une ambition secrète. Gardez les réglages proposés ou personnalisez leurs cartes. Le barème reste à confirmer en test humain.</p>
     <label for="gameTitle">Nom de la partie</label><input id="gameTitle" value="Le Pacte des Fondateurs — Répétition" maxlength="100">
-    <label for="gameCode">Code de partie (unique)</label><input id="gameCode" value="PACTE01" pattern="[A-Z0-9][A-Z0-9_-]{2,11}" maxlength="12">
+    <label for="gameCode">Code de partie (unique)</label><input id="gameCode" placeholder="Ex. PACTE01" pattern="[A-Z0-9][A-Z0-9_-]{2,11}" maxlength="12">
     <div id="familySettings"></div>
-    <hr><h2>Barème final de test</h2>
+    <details class="advanced"><summary>Réglages avancés · barème et laboratoire</summary><h2>Barème final de test</h2>
     <p class="note">Les cartes de familles donnent deux paliers d'objectif secret. Ces valeurs restent expérimentales et seront ajustées après les tests humains.</p>
     <div class="grid2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
       <label for="secretFirst">Points objectif palier 1<input id="secretFirst" type="number" min="0" max="12" value="3"></label>
@@ -128,7 +134,7 @@ small{color:#656a6e}a{color:inherit}ol{padding-left:20px;line-height:1.6}
       <div id="goalAnalysisRows"></div>
       <p id="analysisSummary" class="note"></p>
     </div>
-    <hr>
+    </details><section class="save-config"><h3>Conserver ces réglages pour rejouer</h3><label for="configurationName">Nom du modèle</label><input id="configurationName" maxlength="100" placeholder="Ex. Hot Spring · groupe de 30"><button type="button" id="saveConfiguration">Enregistrer une configuration</button><p id="configurationMessage" class="note" role="status"></p></section><hr>
     <button type="button" id="createNarrative">Créer la partie narrative</button>
     <div id="createdGame" hidden>
       <h3>Partie créée</h3>

@@ -1,3 +1,4 @@
+import {mountPrintKit} from './founders-print.js';
 import {renderCouncilMonitor} from './founders-council-monitor.js';
 import {councilGuidance,startCouncil,organizerError,validNarrativeSession} from './founders-regie-flow.js';
 import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
@@ -103,7 +104,7 @@ function render(s){
  renderCouncilMonitor($('councilMonitor'),s);
  const guidance=councilGuidance(s);step(guidance.step);set('stageTitle',guidance.title);set('stageHint',guidance.hint);
  $('preparation').hidden=s.phase!=='READY';
- const named=s.families.filter(f=>f.name&&f.name!=='Nom à choisir').length;set('teamReadyCount',named+'/6 équipes ont un nom');
+ const named=s.families.filter(f=>f.name&&f.name!=='Nom à choisir').length;set('teamReadyCount',named+'/'+s.families.length+' équipes ont un nom');
  $('preparePublicLink').href='/founders-city.html?session='+s.id;
  set('phase',labels[s.phase]||s.phase);set('sessionCode',s.code+' · '+s.selection.scenarioVersion+' · skin '+s.selection.skinId);
  set('sessionTitle',s.title);set('revision','Révision '+s.revision);
@@ -174,6 +175,7 @@ async function rotate(family){
   const result=await api('/access/'+family,'POST',{});
   const url=new URL('/founders-family.html?session='+sid,location.origin);
   url.hash='token='+encodeURIComponent(result.token);
+  printKit.remember(family,result.token);
   $('newAccessLink').value=url.href;$('accessOutput').hidden=false;
   set('notice','Accès de la famille '+family+' renouvelé. Ne partagez ce lien qu’avec son porte-parole.');
  }catch(e){set('notice',e.message);}
@@ -209,3 +211,8 @@ $('changeAccount').addEventListener('click',login);
 $('retryInit').addEventListener('click',init);
 $('chooseSession').addEventListener('click',async()=>{try{await listSessions();}catch(error){set('notice',organizerError(error));}});
 init();setInterval(refresh,2500);
+
+const printKit=mountPrintKit({session:sid,view:()=>current,request:async(path,body)=>{
+ const bearer=await organizerToken();const r=await fetch(path,{method:'POST',headers:{Authorization:'Bearer '+bearer,'Content-Type':'application/json'},body:JSON.stringify(body)});
+ const data=await r.json();if(!r.ok)throw new Error(data.error||'QR indisponible');return data;
+}});
