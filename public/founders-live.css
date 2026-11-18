@@ -150,6 +150,12 @@ body[data-skin=corporate] .small.muted{color:var(--muted)}
 .projection-results .gauge-head{font-size:clamp(12px,1.05vw,36px);gap:4px;margin-bottom:3px}
 .projection-results .gauge-head strong{white-space:nowrap}
 .projection-results .track{height:clamp(5px,.65vw,10px)}
+.projection-reserve{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;
+ border-top:1px solid var(--border);padding-top:6px;margin:8px 0 0;text-align:center;
+}
+.projection-reserve dt{font-size:clamp(11px,.93vw,25px);line-height:1.15;font-weight:650;color:var(--muted)}
+.projection-reserve dd{margin:2px 0 0;font-size:clamp(16px,1.4vw,40px);font-weight:700;color:var(--gold)}
 .projection-dashboard #notice:empty{display:none}
 .projection-dashboard #notice{position:fixed;bottom:8px;left:8px;z-index:6;padding:8px;background:var(--panel)}
 #chronicleDialog{width:min(960px,92vw);max-width:none;max-height:90dvh;overflow:auto}
@@ -263,8 +269,8 @@ html:fullscreen{overflow-y:auto;background:#15191b}
 .print-card h2{font-size:23pt;margin:4mm 0}.print-card h3{font-size:14pt}.print-card p{margin:3mm 0}
 .print-card .small,.print-kicker{font-size:9pt}.print-kicker{letter-spacing:.06em}.print-qr{background:#fff;width:58mm;height:58mm;margin:5mm auto}
 .print-qr svg{display:block;width:100%;height:100%}.print-reference{text-align:center;font-weight:700}
-.print-hotspring{padding:5mm;color-scheme:light;font-size:9.5pt;line-height:1.22}
-.print-hotspring h2{font-size:19pt;line-height:1.15;margin:2mm 0;overflow-wrap:anywhere}
+.print-hotspring{padding:4.5mm;color-scheme:light;font-size:9.5pt;line-height:1.22}
+.print-hotspring h2{font-size:17pt;line-height:1.15;margin:2mm 0;overflow-wrap:anywhere}
 .print-hotspring h3{font-size:13pt;margin:1.5mm 0 0}
 .print-hotspring p{margin:1mm 0;line-height:inherit}
 .print-hotspring-access{display:grid;grid-template-columns:minmax(0,1fr) 44mm;align-items:center;gap:4mm}
@@ -278,7 +284,10 @@ html:fullscreen{overflow-y:auto;background:#15191b}
 .print-reminder h4{font-size:11pt;margin:0 0 1mm}
 .print-reminder :is(ol,ul){margin:1mm 0;padding-left:5mm}
 .print-reminder li+li{margin-top:.25mm}
-.print-reminder-close{border-top:1px solid #777;padding-top:2mm}
+.print-reminder-close{
+ display:grid;grid-template-columns:auto minmax(0,1fr);gap:3mm;align-items:center;
+ border-top:1px solid #777;padding-top:1mm;
+}
 .print-hotspring .print-url{font-size:8pt}
 @media print{
  @page{size:A4 portrait;margin:10mm}

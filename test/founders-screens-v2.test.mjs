@@ -77,6 +77,26 @@ test('Projection Hotspring : le visuel du dilemme et le panorama coexistent',asy
  assert.equal(city.hidden,false);
 });
 
+test('Projection Hotspring : la réserve affiche l’estimation puis le versement',async()=>{
+ const g=newCampaign();
+ g.command('start');g.command('next');g.command('next');
+ const negotiation=await screen('city',g.state);
+ const get=(view,id)=>view.document.getElementById(id);
+ assert.equal(get(negotiation,'influenceReserve').hidden,false);
+ assert.equal(get(negotiation,'influenceAvailable').textContent,'3');
+ assert.equal(get(negotiation,'influencePart').textContent,'—');
+ g.untilCouncil();
+ g.command('vote',{kind:'passe_pouvoir'}, {role:'team',family:'A'});
+ const council=await screen('city',g.state);
+ assert.equal(get(council,'influenceParticipants').textContent,'1');
+ assert.equal(get(council,'influencePart').textContent,'3');
+ assert.equal(get(council,'influencePartLabel').textContent,'Part estimée par famille');
+ g.vote('pour');
+ const reveal=await screen('city',g.state);
+ assert.equal(get(reveal,'influencePartLabel').textContent,'Part versée par famille');
+ assert.equal(get(reveal,'influencePart').textContent,'3');
+});
+
 test('Configuration : la version V2 est proposée, quatre jauges et ambitions cohérentes à cinq familles',async()=>{
  const {document}=await screen('setup',state);document.getElementById('token').value='local-v2-key-123456789012345678901234';document.getElementById('load').click();
  for(let i=0;i<12;i++)await new Promise(r=>setImmediate(r));

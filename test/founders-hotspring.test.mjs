@@ -63,6 +63,30 @@ test('Hotspring : surenchère, abstention sautée, sauvegarde du scrutin et des 
  assert.equal(g.state.lastReveal.yes,3);
 });
 
+test('Hotspring : la projection estime le partage puis affiche l’Influence réellement versée',()=>{
+ const g=newCampaign();
+ const view=()=>narrativePublicView(g.state).influenceReserve;
+ g.command('start');g.command('next');g.command('next');
+ assert.equal(g.state.phase,'NEGOTIATION');
+ assert.deepEqual(view(),{available:3,participants:0,perFamily:0,settled:false});
+ g.command('beginVote');
+ g.command('vote',{kind:'passe_pouvoir'},team('A'));
+ assert.deepEqual(view(),{available:3,participants:1,perFamily:3,settled:false});
+ g.command('vote',{kind:'passe_moderateur'},team('B'));
+ assert.deepEqual(view(),{available:3,participants:1,perFamily:3,settled:false});
+ g.command('vote',{kind:'pour',amount:4},team('C'));
+ g.command('vote',{kind:'passe_pouvoir'},team('D'));
+ assert.deepEqual(view(),{available:3,participants:2,perFamily:1,settled:false});
+ g.command('vote',{kind:'contre',amount:1},team('E'));
+ g.command('vote',{kind:'maintien'},team('C'));
+ g.command('vote',{kind:'maintien'},team('E'));
+ assert.equal(g.state.phase,'REVEALED');
+ assert.deepEqual(view(),{available:5,participants:2,perFamily:1,settled:true});
+ assert.deepEqual(['A','B','D'].map(id=>g.state.game.families[id].power),[9,8,9]);
+ g.command('next');
+ assert.equal(view(),null);
+});
+
 test('Hotspring : chaque objectif compte les groupes une fois et exige le seuil',()=>{
  const s=newCampaign().state;
  for(const f of Object.values(s.scenario.campaign.families)){

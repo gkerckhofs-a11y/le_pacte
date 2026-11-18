@@ -12,7 +12,7 @@ import {isHybrid,narrativeReserve,chooseNarrativeNext,narrativeEpilogue} from '.
 import {
   createFoundersGame,openFoundersDilemma,castFoundersAction,
   moderatorResolveFoundersTie,moderatorChooseFoundersLeader,
-  applyFoundersCityEffects,transferFoundersDollars,activeFounders,totalPower,expectedFoundersPowerSupply
+  applyFoundersCityEffects,transferFoundersDollars,activeFounders,totalPower,expectedFoundersPowerSupply,foundersReserveAllocation
 } from './founders.ts';
 import {
   DEFAULT_GOAL_CARDS,DEFAULT_SCORE_RULES,validateGoalCards,validateScoreRules,
@@ -295,6 +295,17 @@ function publicDilemma(s){
   ...(isHybrid(s.scenario)?{sequence:s.revealedHistory.length+(s.phase==='REVEALED'?0:1)}:{}),
   vote_question:d.vote_question,labels:copy(d.labels),image:copy(d.image),...campaign};
 }
+function publicInfluenceReserve(s,resolved){
+ const result=s.phase==='REVEALED'?resolved:null;
+ if(!result&&!['NEGOTIATION','COUNCIL'].includes(s.phase))return null;
+ const allocation=foundersReserveAllocation(s.game,result?{pool:result.poolBefore,choices:result.choices}:undefined);
+ return {
+  available:s.game.pool,
+  participants:allocation.families.length,
+  perFamily:result?.recapturedPerPassingTeam??allocation.perFamily,
+  settled:Boolean(result)
+ };
+}
 export function narrativePublicView(s){
  check(s?.kind==='founders-live-session-v2.5','Partie inconnue');
  const v=s.game.vote,resolved=(s.phase==='REVEALED'||s.phase==='FINISHED')?s.game.history.at(-1):null;
@@ -302,7 +313,7 @@ export function narrativePublicView(s){
  return {
   kind:s.kind,id:s.id,code:s.code,title:s.title,phase:s.phase,revision:s.revision,
   ...(isV2(s)?{experienceVersion:2,timing:copy(s.timing),clock:copy(s.clock),gaugeThresholds:copy(s.gaugeThresholds)}:{}),
-  ...(isHotspring(s)?{campaign:campaignPresentation(s)}:{}),
+  ...(isHotspring(s)?{campaign:campaignPresentation(s),influenceReserve:publicInfluenceReserve(s,resolved)}:{}),
   story:{id:s.scenario.scenario.id,title:s.scenario.scenario.title,location:s.scenario.scenario.location,year:s.scenario.scenario.year},
   skin:{id:s.skin.id,title:s.skin.title,labels:copy(s.skin.labels),theme:copy(s.skin.theme),publicScene:copy(s.skin.publicScene)},
   city:copy(s.game.city),families:activeFounders(s.game).map((id,i)=>({id,name:s.names[id],color:copy(teamColor(s.colors?.[id]??DEFAULT_TEAM_COLORS[i])),members:s.game.families[id].members})),

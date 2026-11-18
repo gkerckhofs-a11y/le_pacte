@@ -48,8 +48,10 @@ for(const [count,campaign] of [[5,false],[6,false],[5,true]])test(`Fiches ${camp
    assert.deepEqual([...reminder.querySelectorAll('h4')].map(h=>h.textContent),[
     'Votre but','Un dilemme en 5 étapes','L’Influence','L’abstention','Les dollars','Le Maire','Le Shérif','Rappel express'
    ]);
-   assert.match(reminder.textContent,/Gardez vos objectifs confidentiels/);
-   assert.match(reminder.textContent,/À la fin de la partie, les trois familles les plus riches gagnent respectivement 3, 2 et 1 point\. En cas d’égalité, les familles concernées obtiennent les points du même rang\./);
+   assert.match(reminder.textContent,/Vos objectifs sont secrets\. Gardez-les confidentiels/);
+   assert.match(reminder.textContent,/Maximum : 18 points/);
+   assert.match(reminder.textContent,/deux familles terminent deuxièmes\. Elles gagnent chacune 2 points, et la famille suivante est classée quatrième\./);
+   assert.match(reminder.textContent,/Préservez votre fortune/);
   }else{
    assert.equal(card.querySelector('.print-reminder'),null);
   }

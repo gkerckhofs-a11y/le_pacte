@@ -18,6 +18,14 @@ function status(id,value){
  text(id,value);
  $(id).hidden=!value;
 }
+function drawInfluenceReserve(reserve){
+ $('influenceReserve').hidden=!reserve;
+ if(!reserve)return;
+ text('influenceAvailable',reserve.available);
+ text('influenceParticipants',reserve.participants);
+ text('influencePartLabel',reserve.settled?'Part versée par famille':'Part estimée par famille');
+ text('influencePart',reserve.participants?reserve.perFamily:'—');
+}
 function drawIllustration(s,sceneOnly){
  const image=$('decisionImage');
  const previous=image.getAttribute('src');
@@ -81,6 +89,7 @@ function render(s){
  previousCityStates=cityStates;
  }
  drawIllustration(s,sceneOnly);
+ drawInfluenceReserve(s.influenceReserve);
  const out=$('outcome');out.hidden=!s.reveal;
  if(s.reveal){text('outcomeTitle',s.campaign?s.reveal.chronicle.title:s.reveal.winner==='pour'?'PROPOSITION ADOPTÉE':'PROPOSITION REJETÉE');text('outcomeText',s.reveal.narration);}
  text('voteForTotal',totals.yes);text('voteAgainstTotal',totals.no);text('voteAbstentions',totals.abstentions);

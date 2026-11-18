@@ -46,7 +46,14 @@
    <p id="councilPrompt" role="status" hidden></p>
    <div id="ballots"></div>
   </div>
-  <div class="panel"><h2>La ville après vos décisions</h2><div id="gauges"></div></div>
+  <div class="panel">
+   <h2>La ville après vos décisions</h2><div id="gauges"></div>
+   <dl id="influenceReserve" class="projection-reserve" aria-label="Partage de la réserve d’influence" aria-live="polite" hidden>
+    <div><dt>Influence en réserve</dt><dd id="influenceAvailable"></dd></div>
+    <div><dt>Familles en récupération</dt><dd id="influenceParticipants"></dd></div>
+    <div><dt id="influencePartLabel">Part estimée par famille</dt><dd id="influencePart"></dd></div>
+   </dl>
+  </div>
  </div>
 </section>
 </div>

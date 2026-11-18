@@ -64,11 +64,14 @@ export function transferFoundersDollars(input,from,to,amount,reason) {
  const s=clone(input);s.families[from].dollars-=amount;s.families[to].dollars+=amount;
  s.transactions.push({from,to,amount,reason,voteId:s.vote?.id??null});return s;
 }
+export function foundersReserveAllocation(s,{pool=s.pool,choices=s.vote?.choices??{}}={}){
+ const families=activeFounders(s).filter(id=>choices[id]==='passe_pouvoir');
+ return {families,perFamily:families.length?Math.floor(pool/families.length):0};
+}
 function complete(s,winner,leaderChoice=null) {
  const v=s.vote;
  requireThat(v.phase==='await_moderator'||v.phase==='voting'||v.phase==='await_leader','Vote non résoluble');
  requireThat(['pour','contre'].includes(winner),'Décision invalide');
- const passes=activeFounders(s).filter(id=>v.choices[id]==='passe_pouvoir');
  const candidates=activeFounders(s).filter(id=>v.choices[id]===winner);
  let newLeader=s.leader;
  if(candidates.length===0) newLeader=s.moderator; // all passed: moderator bears responsibility
@@ -79,7 +82,8 @@ function complete(s,winner,leaderChoice=null) {
   requireThat(tied.includes(leaderChoice)||tied.length===1,'Maire final invalide');
   newLeader=tied.length===1?tied[0]:leaderChoice;
  }
- const oldPool=s.pool;const each=passes.length?Math.floor(oldPool/passes.length):0;
+ const oldPool=s.pool;
+ const {families:passes,perFamily:each}=foundersReserveAllocation(s);
  s.pool-=each*passes.length;
  for(const id of passes)s.families[id].power+=each;
  for(const id of activeFounders(s)){
