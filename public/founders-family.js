@@ -146,6 +146,7 @@ function render(data){
  $('offerReason').required=data.experienceVersion!==2;
  if(data.experienceVersion===2)$('offerCommitment').value='gift';
  $('rulesLegacy').hidden=data.experienceVersion===2;$('rulesV2').hidden=data.experienceVersion!==2;
+ $('rulesV2Score').hidden=Boolean(data.campaign);$('rulesHotspringScore').hidden=!data.campaign;
  const target=$('targetFamily'),prev=target.value;target.replaceChildren();
  for(const f of data.families.filter(f=>f.id!==self.id)){
   const option=document.createElement('option');option.value=f.id;option.textContent=teamCaption(f);target.append(option);

@@ -22,12 +22,15 @@ Campagne versionnée à cinq familles, de l’arrivée des chariots en 1872 au c
 
 ## Revue des visuels
 
-138 fichiers WebP intégrés, dont 32 en-têtes, 62 plans fixes de résultat, 6 scènes de charte, 6 ouvertures, 3 variantes de continuité, 28 calques transparents et la vallée de référence. Les 7 captures sont rendues séparément à partir des états de campagne. Les 107 entrées temporaires du manifeste recensent les compositions, variantes et finitions à revoir.
+Le manifeste couvre 272 entrées. Le jeu charge 143 fichiers WebP, dont les 32 en-têtes, les 62 plans fixes des votes, les six chartes, les six ouvertures, trois variantes en image, 33 calques transparents et le fond de vallée. Les 129 autres entrées sont composées par le moteur. Les coordonnées du panorama restent les mêmes quels que soient les toits, les travaux, la densité, l’état de la rivière ou les traces de crise.
 
-- [Galerie de contrôle](galerie.html) avec les en-têtes, résultats, calques et captures. Ouvrir le fichier depuis une copie du dépôt.
-- [Manifeste](manifeste-assets.json), [prompts utilisés](prompts-utilises.json), [briefs des chapitres](briefs-visuels.json) et [visuels temporaires](visuels-temporaires.md). Les statuts « validé » correspondent à des images générées et intégrées au brouillon. La validation artistique en projection est à faire.
-- [Captures](captures/) rendues depuis des sauvegardes de test avec la vallée commune. Le script `node scripts/capture-hotspring.mjs` recrée les rendus 1080p et 4K. Il requiert ImageMagick.
-- Les fichiers de la scène en cours utilisent des WebP. Le plan de la vallée et les calques présents sont partagés entre les phases. Le résultat démarre avec le panorama recomposé pendant le chargement de son plan fixe. Le mode de réduction des animations montre le plan de secours en vignette.
-- Les personnages, enseignes diégétiques et détails situés conditionnellement appellent une revue visuelle. La communauté de la vallée reste fictive dans les textes et les briefs. Tester la cohérence des scènes qui la représentent avant une diffusion.
+- La [galerie](galerie.html) associe les 129 compositions à des planches de contrôle et présente les sept captures de croissance. Les gros plans des planches sont des états de vérification. Les captures de croissance proviennent de parties simulées.
+- Les [crédits](manifeste-assets.json) et les [prompts utilisés](prompts-utilises.json) accompagnent les fichiers intégrés, dont les devantures, la charrette, les peupliers, la charpente et les débris ajoutés après la revue de la direction visuelle. Les entrées « validé » ont un fichier intégré ou un rendu du moteur contrôlable dans la galerie.
+- Les repères de contexte apparaissent lorsque le dilemme et l’état de la partie les justifient. L’épilogue part du camp de 1872 et réutilise jusqu’à trois résultats effectivement joués, selon les décisions prises et les crises survenues. Le réglage de mouvement réduit affiche directement la ville finale.
+- `node scripts/capture-hotspring.mjs --states` reproduit les captures 1080p et 4K, les planches et la galerie. ImageMagick est nécessaire.
 
-La révision d’intégration reste en brouillon jusqu’à la finition de la liste des visuels temporaires et à l’essai en salle.
+## Vérifications de la répétition
+
+Le test HTTP crée une partie à cinq familles, vérifie les liens de leurs fiches et ouvre un scrutin. Il ferme puis rouvre le stockage SQLite, vérifie la mise, le budget et le chrono restaurés et rejoint l’épilogue et le classement. Une partie du premier parcours sert de témoin. Les tests de rendu vérifient aussi les 129 compositions, le chargement des WebP et l’ordre de révélation de l’épilogue.
+
+L’accès du navigateur de contrôle à la répétition locale a échoué. Les rendus du panorama en 1080p et en 4K sont disponibles dans la galerie. L’essai avec cinq porte-paroles et un vidéoprojecteur reste à faire.

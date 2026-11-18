@@ -256,7 +256,7 @@ $('createNarrative').addEventListener('click',async()=>{
   append('Ouvrir la régie de la partie','/founders-regie.html?session='+result.id);
   append('Ouvrir la projection publique','/founders-city.html?session='+result.id);
   for(const a of result.access){
-   const path='/founders-family.html?session='+result.id+'#token='+encodeURIComponent(a.token);
+   const path='/founders-family.html?session='+result.id+'&family='+a.family+'#token='+encodeURIComponent(a.token);
    const i=FAMILY_IDS.indexOf(a.family);append('Accès privé porte-parole : '+teamCaption({name:names[i],color:TEAM_COLORS.find(c=>c.id===colors[i])}),path);
   }
   $('createdGame').hidden=false;
