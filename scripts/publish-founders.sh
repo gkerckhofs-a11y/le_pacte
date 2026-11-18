@@ -16,6 +16,6 @@ npm ci --prefix functions --ignore-scripts --no-audit --no-fund
 npm test
 npm run build:firebase
 node scripts/verify-cloud-build.mjs
-# La connexion est réalisée dans votre propre terminal. Aucun code n’est envoyé au chat.
-npx -y firebase-tools@latest login --no-localhost
+# Cloud Shell may already supply Application Default Credentials.
+# Do not force a second login or expose an authorization code.
 npx -y firebase-tools@latest deploy --project le-pacte-ludificateur --only functions:pacte,hosting

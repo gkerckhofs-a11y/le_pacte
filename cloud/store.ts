@@ -77,6 +77,7 @@ export class FirestoreStore {
   });
  }
  async advanceDue(now:number){
+  await this.narrative.advanceDue(now);
   const p=Pipelines;const due=await this.db.pipeline().collection('pacteSessions').where(p.and(p.field('deadline').greaterThanOrEqual(0),p.field('deadline').lessThanOrEqual(now))).sort(p.ascending('deadline')).limit(100).execute();for(const d of due.results)await this.advanceSession(d.id,now);
  }
 }

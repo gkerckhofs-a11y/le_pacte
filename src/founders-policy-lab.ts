@@ -1,3 +1,4 @@
+import {CITY_V2,GOALS_V2} from './founders-v2.ts';
 /**
  * Le Pacte V2.7 — deterministic policy laboratory.
  * NOT a forecast or a measured success probability. These are synthetic
@@ -42,7 +43,7 @@ const makeCity=(base,effects)=>{
   if(e.operation==='delta')city[e.indicator]=Math.max(0,Math.min(10,city[e.indicator]+e.value));
   else if(e.operation==='toward_center')city.stabilite+=Math.sign(5-city.stabilite);
   else if(e.operation==='away_from_center')city.stabilite+=city.stabilite<=5?-1:1;
-  city.stabilite=Math.max(0,Math.min(10,city.stabilite));
+  if(Object.hasOwn(city,'stabilite'))city.stabilite=Math.max(0,Math.min(10,city.stabilite));
  }
  return city;
 };
@@ -78,7 +79,7 @@ function oneRun(story,goals,rule,calibration,seed,mode,maxDilemmas,members) {
  const random=makeRandom(seed);
  const order=shuffle(random,ids);
  const policies=Object.fromEntries(ids.map(id=>[id,chooseMode(random,mode)]));
- let game=createFoundersGame({calibration,members});
+ let game=createFoundersGame({calibration,members});if(Object.hasOwn(calibration.city,'ecologie'))game.auctionMode='continuous';
  let id=story.scenario.entry_dilemma;
  const index=new Map(story.dilemmas.map(d=>[d.id,d]));
  const trace=[],outcomes={pour:0,contre:0};
@@ -107,7 +108,7 @@ function oneRun(story,goals,rule,calibration,seed,mode,maxDilemmas,members) {
   }
   let actions=0;
   while(game.vote!==null){
-   check(++actions<=80,'Vote bloqué ou nombre de surenchères dépassé');
+   check(++actions<=1000,'Vote bloqué ou nombre de surenchères dépassé');
    if(game.vote.phase==='await_moderator'){
     const mod=game.moderator;
     const winner=intentions[mod].choice;
@@ -156,6 +157,9 @@ export function simulateFoundersPolicies(story,{
  runs=36,seed=20261103,mode='mixte',maxDilemmas=30,includeSamples=false
 }={}){
  check(story?.scenario?.entry_dilemma&&Array.isArray(story.dilemmas)&&story.dilemmas.length>=1,'Scénario invalide');
+ const v2=story.dilemmas.some(d=>d.outcomes.pour.effects.some(e=>e.indicator==='ecologie'));
+ if(v2){if(cards===DEFAULT_GOAL_CARDS)cards=GOALS_V2;if(!Object.hasOwn(calibration.city,'ecologie'))calibration={...calibration,city:{...CITY_V2,economie:calibration.city.economie,securite:calibration.city.securite}};}
+ const metrics=Object.keys(calibration.city);
  check(!validateGoalCards(cards).length,'Objectifs invalides');
  check(!validateScoreRules(rule).length,'Barème invalide');
  check(!validateFoundersCalibration(calibration).length,'Calibrage initial invalide');
@@ -166,7 +170,7 @@ export function simulateFoundersPolicies(story,{
  createFoundersGame({members,calibration});
  const ids=FOUNDERS.slice(0,members.length);
  const familyTotals=Object.fromEntries(ids.map(id=>[id,{wins:0,points:0,goal:0,money:0,power:0}]));
- const cityTotal=Object.fromEntries(METRICS.map(id=>[id,0]));
+ const cityTotal=Object.fromEntries(metrics.map(id=>[id,0]));
  const examples=[],samples=[];
  let completed=0,failed=0,offers=0,voteActions=0,dilemmas=0;
  const failures={};
@@ -175,7 +179,7 @@ export function simulateFoundersPolicies(story,{
    const x=oneRun(story,cards,rule,calibration,(seed+i*1013904223)>>>0,mode,maxDilemmas,members);
    if(includeSamples)samples.push({city:x.final.city,ranking:x.final.ranking,trace:x.trace});
    completed++;offers+=x.stats.offersAccepted;voteActions+=x.stats.powerActions;dilemmas+=x.stats.councils;
-   for(const metric of METRICS)cityTotal[metric]+=x.final.city[metric];
+   for(const metric of metrics)cityTotal[metric]+=x.final.city[metric];
    for(const row of x.final.ranking){
     const v=familyTotals[row.family];v.points+=row.score.total;v.goal+=row.score.secret;
     v.money+=row.dollars;v.power+=row.influenceRemaining;
@@ -198,7 +202,7 @@ export function simulateFoundersPolicies(story,{
      meanPoints:average(f.points,completed),meanGoalPoints:average(f.goal,completed),
      meanFinalDollars:average(f.money,completed),meanFinalInfluence:average(f.power,completed)}];
   })),
-  meanCity:Object.fromEntries(METRICS.map(k=>[k,average(cityTotal[k],completed)])),
+  meanCity:Object.fromEntries(metrics.map(k=>[k,average(cityTotal[k],completed)])),
   meanCouncils:average(dilemmas,completed),
   meanVoteActionsPerCouncil:dilemmas?average(voteActions,dilemmas):null,
   meanOffersAcceptedPerGame:average(offers,completed),

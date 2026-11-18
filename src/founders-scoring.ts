@@ -6,7 +6,7 @@
  */
 import {FOUNDERS,activeFounders,FOUNDERS_DEFAULT_CALIBRATION} from './founders.ts';
 
-const METRICS=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
+const METRICS=['ecologie','demographie','economie','securite','satisfaction','bien_etre','developpement','stabilite'];
 const DIRECTIONS=['at_least','at_most'];
 const copy=x=>structuredClone(x);
 const check=(ok,m)=>{if(!ok)throw new Error(m);};

@@ -1,3 +1,4 @@
+import {isV2,GOALS_V2,TIMING_V2,validateTiming,validateThresholds,setPhaseClock,beginNegotiation,beginVote,revealResolution,nextV2,finishV2} from './founders-v2.ts';
 import {DEFAULT_TEAM_COLORS,DEFAULT_TEAM_NAMES,teamColor} from '../public/founders-identity.js';
 import {isHybrid,narrativeReserve,chooseNarrativeNext,narrativeEpilogue} from './founders-progression.ts';
 /**
@@ -32,13 +33,18 @@ export const TEST_FAMILY_OBJECTIVES=Object.freeze([
   'Objectif de test : préserver l’autonomie des fondateurs en affaiblissant la Stabilité (voir les paliers de votre ambition).'
 ]);
 
-export function createNarrativeSession(preview,{id,ownerId,code,title,objectives=TEST_FAMILY_OBJECTIVES,names,colors=DEFAULT_TEAM_COLORS,goalCards=DEFAULT_GOAL_CARDS,scoreRules=DEFAULT_SCORE_RULES,initiativeOrder,now=Date.now()}) {
+export function createNarrativeSession(preview,{id,ownerId,code,title,objectives=TEST_FAMILY_OBJECTIVES,names,colors=DEFAULT_TEAM_COLORS,goalCards=DEFAULT_GOAL_CARDS,scoreRules=DEFAULT_SCORE_RULES,initiativeOrder,timing=TIMING_V2,gaugeThresholds=[2,4,6,8],now=Date.now()}) {
  check(preview?.kind==='founders-session-preview-v2.3'&&preview.previewOnly===true,'Configuration narrative invalide');
  check(typeof id==='string'&&/^[a-f0-9]{24}$/.test(id),'Identifiant de session invalide');
  check(str(ownerId,128),'Organisateur requis');
  check(typeof code==='string'&&/^[A-Z0-9][A-Z0-9_-]{2,11}$/.test(code),'Code de session invalide');
  check(str(title,100),'Titre de partie invalide');
- const ids=activeFounders(preview.game);
+ const ids=activeFounders(preview.game),v2=preview.game.auctionMode==='continuous';
+ if(v2){
+  if(goalCards===DEFAULT_GOAL_CARDS)goalCards=GOALS_V2;
+  if(objectives===TEST_FAMILY_OBJECTIVES)objectives=ids.map(id=>goalCards[id].description);
+  check(ids.every(id=>Object.hasOwn(preview.game.city,goalCards[id]?.indicator)),'Les ambitions doivent utiliser les quatre jauges de la V2');
+ }
  objectives=objectives===TEST_FAMILY_OBJECTIVES?objectives.slice(0,ids.length):objectives;
  colors=colors===DEFAULT_TEAM_COLORS?colors.slice(0,ids.length):colors;
  initiativeOrder??=ids;
@@ -60,6 +66,7 @@ export function createNarrativeSession(preview,{id,ownerId,code,title,objectives
   colors:Object.fromEntries(ids.map((id,i)=>[id,colors[i]])),
   goals:Object.fromEntries(ids.map((id,i)=>[id,objectives[i]])),
   goalCards:copy(goalCards),scoreRules:copy(scoreRules),initiativeOrder:copy(initiativeOrder),finalResults:null,
+  ...(v2?{experienceVersion:2,timing:validateTiming(timing),gaugeThresholds:validateThresholds(gaugeThresholds),clock:{phase:'READY',deadline:null,remainingMs:null,paused:false}}:{}),
   phase:'READY',currentDilemmaId:preview.scenario.scenario.entry_dilemma,
   lastReveal:null,revealedHistory:[],offers:{},revision:0,createdAt:now,updatedAt:now
  };
@@ -77,7 +84,7 @@ const validateActor=(s,actor)=>{
 };
 const activeOffers=s=>Object.values(s.offers).filter(o=>o.status==='pending').length;
 export function acceptedVoteCommitment(s,family){
- const offers=Object.values(s.offers).filter(o=>o.status==='accepted'&&o.to===family&&o.councilNumber===s.game.history.length&&o.commitment?.choice);
+ const offers=Object.values(s.offers).filter(o=>o.status==='accepted'&&o.to===family&&o.councilNumber===s.game.history.length&&o.commitment?.choice&&o.commitment.choice!=='gift');
  if(!offers.length)return null;
  return {choice:offers[0].commitment.choice,minInfluence:Math.max(...offers.map(o=>o.commitment.minInfluence))};
 }
@@ -102,6 +109,7 @@ export function applyNarrativeCommand(input,actor,command,now){
  check(Number.isSafeInteger(now)&&now>=0,'Horodatage invalide');
  check(command&&typeof command.kind==='string','Commande invalide');
  const s=copy(input),data=command.data??{},kind=command.kind;
+ check(!s.clock?.paused||['pause','resume','configureTiming','adjustTime','correctResource','finish'].includes(kind),'Partie en pause');
  const org=()=>check(actor.role==='organizer','Régie uniquement');
  const team=()=>check(actor.role==='team','Porte-parole uniquement');
  switch(kind){
@@ -119,7 +127,7 @@ export function applyNarrativeCommand(input,actor,command,now){
 
   case 'start':
    org();check(s.phase==='READY','La partie est déjà lancée');
-   s.game=openFoundersDilemma(s.game,s.currentDilemmaId);s.phase='COUNCIL';break;
+   if(isV2(s))beginNegotiation(s,now);else {s.game=openFoundersDilemma(s.game,s.currentDilemmaId);s.phase='COUNCIL';}break;
   case 'vote':
    team();check(s.phase==='COUNCIL','Conseil fermé');
    {
@@ -130,17 +138,17 @@ export function applyNarrativeCommand(input,actor,command,now){
     }
     s.game=castFoundersAction(s.game,actor.family,data);
    }
-   if(!s.game.vote)s.phase='AWAITING_REVEAL';
+   if(!s.game.vote){if(isV2(s))revealResolution(s,now);else s.phase='AWAITING_REVEAL';}
    break;
   case 'resolveTie':
    team();check(s.phase==='COUNCIL'&&s.game.vote?.phase==='await_moderator','Aucune égalité à départager');
    s.game=moderatorResolveFoundersTie(s.game,actor.family,data.winner);
-   if(!s.game.vote)s.phase='AWAITING_REVEAL';
+   if(!s.game.vote){if(isV2(s))revealResolution(s,now);else s.phase='AWAITING_REVEAL';}
    break;
   case 'chooseLeader':
    team();check(s.phase==='COUNCIL'&&s.game.vote?.phase==='await_leader','Aucun Maire à départager');
    s.game=moderatorChooseFoundersLeader(s.game,actor.family,data.family);
-   if(!s.game.vote)s.phase='AWAITING_REVEAL';
+   if(!s.game.vote){if(isV2(s))revealResolution(s,now);else s.phase='AWAITING_REVEAL';}
    break;
   case 'reveal': {
    org();check(s.phase==='AWAITING_REVEAL','Aucun résultat à révéler');
@@ -159,7 +167,9 @@ export function applyNarrativeCommand(input,actor,command,now){
    s.phase='REVEALED';break;
   }
   case 'next': {
-   org();check(s.phase==='REVEALED','Révéler le résultat avant de poursuivre');
+   org();
+   if(isV2(s)){check(s.phase==='REVEALED','Résolution requise');nextV2(s,now,data.dilemmaId);break;}
+  check(s.phase==='REVEALED','Révéler le résultat avant de poursuivre');
    const next=isHybrid(s.scenario)?chooseNarrativeNext(s,data.dilemmaId):s.lastReveal.nextId;
    if(next===null){s.phase='FINISHED';s.finalResults=calculateFoundersFinal(s);s.narrativeEnding=narrativeEpilogue(s);break;}
    check(s.revealedHistory.length<=s.scenario.dilemmas.length*3,'Nombre maximal de dilemmes atteint');
@@ -168,10 +178,11 @@ export function applyNarrativeCommand(input,actor,command,now){
    break;
   }
   case 'offer': {
-   team();check(s.phase==='COUNCIL','Négociations fermées');
+   team();check(['NEGOTIATION','COUNCIL'].includes(s.phase),'Négociations fermées');
    check(activeOffers(s)<maxOffers,'Trop d’offres en attente');
    check(activeFounders(s.game).includes(data.to)&&data.to!==actor.family,'Destinataire invalide');
    check(Number.isSafeInteger(data.amount)&&data.amount>=1&&data.amount<=s.game.families[actor.family].dollars,'Dollars insuffisants');
+   if(isV2(s)){check(data.reason===undefined||typeof data.reason==='string'&&data.reason.length<=300,'Message : 300 caractères maximum');data.reason=data.reason?.trim()||'Proposition financière';data.commitment={choice:'gift'};}
    check(str(data.reason,300),'Motif de proposition requis');
    validateOfferCommitment(s,data.to,data.commitment);
    check(typeof data.id==='string'&&/^[A-Za-z0-9_-]{8,80}$/.test(data.id)&&!has(s.offers,data.id),'Identifiant d’offre déjà utilisé');
@@ -179,7 +190,7 @@ export function applyNarrativeCommand(input,actor,command,now){
    break;
   }
   case 'acceptOffer': {
-   team();check(s.phase==='COUNCIL','Négociations fermées');
+   team();check(['NEGOTIATION','COUNCIL'].includes(s.phase),'Négociations fermées');
    const offer=has(s.offers,data.id)?s.offers[data.id]:null;
    check(offer&&offer.status==='pending'&&offer.to===actor.family,'Offre non destinée à votre famille');
    if(offer.commitment){
@@ -190,11 +201,34 @@ export function applyNarrativeCommand(input,actor,command,now){
    offer.status='accepted';break;
   }
   case 'rejectOffer': {
-   team();check(s.phase==='COUNCIL','Négociations fermées');
+   team();check(['NEGOTIATION','COUNCIL'].includes(s.phase),'Négociations fermées');
    const offer=has(s.offers,data.id)?s.offers[data.id]:null;
    check(offer&&offer.status==='pending'&&(offer.to===actor.family||offer.from===actor.family),'Offre inaccessible');
    offer.status='rejected';break;
   }
+  case 'beginVote':
+   org();check(isV2(s)&&s.phase==='NEGOTIATION','Aucune négociation à clore');beginVote(s,now);break;
+  case 'configureTiming':
+   org();check(isV2(s)&&s.phase!=='FINISHED','Chronos indisponibles');s.timing=validateTiming(data.timing);s.gaugeThresholds=validateThresholds(data.gaugeThresholds??s.gaugeThresholds);break;
+  case 'pause':
+   org();check(isV2(s)&&s.phase!=='FINISHED'&&!s.clock.paused,'Pause indisponible');
+   s.clock.remainingMs=s.clock.deadline===null?null:Math.max(0,s.clock.deadline-now);s.clock.deadline=null;s.clock.paused=true;break;
+  case 'resume':
+   org();check(isV2(s)&&s.clock.paused,'La partie n’est pas en pause');s.clock.paused=false;s.clock.deadline=s.clock.remainingMs===null?null:now+s.clock.remainingMs;break;
+  case 'adjustTime':
+   org();check(isV2(s)&&Number.isInteger(data.seconds)&&Math.abs(data.seconds)<=3600&&s.clock.remainingMs!==null,'Ajustement de chrono invalide');
+   if(s.clock.paused)s.clock.remainingMs=Math.max(0,s.clock.remainingMs+data.seconds*1000);
+   else {s.clock.deadline=Math.max(now,s.clock.deadline+data.seconds*1000);s.clock.remainingMs=Math.max(0,s.clock.deadline-now);}break;
+  case 'correctResource': {
+   org();check(isV2(s)&&s.phase!=='FINISHED'&&s.clock.paused,'Mettre la partie en pause avant correction');
+   check(activeFounders(s.game).includes(data.family)&&['power','dollars'].includes(data.resource)&&Number.isSafeInteger(data.value)&&data.value>=0&&data.value<=100000,'Correction invalide');
+   const f=s.game.families[data.family];
+   if(data.resource==='power')s.game.powerSupply+=data.value-f.power;
+   (s.corrections??=[]).push({family:data.family,resource:data.resource,before:f[data.resource],after:data.value,at:now});
+   f[data.resource]=data.value;break;
+  }
+  case 'finish':
+   org();check(isV2(s)&&s.phase!=='FINISHED'&&data.confirm===true,'Confirmation de fin de partie requise');finishV2(s,now);break;
   default:throw new Error('Commande narrative inconnue');
  }
  s.revision++;s.updatedAt=now;
@@ -214,6 +248,7 @@ export function narrativePublicView(s){
  // No secrets, unrevealed outcomes, future branches, or source Sheets IDs.
  return {
   kind:s.kind,id:s.id,code:s.code,title:s.title,phase:s.phase,revision:s.revision,
+  ...(isV2(s)?{experienceVersion:2,timing:copy(s.timing),clock:copy(s.clock),gaugeThresholds:copy(s.gaugeThresholds)}:{}),
   story:{id:s.scenario.scenario.id,title:s.scenario.scenario.title,location:s.scenario.scenario.location,year:s.scenario.scenario.year},
   skin:{id:s.skin.id,title:s.skin.title,labels:copy(s.skin.labels),theme:copy(s.skin.theme),publicScene:copy(s.skin.publicScene)},
   city:copy(s.game.city),families:activeFounders(s.game).map((id,i)=>({id,name:s.names[id],color:copy(teamColor(s.colors?.[id]??DEFAULT_TEAM_COLORS[i])),members:s.game.families[id].members})),
@@ -246,9 +281,9 @@ export function narrativeFamilyView(s,family){
  return {...view,self:{id:family,name:s.names[family],color:copy(view.families.find(f=>f.id===family).color),objective:s.goals[family],
   members:s.game.families[family].members,power:s.game.families[family].power,dollars:s.game.families[family].dollars,
   choice:v?.choices[family]??null,bid:v?.bids[family]??0,
-  mayVote:s.phase==='COUNCIL'&&v?.phase==='voting'&&v?.turn===family,
-  mayResolve:s.phase==='COUNCIL'&&v?.phase==='await_moderator'&&s.game.moderator===family,
-  mayChooseLeader:s.phase==='COUNCIL'&&v?.phase==='await_leader'&&s.game.moderator===family},
+  mayVote:!s.clock?.paused&&s.phase==='COUNCIL'&&v?.phase==='voting'&&v?.turn===family,
+  mayResolve:!s.clock?.paused&&s.phase==='COUNCIL'&&v?.phase==='await_moderator'&&s.game.moderator===family,
+  mayChooseLeader:!s.clock?.paused&&s.phase==='COUNCIL'&&v?.phase==='await_leader'&&s.game.moderator===family},
   goalCard:copy(card),goalProgress:progress,offers,voteCommitment:acceptedVoteCommitment(s,family)};
 }
 export function narrativeOrganizerView(s){

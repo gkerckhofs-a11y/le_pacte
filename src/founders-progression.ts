@@ -1,5 +1,5 @@
 /** Hybrid narrative reserve. Pure, reproducible, and server-only. No eval or clock. */
-const METRICS=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
+const METRICS=['ecologie','demographie','economie','securite','satisfaction','bien_etre','developpement','stabilite'];
 const obj=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
 const keys=(x,ks)=>obj(x)&&Object.keys(x).every(k=>ks.includes(k));
 const int=(n,a,b)=>Number.isSafeInteger(n)&&n>=a&&n<=b;

@@ -1,3 +1,4 @@
+import {advanceNarrativeTime} from '../src/founders-v2.ts';
 import {activeFounders} from '../src/founders.ts';
 import {randomBytes} from 'node:crypto';
 import {tokenHash,shuffle} from './security.ts';
@@ -39,11 +40,11 @@ export class LocalNarrativeSessions{
     scenarioId:s.selection.scenarioId,scenarioVersion:s.selection.scenarioVersion,skinId:s.selection.skinId};
   });
  }
- create({ownerId,preview,code,title,objectives,names,colors,goalCards,scoreRules,now}){
+ create({ownerId,preview,code,title,objectives,names,colors,goalCards,scoreRules,timing,gaugeThresholds,now}){
   check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
   return this.transaction(()=>{
    const id=randomBytes(12).toString('hex');
-   const s=createNarrativeSession(preview,{id,ownerId,code,title,objectives,names,colors,goalCards,scoreRules,initiativeOrder:shuffle(activeFounders(preview.game)),now});
+   const s=createNarrativeSession(preview,{id,ownerId,code,title,objectives,names,colors,goalCards,scoreRules,timing,gaugeThresholds,initiativeOrder:shuffle(activeFounders(preview.game)),now});
    const access=activeFounders(s.game).map(family=>({family,token:randomBytes(32).toString('base64url')}));
    this.db.prepare('INSERT INTO founders_sessions(id,code,owner_id,state_json,updated) VALUES(?,?,?,?,?)')
     .run(id,code,ownerId,JSON.stringify(s),now);
@@ -70,16 +71,19 @@ export class LocalNarrativeSessions{
   check(actor.role==='public','Acteur invalide');
  }
  view(id,actor,now){
-  const s=this.get(id);
-  this.verify(s,actor,now);
-  return narrativeView(s,actor);
+  return this.transaction(()=>{
+   const stored=this.get(id);this.verify(stored,actor,now);
+   const s=advanceNarrativeTime(stored,now);
+   if(s!==stored)this.db.prepare('UPDATE founders_sessions SET state_json=?,updated=? WHERE id=?').run(JSON.stringify(s),now,id);
+   return {...narrativeView(s,actor),serverNow:now};
+  });
  }
  command(id,actor,command,now){
   return this.transaction(()=>{
    const s=this.get(id);this.verify(s,actor,now);
    const next=applyNarrativeCommand(s,actor,command,now);
    this.db.prepare('UPDATE founders_sessions SET state_json=?,updated=? WHERE id=?').run(JSON.stringify(next),now,id);
-   return narrativeView(next,actor);
+   return {...narrativeView(next,actor),serverNow:now};
   });
  }
  rotate(id,family,ownerId,now){

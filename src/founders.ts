@@ -25,7 +25,7 @@ export function validateFoundersCalibration(settings){
  if(!integer(settings.initialPower,1,30))errors.push('Influence initiale : 1 à 30');
  if(!integer(settings.initialDollars,0,100))errors.push('Dollars initiaux : 0 à 100');
  if(!integer(settings.initialPool,0,100))errors.push('Réserve commune : 0 à 100');
- const names=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
+ const names=Object.hasOwn(settings.city??{},'ecologie')?['economie','ecologie','securite','demographie']:['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
  if(!settings.city||typeof settings.city!=='object'||Array.isArray(settings.city)||
     Object.keys(settings.city).some(k=>!names.includes(k)))errors.push('Jauges initiales invalides');
  else for(const name of names)if(!integer(settings.city[name],0,10))errors.push('Jauge '+name+' : 0 à 10');
@@ -124,6 +124,25 @@ export function castFoundersAction(input,id,action) {
  const current=v.bids[id]||0;
  if(current>0&&activeFounders(s).every(other=>other===id||current>(v.bids[other]||0)))s.leader=id;
  v.steps.push({family:id,kind,amount:action.amount||0,leaderAfter:s.leader});
+ if(s.auctionMode==='continuous'){
+  // Every family gets its initial choice. Abstentions are then skipped forever.
+  // A full circuit of active voters without a raise closes the auction.
+  if(kind==='augmenter')v.held=[];
+  else if(prior!==undefined)v.held=[...new Set([...(v.held??[]),id])];
+  const ids=activeFounders(s),unplayed=ids.filter(f=>v.choices[f]===undefined);
+  const active=ids.filter(f=>['pour','contre'].includes(v.choices[f]));
+  if(!unplayed.length&&active.every(f=>(v.held??[]).includes(f))){
+   const sum=side=>active.reduce((n,f)=>n+(v.choices[f]===side?v.bids[f]:0),0);
+   const yes=sum('pour'),no=sum('contre');
+   if(yes===no){v.phase='await_moderator';v.turn=null;return s;}
+   return complete(s,yes>no?'pour':'contre');
+  }
+  let candidate=next(s,id);
+  while(v.choices[candidate]!==undefined&&!active.includes(candidate))candidate=next(s,candidate);
+  v.turn=candidate;
+  requireThat(totalPower(s)===expectedFoundersPowerSupply(s),'Invariant Influence violé');
+  return s;
+ }
  if(id===prev(s,s.leader)) {
   const yes=activeFounders(s).reduce((n,f)=>n+(v.choices[f]==='pour'?(v.bids[f]||0):0),0);
   const no=activeFounders(s).reduce((n,f)=>n+(v.choices[f]==='contre'?(v.bids[f]||0):0),0);

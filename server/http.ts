@@ -17,7 +17,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
  if(!/^[A-Za-z0-9_-]{32,128}$/.test(organizerToken))throw new Error('Clé régie : au moins 32 caractères');
  const tokenDigest=Buffer.from(tokenHash(organizerToken),'hex');
  const staticFiles:Record<string,[string,string]>={ '/founders-regie-flow.js':['founders-regie-flow.js','text/javascript; charset=utf-8'], '/founders-name-save.js':['founders-name-save.js','text/javascript; charset=utf-8'], '/founders-painted-western.js':['founders-painted-western.js','text/javascript; charset=utf-8'], '/founders-skins.json':['../content/founders-skins-v1.json','application/json; charset=utf-8'], '/founders-skins.html':['founders-skins.html','text/html; charset=utf-8'], '/founders-skins.js':['founders-skins.js','text/javascript; charset=utf-8'], '/founders-skin-theme.js':['founders-skin-theme.js','text/javascript; charset=utf-8'], '/founders-skin-scenes.js':['founders-skin-scenes.js','text/javascript; charset=utf-8'], '/founders-identity.js':['founders-identity.js','text/javascript; charset=utf-8'], '/founders-city-scene.js':['founders-city-scene.js','text/javascript; charset=utf-8'], '/founders-live.css':['founders-live.css','text/css; charset=utf-8'], '/founders-city.html':['founders-city.html','text/html; charset=utf-8'], '/founders-city.js':['founders-city.js','text/javascript; charset=utf-8'], '/founders-family.html':['founders-family.html','text/html; charset=utf-8'], '/founders-family.js':['founders-family.js','text/javascript; charset=utf-8'], '/founders-regie.html':['founders-regie.html','text/html; charset=utf-8'], '/founders-regie.js':['founders-regie.js','text/javascript; charset=utf-8'], '/founders-import.html':['founders-import.html','text/html; charset=utf-8'], '/founders-import.js':['founders-import.js','text/javascript; charset=utf-8'], '/founders-setup.html':['founders-setup.html','text/html; charset=utf-8'], '/founders-setup.js':['founders-setup.js','text/javascript; charset=utf-8'], '/western-board.js':['western-board.js','text/javascript; charset=utf-8'],'/western-territories.js':['western-territories.js','text/javascript; charset=utf-8'],'/far-west.html':['far-west.html','text/html; charset=utf-8'],'/western-preview.js':['western-preview.js','text/javascript; charset=utf-8'],'/assets/western/frontier-terrain-v1.webp':['assets/western/frontier-terrain-v1.webp','image/webp'], '/':['index.html','text/html; charset=utf-8'],'/app.js':['app.js','text/javascript; charset=utf-8'],'/studio.js':['studio.js','text/javascript; charset=utf-8'],'/animation.js':['animation.js','text/javascript; charset=utf-8'],'/style.css':['style.css','text/css; charset=utf-8']};
- for(const name of ['pacte-entry','founders-workspace','founders-print','founders-council-monitor','founders-vote-progress','founders-role-badges','founders-chronicle','founders-agreements','founders-fullscreen'])staticFiles['/'+name+'.js']=[name+'.js','text/javascript; charset=utf-8'];
+ for(const name of ['pacte-entry','founders-workspace','founders-live-ui','founders-print','founders-council-monitor','founders-vote-progress','founders-role-badges','founders-chronicle','founders-agreements','founders-fullscreen'])staticFiles['/'+name+'.js']=[name+'.js','text/javascript; charset=utf-8'];
  staticFiles['/territorial.html']=['territorial.html','text/html; charset=utf-8'];
  for(let i=1;i<=10;i++){const path='/assets/western/dilemmas/d'+String(i).padStart(2,'0')+'.jpg';staticFiles[path]=[path.slice(1),'image/jpeg'];}
  for(const name of ['reference',...['economie','securite','satisfaction','bien_etre','developpement','stabilite'].flatMap(k=>[k+'-low',k+'-high'])]){
@@ -70,14 +70,17 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
       }
       if (path === "/api/founders/access-qr" && req.method === "POST") {
         const actor = await requireOrg(req), d = await body(req, 1e3);
-        await store.narrative.view(d.session, actor, now);
+        const sessionView=await store.narrative.view(d.session, actor, now);
         const team3 = await store.narrative.authenticate(d.session, d.token, now);
+        const familyView=await store.narrative.view(d.session,team3,now);
+        if(d.family!==undefined&&d.family!==team3.family)throw new Error('Famille du QR incohérente');
+        if(familyView.self.id!==team3.family)throw new Error('Terminal du QR incohérent');
         const origin = publicOrigin ?? normalizeOrigin(d.origin);
-        const link2 = origin + "/founders-family.html?session=" + d.session + "#token=" + encodeURIComponent(d.token);
+        const link2 = origin + "/founders-family.html?session=" + d.session + "&family=" + team3.family + "#token=" + encodeURIComponent(d.token);
         const qr2 = qrcode(0, "M");
         qr2.addData(link2, "Byte");
         qr2.make();
-        json(200, { family: team3.family, link: link2, svg: qr2.createSvgTag({ cellSize: 4, margin: 16, scalable: true }) });
+        json(200, { session:d.session,code:sessionView.code,name:familyView.self.name,revision:sessionView.revision,verifiedAt:now,family: team3.family, link: link2, svg: qr2.createSvgTag({ cellSize: 4, margin: 16, scalable: true }) });
         return;
       }
    if(path==='/api/founders/catalog'&&req.method==='GET'){
@@ -143,7 +146,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
      const preview=await foundersPreviewFor(store,actor.id,d);
      const created=await store.narrative.create({
       ownerId:actor.id,preview,code:d.code,title:d.title,
-      objectives:d.objectives,names:d.names,colors:d.colors,goalCards:d.goalCards,scoreRules:d.scoreRules,now
+      objectives:d.objectives,names:d.names,colors:d.colors,goalCards:d.goalCards,scoreRules:d.scoreRules,timing:d.timing,gaugeThresholds:d.gaugeThresholds,now
      });
      json(201,created);return;
     }

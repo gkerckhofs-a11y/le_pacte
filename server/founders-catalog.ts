@@ -1,3 +1,5 @@
+import hybridV2 from '../content/founders-hybrid-v2.json' with {type:'json'};
+import {GOALS_V2,CITY_V2} from '../src/founders-v2.ts';
 import {createHash} from 'node:crypto';
 import {DEFAULT_GOAL_CARDS,DEFAULT_SCORE_RULES} from '../src/founders-scoring.ts';
 import {FOUNDERS_DEFAULT_CALIBRATION} from '../src/founders.ts';
@@ -42,6 +44,7 @@ library=publishFoundersScenario(library,{payload:hybridDemo,version:'1.0.0',
 library=publishFoundersScenario(library,{payload:hybridExpanded,version:'1.1.0',source:{type:'bundled_fixture',label:'Prototype hybride — vingt dilemmes'}});
 library=publishFoundersScenario(library,{payload:hybridBalanced,version:'1.2.0',source:{type:'bundled_fixture',label:'Hot Spring hybride — calibration des vingt dilemmes'}});
 library=publishFoundersScenario(library,{payload:hybridIllustrated,version:'1.3.0',source:{type:'bundled_fixture',label:'Hot Spring hybride — vingt scènes et quarante résolutions illustrées'}});
+library=publishFoundersScenario(library,{payload:hybridV2,version:'2.0.0',source:{type:'bundled_fixture',label:'Corrections du premier test — quatre jauges et surenchère continue'}});
 export const foundersLibrary=library;
 export const foundersCatalog=()=>listFoundersLibrary(foundersLibrary);
 export const foundersPreview=selection=>prepareFoundersSession(foundersLibrary,selection);
@@ -68,6 +71,7 @@ export async function founderLibraryFor(store,ownerId){
 }
 export async function foundersCatalogFor(store,ownerId){
  return {...listFoundersLibrary(await founderLibraryFor(store,ownerId)),
+   goalCardPresetsV2:structuredClone(GOALS_V2),calibrationPresetV2:{...structuredClone(FOUNDERS_DEFAULT_CALIBRATION),city:structuredClone(CITY_V2)},
    goalCardPresets:structuredClone(DEFAULT_GOAL_CARDS),scoreRulesPreset:structuredClone(DEFAULT_SCORE_RULES),
    calibrationPreset:structuredClone(FOUNDERS_DEFAULT_CALIBRATION)};
 }

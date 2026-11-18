@@ -6,7 +6,7 @@
 <header class="top">
 <div><div class="eyebrow">Ludificateur · Le Pacte</div><h1>Régie narrative</h1></div>
 <div class="row"><button id="chooseSession" type="button" class="secondary" hidden>Mes parties</button><a href="/founders-setup.html">Créer une autre partie</a><span id="phase" class="chip">Connexion en cours…</span></div>
-</header><main class="page">
+</header><div id="phaseClock" class="phase-clock" role="timer" hidden></div><main class="page">
 <ol class="regie-steps" aria-label="Étapes de la régie"><li id="step1" aria-current="step"><b>1</b> Connexion organisateur</li><li id="step2"><b>2</b> Préparer et lancer</li><li id="step3"><b>3</b> Animer le Conseil</li></ol>
 <div class="panel regie-login" id="loginPanel">
  <div class="eyeline">Étape 1 · Accès organisateur</div><h2>Connectez la régie pour lancer votre partie</h2>
@@ -38,7 +38,7 @@
     <p id="reserveStatus" class="small muted"></p>
    </div>
    <div class="row" id="actions">
-    <button id="start" type="button" hidden>Lancer la partie</button>
+    <button id="beginVote" type="button" hidden>Ouvrir le vote maintenant</button><button id="start" type="button" hidden>Lancer la partie</button>
     <button id="reveal" type="button" hidden>Révéler la décision</button>
     <button id="next" type="button" hidden>Dilemme suivant</button>
    </div>
@@ -47,7 +47,10 @@
    
    <div class="row"><a href="#printKit">Cartes et QR à imprimer ↓</a><a id="publicLink" href="#" target="_blank" rel="noopener">Ouvrir l'écran public</a></div>
   </div>
-  <section class="panel" id="printKit" style="margin-top:16px"><h2>Supports à imprimer</h2><p class="small muted">Cartes adaptées à cette partie. Les ambitions et les QR d’accès sont confidentiels : distribuez-les séparément à chaque famille.</p><div class="row"><button id="printFamilyCards" class="secondary" type="button">Imprimer les cartes des familles</button><button id="printRoleCards" class="secondary" type="button">Imprimer les rôles</button></div><label for="diplomatCopies">Cartes Diplomate par famille (en plus du porte-parole)</label><input id="diplomatCopies" type="number" min="1" max="30" value="4"><p class="small muted">Rôles distribués librement. Augmentez le nombre de Diplomates selon votre groupe.</p><div class="row"><button id="prepareQR" type="button">Préparer les QR d’équipes</button><button id="printReadyQR" type="button" class="secondary" disabled>Imprimer les QR prêts</button></div><p id="printStatus" class="small" role="status">Les liens créés dans cet onglet sont repris sans renouvellement. Pour une autre partie, retrouvez ou renouvelez les accès ci-dessous.</p></section>
+  <section class="panel" id="v2Controls" hidden><h2>Animation et chronos</h2><div class="row"><button id="pauseGame" type="button">Pause</button><button id="resumeGame" type="button" hidden>Reprendre</button><button id="addTime" type="button" class="secondary">+ 1 minute</button><button id="removeTime" type="button" class="secondary">− 1 minute</button></div>
+<form id="timingForm"><div class="grid2"><label>Négociation (secondes)<input id="negotiationSeconds" type="number" min="5" max="7200" required></label><label>Vote (secondes)<input id="voteSeconds" type="number" min="5" max="7200" required></label><label>Résolution (secondes)<input id="resolutionSeconds" type="number" min="5" max="7200" required></label><label>Seuils des jauges<input id="gaugeThresholds" required value="2,4,6,8"></label></div><label><input id="autoAdvance" type="checkbox"> Passer automatiquement de la négociation au vote et du résultat au chapitre suivant</label><p class="small">Le chrono du vote signale le temps écoulé ; les familles et le Shérif terminent leurs décisions. Les durées enregistrées s’appliquent aux prochaines phases. Les boutons ± 1 minute ajustent le chrono actuel.</p><button type="submit">Enregistrer les réglages</button></form>
+<p id="pendingOffers"></p><details><summary>Correction exceptionnelle d’une ressource</summary><p class="small">Mettez la partie en pause. Les corrections sont conservées dans l’historique technique de la partie.</p><form id="correctionForm"><label>Famille<select id="correctFamily"></select></label><label>Ressource<select id="correctResource"><option value="power">Influence</option><option value="dollars">Argent</option></select></label><label>Nouvelle valeur<input id="correctValue" type="number" min="0" max="100000" required></label><button type="submit">Corriger la ressource</button></form></details><hr><button id="finishGame" type="button" class="danger">Terminer la partie</button></section>
+<section class="panel" id="printKit" style="margin-top:16px"><h2>Supports à imprimer</h2><p class="small muted">Cartes adaptées à cette partie. Les ambitions et les QR d’accès sont confidentiels : distribuez-les séparément à chaque famille.</p><div class="row"><button id="printFamilyCards" class="secondary" type="button">Imprimer les cartes des familles</button><button id="printRoleCards" class="secondary" type="button">Imprimer les rôles</button></div><label for="diplomatCopies">Cartes Diplomate par famille (en plus du porte-parole)</label><input id="diplomatCopies" type="number" min="1" max="30" value="4"><p class="small muted">Rôles distribués librement. Augmentez le nombre de Diplomates selon votre groupe.</p><div class="row"><button id="prepareQR" type="button">Générer les fiches équipes</button><button id="printReadyQR" type="button" class="secondary" disabled>Imprimer les fiches équipes</button></div><p id="printStatus" class="small" role="status">Chaque terminal sera vérifié. Les accès absents ou expirés seront remplacés, ce qui invalidera leurs anciennes fiches. L’impression exige une fiche valide par équipe.</p></section>
   <div class="panel" id="finalPanel" style="margin-top:16px" hidden>
    <div class="eyeline">Résultat de la campagne</div><h2 id="finalWinner">Famille gagnante</h2>
    <p class="small muted">Barème de test V2.6 ; une seule famille déclarée vainqueure.</p>
@@ -70,4 +73,4 @@
  </aside>
  </div>
 </div><div id="notice" role="status" style="margin-top:18px"></div>
-</main><section id="printSheets" hidden aria-label="Feuilles à imprimer"></section></body></html>
+</main><section id="printSheets" hidden aria-label="Feuilles à imprimer"></section><dialog id="finishDialog" aria-labelledby="finishHeading"><h2 id="finishHeading">Terminer définitivement la partie ?</h2><p>Cette action clôturera les votes en cours et affichera le résultat final sur tous les écrans.</p><p>Les mises du vote interrompu seront rendues. Seules les décisions déjà résolues compteront pour la ville et les scores.</p><div class="row"><button id="cancelFinish" class="secondary">Annuler</button><button id="confirmFinish" class="danger">Terminer la partie</button></div></dialog></body></html>

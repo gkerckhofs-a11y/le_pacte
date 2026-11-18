@@ -26,7 +26,7 @@ for(const count of [5,6])test(`HTTP ${count} familles : modèle enregistré, rec
   assert.equal((await req('/api/founders/access-qr',access.token,payload)).status,403);
   const qr=await req('/api/founders/access-qr',key,payload);
   assert.equal(qr.status,200,JSON.stringify(qr.data));assert.equal(qr.data.family,access.family);
-  assert.equal(qr.data.link,`https://le-pacte-ludificateur.web.app/founders-family.html?session=${created.data.id}#token=${access.token}`);
+  assert.equal(qr.data.link,`https://le-pacte-ludificateur.web.app/founders-family.html?session=${created.data.id}&family=${access.family}#token=${access.token}`);
   assert.match(qr.data.svg,/^<svg/);
  }
  const old=created.data.access[0];

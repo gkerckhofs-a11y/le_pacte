@@ -1,3 +1,4 @@
+import {decorateGauge,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
 import {mountPrintKit} from './founders-print.js';
 import {renderCouncilMonitor} from './founders-council-monitor.js';
 import {councilGuidance,startCouncil,organizerError,validNarrativeSession} from './founders-regie-flow.js';
@@ -6,7 +7,7 @@ import {teamCaption,teamLabel,colorize} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id),p=new URLSearchParams(location.search);
 const sid=p.get('session');let authSDK=null,cloud=false,token='',current=null,busy=false,initialized=false,authenticating=false,waitingForLogin=false;
-const labels={READY:'Prêt',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'En attente de la révélation',REVEALED:'Résultat annoncé',FINISHED:'Partie terminée'};
+const labels={NEGOTIATION:'Négociations',READY:'Prêt',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'En attente de la révélation',REVEALED:'Résultat annoncé',FINISHED:'Partie terminée'};
 const gaugeIds=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
 const set=(id,v)=>$(id).textContent=String(v??'');
 const secure=()=>validNarrativeSession(sid);
@@ -83,24 +84,25 @@ async function refresh(){
   }
   const s=await api('');
   if(busy||authenticating||waitingForLogin||s.revision<(current?.revision??-1))return;
-  if(current?.revision!==s.revision)render(s);
+  if(current?.revision!==s.revision)render(s);else renderPhaseClock($('phaseClock'),s);
   connected();$('regieContent').hidden=false;set('monitorConnection','● Synchronisé · actualisation automatique');
  }catch(error){connectionFailure(error);}
 }
 function gauge(s){
  const root=$('gauges');root.replaceChildren();
- for(const k of gaugeIds){
+ for(const k of Object.keys(s.city)){
   const el=document.createElement('div');el.className='gauge';
   const row=document.createElement('div');row.className='gauge-head';
   const label=document.createElement('span');label.textContent=s.skin.labels.resources[k]||k;
-  const n=document.createElement('strong');n.textContent=s.city[k]+'/10';row.append(label,n);
+  const n=document.createElement('strong');n.textContent=s.city[k]+'/10';appendGaugeDelta(n,s,k);row.append(label,n);
   const track=document.createElement('div');track.className='track';
-  const bar=document.createElement('div');bar.className='bar';bar.style.width=s.city[k]*10+'%';track.append(bar);el.append(row,track);root.append(el);
+  const bar=document.createElement('div');bar.className='bar';bar.style.width=s.city[k]*10+'%';decorateGauge(bar,label,s.city[k],s);track.append(bar);el.append(row,track);root.append(el);
  }
 }
 function render(s){
  applySkin(document.body,s.skin);
  current=s;
+ printKit.sync(s);renderPhaseClock($('phaseClock'),s);renderV2Controls(s);
  renderCouncilMonitor($('councilMonitor'),s);
  const guidance=councilGuidance(s);step(guidance.step);set('stageTitle',guidance.title);set('stageHint',guidance.hint);
  $('preparation').hidden=s.phase!=='READY';
@@ -214,5 +216,29 @@ init();setInterval(refresh,2500);
 
 const printKit=mountPrintKit({session:sid,view:()=>current,request:async(path,body)=>{
  const bearer=await organizerToken();const r=await fetch(path,{method:'POST',headers:{Authorization:'Bearer '+bearer,'Content-Type':'application/json'},body:JSON.stringify(body)});
- const data=await r.json();if(!r.ok)throw new Error(data.error||'QR indisponible');return data;
+ const data=await r.json();if(!r.ok){const error=new Error(data.error||'QR indisponible');error.accessInvalid=r.status===403&&/expiré|révoqué|famille invalide/.test(error.message);throw error;}return data;
 }});
+
+function renderV2Controls(s){
+ $('v2Controls').hidden=s.experienceVersion!==2;
+ $('beginVote').hidden=s.phase!=='NEGOTIATION';
+ $('pauseGame').hidden=Boolean(s.clock?.paused);$('resumeGame').hidden=!s.clock?.paused;
+ $('finishGame').disabled=s.phase==='FINISHED';
+ const fields={negotiationSeconds:s.timing?.negotiationSeconds,voteSeconds:s.timing?.voteSeconds,resolutionSeconds:s.timing?.resolutionSeconds};
+ if(!document.activeElement?.closest('#timingForm')){for(const [id,value] of Object.entries(fields))$(id).value=value??'';$('autoAdvance').checked=s.timing?.autoAdvance??false;$('gaugeThresholds').value=(s.gaugeThresholds??[2,4,6,8]).join(',');}
+ if(!document.activeElement?.closest('#correctionForm')){
+  const selected=$('correctFamily').value;$('correctFamily').replaceChildren();for(const f of s.families){const o=document.createElement('option');o.value=f.id;o.textContent=teamCaption(f);$('correctFamily').append(o);}$('correctFamily').value=selected||s.families[0].id;
+ }
+ const pending=Object.values(s.offers).filter(o=>o.status==='pending');
+ set('pendingOffers',pending.length?'Offres en attente : '+pending.map(o=>teamLabel(s,o.from)+' → '+teamLabel(s,o.to)+' : '+o.amount+' '+s.skin.labels.currency).join(' ; '):'Aucune proposition financière en attente.');
+}
+$('beginVote').addEventListener('click',()=>command('beginVote'));
+$('pauseGame').addEventListener('click',()=>command('pause'));
+$('resumeGame').addEventListener('click',()=>command('resume'));
+$('addTime').addEventListener('click',()=>command('adjustTime',{seconds:60}));
+$('removeTime').addEventListener('click',()=>command('adjustTime',{seconds:-60}));
+$('timingForm').addEventListener('submit',event=>{event.preventDefault();command('configureTiming',{timing:{negotiationSeconds:Number($('negotiationSeconds').value),voteSeconds:Number($('voteSeconds').value),resolutionSeconds:Number($('resolutionSeconds').value),autoAdvance:$('autoAdvance').checked},gaugeThresholds:$('gaugeThresholds').value.split(',').map(Number)});});
+$('correctionForm').addEventListener('submit',event=>{event.preventDefault();command('correctResource',{family:$('correctFamily').value,resource:$('correctResource').value,value:Number($('correctValue').value)});});
+$('finishGame').addEventListener('click',()=>$('finishDialog').showModal());
+$('cancelFinish').addEventListener('click',()=>$('finishDialog').close());
+$('confirmFinish').addEventListener('click',async()=>{await command('finish',{confirm:true});if(current?.phase==='FINISHED')$('finishDialog').close();});

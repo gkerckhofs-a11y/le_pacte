@@ -7,7 +7,7 @@ import {narrativeReserve,chooseNarrativeNext} from '../src/founders-progression.
 import {analyzeFoundersGoalReachability} from '../src/founders-scoring.ts';
 import {simulateFoundersPolicies} from '../src/founders-policy-lab.ts';
 const org={role:'organizer',id:'qa'};
-const fixture=(seed=1)=>createNarrativeSession(foundersPreview({scenarioId:'hot-spring-reserve-hybride',skinId:'western'}),{id:seed.toString(16).padStart(24,'0'),ownerId:'qa',code:'HYBRID',title:'Réserve'});
+const fixture=(seed=1)=>createNarrativeSession(foundersPreview({scenarioId:'hot-spring-reserve-hybride',scenarioVersion:'1.3.0',skinId:'western'}),{id:seed.toString(16).padStart(24,'0'),ownerId:'qa',code:'HYBRID',title:'Réserve'});
 const cmd=(s,actor,kind,data={})=>applyNarrativeCommand(s,actor,{kind,data,expectedRevision:s.revision},s.updatedAt+1);
 function resolve(s,winner='pour'){
  const payer=Object.keys(s.game.families).sort((a,b)=>s.game.families[b].power-s.game.families[a].power)[0];let count=0;

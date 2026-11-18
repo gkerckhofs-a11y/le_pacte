@@ -3,6 +3,7 @@ export const validNarrativeSession=id=>typeof id==='string'&&/^[a-f0-9]{24}$/.te
 export function councilGuidance(s){
  const name=id=>teamLabel(s,id);
  if(s.phase==='READY')return {step:2,title:'Votre partie est prête à être lancée',hint:'Distribuez les accès aux porte-paroles des familles actives et ouvrez l’écran à projeter. Cliquez ensuite sur « Lancer la partie » : le premier dilemme s’affichera et le Maire pourra voter.'};
+ if(s.phase==='NEGOTIATION')return {step:3,title:'Les familles négocient',hint:'Le vote s’ouvre à la fin du chrono si les transitions automatiques sont activées. Vous pouvez aussi l’ouvrir maintenant.'};
  if(s.phase==='COUNCIL')return {step:3,title:'La partie est lancée',hint:s.council.turn?'Le vote se fait sur les écrans des équipes. C’est au tour de '+name(s.council.turn)+'.':s.council.phase==='await_moderator'?'Le Shérif doit départager le vote sur son écran d’équipe.':'Le Shérif doit choisir le nouveau Maire sur son écran d’équipe.'};
  if(s.phase==='AWAITING_REVEAL')return {step:3,title:'Le vote est terminé : révélez la décision',hint:'Cliquez sur « Révéler la décision ». Les conséquences et l’évolution des indicateurs seront affichées sur la projection.'};
  if(s.phase==='REVEALED'){
