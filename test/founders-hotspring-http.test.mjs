@@ -77,7 +77,8 @@ test('Hotspring HTTP : reprise SQLite en cours de scrutin puis campagne complèt
  const final=await client.projection();
  assert.equal(final.phase,'FINISHED');
  assert.equal(final.finalResults.rows.length,5);
- assert.ok(final.finalResults.rows.every(r=>r.maximum===15));
+ assert.ok(final.finalResults.rows.every(r=>r.maximum===18&&r.wealth>=0&&r.wealth<=3));
+ assert.deepEqual((await client.family('B')).privateCampaign.score,final.finalResults.rows.find(r=>r.family==='B'));
  assert.equal(final.campaign.archive.charter,'A');
  assert.deepEqual((await client.projection()).campaign.landscape,final.campaign.landscape);
  const savedOriginal=await hotspringClient(server,original).projection();

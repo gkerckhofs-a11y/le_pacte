@@ -224,8 +224,10 @@ export function renderCampaignRanking(root,rows,final=false,{compact=false}={}){
 }
 
 export function campaignScoreText(r){
+ const hasLegacy=r.hasLegacy??(r.maximum===15);
  return [...r.chapterPoints.map(c=>'Chap. '+c.chapter+' '+c.points+'/2'),'Trajectoire '+r.trajectory+'/2',
-  ...(r.maximum===15?['Gouvernance '+r.governance+'/1','Charte '+r.charter+'/2']:[])].join(' · ');
+  ...(hasLegacy?['Gouvernance '+r.governance+'/1','Charte '+r.charter+'/2']:[]),
+  ...(r.wealth===undefined?[]:['Fortune '+r.wealth+'/3 ('+r.dollars+' $ · rang '+r.wealthRank+')'])].join(' · ');
 }
 
 export function hotspringWinners(s){

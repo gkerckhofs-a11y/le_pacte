@@ -28,7 +28,7 @@ export function mountPrintKit({session,view,request,renew}){
     const family=s.privateFamilies[f.id];
     c.append(node('p',family.role),node('p',family.briefing),node('p',family.trajectory));
     const list=node('ol');for(const goal of family.objectives)list.append(node('li',goal));
-    c.append(list,node('p','Jusqu’à 10 points de chapitre, 2 de trajectoire et 3 d’héritage.'));
+    c.append(list,node('p','Jusqu’à 18 points : 10 de chapitre, 2 de trajectoire, 3 d’héritage et 3 pour la fortune finale.'));
     continue;
    }
    const goal=s.goalCards[f.id];
@@ -77,13 +77,16 @@ export function mountPrintKit({session,view,request,renew}){
     const c=card(root,f,s.campaign?null:'Accès privé · terminal officiel');c.dataset.family=f.id;
     const image=node('div',undefined,'print-qr'),svg=new DOMParser().parseFromString(data.svg,'image/svg+xml').documentElement;
     if(svg.localName!=='svg'||svg.querySelector('parsererror'))throw new Error('Image QR invalide');
-    image.append(document.importNode(svg,true));c.append(image);
-    c.append(node('p','Session '+s.code+' · Équipe '+f.id,'print-reference'));
+    image.append(document.importNode(svg,true));
+    const reference=node('p','Session '+s.code+' · Équipe '+f.id,'print-reference');
     if(s.campaign){
      c.classList.add('print-hotspring');
-     c.append(node('p','Porte-parole : scannez le QR code, vérifiez la famille et la session. Gardez cette page ouverte.','print-scan'));
-     c.append($('hotspringQrReminder').content.cloneNode(true));
+     const access=node('header',undefined,'print-hotspring-access'),identity=node('div');
+     identity.append(...c.children,reference,node('p','Porte-parole : scannez le QR code, vérifiez la famille et la session. Gardez cette page ouverte.','print-scan'));
+     access.append(identity,image);
+     c.append(access,$('hotspringQrReminder').content.cloneNode(true));
     }else{
+     c.append(image,reference);
      const instructions=node('ol');for(const t of ['Scannez le QR code.','Vérifiez le nom de votre famille et le code de session affichés.','Gardez cette page ouverte pendant toute la partie.','Un seul terminal officiel est utilisé pour votre famille.'])instructions.append(node('li',t));c.append(instructions);
      c.append(node('h3','Votre application'));
      for(const [title,body] of [['Accueil','« Ma table » : votre situation et vos ressources.'],['Vote','« Votre décision politique » : POUR, CONTRE ou ABSTENTION, puis ajout d’Influence ou passage.'],['Négociation et finances','« Vos négociations » : envoyez une proposition, acceptez ou refusez une somme ; vos fonds sont dans « Vos ressources ».'],['Objectifs','Votre ambition secrète et ses paliers se trouvent sur « Ma table ».']])c.append(node('p',title+' — '+body));

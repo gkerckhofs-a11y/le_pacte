@@ -263,16 +263,18 @@ html:fullscreen{overflow-y:auto;background:#15191b}
 .print-card h2{font-size:23pt;margin:4mm 0}.print-card h3{font-size:14pt}.print-card p{margin:3mm 0}
 .print-card .small,.print-kicker{font-size:9pt}.print-kicker{letter-spacing:.06em}.print-qr{background:#fff;width:58mm;height:58mm;margin:5mm auto}
 .print-qr svg{display:block;width:100%;height:100%}.print-reference{text-align:center;font-weight:700}
-.print-hotspring{padding:6mm;color-scheme:light;font-size:9.5pt;line-height:1.22}
+.print-hotspring{padding:5mm;color-scheme:light;font-size:9.5pt;line-height:1.22}
 .print-hotspring h2{font-size:19pt;line-height:1.15;margin:2mm 0;overflow-wrap:anywhere}
 .print-hotspring h3{font-size:13pt;margin:1.5mm 0 0}
 .print-hotspring p{margin:1mm 0;line-height:inherit}
-.print-hotspring .print-qr{width:44mm;height:44mm;margin:1.5mm auto}
-.print-scan,.print-reminder header{text-align:center}
+.print-hotspring-access{display:grid;grid-template-columns:minmax(0,1fr) 44mm;align-items:center;gap:4mm}
+.print-hotspring .print-qr{width:44mm;height:44mm;margin:0}
+.print-hotspring-access .print-reference{text-align:left}
+.print-reminder header{text-align:center}
 .print-scan{font-size:9pt}
 .print-reminder{margin:2mm 0;padding-top:2mm;border-top:1px solid #555}
-.print-reminder-columns{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:5mm}
-.print-reminder-columns section{margin:1.6mm 0}
+.print-reminder-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:5mm}
+.print-reminder-columns section{margin:1.25mm 0}
 .print-reminder h4{font-size:11pt;margin:0 0 1mm}
 .print-reminder :is(ol,ul){margin:1mm 0;padding-left:5mm}
 .print-reminder li+li{margin-top:.25mm}

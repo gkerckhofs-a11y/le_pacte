@@ -18,7 +18,7 @@ Campagne versionnée à cinq familles, de l’arrivée des chariots en 1872 au c
 - Pour la crue et la pénurie d’eau, le moteur utilise un seuil de 2 à partir d’un risque de base de 1, puis compte les vulnérabilités et protections du chapitre V. Pour la mine et la banque, les marqueurs de présence déterminent l’éligibilité. Le détail des risques et l’ordre sont visibles en régie. Les scores égaux sont triés par numéro de dilemme.
 - Le coût foncier privé du programme d’assainissement s’applique si ce coût et l’avantage du quartier planifié coexistent. Les bonus et pertes de jauge sortent de la résolution puis sont bornés entre 0 et 10.
 - En qualification des chartes, une égalité au seuil des deux premières places ouvre un vote simple entre les chartes ex æquo. Le moteur actuel ne fournit pas de registre de Prestige public pour le départage prévu sous le Conseil des Fondateurs. Le test utilise le tour supplémentaire.
-- Le classement donne deux points au maximum par chapitre clôturé, deux pour la trajectoire et trois pour l’héritage lorsque les deux votes du final ont été joués. Les ex æquo partagent la victoire.
+- Le total sur 18 points se compose de deux points au maximum par chapitre clôturé, deux pour la trajectoire, trois pour l’héritage si la charte a été choisie et trois pour le classement des fortunes finales. Les rangs 1, 2 et 3 valent respectivement 3, 2 et 1 point. Deux fortunes égales occupent le même rang et les rangs suivants tiennent compte du nombre de familles devant elles. Les familles à égalité au total le plus élevé partagent la victoire.
 
 ## Revue des visuels
 

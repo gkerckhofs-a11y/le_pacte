@@ -82,6 +82,39 @@ test('Hotspring : chaque objectif compte les groupes une fois et exige le seuil'
  assert.equal(hotspringScores(s).rows[0].maximum,2);
 });
 
+test('Hotspring : les fortunes à égalité partagent les points de leur rang',()=>{
+ const g=newCampaign();
+ g.command('start');
+ for(const [family,dollars] of Object.entries({A:14,B:10,C:7,D:10,E:4}))g.state.game.families[family].dollars=dollars;
+ assert.ok(hotspringScores(g.state).rows.every(row=>row.wealth===undefined));
+ g.command('finish',{confirm:true});
+ g.command('showResults');
+ const {rows,winners}=g.state.finalResults;
+ const ranking=Object.fromEntries(rows.map(row=>[row.family,[row.dollars,row.wealthRank,row.wealth]]));
+ assert.deepEqual(ranking,{A:[14,1,3],B:[10,2,2],D:[10,2,2],C:[7,4,0],E:[4,5,0]});
+ assert.deepEqual(winners,['A']);
+ assert.ok(rows.every(row=>row.total===row.wealth&&row.maximum===5));
+ assert.deepEqual(narrativeFamilyView(g.state,'B').privateCampaign.score,rows.find(row=>row.family==='B'));
+ assert.deepEqual(narrativeOrganizerView(g.state).campaignAdmin.scores,{rows,winners});
+
+ g.state.game.families.B.dollars=14;
+ const tie=hotspringScores(g.state,{final:true});
+ assert.deepEqual(tie.rows.filter(row=>row.wealthRank===1).map(row=>row.wealth),[3,3]);
+ assert.deepEqual(tie.rows.filter(row=>row.wealthRank===3).map(row=>row.wealth),[1]);
+});
+
+test('Hotspring : une archive à l’ancien barème conserve son classement sur tous les écrans',()=>{
+ const {state}=simulateCampaign(trajectories.institutions);
+ const rows=state.finalResults.rows.map(({dollars,wealthRank,wealth,hasLegacy,...row})=>({
+  ...row,total:row.total-wealth,maximum:row.maximum-3
+ })).sort((a,b)=>b.total-a.total);
+ const winners=rows.filter(row=>row.total===rows[0].total).map(row=>row.family);
+ state.finalResults={...state.finalResults,rows,winners};
+ assert.deepEqual(narrativeOrganizerView(state).campaignAdmin.scores,{rows,winners});
+ assert.deepEqual(narrativeFamilyView(state,'A').privateCampaign.score,rows.find(row=>row.family==='A'));
+ assert.deepEqual(narrativePublicView(state).finalResults.rows,rows);
+});
+
 test('Hotspring : variantes de l’eau, seuils et coûts différés',()=>{
  const s=newCampaign().state;
  s.campaign.markers=['VILLE_BASSE','QUARTIER_PROVISOIRE','CENTRE_PRIVE','ABATTOIR_CENTRAL'];
@@ -121,7 +154,7 @@ test('Hotspring : qualification sans mise, nouveau tour et fermeture explicite',
  assert.equal(pre.phase,'EPILOGUE');assert.equal(pre.finalResults,null);
  assert.ok(pre.narrativeEnding.paragraphs.includes('Qu’avez-vous fait de Hotspring ?'));
  g.command('showResults');
- assert.equal(g.state.phase,'FINISHED');assert.equal(g.state.finalResults.rows[0].maximum,15);
+ assert.equal(g.state.phase,'FINISHED');assert.equal(g.state.finalResults.rows[0].maximum,18);
  assert.throws(()=>g.command('start'),/déjà lancée/);
  const archived=g.state;
  const variant=duplicateHotspringFinal(archived,{id:'b'.repeat(24),code:'VAR',ownerId:'organizer',now:50000});
@@ -143,7 +176,8 @@ test('Hotspring : Terminer l’histoire produit un épilogue anticipé et rembou
  assert.equal(g.state.game.families.A.power,8);
  assert.equal(g.state.phase,'EPILOGUE');assert.equal(g.state.campaign.charter,null);
  g.command('showResults');
- assert.equal(g.state.finalResults.rows[0].maximum,2);
+ assert.equal(g.state.finalResults.rows[0].maximum,5);
+ assert.ok(g.state.finalResults.rows.every(row=>row.wealthRank===1&&row.wealth===3));
  assert.equal(g.state.finalResults.winners.length,5);
 });
 
@@ -155,7 +189,8 @@ for(const [name,policy] of Object.entries(trajectories))test('Hotspring : parcou
  assert.ok(s.campaign.crisesThisSitting<=2);
  assert.deepEqual(s.campaign.completedChapters,[1,2,3,4,5]);
  assert.equal(s.finalResults.rows.length,5);
- assert.ok(s.finalResults.rows.every(r=>r.total>=0&&r.total<=15&&r.maximum===15));
+ assert.ok(s.finalResults.rows.every(r=>r.total>=0&&r.total<=18&&r.maximum===18));
+ assert.ok(s.finalResults.rows.every(r=>r.total===r.chapterPoints.reduce((sum,c)=>sum+c.points,0)+r.trajectory+r.charter+r.governance+r.wealth));
  assert.ok(s.game.city.demographie>=0&&s.game.city.demographie<=10);
  assert.ok(s.revealedHistory.some(h=>h.id.startsWith('D14')));
  for(const round of snapshots.filter(s=>s.phase==='CHECKPOINT')){

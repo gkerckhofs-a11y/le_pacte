@@ -29,7 +29,8 @@ export function hotspringScores(s,{final=false}={}){
  const markers=new Set(campaign.markers);
  const chapters=campaign.completedChapters;
  const hasLegacy=final&&Boolean(campaign.charter);
- const rows=activeFounders(s.game).map((family,i)=>{
+ const families=activeFounders(s.game);
+ const rows=families.map((family,i)=>{
   const key=Object.keys(definitions)[i],definition=definitions[key];
   const chapterPoints=chapters.map(chapter=>{
    const objective=definition.objectives[chapter-1];
@@ -42,9 +43,14 @@ export function hotspringScores(s,{final=false}={}){
   const governance=hasLegacy&&(
    key==='whitmore'?campaign.trust>=3||markers.has('ALLIANCE_VALLEE'):markers.has(legacy[key].government)
   )?1:0;
-  return {family,name:s.names[family],chapterPoints,trajectory,charter,governance,
-   total:chapterPoints.reduce((sum,c)=>sum+c.points,0)+trajectory+charter+governance,
-   maximum:chapters.length*2+2+(hasLegacy?3:0)};
+  const dollars=s.game.families[family].dollars;
+  // Counting only strictly richer families gives shared ranks and skips occupied places.
+  const wealthRank=final?1+families.filter(id=>s.game.families[id].dollars>dollars).length:0;
+  const wealth=final?Math.max(0,4-wealthRank):0;
+  return {family,name:s.names[family],chapterPoints,trajectory,charter,governance,hasLegacy,
+   ...(final?{dollars,wealthRank,wealth}:{}),
+   total:chapterPoints.reduce((sum,c)=>sum+c.points,0)+trajectory+charter+governance+wealth,
+   maximum:chapters.length*2+2+(hasLegacy?3:0)+(final?3:0)};
  });
  rows.sort((a,b)=>b.total-a.total);
  return {rows,winners:rows.filter(r=>r.total===rows[0].total).map(r=>r.family)};

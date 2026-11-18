@@ -42,13 +42,14 @@ for(const [count,campaign] of [[5,false],[6,false],[5,true]])test(`Fiches ${camp
   if(campaign){
    assert.equal(terminal.privateCampaign.objectives.length,5);assert.ok(card.textContent.includes(link));
    const reminder=card.querySelector('.print-reminder');
-   assert.ok(reminder);assert.ok(card.querySelector('.print-qr').compareDocumentPosition(reminder)&4);
+   assert.ok(reminder);
+   assert.equal(card.querySelector('.print-qr').closest('.print-hotspring-access').nextElementSibling,reminder);
    assert.equal(reminder.querySelector('ol').children.length,5);
    assert.deepEqual([...reminder.querySelectorAll('h4')].map(h=>h.textContent),[
     'Votre but','Un dilemme en 5 étapes','L’Influence','L’abstention','Les dollars','Le Maire','Le Shérif','Rappel express'
    ]);
    assert.match(reminder.textContent,/Gardez vos objectifs confidentiels/);
-   assert.doesNotMatch(reminder.textContent,/dollars.*(?:convertis en points|rapportent des points)/i);
+   assert.match(reminder.textContent,/À la fin de la partie, les trois familles les plus riches gagnent respectivement 3, 2 et 1 point\. En cas d’égalité, les familles concernées obtiennent les points du même rang\./);
   }else{
    assert.equal(card.querySelector('.print-reminder'),null);
   }

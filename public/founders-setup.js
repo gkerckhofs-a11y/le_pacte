@@ -352,7 +352,7 @@ function syncV2Setup(){
  if(campaign)count.value='5';
  count.disabled=campaign;
  $('legacyScoring').hidden=campaign;$('crisisModeField').hidden=!campaign;
- $('familySetupNote').textContent=campaign?'Cinq familles, ressources égales et objectifs confidentiels. Score maximal de 15 points.':legacyNote;
+ $('familySetupNote').textContent=campaign?'Cinq familles, ressources égales et objectifs confidentiels. Score maximal de 18 points.':legacyNote;
  syncFamilyCount();
  const familyNames=catalog.scenarios.find(s=>s.id===$('scenario').value)?.familyNames;
  for(const [i,id] of FAMILY_IDS.entries()){

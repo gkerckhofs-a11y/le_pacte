@@ -310,7 +310,7 @@ export function campaignFamily(s,family){
   const options=o.groups.map(group=>group.map(mark=>labels.get(mark)).filter(Boolean).join(' ou '));
   return o.title+' ('+o.required+' choix) — '+options.join(', ')+'.';
  });
- const score=current?hotspringScores(s,{final:s.phase==='FINISHED'}).rows.find(r=>r.family===family):null;
+ const score=current?(s.finalResults??hotspringScores(s)).rows.find(r=>r.family===family):null;
  return {role:def.publicRole,briefing:def.briefing,objectives,
   trajectory:def.trajectory==='autonomy'?'Atteindre un indice d’autonomie d’au moins 2.':
    'Améliorer la jauge '+cityLabels[def.trajectory]+' par rapport à sa valeur de départ.',
@@ -329,7 +329,8 @@ export function campaignOrganizer(s){
    {id:'D20',available:m.has('GRANDE_MINE')||m.has('CHEMIN_DE_FER'),reason:m.has('GRANDE_MINE')?'Employeur retenu : grande mine.':m.has('CHEMIN_DE_FER')?'Employeur retenu : compagnie ferroviaire.':'Grande mine et gare absentes.'}
   ],
   checkpoints:c.checkpoints.map(p=>({chapter:p.chapter,name:p.name,at:p.at})),
-  scores:hotspringScores(s,{final:Boolean(c.charter)})};
+  scores:s.finalResults?{rows:s.finalResults.rows,winners:s.finalResults.winners}:
+   hotspringScores(s,{final:s.phase==='EPILOGUE'||Boolean(c.charter)})};
 }
 
 export function campaignEpilogue(s){
