@@ -169,3 +169,31 @@ for(const [name,policy] of Object.entries(trajectories))test('Hotspring : parcou
  if(name==='autonomie'){assert.ok(autonomyIndex(new Set(s.campaign.markers))>=2);assert.ok(!s.revealedHistory.some(h=>h.id==='D20'));}
  if(name==='vallee'){assert.ok(s.campaign.trust>=3);assert.ok(s.revealedHistory.some(h=>h.id==='D14A'));assert.ok(s.campaign.markers.includes('PACTE_VALLEE_FINAL'));}
 });
+
+test('Hotspring : les crises en réserve se rejouent dans une nouvelle séance',()=>{
+ const g=newCampaign();g.command('start');
+ const s=g.state;
+ s.currentDilemmaId='D23';s.phase='PRESENTATION';s.campaign.chapter=5;
+ s.campaign.completedChapters=[1,2,3,4];
+ s.campaign.markers=['VILLE_BASSE','CENTRE_PRIVE','CONSTRUCTION_SERREE','QUARTIER_PROVISOIRE','GRANDE_MINE','BANQUE_CREDIT','DISPENSAIRE','ECOLE','DECHETS_LIBRES'];
+ g.vote('pour');
+ for(let i=0;i<2;i++){
+  g.command('next');
+  assert.equal(g.state.phase,'PRESENTATION');
+  g.vote('contre');
+ }
+ g.command('next');
+ assert.equal(g.state.phase,'CHECKPOINT');
+ assert.equal(g.state.campaign.crisesThisSitting,2);
+ assert.ok(g.state.campaign.markers.includes('SERVICES_MAINTENUS'));
+ const remaining=crisisCandidates(g.state).filter(c=>c.available).map(c=>c.id);
+ assert.ok(remaining.length>=1);
+ assert.equal(narrativeOrganizerView(g.state).campaignAdmin.mayResumeCrises,true);
+ g.command('resumeCrises');
+ assert.equal(g.state.phase,'PRESENTATION');
+ assert.ok(remaining.includes(g.state.currentDilemmaId));
+ g.vote('contre');
+ assert.equal(g.state.campaign.crisesThisSitting,1);
+ const applied=g.state.campaign.interludeHistory.filter(e=>e.includes('budget local'));
+ assert.equal(applied.length,1);
+});

@@ -174,9 +174,19 @@ export function renderCampaignRanking(root,rows,final=false){
  const list=node('ol',null,'hotspring-ranking');
  for(const r of rows){
   const item=node('li');
+  item.value=rows.findIndex(p=>p.total===r.total)+1;
   item.append(node('strong',r.name+' · '+r.total+' / '+r.maximum));
   if(final){
    item.append(node('p',r.briefing),node('p',campaignScoreText(r),'small'));
+   const goals=node('details');
+   goals.append(node('summary','Objectifs de la famille'));
+   const breakdown=node('ul');
+   for(const [i,objective] of r.objectives.entries()){
+    const result=r.chapterPoints.find(chapter=>chapter.chapter===i+1);
+    const points=result?result.points+'/'+result.maximum:'chapitre en réserve';
+    breakdown.append(node('li',objective+' '+points));
+   }
+   goals.append(breakdown);item.append(goals);
   }
   list.append(item);
  }

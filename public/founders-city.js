@@ -113,6 +113,11 @@ function render(s){
   text('winnerTitle',hotspringWinners(s));
   const root=$('finalRanking');root.replaceChildren();
   const revealText=document.createElement('p');revealText.textContent=s.finalResults.text;root.append(revealText);
+  const archive=s.campaign.archive;
+  if(archive?.governance){
+   const record=document.createElement('p');record.textContent=archive.governance+' · '+s.narrativeEnding.title;
+   root.append(record);
+  }
   renderCampaignRanking(root,s.finalResults.rows,true);
  }else if(s.finalResults){
   const ranking=s.finalResults.ranking;
