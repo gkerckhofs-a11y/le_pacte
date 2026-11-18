@@ -129,7 +129,25 @@
         "sprite_saloon",
         "sprite_clinic",
         "sprite_bank",
-        "sprite_mine"
+        "sprite_mine",
+        "sprite_tent",
+        "sprite_cottages",
+        "sprite_inn",
+        "sprite_shacks",
+        "sprite_planned",
+        "sprite_stockyard",
+        "sprite_office",
+        "sprite_jail",
+        "sprite_drains",
+        "sprite_hall",
+        "sprite_trade",
+        "sprite_people",
+        "sprite_fire",
+        "sprite_flood",
+        "sprite_drought",
+        "sprite_quarantine",
+        "sprite_mine_accident",
+        "sprite_bankruptcy"
       ]
     },
     {

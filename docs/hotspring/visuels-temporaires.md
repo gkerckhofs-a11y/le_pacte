@@ -4,24 +4,6 @@ Les vues procédurales et leurs emplacements restent identifiables dans le manif
 
 | ID | Type | Condition | Emplacement |
 | --- | --- | --- | --- |
-| `sprite_tent` | calque | Convois en place | `/assets/hotspring/v1/characters/tent_complete.webp` |
-| `sprite_cottages` | calque | Construction correspondante en service | `/assets/hotspring/v1/buildings/cottages_complete.webp` |
-| `sprite_inn` | calque | Construction correspondante en service | `/assets/hotspring/v1/buildings/inn_complete.webp` |
-| `sprite_shacks` | calque | Construction correspondante en service | `/assets/hotspring/v1/buildings/shacks_complete.webp` |
-| `sprite_planned` | calque | Construction correspondante en service | `/assets/hotspring/v1/buildings/planned_complete.webp` |
-| `sprite_stockyard` | calque | Construction correspondante en service | `/assets/hotspring/v1/buildings/stockyard_complete.webp` |
-| `sprite_office` | calque | Construction correspondante en service | `/assets/hotspring/v1/buildings/office_complete.webp` |
-| `sprite_jail` | calque | Construction correspondante en service | `/assets/hotspring/v1/buildings/jail_complete.webp` |
-| `sprite_drains` | calque | Construction correspondante en service | `/assets/hotspring/v1/buildings/drains_complete.webp` |
-| `sprite_hall` | calque | Construction correspondante en service | `/assets/hotspring/v1/buildings/hall_complete.webp` |
-| `sprite_trade` | calque | Construction correspondante en service | `/assets/hotspring/v1/buildings/trade_complete.webp` |
-| `sprite_people` | calque | Population de la ville | `/assets/hotspring/v1/characters/people_complete.webp` |
-| `sprite_fire` | calque | Crise correspondante révélée | `/assets/hotspring/v1/crises/fire_trace.webp` |
-| `sprite_flood` | calque | Crise correspondante révélée | `/assets/hotspring/v1/crises/flood_trace.webp` |
-| `sprite_drought` | calque | Crise correspondante révélée | `/assets/hotspring/v1/crises/drought_trace.webp` |
-| `sprite_quarantine` | calque | Crise correspondante révélée | `/assets/hotspring/v1/crises/quarantine_trace.webp` |
-| `sprite_mine_accident` | calque | Crise correspondante révélée | `/assets/hotspring/v1/crises/mine_accident_trace.webp` |
-| `sprite_bankruptcy` | calque | Crise correspondante révélée | `/assets/hotspring/v1/crises/bankruptcy_trace.webp` |
 | `variant_D10_ACCORD_RIVIERE` | variante | ACCORD_RIVIERE | `/assets/hotspring/v1/effects/d10_accord_riviere.webp` |
 | `variant_D12_ACCORD_RIVIERE` | variante | ACCORD_RIVIERE | `/assets/hotspring/v1/effects/d12_accord_riviere.webp` |
 | `variant_D15_AUTONOMIE_LOCALE` | variante | AUTONOMIE_LOCALE | `/assets/hotspring/v1/effects/d15_autonomie_locale.webp` |

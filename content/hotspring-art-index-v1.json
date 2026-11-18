@@ -811,6 +811,132 @@
     "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
     "license": null
   },
+  "sprite_tent": {
+    "url": "/assets/hotspring/v1/characters/tent_complete.webp",
+    "alt": "Tente de campement",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_cottages": {
+    "url": "/assets/hotspring/v1/buildings/cottages_complete.webp",
+    "alt": "Premières habitations",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_inn": {
+    "url": "/assets/hotspring/v1/buildings/inn_complete.webp",
+    "alt": "Auberge de Main Street",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_shacks": {
+    "url": "/assets/hotspring/v1/buildings/shacks_complete.webp",
+    "alt": "Quartier ouvrier précaire",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_planned": {
+    "url": "/assets/hotspring/v1/buildings/planned_complete.webp",
+    "alt": "Quartier ouvrier planifié",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_stockyard": {
+    "url": "/assets/hotspring/v1/buildings/stockyard_complete.webp",
+    "alt": "Parc à bétail",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_office": {
+    "url": "/assets/hotspring/v1/buildings/office_complete.webp",
+    "alt": "Bureau de la ville",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_jail": {
+    "url": "/assets/hotspring/v1/buildings/jail_complete.webp",
+    "alt": "Prison municipale",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_drains": {
+    "url": "/assets/hotspring/v1/buildings/drains_complete.webp",
+    "alt": "Travaux sanitaires",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_hall": {
+    "url": "/assets/hotspring/v1/buildings/hall_complete.webp",
+    "alt": "Salle du conseil",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_trade": {
+    "url": "/assets/hotspring/v1/buildings/trade_complete.webp",
+    "alt": "Comptoir de la vallée",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_people": {
+    "url": "/assets/hotspring/v1/characters/people_complete.webp",
+    "alt": "Habitants de la rue",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_fire": {
+    "url": "/assets/hotspring/v1/crises/fire_trace.webp",
+    "alt": "Cicatrice de l’incendie",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_flood": {
+    "url": "/assets/hotspring/v1/crises/flood_trace.webp",
+    "alt": "Cicatrice de la crue",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_drought": {
+    "url": "/assets/hotspring/v1/crises/drought_trace.webp",
+    "alt": "Trace de sécheresse",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_quarantine": {
+    "url": "/assets/hotspring/v1/crises/quarantine_trace.webp",
+    "alt": "Vestige d’un poste de soins",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_mine_accident": {
+    "url": "/assets/hotspring/v1/crises/mine_accident_trace.webp",
+    "alt": "Trace de l’accident minier",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_bankruptcy": {
+    "url": "/assets/hotspring/v1/crises/bankruptcy_trace.webp",
+    "alt": "Trace des saisies",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
   "variant_D05_CENTRE_PRIVE": {
     "url": "/assets/hotspring/v1/headers/d05_centre_prive.webp",
     "alt": "Remplacer la pancarte publique par une clôture et par le piquet du propriétaire.",

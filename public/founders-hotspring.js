@@ -38,7 +38,7 @@ function image(url){
 
 export function landscapeSummary(landscape){
  const river={claire:'claire',degradee:'dégradée',polluee:'polluée',basse:'basse',crue:'marquée par la crue'}[landscape.river];
- return 'Rivière '+river+' · Végétation '+landscape.vegetation+' · Rue '+landscape.street+' · Population '+landscape.density+' · '+landscape.prosperity;
+ return 'Rivière '+river+' · Végétation '+landscape.vegetation+' · Rue '+landscape.street+' · Population '+landscape.density+' · Ville '+landscape.mood+' · '+landscape.prosperity;
 }
 
 export function renderHotspringPanorama(root,s){
@@ -55,6 +55,7 @@ export function renderHotspringPanorama(root,s){
  root.append(node('span','Panorama de travail','hotspring-map-status'));
  state.key=key;state.effectKey=effectKey;state.map=map;
  const current=root.querySelector('.hotspring-map');
+ if(s.phase==='INTRO'&&s.campaign.chapter===1)current.classList.add('hotspring-prologue');
  if(!reveal)return;
  const chosen=(cue[reveal.id]??['build','survey'])[reveal.winner==='pour'?0:1];
  current.classList.add('hotspring-after','scene-'+chosen);

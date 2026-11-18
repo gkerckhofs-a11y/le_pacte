@@ -6,7 +6,7 @@ import {Resvg} from '@resvg/resvg-js';
 import {GameStore} from '../server/store.ts';
 import {createGameServer} from '../server/http.ts';
 import {VALLEY_PLATE,renderPanoramaSvg} from '../public/hotspring-panorama.js';
-import {renderHotspringStage,renderTendencies} from '../public/founders-hotspring.js';
+import {renderHotspringStage,renderTendencies,renderHotspringPanorama} from '../public/founders-hotspring.js';
 import {narrativePublicView} from '../src/founders-live.ts';
 import {newCampaign} from './helpers/hotspring.mjs';
 
@@ -94,4 +94,29 @@ test('Hotspring : tendances lisibles et prologue sur la projection et le termina
   g.command('next');renderTendencies(tendencies,narrativePublicView(g.state).dilemma);
   assert.match(tendencies.textContent,/POUR.*Économie ↑.*CONTRE.*Sécurité ↑/);
  }finally{globalThis.document=original;globalThis.Image=previousImage;}
+});
+
+test('Hotspring : la révélation présente le plan fixe du bon choix et conserve le panorama',()=>{
+ const {document}=parseHTML('<div id="map"></div>');
+ const previous=[globalThis.document,globalThis.Image];
+ globalThis.document=document;
+ globalThis.Image=class {
+  constructor(){
+   const img=document.createElement('img');
+   Object.defineProperties(img,{complete:{value:true},naturalWidth:{value:1440}});
+   return img;
+  }
+ };
+ try{
+  const g=newCampaign();g.command('start');
+  const map=document.getElementById('map');
+  renderHotspringPanorama(map,narrativePublicView(g.state));
+  assert.ok(map.querySelector('.hotspring-prologue'));
+  g.vote('contre');
+  renderHotspringPanorama(map,narrativePublicView(g.state));
+  assert.ok(map.querySelector('.hotspring-after'));
+  assert.ok(map.querySelector('.hotspring-before'));
+  assert.match(map.querySelector('.hotspring-result-still').src,/d01_result_against_highlands/);
+  assert.ok(!map.innerHTML.includes('result_for_lowlands'));
+ }finally{[globalThis.document,globalThis.Image]=previous;}
 });

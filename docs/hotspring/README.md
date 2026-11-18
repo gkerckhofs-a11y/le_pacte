@@ -22,6 +22,8 @@ Campagne versionnée à cinq familles, de l’arrivée des chariots en 1872 au c
 
 ## Revue des visuels
 
+138 fichiers WebP intégrés, dont 32 en-têtes, 62 plans fixes de résultat, 6 scènes de charte, 6 ouvertures, 3 variantes de continuité, 28 calques transparents et la vallée de référence. Les 7 captures sont rendues séparément à partir des états de campagne. Les 107 entrées temporaires du manifeste recensent les compositions, variantes et finitions à revoir.
+
 - [Galerie de contrôle](galerie.html) avec les en-têtes, résultats, calques et captures. Ouvrir le fichier depuis une copie du dépôt.
 - [Manifeste](manifeste-assets.json), [prompts utilisés](prompts-utilises.json), [briefs des chapitres](briefs-visuels.json) et [visuels temporaires](visuels-temporaires.md). Les statuts « validé » correspondent à des images générées et intégrées au brouillon. La validation artistique en projection est à faire.
 - [Captures](captures/) rendues depuis des sauvegardes de test avec la vallée commune. Le script `node scripts/capture-hotspring.mjs` recrée les rendus 1080p et 4K. Il requiert ImageMagick.
