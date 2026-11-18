@@ -20,6 +20,8 @@ test('Hotspring HTTP : reprise SQLite en cours de scrutin puis campagne complèt
  let client=hotspringClient(server,session);
  const ready=await client.projection();
  assert.equal(ready.phase,'READY');
+ assert.equal(ready.story.schemaVersion,'1.1.0');
+ assert.deepEqual(ready.city,{economie:5,ecologie:5,securite:5,bien_etre:5,demographie:5,stabilite:5});
 
  for(const {family,token} of session.access){
   const sheet=await server.request('/api/founders/access-qr',{token:hotspringTestKey,body:{

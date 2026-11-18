@@ -1,5 +1,5 @@
-import {CAMPAIGN_PHASES,landscapeSummary,renderHotspringPanorama,setHotspringImage,renderTendencies,renderHotspringStage,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
-import {decorateGauge,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
+import {CAMPAIGN_PHASES,renderHotspringPanorama,setHotspringImage,renderTendencies,renderHotspringStage,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
+import {decorateGauge,formatGaugeNumber,renderPhaseClock,voteTotals,appendGaugeDelta,gaugeDelta} from './founders-live-ui.js';
 import {voteProgress} from './founders-vote-progress.js';
 import {appendFamilyRoles} from './founders-role-badges.js';
 import {setupProjectionFullscreen} from './founders-fullscreen.js';
@@ -40,19 +40,30 @@ function drawIllustration(s,sceneOnly){
 }
 function drawGauges(s){
  const root=$('gauges');root.replaceChildren();
+ const compact=Boolean(s.campaign)&&Object.hasOwn(s.city,'bien_etre');
+ root.classList.toggle('projection-gauges-grid',compact);
  for(const key of Object.keys(s.city)){
   const g=document.createElement('div');g.className='gauge';
   const row=document.createElement('div');row.className='gauge-head';
   const label=document.createElement('span');label.textContent=s.skin.labels.resources[key]||key;
   const score=document.createElement('strong'),before=s.reveal?.cityBefore?.[key];
-  score.textContent=s.city[key]+'/10';appendGaugeDelta(score,s,key);
+  const decimal=compact&&key==='stabilite',value=formatGaugeNumber(s.city[key],decimal);
+  if(decimal)label.setAttribute('aria-description','Moyenne des cinq indicateurs de Hotspring');
+  score.textContent=(compact&&Number.isFinite(before)&&s.reveal?.cityAfter?.[key]===s.city[key]&&(decimal||gaugeDelta(s,key)?.value!==0)
+   ?formatGaugeNumber(before,decimal)+' → '+value:value)+'/10';
+  appendGaugeDelta(score,s,key);
   row.append(label,score);g.append(row);
   const track=document.createElement('div');track.className='track';
   const bar=document.createElement('div');bar.className='bar';
   bar.style.width=((Number.isFinite(before)?before:s.city[key])*10)+'%';
-  decorateGauge(bar,label,s.city[key],s);
+  decorateGauge(bar,label,s.city[key],s,{compact});
+  track.append(bar);g.append(track);
+  if(decimal){
+   const description=document.createElement('small');description.className='stability-caption';
+   description.textContent='Moyenne générale de Hotspring';g.append(description);
+  }
   requestAnimationFrame(()=>requestAnimationFrame(()=>{bar.style.width=(s.city[key]*10)+'%';}));
-  track.append(bar);g.append(track);root.append(g);
+  root.append(g);
  }
 
 }
@@ -62,6 +73,7 @@ function render(s){
  const stageReading=Boolean(s.campaign)&&['CHECKPOINT','SUSPENDED','CHARTER_SUPPORT','EPILOGUE'].includes(s.phase);
  document.body.classList.toggle('projection-stage-reading',stageReading);
  document.body.classList.toggle('projection-qualification',s.phase==='CHARTER_SUPPORT');
+ document.body.classList.toggle('projection-hotspring-epilogue',s.campaign?.version===2&&s.phase==='EPILOGUE');
  renderPhaseClock($('phaseClock'),s);
  $('phase').hidden=!$('phaseClock').hidden;
  const totals=voteTotals(s);
@@ -80,7 +92,7 @@ function render(s){
   renderHotspringPanorama($('city'),s,{showResultStill:false});
   renderHotspringStage($('hotspringStage'),s,undefined,{showIntroImage:false});
   renderTendencies($('hotspringTendencies'),sceneOnly||s.reveal?null:s.dilemma);
-  status('cityEvolution',landscapeSummary(s.campaign.landscape)+(s.campaign.relation?' · '+s.campaign.relation:''));
+  status('cityEvolution','');
  }else{
  if(mountedSkin!==s.skin.id){mountCity($('city'),s.skin.id);mountedSkin=s.skin.id;previousCityStates=null;}
  const cityStates=updateCity($('city'),s.city,s.skin.id,s.skin.labels.resources);

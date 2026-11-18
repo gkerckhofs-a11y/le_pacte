@@ -2,7 +2,14 @@ import {CAMPAIGN_PHASES} from './founders-hotspring.js';
 const levels=['Critique','Faible','Stable','Bon','Excellent'];
 const colors=['#d74747','#e78b36','#d6b83d','#76b45e','#26905f'];
 export function gaugeState(value,thresholds=[2,4,6,8]){const level=thresholds.filter(t=>value>t).length;return {label:levels[level],color:colors[level]};}
-export function decorateGauge(bar,label,value,s){const state=gaugeState(value,s.gaugeThresholds);bar.style.background=state.color;label.textContent+=' · '+state.label;}
+const gaugeNumber=new Intl.NumberFormat('fr-BE',{maximumFractionDigits:1});
+const stabilityNumber=new Intl.NumberFormat('fr-BE',{minimumFractionDigits:1,maximumFractionDigits:1});
+export const formatGaugeNumber=(value,decimal=false)=>(decimal?stabilityNumber:gaugeNumber).format(value);
+export function decorateGauge(bar,label,value,s,{compact=false}={}){
+ const state=gaugeState(value,s.gaugeThresholds);bar.style.background=state.color;
+ if(compact)label.title=state.label;
+ else label.textContent+=' · '+state.label;
+}
 const clocks=new Map();
 export function renderPhaseClock(root,s){
  if(!root){return;}root.hidden=s.experienceVersion!==2;
@@ -26,8 +33,10 @@ export function voteTotals(s){
 export function gaugeDelta(s,key){
  const before=s.reveal?.cityBefore?.[key],after=s.reveal?.cityAfter?.[key];
  if(!Number.isFinite(before)||!Number.isFinite(after))return null;
- const value=after-before;
- return {value,text:value>0?'+'+value:value<0?'−'+Math.abs(value):'0',kind:value>0?'positive':value<0?'negative':'neutral',description:'Effet du dilemme : '+before+' → '+after+'/10'};
+ const value=Math.round((after-before)*10)/10;
+ const format=number=>formatGaugeNumber(number,key==='stabilite'&&s.campaign?.version===2);
+ const description=key==='stabilite'&&s.campaign?.version===2?'Moyenne calculée, ':'Effet du dilemme : ';
+ return {value,text:value>0?'+'+format(value):value<0?'−'+format(Math.abs(value)):format(0),kind:value>0?'positive':value<0?'negative':'neutral',description:description+format(before)+' → '+format(after)+'/10'};
 }
 export function appendGaugeDelta(root,s,key){
  const delta=gaugeDelta(s,key);if(!delta)return;

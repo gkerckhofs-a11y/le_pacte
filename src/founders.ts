@@ -18,25 +18,26 @@ export const FOUNDERS_DEFAULT_CALIBRATION=Object.freeze({
  initialPower:8,initialDollars:10,initialPool:3,
  city:{economie:5,securite:5,satisfaction:5,bien_etre:5,developpement:5,stabilite:5}
 });
-export function validateFoundersCalibration(settings){
+export function validateFoundersCalibration(settings,{expandedHotspring=false}={}){
  const errors=[],allowed=['initialPower','initialDollars','initialPool','city'];
  if(!settings||typeof settings!=='object'||Array.isArray(settings))return ['Calibrage invalide'];
  if(Object.keys(settings).some(k=>!allowed.includes(k)))errors.push('Champ de calibrage non autorisé');
  if(!integer(settings.initialPower,1,30))errors.push('Influence initiale : 1 à 30');
  if(!integer(settings.initialDollars,0,100))errors.push('Dollars initiaux : 0 à 100');
  if(!integer(settings.initialPool,0,100))errors.push('Réserve commune : 0 à 100');
- const names=Object.hasOwn(settings.city??{},'ecologie')?['economie','ecologie','securite','demographie']:['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
+ const names=expandedHotspring||Object.hasOwn(settings.city??{},'ecologie')?['economie','ecologie','securite','demographie']:['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
+ if(expandedHotspring)names.push('bien_etre');
  if(!settings.city||typeof settings.city!=='object'||Array.isArray(settings.city)||
     Object.keys(settings.city).some(k=>!names.includes(k)))errors.push('Jauges initiales invalides');
  else for(const name of names)if(!integer(settings.city[name],0,10))errors.push('Jauge '+name+' : 0 à 10');
  return errors;
 }
-export function createFoundersGame({members=[5,5,5,5,5,5],leader='A',moderator,calibration=FOUNDERS_DEFAULT_CALIBRATION}={}) {
+export function createFoundersGame({members=[5,5,5,5,5,5],leader='A',moderator,calibration=FOUNDERS_DEFAULT_CALIBRATION,expandedHotspring=false}={}) {
  requireThat(Array.isArray(members)&&[5,6].includes(members.length)&&members.every(n=>integer(n,1,300)), 'Cinq ou six effectifs positifs obligatoires');
  const ids=FOUNDERS.slice(0,members.length);
  moderator??=ids.at(-1);
  requireThat(ids.includes(leader)&&ids.includes(moderator),'Maire ou shérif inconnu');
- const errors=validateFoundersCalibration(calibration);
+ const errors=validateFoundersCalibration(calibration,{expandedHotspring});
  requireThat(!errors.length,errors.join(' ; '));
  const powerSupply=ids.length*calibration.initialPower+calibration.initialPool;
  return {

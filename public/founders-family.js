@@ -1,5 +1,5 @@
 import {CAMPAIGN_PHASES,setHotspringImage,renderTendencies,renderHotspringStage,campaignScoreText,hotspringWinners} from './founders-hotspring.js';
-import {decorateGauge,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
+import {decorateGauge,formatGaugeNumber,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
 import {renderVoteProgress} from './founders-vote-progress.js';
 import {commitmentLabel} from './founders-agreements.js';
 import {renderCouncilRoles,appendFamilyRoles} from './founders-role-badges.js';
@@ -33,7 +33,7 @@ function gauge(data){
   const item=document.createElement('div');item.className='gauge';
   const top=document.createElement('div');top.className='gauge-head';
   const name=document.createElement('span');name.textContent=data.skin.labels.resources[indicator]||indicator;
-  const n=document.createElement('strong');n.textContent=data.city[indicator]+'/10';appendGaugeDelta(n,data,indicator);top.append(name,n);
+  const n=document.createElement('strong');n.textContent=formatGaugeNumber(data.city[indicator],indicator==='stabilite'&&data.campaign?.version===2)+'/10';appendGaugeDelta(n,data,indicator);top.append(name,n);
   const bar=document.createElement('div');bar.className='track';
   const inside=document.createElement('div');inside.className='bar';inside.style.width=data.city[indicator]*10+'%';
   decorateGauge(inside,name,data.city[indicator],data);bar.append(inside);item.append(top,bar);root.append(item);
@@ -147,6 +147,7 @@ function render(data){
  if(data.experienceVersion===2)$('offerCommitment').value='gift';
  $('rulesLegacy').hidden=data.experienceVersion===2;$('rulesV2').hidden=data.experienceVersion!==2;
  $('rulesV2Score').hidden=Boolean(data.campaign);$('rulesHotspringScore').hidden=!data.campaign;
+ $('rulesHotspringStability').hidden=data.campaign?.version!==2;
  const target=$('targetFamily'),prev=target.value;target.replaceChildren();
  for(const f of data.families.filter(f=>f.id!==self.id)){
   const option=document.createElement('option');option.value=f.id;option.textContent=teamCaption(f);target.append(option);

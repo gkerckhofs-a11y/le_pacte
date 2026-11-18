@@ -2,6 +2,8 @@
 
 Campagne versionnée à cinq familles, de l’arrivée des chariots en 1872 au choix d’une charte en 1893. La sélection « Les Colons de Hotspring » crée une session propre au parcours.
 
+Le catalogue propose la V1.1 par défaut. Économie, Écologie, Sécurité, Bien-être et Démographie commencent à 5. La Stabilité affiche leur moyenne, soit 5,0 au départ. Les sauvegardes antérieures réutilisent les règles de leur version. La [matrice des résultats](matrice-indicateurs-v1.1.md) détaille les choix, les variantes et les chartes. Le [rapport de simulation](rapport-simulation-v1.1.md) contient les captures et les points à revoir en salle.
+
 ## Essai local
 
 1. Démarrer le serveur avec `npm start`.

@@ -1,7 +1,7 @@
 import {openFoundersDilemma,applyFoundersCityEffects,activeFounders} from './founders.ts';
 import {calculateFoundersFinal} from './founders-scoring.ts';
 import {isHybrid,chooseNarrativeNext,narrativeReserve,narrativeEpilogue} from './founders-progression.ts';
-import {isHotspring,hotspringOutcome,campaignNext,campaignCheckpoint,startCharter,campaignEpilogue,campaignResults} from './founders-hotspring.ts';
+import {isHotspring,hotspringOutcome,campaignNext,campaignCheckpoint,startCharter,campaignEpilogue,campaignResults,hotspringCityIndicators} from './founders-hotspring.ts';
 import {hotspringScores} from './hotspring-scoring.ts';
 export const CITY_V2={economie:5,ecologie:5,securite:5,demographie:5};
 export const LABELS_V2={economie:'Économie',ecologie:'Écologie',securite:'Sécurité',demographie:'Démographie'};
@@ -33,13 +33,14 @@ export function beginNegotiation(s,now){s.phase='NEGOTIATION';setPhaseClock(s,no
 export function beginVote(s,now){s.game=openFoundersDilemma(s.game,s.currentDilemmaId);s.phase='COUNCIL';setPhaseClock(s,now);}
 export function revealResolution(s,now){
  const result=s.game.history.at(-1);check(result?.id===s.currentDilemmaId,'Résultat du vote introuvable');
- const d=s.scenario.dilemmas.find(d=>d.id===s.currentDilemmaId),cityBefore=structuredClone(s.game.city);
- const campaign=isHotspring(s),outcome=campaign?hotspringOutcome(s,d,result.winner):d.outcomes[result.winner];
+ const campaign=isHotspring(s),cityIndicators=campaign?hotspringCityIndicators:structuredClone;
+ const d=s.scenario.dilemmas.find(d=>d.id===s.currentDilemmaId),cityBefore=cityIndicators(s.game.city);
+ const outcome=campaign?hotspringOutcome(s,d,result.winner):d.outcomes[result.winner];
  s.game=applyFoundersCityEffects(s.game,outcome.effects.map(e=>({resource:e.indicator,kind:e.operation,...(e.operation==='delta'?{amount:e.value}:{})})));
  for(const o of Object.values(s.offers))if(o.status==='pending')o.status='expired';
- s.lastReveal={id:d.id,title:d.title,winner:result.winner,yes:result.yes,no:result.no,narration:outcome.narration,effects:structuredClone(outcome.effects),cityBefore,cityAfter:structuredClone(s.game.city),nextId:outcome.next_id,...(outcome.chronicle?{chronicle:structuredClone(outcome.chronicle)}:{})};
+ s.lastReveal={id:d.id,title:d.title,winner:result.winner,yes:result.yes,no:result.no,narration:outcome.narration,effects:structuredClone(outcome.effects),cityBefore,cityAfter:cityIndicators(s.game.city),nextId:outcome.next_id,...(outcome.chronicle?{chronicle:structuredClone(outcome.chronicle)}:{})};
  if(campaign)Object.assign(s.lastReveal,{chapter:d.chapter,visual:outcome.visual});
- s.revealedHistory.push({...structuredClone(s.lastReveal),city:structuredClone(s.game.city)});s.phase='REVEALED';setPhaseClock(s,now);
+ s.revealedHistory.push({...structuredClone(s.lastReveal),city:cityIndicators(s.game.city)});s.phase='REVEALED';setPhaseClock(s,now);
 }
 export function finishV2(s,now){
  // Interrupting a council refunds all its bids; no unfinished decision affects city or score.
@@ -78,7 +79,7 @@ export function continueHotspring(s,now,requested){
  if(next.end){finishV2(s,now);return;}
  if(next.checkpoint){
   campaignCheckpoint(s,now,()=>{
-   s.game=applyFoundersCityEffects(s.game,[{resource:'demographie',kind:'delta',amount:1}]);
+   s.game=applyFoundersCityEffects(s.game,[{resource:c.version===2?'bien_etre':'demographie',kind:'delta',amount:1}]);
   });
   s.phase='CHECKPOINT';
  }else {

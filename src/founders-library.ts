@@ -29,7 +29,7 @@ const requireValid=(errors,label)=>{if(errors.length)throw new Error(label+': '+
 export function validateFoundersStory(payload) {
  const errors=[];
  if(!keys(payload,['schema_version','scenario','dilemmas','campaign']))return ['Objet de scénario invalide'];
- error(payload.schema_version==='1.0.0','schema_version incompatible',errors);
+ error(payload.schema_version==='1.0.0'||payload.schema_version==='1.1.0'&&payload.scenario?.id===HOTSPRING_ID&&payload.campaign?.version===2,'schema_version incompatible',errors);
  const s=payload.scenario;
  if(!keys(s,['id','title','universe','location','year','entry_dilemma','status','progression']))errors.push('scenario : structure');
  else {
@@ -194,12 +194,18 @@ export function prepareFoundersSession(input,{scenarioId,scenarioVersion,skinId,
  members??=hotspring?[5,5,5,5,5]:[5,5,5,5,5,5];
  if(hotspring&&(!Array.isArray(members)||members.length!==5))throw new Error('Les Colons de Hotspring se jouent avec cinq familles.');
  const v2=hotspring||selectedVersion==='2.0.0'&&scenarioId==='hot-spring-reserve-hybride';
- if(v2&&!Object.hasOwn(calibration.city??{},'ecologie'))calibration={...calibration,city:{...CITY_V2,economie:calibration.city.economie,securite:calibration.city.securite}};
- const calibrationErrors=validateFoundersCalibration(calibration);
+ const expandedHotspring=hotspring&&release.payload.campaign.version===2;
+ if(expandedHotspring&&calibration===FOUNDERS_DEFAULT_CALIBRATION)
+  calibration={...calibration,city:{...CITY_V2,bien_etre:5}};
+ else if(v2&&!expandedHotspring&&!Object.hasOwn(calibration.city??{},'ecologie'))
+  calibration={...calibration,city:{...CITY_V2,economie:calibration.city.economie,securite:calibration.city.securite}};
+ const calibrationErrors=validateFoundersCalibration(calibration,{expandedHotspring});
  if(calibrationErrors.length)throw new Error(calibrationErrors.join(' ; '));
- const game=createFoundersGame({members,calibration});
+ if(expandedHotspring&&Object.values(calibration.city).some(value=>value!==5))throw new Error('Les cinq jauges de Hotspring démarrent à 5');
+ const game=createFoundersGame({members,calibration,expandedHotspring});
  if(v2)game.auctionMode='continuous';
  const selectedSkin=clone(skin);if(v2)selectedSkin.labels.resources=clone(LABELS_V2);
+ if(expandedHotspring)Object.assign(selectedSkin.labels.resources,{bien_etre:'Bien-être',stabilite:'Stabilité'});
  const warnings=[];
  if(skin.universe!==release.payload.scenario.universe)warnings.push('Univers différent : le visuel ne traduit pas automatiquement le texte narratif.');
  if(skin.status==='prototype')warnings.push('Skin en cours de conception, affichage non final.');

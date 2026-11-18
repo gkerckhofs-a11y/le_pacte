@@ -22,7 +22,7 @@ for(const [count,campaign] of [[5,false],[6,false],[5,true]])test(`Fiches ${camp
   const result=await r.json();if(!r.ok){const e=new Error(result.error);e.accessInvalid=r.status===403&&/expiré|révoqué/.test(e.message);throw e;}return result;
  };
  const scenarioId=campaign?'les-colons-de-hotspring':'hot-spring-reserve-hybride';
- const created=await request('/api/founders/sessions',{scenarioId,scenarioVersion:campaign?'1.0.0':'2.0.0',skinId:'western',code:'QRTEST'+count,title:'Équipes & vérification',members:Array(count).fill(1),names:['Caldwell','Doyle','Mercer','L’eau & les terres','Les Établis','Sixième'].slice(0,count)});
+ const created=await request('/api/founders/sessions',{scenarioId,scenarioVersion:campaign?'1.1.0':'2.0.0',skinId:'western',code:'QRTEST'+count,title:'Équipes & vérification',members:Array(count).fill(1),names:['Caldwell','Doyle','Mercer','L’eau & les terres','Les Établis','Sixième'].slice(0,count)});
  let view=await request('/api/founders/sessions/'+created.id);
  const storage=new Map();let prints=0,offline=false,wrong=false;
  const mount=()=>{

@@ -1,5 +1,5 @@
 import {isV2,GOALS_V2,TIMING_V2,validateTiming,validateThresholds,setPhaseClock,beginNegotiation,beginVote,revealResolution,nextV2,finishV2,continueHotspring,suspendHotspring,resumeHotspring,revealHotspringResults} from './founders-v2.ts';
-import {isHotspring,createHotspringState,campaignDilemma,campaignFamily,campaignOrganizer,campaignPresentation,hotspringSupports,crisisCandidates} from './founders-hotspring.ts';
+import {isHotspring,createHotspringState,campaignDilemma,campaignFamily,campaignOrganizer,campaignPresentation,hotspringSupports,crisisCandidates,hotspringCityIndicators,hotspringOutcome,HOTSPRING_INDICATORS} from './founders-hotspring.ts';
 import {DEFAULT_TEAM_COLORS,DEFAULT_TEAM_NAMES,teamColor} from '../public/founders-identity.js';
 import {isHybrid,narrativeReserve,chooseNarrativeNext,narrativeEpilogue} from './founders-progression.ts';
 /**
@@ -75,7 +75,7 @@ export function createNarrativeSession(preview,{id,ownerId,code,title,objectives
   goals:Object.fromEntries(ids.map((id,i)=>[id,objectives[i]])),
   goalCards:copy(goalCards),scoreRules:copy(scoreRules),initiativeOrder:copy(initiativeOrder),finalResults:null,
   ...(v2?{experienceVersion:2,timing:validateTiming(timing),gaugeThresholds:validateThresholds(gaugeThresholds),clock:{phase:'READY',deadline:null,remainingMs:null,paused:false}}:{}),
-  ...(families?{campaign:createHotspringState(preview.game.city,crisisMode,presentationSeconds)}:{}),
+  ...(families?{campaign:createHotspringState(preview.game.city,crisisMode,presentationSeconds,preview.scenario.campaign.version)}:{}),
   phase:'READY',currentDilemmaId:preview.scenario.scenario.entry_dilemma,
   lastReveal:null,revealedHistory:[],offers:{},revision:0,createdAt:now,updatedAt:now
  };
@@ -132,7 +132,7 @@ export function applyNarrativeCommand(input,actor,command,now){
  check(Number.isSafeInteger(now)&&now>=0,'Horodatage invalide');
  check(command&&typeof command.kind==='string','Commande invalide');
  const s=copy(input),data=command.data??{},kind=command.kind;
- check(!s.clock?.paused||['pause','resume','configureTiming','adjustTime','correctResource','finish','endSitting'].includes(kind),'Partie en pause');
+ check(!s.clock?.paused||['pause','resume','configureTiming','adjustTime','correctResource','correctCity','finish','endSitting'].includes(kind),'Partie en pause');
  check(s.phase!=='SUSPENDED'||['resumeSitting','finish'].includes(kind),'Séance sauvegardée');
  const org=()=>check(actor.role==='organizer','Régie uniquement');
  const team=()=>check(actor.role==='team','Porte-parole uniquement');
@@ -258,6 +258,15 @@ export function applyNarrativeCommand(input,actor,command,now){
    (s.corrections??=[]).push({family:data.family,resource:data.resource,before:f[data.resource],after:data.value,at:now});
    f[data.resource]=data.value;break;
   }
+  case 'correctCity': {
+   org();
+   check(isHotspring(s)&&s.campaign.version===2&&!['FINISHED','EPILOGUE'].includes(s.phase)&&s.clock.paused,'Mettre la campagne en pause avant de corriger une jauge');
+   const {indicator,value}=data;
+   check(HOTSPRING_INDICATORS.includes(indicator)&&Number.isInteger(value)&&value>=0&&value<=10,'Choisir une jauge fondamentale et un entier entre 0 et 10');
+   (s.corrections??=[]).push({kind:'city',indicator,before:s.game.city[indicator],after:value,at:now});
+   s.game.city[indicator]=value;
+   break;
+  }
   case 'finish':
    org();check(isV2(s)&&!['FINISHED','EPILOGUE'].includes(s.phase)&&data.confirm===true,'Confirmation de fin de partie requise');
    if(isHotspring(s)&&s.phase==='CHECKPOINT'&&s.campaign.chapter>=5)continueHotspring(s,now);
@@ -309,28 +318,35 @@ function publicInfluenceReserve(s,resolved){
 export function narrativePublicView(s){
  check(s?.kind==='founders-live-session-v2.5','Partie inconnue');
  const v=s.game.vote,resolved=(s.phase==='REVEALED'||s.phase==='FINISHED')?s.game.history.at(-1):null;
+ const snapshot=record=>{
+  const view=copy(record);
+  if(isHotspring(s)&&s.campaign.version===2&&view){
+   for(const key of ['city','cityBefore','cityAfter'])if(view[key])view[key]=hotspringCityIndicators(view[key]);
+  }
+  return view;
+ };
  // No secrets, unrevealed outcomes, future branches, or source Sheets IDs.
  return {
   kind:s.kind,id:s.id,code:s.code,title:s.title,phase:s.phase,revision:s.revision,
   ...(isV2(s)?{experienceVersion:2,timing:copy(s.timing),clock:copy(s.clock),gaugeThresholds:copy(s.gaugeThresholds)}:{}),
   ...(isHotspring(s)?{campaign:campaignPresentation(s),influenceReserve:publicInfluenceReserve(s,resolved)}:{}),
-  story:{id:s.scenario.scenario.id,title:s.scenario.scenario.title,location:s.scenario.scenario.location,year:s.scenario.scenario.year},
+  story:{id:s.scenario.scenario.id,title:s.scenario.scenario.title,location:s.scenario.scenario.location,year:s.scenario.scenario.year,schemaVersion:s.scenario.schema_version},
   skin:{id:s.skin.id,title:s.skin.title,labels:copy(s.skin.labels),theme:copy(s.skin.theme),publicScene:copy(s.skin.publicScene)},
-  city:copy(s.game.city),families:activeFounders(s.game).map((id,i)=>({id,name:s.names[id],color:copy(teamColor(s.colors?.[id]??DEFAULT_TEAM_COLORS[i])),members:s.game.families[id].members})),
+  city:isHotspring(s)?hotspringCityIndicators(s.game.city):copy(s.game.city),families:activeFounders(s.game).map((id,i)=>({id,name:s.names[id],color:copy(teamColor(s.colors?.[id]??DEFAULT_TEAM_COLORS[i])),members:s.game.families[id].members})),
   leader:s.game.leader,moderator:s.game.moderator,
   dilemma:publicDilemma(s),
   council:v?{phase:v.phase,turn:v.turn,bids:copy(v.bids),choices:copy(v.choices),
     pendingLeaderChoices:v.pendingLeaderChoices?copy(v.pendingLeaderChoices):[]}:
     {phase:resolved?'revealed':s.phase==='AWAITING_REVEAL'?'closed':'inactive',turn:null,bids:resolved?copy(resolved.bids):{},choices:resolved?copy(resolved.choices):{},pendingLeaderChoices:[]},
-  reveal:s.phase==='REVEALED'||s.phase==='FINISHED'?copy(s.lastReveal):null,
-  narrativeEnding:['EPILOGUE','FINISHED'].includes(s.phase)?copy(s.narrativeEnding??null):null,
+  reveal:s.phase==='REVEALED'||s.phase==='FINISHED'?snapshot(s.lastReveal):null,
+  narrativeEnding:['EPILOGUE','FINISHED'].includes(s.phase)?snapshot(s.narrativeEnding??null):null,
   // Enrich only already revealed chapters. Never send the other outcome.
   // Resolve illustrations from the frozen scenario, including older sessions
   // whose stored history predates the illustrated chronicle.
   history:s.revealedHistory.map(h=>{
    const d=s.scenario.dilemmas.find(d=>d.id===h.id);
    const c=h.chronicle??d?.outcomes?.[h.winner]?.chronicle;
-   return {...copy(h),...(c?{chronicle:copy(c)}:{}),image:h.visual??(c?.image?copy(c.image):d?copy(d.image):null),
+   return {...snapshot(h),...(c?{chronicle:copy(c)}:{}),image:h.visual??(c?.image?copy(c.image):d?copy(d.image):null),
     decisionLabel:h.id==='D30'&&isHotspring(s)?c.title:d?.labels?.[h.winner]??h.winner};
   }),
   finalTieOrder:copy(s.initiativeOrder??activeFounders(s.game)),
@@ -355,10 +371,21 @@ export function narrativeFamilyView(s,family){
 export function narrativeOrganizerView(s){
  return {...narrativePublicView(s),familyGoals:copy(s.goals),familyResources:copy(s.game.families),
   ...(isHotspring(s)?{campaignAdmin:campaignOrganizer(s),privateFamilies:Object.fromEntries(activeFounders(s.game).map(id=>[id,campaignFamily(s,id)]))}:{}),
+  effectsPreview:hotspringEffectsPreview(s),
   progression:s.phase==='REVEALED'?narrativeReserve(s):null,
   source:copy(s.source),selection:copy(s.selection),offers:copy(s.offers),
   goalCards:copy(s.goalCards??DEFAULT_GOAL_CARDS),scoreRules:copy(s.scoreRules??DEFAULT_SCORE_RULES),initiativeOrder:copy(s.initiativeOrder??activeFounders(s.game)),
   game:copy(s.game),scenario:copy(s.scenario)};
+}
+function hotspringEffectsPreview(s){
+ if(!isHotspring(s)||s.campaign.version!==2||!['PRESENTATION','NEGOTIATION','COUNCIL'].includes(s.phase))return null;
+ const dilemma=s.scenario.dilemmas.find(d=>d.id===s.currentDilemmaId);
+ const cityBefore=hotspringCityIndicators(s.game.city);
+ return ['pour','contre'].map(side=>{
+  const effects=hotspringOutcome(copy(s),dilemma,side).effects;
+  const projectedGame=applyFoundersCityEffects({...s.game,vote:null},effects.map(e=>({resource:e.indicator,kind:e.operation,amount:e.value})));
+  return {side,effects,cityBefore,cityAfter:hotspringCityIndicators(projectedGame.city)};
+ });
 }
 export function narrativeView(s,actor){
  if(actor.role==='public')return narrativePublicView(s);

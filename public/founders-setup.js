@@ -202,7 +202,7 @@ function loadGoalPresets(cards,rules,calibration){
 }
 function collectCalibration(){
  const city={};
- for(const k of (isV2Setup()?['economie','ecologie','securite','demographie']:['economie','securite','satisfaction','bien_etre','developpement','stabilite']))city[k]=Number($('city_'+k).value);
+ for(const k of setupCityKeys())city[k]=Number($('city_'+k).value);
  return {initialPower:Number($('initPower').value),
   initialDollars:Number($('initDollars').value),
   initialPool:Number($('initPool').value),city};
@@ -343,16 +343,21 @@ const workspace=mountWorkspace({api,getCatalog:()=>catalog,
 $('gameCode').value='P'+crypto.randomUUID().replaceAll('-','').slice(0,7).toUpperCase();
 
 const campaignSetup=()=>$('scenario').value==='les-colons-de-hotspring';
+const expandedCampaignSetup=()=>campaignSetup()&&$('scenarioVersion').value==='1.1.0';
 const legacyNote=$('familySetupNote').textContent;
 let usedCampaignNames=false;
 function isV2Setup(){return campaignSetup()|| $('scenario').value==='hot-spring-reserve-hybride'&&$('scenarioVersion').value==='2.0.0';}
+function setupCityKeys(){
+ if(expandedCampaignSetup())return ['economie','ecologie','securite','demographie','bien_etre'];
+ return isV2Setup()?['economie','ecologie','securite','demographie']:['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
+}
 function syncV2Setup(){
  if(!catalog)return;const v2=isV2Setup(),campaign=campaignSetup(),changingCampaign=usedCampaignNames!==campaign;
  const count=$('familyCount');
  if(campaign)count.value='5';
  count.disabled=campaign;
  $('legacyScoring').hidden=campaign;$('crisisModeField').hidden=!campaign;
- $('familySetupNote').textContent=campaign?'Cinq familles, ressources égales et objectifs confidentiels. Score maximal de 18 points.':legacyNote;
+ $('familySetupNote').textContent=campaign?'Cinq familles, objectifs confidentiels et score maximal de 18 points.'+(expandedCampaignSetup()?' Les cinq jauges commencent à 5. Leur moyenne fixe la Stabilité de départ à 5,0.':''):legacyNote;
  syncFamilyCount();
  const familyNames=catalog.scenarios.find(s=>s.id===$('scenario').value)?.familyNames;
  for(const [i,id] of FAMILY_IDS.entries()){
@@ -372,9 +377,11 @@ function syncV2Setup(){
  }
  if(changingCampaign)$('gameTitle').value=campaign?'Les Colons de Hotspring — Campagne':'Le Pacte des Fondateurs — Répétition';
  usedCampaignNames=campaign;
- for(const k of ['economie','ecologie','securite','demographie','satisfaction','bien_etre','developpement','stabilite']){const input=$('city_'+k);if(input){const visible=v2?['economie','ecologie','securite','demographie'].includes(k):!['ecologie','demographie'].includes(k);input.parentElement.hidden=!visible;input.disabled=!visible;}}
+ const cityKeys=setupCityKeys();
+ for(const k of ['economie','ecologie','securite','demographie','satisfaction','bien_etre','developpement','stabilite']){const input=$('city_'+k);if(input){const visible=cityKeys.includes(k);input.parentElement.hidden=!visible;input.disabled=!visible;input.readOnly=visible&&expandedCampaignSetup();}}
  for(const id of FAMILY_IDS)for(const o of $('goalIndicator-'+id).options){const valid=v2?['economie','ecologie','securite','demographie'].includes(o.value):!['ecologie','demographie'].includes(o.value);o.hidden=!valid;o.disabled=!valid;}
  loadGoalPresets(v2?catalog.goalCardPresetsV2:catalog.goalCardPresets,catalog.scoreRulesPreset,v2?catalog.calibrationPresetV2:catalog.calibrationPreset);
+ if(expandedCampaignSetup())for(const key of cityKeys)$('city_'+key).value=5;
  selectedPreview=null;$('preview').hidden=true;$('empty').hidden=false;
 }
 for(const [key,label] of [['ecologie','Écologie'],['demographie','Démographie']]){

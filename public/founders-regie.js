@@ -1,6 +1,6 @@
 import {rememberAccess} from './founders-workspace.js';
 import {CAMPAIGN_PHASES,renderHotspringStage,renderTendencies,renderCampaignAdmin,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
-import {decorateGauge,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
+import {decorateGauge,formatGaugeNumber,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
 import {mountPrintKit} from './founders-print.js';
 import {renderCouncilMonitor} from './founders-council-monitor.js';
 import {councilGuidance,startCouncil,organizerError,validNarrativeSession} from './founders-regie-flow.js';
@@ -96,9 +96,40 @@ function gauge(s){
   const el=document.createElement('div');el.className='gauge';
   const row=document.createElement('div');row.className='gauge-head';
   const label=document.createElement('span');label.textContent=s.skin.labels.resources[k]||k;
-  const n=document.createElement('strong');n.textContent=s.city[k]+'/10';appendGaugeDelta(n,s,k);row.append(label,n);
+  const n=document.createElement('strong');n.textContent=formatGaugeNumber(s.city[k],k==='stabilite'&&s.campaign?.version===2)+'/10';appendGaugeDelta(n,s,k);row.append(label,n);
   const track=document.createElement('div');track.className='track';
   const bar=document.createElement('div');bar.className='bar';bar.style.width=s.city[k]*10+'%';decorateGauge(bar,label,s.city[k],s);track.append(bar);el.append(row,track);root.append(el);
+ }
+ renderCityAudit(s);
+}
+function renderCityAudit(s){
+ const expanded=s.campaign?.version===2,formula=$('stabilityFormula'),correction=$('cityCorrection'),audit=$('cityEffectAudit');
+ formula.hidden=correction.hidden=!expanded;
+ audit.replaceChildren();audit.hidden=true;
+ if(!expanded)return;
+ const indicators=Object.keys(s.city).filter(key=>key!=='stabilite');
+ formula.textContent='Stabilité en lecture seule · ('+indicators.map(key=>s.city[key]).join(' + ')+') ÷ 5 = '+formatGaugeNumber(s.city.stabilite,true);
+ const select=$('correctIndicator');
+ if(!select.options.length)for(const key of indicators){
+  const option=document.createElement('option');option.value=key;option.textContent=s.skin.labels.resources[key];select.append(option);
+ }
+ for(const field of $('cityCorrectionForm').querySelectorAll('select,input,button'))field.disabled=!s.clock.paused||['FINISHED','EPILOGUE','SUSPENDED'].includes(s.phase);
+ const records=s.reveal?[{...s.reveal,side:s.reveal.winner}]:s.effectsPreview;
+ if(!records?.length)return;
+ audit.hidden=false;
+ const heading=document.createElement('h3');heading.textContent=s.reveal?'Effets appliqués':'Effets prévus avant le vote';audit.append(heading);
+ const sign=n=>n>0?'+'+n:n<0?'−'+Math.abs(n):'0';
+ for(const record of records){
+  const title=document.createElement('strong');title.textContent=record.side==='pour'?'POUR':'CONTRE';audit.append(title);
+  const list=document.createElement('ul');
+  for(const effect of record.effects){
+   const key=effect.indicator,before=record.cityBefore[key],after=record.cityAfter[key],row=document.createElement('li');
+   row.textContent=s.skin.labels.resources[key]+' '+sign(effect.value)+' prévu · '+before+' → '+after+' ('+sign(after-before)+(s.reveal?' appliqué':' après plafonnement')+')';
+   list.append(row);
+  }
+  const stability=document.createElement('li');
+  stability.textContent='Stabilité calculée · '+formatGaugeNumber(record.cityBefore.stabilite,true)+' → '+formatGaugeNumber(record.cityAfter.stabilite,true);
+  list.append(stability);audit.append(list);
  }
 }
 function render(s){
@@ -154,9 +185,11 @@ function render(s){
  const final=$('finalPanel');final.hidden=!s.finalResults;
  if(s.campaign&&s.finalResults){
   set('finalWinner',hotspringWinners(s));
+  set('finalScoreRule',s.finalResults.rows[0].maximum+' points possibles par famille.');
   const root=$('ranking');root.replaceChildren();
   renderCampaignRanking(root,s.finalResults.rows,true);
  }else if(s.finalResults){
+  set('finalScoreRule','Barème de test V2.6 · une seule famille déclarée vainqueure.');
   set('finalWinner',teamLabel(s,s.finalResults.ranking[0].family)+' remporte la partie ('+s.finalResults.ranking[0].score.total+' pts)');
   const root=$('ranking');root.replaceChildren();
   for(const r of s.finalResults.ranking){
@@ -270,6 +303,7 @@ $('addTime').addEventListener('click',()=>command('adjustTime',{seconds:60}));
 $('removeTime').addEventListener('click',()=>command('adjustTime',{seconds:-60}));
 $('timingForm').addEventListener('submit',event=>{event.preventDefault();command('configureTiming',{timing:{negotiationSeconds:Number($('negotiationSeconds').value),voteSeconds:Number($('voteSeconds').value),resolutionSeconds:Number($('resolutionSeconds').value),autoAdvance:$('autoAdvance').checked},gaugeThresholds:$('gaugeThresholds').value.split(',').map(Number),...(current?.campaign?{presentationSeconds:Number($('presentationSeconds').value)}:{})});});
 $('correctionForm').addEventListener('submit',event=>{event.preventDefault();command('correctResource',{family:$('correctFamily').value,resource:$('correctResource').value,value:Number($('correctValue').value)});});
+$('cityCorrectionForm').addEventListener('submit',event=>{event.preventDefault();command('correctCity',{indicator:$('correctIndicator').value,value:Number($('correctIndicatorValue').value)});});
 $('finishGame').addEventListener('click',()=>$('finishDialog').showModal());
 $('cancelFinish').addEventListener('click',()=>$('finishDialog').close());
 $('confirmFinish').addEventListener('click',async()=>{await command('finish',{confirm:true});if(current&&['EPILOGUE','FINISHED','INTRO','CHARTER_SUPPORT'].includes(current.phase))$('finishDialog').close();});

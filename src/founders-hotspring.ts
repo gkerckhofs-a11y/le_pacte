@@ -4,8 +4,9 @@ import {hotspringLandscape} from './hotspring-landscape.ts';
 import art from '../content/hotspring-art-index-v1.json' with {type:'json'};
 
 export const HOTSPRING_ID='les-colons-de-hotspring';
-export const isHotspring=s=>s.scenario?.scenario?.id===HOTSPRING_ID&&s.campaign?.version===1;
-const cityLabels={economie:'Économie',ecologie:'Écologie',securite:'Sécurité',demographie:'Démographie'};
+export const HOTSPRING_INDICATORS=['economie','ecologie','securite','bien_etre','demographie'];
+export const isHotspring=s=>s.scenario?.scenario?.id===HOTSPRING_ID&&[1,2].includes(s.campaign?.version);
+const cityLabels={economie:'Économie',ecologie:'Écologie',securite:'Sécurité',demographie:'Démographie',bien_etre:'Bien-être',stabilite:'Stabilité'};
 const check=(ok,message)=>{if(!ok)throw new Error(message);};
 const copy=structuredClone;
 const sceneKey=(id,side)=>side?id+'_'+side:id;
@@ -18,7 +19,8 @@ export function validateHotspring(payload){
  const c=payload.campaign;
  if(!c)return [];
  const ds=payload.dilemmas;
- if(payload.scenario?.id!==HOTSPRING_ID||c.version!==1||ds.length!==32)return ['Version des Colons de Hotspring invalide'];
+ if(payload.scenario?.id!==HOTSPRING_ID||![1,2].includes(c.version)||ds.length!==32||
+   payload.schema_version!==(c.version===2?'1.1.0':'1.0.0'))return ['Version des Colons de Hotspring invalide'];
  if(!c.rules||!c.intros||!c.checkpoints||!c.families||!c.epilogue||
    Object.keys(c.families).length!==5||!Array.isArray(c.charters)||c.charters.map(x=>x?.id).join('')!=='ABCDEF')
   return ['Configuration de la campagne Hotspring invalide'];
@@ -27,13 +29,38 @@ export function validateHotspring(payload){
  if(ids.some((id,i)=>ds[i]?.id!==id||id!=='D30'&&['pour','contre'].some(side=>
   !Array.isArray(c.rules[id]?.tendencies?.[side])||!Array.isArray(c.rules[id]?.markers?.[side]))))
   return ['Embranchements de Hotspring invalides'];
+ if(c.version===2){
+  const validEffects=effects=>Array.isArray(effects)&&
+   effects.every(e=>e&&HOTSPRING_INDICATORS.includes(e.indicator)&&e.operation==='delta'&&Number.isInteger(e.value)&&Math.abs(e.value)>=1&&Math.abs(e.value)<=3)&&
+   new Set(effects.map(e=>e.indicator)).size===effects.length;
+  if(ds.some(d=>['pour','contre'].some(side=>!validEffects(d.outcomes?.[side]?.effects)))||
+     c.charters.some(charter=>!validEffects(charter.effects)||charter.effects.length<2||charter.effects.length>4))
+   return ['Effets des dilemmes ou chartes de Hotspring invalides'];
+  if(new Set(Object.values(c.families).map(f=>f.trajectory)).size!==5||
+     Object.values(c.families).some(f=>!HOTSPRING_INDICATORS.includes(f.trajectory)))
+   return ['Les cinq familles doivent avoir une trajectoire fondamentale distincte'];
+ }
  return [];
 }
 
-export function createHotspringState(city,crisisMode='standard',presentationSeconds=35){
+export function calculateHotspringStability(city){
+ return HOTSPRING_INDICATORS.reduce((sum,key)=>sum+city[key],0)/HOTSPRING_INDICATORS.length;
+}
+
+export function hotspringCityIndicators(city){
+ if(!Object.hasOwn(city,'bien_etre'))return {...city};
+ return Object.fromEntries([...HOTSPRING_INDICATORS.map(key=>[key,city[key]]),['stabilite',calculateHotspringStability(city)]]);
+}
+
+function checkpointChanges(before,after){
+ const keys=Object.keys(after).filter(key=>key!=='stabilite');
+ return hotspringCityIndicators(Object.fromEntries(keys.map(k=>[k,after[k]-before[k]])));
+}
+
+export function createHotspringState(city,crisisMode='standard',presentationSeconds=35,version=1){
  check(['standard','extended'].includes(crisisMode),'Rythme des crises invalide');
  check(Number.isInteger(presentationSeconds)&&presentationSeconds>=5&&presentationSeconds<=7200,'Lecture : de 5 à 7200 secondes');
- return {version:1,chapter:1,trust:0,markers:[],initialCity:copy(city),checkpoints:[],completedChapters:[],
+ return {version,chapter:1,trust:0,markers:[],initialCity:copy(city),checkpoints:[],completedChapters:[],
   playedCrises:[],crisesThisSitting:0,crisisMode,presentationSeconds,interlude:null,suspension:null,
   publicRanking:null,qualification:null,finalists:null,charter:null,interludeHistory:[]};
 }
@@ -121,7 +148,7 @@ export function hotspringOutcome(s,d,side){
   return {narration:charter.narration,effects:copy(charter.effects),next_id:null,
    chronicle:{title:charter.title,summary:charter.narration},visual:hotspringArt('charter_'+charter.id.toLowerCase())};
  }
- const m=new Set(c.markers),h=id=>m.has(id),n=(...ids)=>ids.filter(h).length,yes=side==='pour';
+ const m=new Set(c.markers),h=id=>m.has(id),n=(...ids)=>ids.filter(h).length,yes=side==='pour',expanded=c.version===2;
  const rule=s.scenario.campaign.rules[d.id],outcome=copy(d.outcomes[side]);
  const values=Object.fromEntries(outcome.effects.map(e=>[e.indicator,e.value]));
  switch(d.id){
@@ -130,25 +157,28 @@ export function hotspringOutcome(s,d,side){
   case 'D16':if(yes)values.economie=h('CHEMIN_DE_FER')?3:2;break;
   case 'D17':if(!yes)values.economie=h('CENTRE_PRIVE')?-2:-1;break;
   case 'D19':if(yes&&h('CHEMIN_DE_FER')&&h('PASSAGE_DIRECT'))values.economie++;break;
-  case 'D21':if(yes&&h('POSTE_TERRITORIAL'))values.securite++;break;
+  case 'D21':if(!expanded&&yes&&h('POSTE_TERRITORIAL'))values.securite++;break;
   case 'D22':
-   if(yes)values.economie=h('CENTRE_PRIVE')?-3:n('RESERVES_PUBLIQUES','QUARTIER_PLANIFIE')?-1:-2;
+   if(yes)values.economie=h('CENTRE_PRIVE')?-3:expanded||n('RESERVES_PUBLIQUES','QUARTIER_PLANIFIE')?-1:-2;
    break;
   case 'D24':
    if(n('REGLEMENT_INCENDIE','EAU_COMMUNALE'))values[yes?'demographie':'economie']++;
    break;
   case 'D25':
-   if(yes&&h('DISPENSAIRE')&&h('ASSAINISSEMENT')){values.economie=-1;values.demographie=0;}
+   if(yes&&h('DISPENSAIRE')&&h('ASSAINISSEMENT')){values.economie=-1;values.demographie=0;if(expanded)values.bien_etre=0;}
    if(!yes&&n('EAU_COMMUNALE','QUARTIER_PLANIFIE'))values.demographie++;
    break;
   case 'D26A':
-   values.demographie=Math.min(0,values.demographie+
+   values.demographie=Math.max(expanded?-3:-10,Math.min(0,(values.demographie??0)+
     Math.min(2,n('ASSAINISSEMENT','QUARTIER_PLANIFIE','MARSHAL','ALLIANCE_VALLEE'))-
-    Math.min(2,n('QUARTIER_PROVISOIRE','CENTRE_PRIVE','ABATTOIR_CENTRAL')));
+    Math.min(2,n('QUARTIER_PROVISOIRE','CENTRE_PRIVE','ABATTOIR_CENTRAL'))));
    break;
   case 'D26B':
-   if(h('EAU_COMMUNALE')&&h('ALLIANCE_VALLEE'))values.demographie++;
-   if(!yes&&h('EAU_PRIVEE'))values.securite--;
+   if(h('EAU_COMMUNALE')&&h('ALLIANCE_VALLEE')){
+    if(expanded)values.bien_etre++;
+    else values.demographie++;
+   }
+   if(!yes&&h('EAU_PRIVEE')&&!expanded)values.securite--;
    break;
   case 'D27':if(yes&&h('SCRIP'))values.economie=-3;break;
   case 'D28':if(yes)values.economie=h('IMPOT_LOCAL')?-1:h('FINANCEMENT_PONCTUEL')?-3:-2;break;
@@ -201,16 +231,17 @@ export function campaignCheckpoint(s,now,chapterBonus){
   if(count>=2){
    chapterBonus();
    c.markers.push('SERVICES_MAINTENUS');
-   c.interludeHistory.push('Les services publics restent ouverts grâce au budget local. Démographie +1.');
+   c.interludeHistory.push('Les services publics restent ouverts grâce au budget local. '+(c.version===2?'Bien-être':'Démographie')+' +1.');
   }
  }
  if(chapter<=5&&!c.completedChapters.includes(chapter))c.completedChapters.push(chapter);
  const definition=s.scenario.campaign.checkpoints[chapter];
  const name=chapter===5?'Hotspring — Veille du conseil':chapter===6?'Hotspring — Gouvernement choisi':'Hotspring — '+definition.title;
- const before=c.checkpoints.findLast(p=>p.chapter<chapter)?.city??c.initialCity;
- const checkpoint={chapter,name,at:now,city:copy(s.game.city),markers:[...c.markers],trust:c.trust,
+ const before=hotspringCityIndicators(c.checkpoints.findLast(p=>p.chapter<chapter)?.city??c.initialCity);
+ const city=hotspringCityIndicators(s.game.city);
+ const checkpoint={chapter,name,at:now,city,markers:[...c.markers],trust:c.trust,
   scores:hotspringScores(s),decisions:s.revealedHistory.filter(h=>h.chapter===chapter).map(h=>h.id),
-  changes:Object.fromEntries(Object.entries(s.game.city).map(([k,value])=>[k,value-before[k]]))};
+  changes:checkpointChanges(before,city)};
  c.checkpoints.push(checkpoint);
  c.publicRanking=checkpoint.scores.rows.map(r=>({family:r.family,name:r.name,total:r.total,maximum:r.maximum}));
  return checkpoint;
@@ -275,10 +306,13 @@ export function campaignPresentation(s){
   chapter:c.chapter,version:c.version,familyPitches:s.phase==='READY'?Object.values(content.families).map(f=>({role:f.publicRole,text:f.pitch})):null,relation:c.chapter>=3?relationLabel(c.trust,c.markers):null,
   landscape:hotspringLandscape(s),intro,recap:intro||c.justResumed?summary:[],epilogueRecap:epilogueRecap(s),
   checkpoint:chapterScreen?{title:stopsAtCheckpoint?checkpoint?.name:'Hotspring — Fin de séance',
+   ...(c.version===2?{city:hotspringCityIndicators(stopsAtCheckpoint&&checkpoint?checkpoint.city:s.game.city)}:{}),
    text:stopsAtCheckpoint?content.checkpoints[c.chapter].text:'L’histoire de Hotspring se poursuit…',
    decisions:stopsAtCheckpoint?s.revealedHistory.filter(h=>h.chapter===c.chapter).map(h=>({
     id:h.id,title:h.chronicle?.title??h.title,summary:h.narration})):summary,
-   changes:stopsAtCheckpoint?copy(checkpoint?.changes??{}):{},interlude:c.interlude,
+   changes:stopsAtCheckpoint&&checkpoint
+    ?checkpointChanges(c.checkpoints.findLast(p=>p.chapter<checkpoint.chapter)?.city??c.initialCity,checkpoint.city)
+    :{},interlude:c.interlude,
    events:c.chapter===5?copy(c.interludeHistory):[],
    ranking:copy(c.publicRanking)}:null,
   qualification:s.phase==='CHARTER_SUPPORT'&&q?{
@@ -339,8 +373,14 @@ export function campaignEpilogue(s){
  const gov=m.has('CONSEIL_ELU')?'Le conseil élu gouverne Hotspring.':m.has('CONSEIL_FONDATEURS')?'Le Conseil des Fondateurs reste en place.':null;
  const paragraphs=a?[a.quote,gov,a.narration].filter(Boolean):['Les décisions de cette campagne demeurent inscrites dans Hotspring.'];
  for(const [k,value] of Object.entries(city)){
-  const level=value<=2?0:value<=4?1:value<=7?2:3;
+  const level=k==='bien_etre'?(value<=2?0:value<=4?1:value<=6?2:value<=8?3:4):value<=2?0:value<=4?1:value<=7?2:3;
   paragraphs.push(cityLabels[k]+' — '+e[k][level].label+' ('+value+'/10). '+e[k][level].text);
+ }
+ if(c.version===2){
+  const stability=calculateHotspringStability(city);
+  const summary=['Ville au bord de la rupture','Équilibre fragile','Ville viable','Ville solidement établie','Hotspring durablement prospère et équilibrée'];
+  const level=[3,5,7,9].filter(threshold=>stability>=threshold).length;
+  paragraphs.push('Stabilité — '+summary[level]+' ('+stability.toFixed(1).replace('.',',')+'/10).');
  }
  const memories=[['VILLE_BASSE','VILLE_HAUTE'],
   ['ACCORD_ROMPU','ACCORD_RESPECTE','CHEMIN_DE_FER','GRANDE_MINE','EAU_COMMUNALE','EAU_PRIVEE'],
@@ -356,7 +396,7 @@ export function campaignEpilogue(s){
  const cross=matches.indexOf(true);
  if(cross>=0)paragraphs.push(e.cross[cross]);
  paragraphs.push(e.closing,'Qu’avez-vous fait de Hotspring ?');
- return {title:a?.title??'Épilogue de Hotspring',paragraphs,city:copy(city)};
+ return {title:a?.title??'Épilogue de Hotspring',paragraphs,city:hotspringCityIndicators(city)};
 }
 
 export function campaignResults(s){

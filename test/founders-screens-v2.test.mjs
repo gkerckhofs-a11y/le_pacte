@@ -62,6 +62,10 @@ test('Projection Hotspring : le visuel du dilemme et le panorama coexistent',asy
  campaign.command('next');
  const {document}=await screen('city',campaign.state);
  const artwork=document.getElementById('decisionImage'),city=document.getElementById('city');
+ assert.equal(document.querySelectorAll('#gauges .gauge').length,6);
+ assert.match(document.getElementById('gauges').textContent,/Bien-être.*Stabilité/);
+ assert.match(document.getElementById('gauges').textContent,/5,0\/10Moyenne générale de Hotspring/);
+ assert.equal(document.getElementById('cityEvolution').hidden,true);
  assert.equal(artwork.hidden,false);
  assert.equal(city.hidden,false);
  assert.equal(artwork.closest('#dilemmaPanel').id,'dilemmaPanel');
@@ -69,12 +73,32 @@ test('Projection Hotspring : le visuel du dilemme et le panorama coexistent',asy
  assert.ok(document.getElementById('question').textContent);
  campaign.vote('pour');
  const reveal=await screen('city',campaign.state);
+ assert.match(reveal.document.getElementById('gauges').textContent,/Stabilité5,0 → 5,4\/10\+0,4/);
  assert.equal(reveal.document.getElementById('city').hidden,false);
  assert.match(reveal.document.getElementById('decisionImage').getAttribute('src'),/d01_result_for_lowlands/);
  assert.equal(reveal.document.getElementById('decisionImage').hidden,false);
  artwork.dispatchEvent(new document.defaultView.Event('error'));
  assert.equal(document.getElementById('dilemmaArtwork').hidden,true);
  assert.equal(city.hidden,false);
+});
+
+test('Hotspring : six valeurs au Terminal et simulation plafonnée en Régie',async()=>{
+ const g=newCampaign({ownerId:owner.id});
+ // Commandes de cette fixture exécutées avec le même rôle que le navigateur.
+ g.command('start',{},owner);
+ g.command('next',{},owner);
+ g.command('pause',{},owner);
+ g.command('correctCity',{indicator:'economie',value:10},owner);
+ const regie=await screen('regie',g.state);
+ assert.match(regie.document.getElementById('stabilityFormula').textContent,/lecture seule.*\(10 \+ 5 \+ 5 \+ 5 \+ 5\) ÷ 5 = 6,0/);
+ assert.match(regie.document.getElementById('cityEffectAudit').textContent,/Économie \+1 prévu · 10 → 10 \(0 après plafonnement\)/);
+ assert.equal(regie.document.querySelectorAll('#correctIndicator option').length,5);
+ assert.equal(regie.document.querySelector('#correctIndicator option[value=stabilite]'),null);
+ const family=await screen('family',g.state);
+ const text=family.document.getElementById('gauges').textContent;
+ assert.match(text,/Bien-être.*Stabilité.*6,0\/10/);
+ assert.equal(family.document.querySelectorAll('#gauges .gauge').length,6);
+ assert.doesNotMatch(family.document.body.textContent,/après plafonnement/);
 });
 
 test('Projection Hotspring : la réserve affiche l’estimation puis le versement',async()=>{

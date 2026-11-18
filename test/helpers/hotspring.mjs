@@ -6,8 +6,9 @@ const organizer={role:'organizer',id:'organizer'};
 export const hotspringSelection={scenarioId:'les-colons-de-hotspring',skinId:'western'};
 export const team=family=>({role:'team',family});
 export function newCampaign(options={}){
- const preview=foundersPreview(hotspringSelection);
- let current=createNarrativeSession(preview,{id,ownerId:organizer.id,code:'HOT01',title:'Hotspring',now:1000,...options});
+ const {scenarioVersion,...sessionOptions}=options;
+ const preview=foundersPreview({...hotspringSelection,scenarioVersion});
+ let current=createNarrativeSession(preview,{id,ownerId:organizer.id,code:'HOT01',title:'Hotspring',now:1000,...sessionOptions});
  const command=(kind,data={},actor=organizer,now=current.updatedAt+100)=>{
   current=applyNarrativeCommand(current,actor,{kind,data,expectedRevision:current.revision},now);
   return current;
@@ -38,12 +39,13 @@ export const trajectories={
  commerce:{reject:['D22','D23','D24','D25','D26A','D27','D29'],charter:'A'},
  civique:{reject:['D02','D03','D06','D10','D17','D19','D20'],charter:'B'},
  institutions:{reject:['D01','D02','D03','D06','D10','D17','D19'],charter:'D'},
- autonomie:{approve:['D03','D18'],charter:'C'},
+ autonomie:{approve:['D03','D04','D05','D07','D18'],charter:'C'},
  vallee:{reject:['D01','D02','D03','D04','D06','D10','D12','D15','D16','D17','D18','D19'],charter:'E'}
 };
 
 export function simulateCampaign(policy,options={}){
  const game=newCampaign(options),snapshots=[];
+ let charter=policy.charter;
  game.command('start');
  snapshots.push(game.state);
  for(let i=0;i<90&&game.state.phase!=='FINISHED';i++){
@@ -53,13 +55,14 @@ export function simulateCampaign(policy,options={}){
   else if(s.phase==='EPILOGUE'){snapshots.push(s);game.command('showResults');}
   else if(s.phase==='CHARTER_SUPPORT'){
    const q=s.campaign.qualification,ids=q.candidates;
-   if(!ids.includes(policy.charter))throw Error('Charte attendue indisponible : '+policy.charter+' ; '+ids.join(','));
-   const other=ids.find(id=>id!==policy.charter);
+   charter=policy.chooseCharter?.(ids)??charter;
+   if(!ids.includes(charter))throw Error('Charte attendue indisponible : '+charter+' ; '+ids.join(','));
+   const other=ids.find(id=>id!==charter);
    for(const [i,f] of Object.keys(s.game.families).entries()){
-    game.command('supportCharter',{charter:i<3?policy.charter:other},team(f));
+    game.command('supportCharter',{charter:i<3?charter:other},team(f));
    }
   }else game.vote(id==='D30'?
-   (s.campaign.finalists[0]===policy.charter?'pour':'contre'):
+   (s.campaign.finalists[0]===charter?'pour':'contre'):
    (policy.approve?policy.approve.includes(id):!policy.reject?.includes(id))?'pour':'contre');
  }
  if(game.state.phase!=='FINISHED')throw Error('Fin de la campagne non atteinte');

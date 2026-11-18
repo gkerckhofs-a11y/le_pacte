@@ -3,7 +3,7 @@ import {test} from 'node:test';
 import {activeFounders} from '../src/founders.ts';
 import {narrativePublicView,narrativeFamilyView,narrativeOrganizerView,duplicateHotspringFinal} from '../src/founders-live.ts';
 import {advanceNarrativeTime} from '../src/founders-v2.ts';
-import {availableCharters,crisisCandidates,hotspringOutcome} from '../src/founders-hotspring.ts';
+import {availableCharters,calculateHotspringStability,crisisCandidates,hotspringOutcome,HOTSPRING_INDICATORS} from '../src/founders-hotspring.ts';
 import {autonomyIndex,chapterObjective,hotspringScores} from '../src/hotspring-scoring.ts';
 import {hotspringSelection,newCampaign,simulateCampaign,team,trajectories} from './helpers/hotspring.mjs';
 import {foundersPreview} from '../server/founders-catalog.ts';
@@ -58,9 +58,88 @@ test('Hotspring : surenchère, abstention sautée, sauvegarde du scrutin et des 
  g.command('vote',{kind:'maintien'},team('C'));
  g.command('vote',{kind:'maintien'},team('A'));
  assert.equal(g.state.phase,'REVEALED');
- assert.deepEqual(g.state.game.city,{economie:6,ecologie:5,securite:5,demographie:6});
+ assert.deepEqual(g.state.game.city,{economie:6,ecologie:5,securite:5,demographie:6,bien_etre:5});
  assert.deepEqual(g.state.campaign.markers,['VILLE_BASSE']);
  assert.equal(g.state.lastReveal.yes,3);
+});
+
+test('Hotspring : le Bien-être évolue par les votes et la Stabilité suit la moyenne exacte',()=>{
+ const g=newCampaign();
+ const first=narrativePublicView(g.state);
+ assert.deepEqual(first.city,{economie:5,ecologie:5,securite:5,demographie:5,bien_etre:5,stabilite:5});
+ assert.deepEqual(Object.values(g.state.scenario.campaign.families).map(f=>f.trajectory),['economie','bien_etre','securite','demographie','ecologie']);
+ assert.match(narrativeFamilyView(g.state,'B').privateCampaign.trajectory,/Bien-être/);
+ assert.match(narrativeFamilyView(g.state,'D').privateCampaign.trajectory,/Démographie/);
+ g.command('start');g.vote('pour');g.command('next');
+ assert.match(narrativePublicView(g.state).dilemma.tendencies.contre.join(' '),/Bien-être ↑/);
+ g.vote('contre');
+ const result=narrativePublicView(g.state);
+ assert.deepEqual(result.city,{economie:5,ecologie:6,securite:5,demographie:6,bien_etre:6,stabilite:5.6});
+ assert.equal(result.reveal.cityBefore.stabilite,5.4);
+ assert.equal(result.reveal.cityAfter.stabilite,5.6);
+ assert.ok(!Object.hasOwn(g.state.game.city,'stabilite'));
+ g.command('next');g.vote('contre');g.command('next');
+ const atCheckpoint=narrativePublicView(g.state).campaign.checkpoint;
+ assert.equal(atCheckpoint.changes.stabilite,0.6);
+ assert.equal(atCheckpoint.city.stabilite,5.6);
+ assert.equal(narrativeFamilyView(g.state,'B').privateCampaign.score.trajectory,2);
+ const calibration=foundersPreview(hotspringSelection).settings.calibration;
+ calibration.city.bien_etre=8;
+ assert.throws(()=>foundersPreview({...hotspringSelection,calibration}),/démarrent à 5/);
+ calibration.city.stabilite=2;
+ assert.throws(()=>foundersPreview({...hotspringSelection,calibration}),/Jauges initiales invalides/);
+});
+
+test('Hotspring : corrections privées, plafonnement et moyenne recalculée après relecture',()=>{
+ const g=newCampaign();
+ g.command('start');g.command('next');g.vote('contre');g.command('next');
+ assert.throws(()=>g.command('correctCity',{indicator:'economie',value:9}),/pause/);
+ g.command('pause');
+ assert.throws(()=>g.command('correctCity',{indicator:'economie',value:9},team('A')),/Régie/);
+ for(const indicator of ['stabilite','satisfaction','developpement'])assert.throws(()=>g.command('correctCity',{indicator,value:6}),/fondamentale/);
+ assert.throws(()=>g.command('correctCity',{indicator:'economie',value:9.5}),/entier/);
+ g.command('correctCity',{indicator:'economie',value:9});
+ g.command('correctCity',{indicator:'bien_etre',value:0});
+ assert.deepEqual(g.state.corrections.slice(-2).map(({indicator,before,after})=>[indicator,before,after]),[['economie',5,9],['bien_etre',5,0]]);
+ const planned=narrativeOrganizerView(g.state).effectsPreview.find(o=>o.side==='pour');
+ assert.equal(planned.effects.find(e=>e.indicator==='economie').value,2);
+ assert.equal(planned.cityBefore.stabilite,5);
+ assert.equal(planned.cityAfter.stabilite,5.4);
+ assert.equal(narrativePublicView(g.state).effectsPreview,undefined);
+ assert.equal(narrativeFamilyView(g.state,'A').effectsPreview,undefined);
+ g.command('resume');g.vote('pour');
+ const restored=JSON.parse(JSON.stringify(g.state));
+ restored.lastReveal.cityAfter.stabilite=10;
+ restored.revealedHistory.at(-1).city.stabilite=10;
+ const live=narrativePublicView(restored);
+ assert.deepEqual(live.reveal.cityAfter,planned.cityAfter);
+ assert.deepEqual(live.history.at(-1).city,planned.cityAfter);
+ assert.equal(live.city.bien_etre,0);
+ assert.equal(live.city.economie,10);
+ assert.equal(live.city.stabilite,5.4);
+});
+
+test('Hotspring : les 64 résultats et les six chartes respectent les jauges de leur version',()=>{
+ const original=newCampaign({scenarioVersion:'1.0.0'});
+ const previous=original.state.scenario.campaign.families;
+ assert.equal(previous.caldwell.trajectory,'autonomy');
+ const g=newCampaign(),s=g.state;
+ for(const [family,definition] of Object.entries(s.scenario.campaign.families))assert.deepEqual(definition.objectives,previous[family].objectives);
+ const checkOutcome=(d,side,finalists)=>{
+  const branch=structuredClone(s);branch.campaign.finalists=finalists;
+  const {effects}=hotspringOutcome(branch,d,side);
+  assert.ok(effects.length>=1&&effects.length<=4);
+  assert.equal(new Set(effects.map(e=>e.indicator)).size,effects.length);
+  assert.ok(effects.every(e=>HOTSPRING_INDICATORS.includes(e.indicator)&&e.operation==='delta'&&Number.isInteger(e.value)&&Math.abs(e.value)<=3));
+ };
+ assert.equal(s.scenario.dilemmas.length*2,64);
+ for(const d of s.scenario.dilemmas)for(const side of ['pour','contre'])checkOutcome(d,side,['A','B']);
+ for(const charter of s.scenario.campaign.charters)checkOutcome(s.scenario.dilemmas.at(-1),'pour',[charter.id,'A']);
+ original.command('start');original.vote('pour');original.command('next');original.vote('contre');
+ const historic=JSON.parse(JSON.stringify(original.state));
+ assert.deepEqual(Object.keys(narrativePublicView(historic).city),['economie','ecologie','securite','demographie']);
+ assert.match(narrativeFamilyView(historic,'D').privateCampaign.trajectory,/autonomie/i);
+ assert.equal(calculateHotspringStability({economie:8,ecologie:4,securite:6,bien_etre:7,demographie:5}),6);
 });
 
 test('Hotspring : la projection estime le partage puis affiche l’Influence réellement versée',()=>{
@@ -144,11 +223,13 @@ test('Hotspring : variantes de l’eau, seuils et coûts différés',()=>{
  s.campaign.markers=['VILLE_BASSE','QUARTIER_PROVISOIRE','CENTRE_PRIVE','ABATTOIR_CENTRAL'];
  assert.equal(crisisCandidates(s).find(c=>c.id==='D26A').available,true);
  let d=s.scenario.dilemmas.find(d=>d.id==='D26A');
- assert.equal(hotspringOutcome(s,d,'contre').effects.find(e=>e.indicator==='demographie').value,-5);
+ assert.equal(hotspringOutcome(s,d,'contre').effects.find(e=>e.indicator==='demographie').value,-3);
  s.campaign.markers=['VILLE_HAUTE','EAU_PRIVEE','ABATTOIR_CENTRAL'];
  assert.equal(crisisCandidates(s).find(c=>c.id==='D26B').available,true);
  d=s.scenario.dilemmas.find(d=>d.id==='D26B');
- assert.equal(hotspringOutcome(s,d,'contre').effects.find(e=>e.indicator==='securite').value,-2);
+ const drought=hotspringOutcome(s,d,'contre').effects;
+ assert.equal(drought.find(e=>e.indicator==='bien_etre').value,-3);
+ assert.equal(drought.some(e=>e.indicator==='securite'),false);
  d=s.scenario.dilemmas.find(d=>d.id==='D05');
  s.campaign.markers=['RESERVES_PUBLIQUES'];assert.equal(hotspringOutcome(s,d,'pour').effects.find(e=>e.indicator==='economie').value,-1);
  s.campaign.markers=['CENTRE_PRIVE'];assert.equal(hotspringOutcome(s,d,'pour').effects.find(e=>e.indicator==='economie').value,-2);
@@ -205,6 +286,8 @@ test('Hotspring : Terminer l’histoire produit un épilogue anticipé et rembou
  assert.equal(g.state.finalResults.winners.length,5);
 });
 
+const trajectoryFamilies={commerce:'A',civique:'B',institutions:'C',autonomie:'D',vallee:'E'};
+const unsuccessfulExamples={commerce:'B',civique:'A',institutions:'A',autonomie:'C',vallee:'A'};
 for(const [name,policy] of Object.entries(trajectories))test('Hotspring : parcours complet '+name,()=>{
  const {state:s,snapshots}=simulateCampaign(policy);
  assert.equal(s.campaign.charter,policy.charter);
@@ -213,6 +296,8 @@ for(const [name,policy] of Object.entries(trajectories))test('Hotspring : parcou
  assert.ok(s.campaign.crisesThisSitting<=2);
  assert.deepEqual(s.campaign.completedChapters,[1,2,3,4,5]);
  assert.equal(s.finalResults.rows.length,5);
+ assert.equal(s.finalResults.rows.find(r=>r.family===trajectoryFamilies[name]).trajectory,2);
+ assert.equal(s.finalResults.rows.find(r=>r.family===unsuccessfulExamples[name]).trajectory,0);
  assert.ok(s.finalResults.rows.every(r=>r.total>=0&&r.total<=18&&r.maximum===18));
  assert.ok(s.finalResults.rows.every(r=>r.total===r.chapterPoints.reduce((sum,c)=>sum+c.points,0)+r.trajectory+r.charter+r.governance+r.wealth));
  assert.ok(s.game.city.demographie>=0&&s.game.city.demographie<=10);
@@ -223,7 +308,7 @@ for(const [name,policy] of Object.entries(trajectories))test('Hotspring : parcou
   assert.ok(!JSON.stringify(pub).includes(round.goals.A));
  }
  if(name==='commerce'){assert.ok(s.game.city.ecologie<=3);assert.ok(s.campaign.markers.includes('BANQUE_CREDIT'));}
- if(name==='civique'){assert.ok(s.game.city.demographie>=8);assert.ok(s.campaign.markers.includes('ECOLE'));}
+ if(name==='civique'){assert.ok(s.game.city.bien_etre>=8);assert.ok(s.campaign.markers.includes('ECOLE'));}
  if(name==='institutions'){assert.ok(s.game.city.securite>=8);assert.ok(s.campaign.markers.includes('CONSEIL_ELU'));}
  if(name==='autonomie'){assert.ok(autonomyIndex(new Set(s.campaign.markers))>=2);assert.ok(!s.revealedHistory.some(h=>h.id==='D20'));}
  if(name==='vallee'){assert.ok(s.campaign.trust>=3);assert.ok(s.revealedHistory.some(h=>h.id==='D14A'));assert.ok(s.campaign.markers.includes('PACTE_VALLEE_FINAL'));}

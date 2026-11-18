@@ -11,7 +11,7 @@ const node=(tag,text,className)=>{
  return n;
 };
 const familyName=(s,id)=>s.families.find(f=>f.id===id)?.name??id;
-const sign=n=>n>0?'+'+n:n<0?'−'+Math.abs(n):'0';
+const sign=n=>(n>0?'+'+n:n<0?'−'+Math.abs(n):'0').replace('.',',');
 const still=/^\/assets\/hotspring\/v1\/[\w/-]+\.webp$/;
 const cue={
  D01:['diagonal-low','diagonal-high'],D02:['water','build'],D03:['build','survey'],D04:['smoke','wood'],
@@ -34,11 +34,6 @@ function image(url){
  cachedImages.set(url,img);
  if(cachedImages.size>10)cachedImages.delete(cachedImages.keys().next().value);
  return img;
-}
-
-export function landscapeSummary(landscape){
- const river={claire:'claire',degradee:'dégradée',polluee:'polluée',basse:'basse',crue:'marquée par la crue'}[landscape.river];
- return 'Rivière '+river+' · Végétation '+landscape.vegetation+' · Rue '+landscape.street+' · Population '+landscape.density+' · Ville '+landscape.mood+' · '+landscape.prosperity;
 }
 
 export function renderHotspringPanorama(root,s,{showResultStill=true}={}){
@@ -160,7 +155,15 @@ export function renderHotspringStage(root,s,support,{showIntroImage=true}={}){
   if(checkpoint.interlude)root.append(node('p',checkpoint.interlude));
   if(relation)root.append(node('p',relation));
   for(const event of checkpoint.events)root.append(node('p',event));
-  if(Object.keys(checkpoint.changes).length){
+  if(checkpoint.city){
+   const list=node('ul',null,'checkpoint-indicators');
+   for(const [key,value] of Object.entries(checkpoint.city)){
+    const change=checkpoint.changes[key];
+    const formatted=key==='stabilite'?value.toFixed(1).replace('.',','):value;
+    list.append(node('li',s.skin.labels.resources[key]+' '+formatted+'/10'+(Number.isFinite(change)?' ('+sign(change)+')':'')));
+   }
+   root.append(list);
+  }else if(Object.keys(checkpoint.changes).length){
    const changes=Object.entries(checkpoint.changes).map(([k,v])=>s.skin.labels.resources[k]+' '+sign(v)).join(' · ');
    root.append(node('p',changes));
   }
