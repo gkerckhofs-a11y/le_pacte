@@ -1,0 +1,48 @@
+name: Publier Le Pacte sur Firebase
+
+on:
+  push:
+    branches: [deploy/firebase]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: le-pacte-firebase-production
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository_id == '1443026566'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - name: Installer et vérifier le jeu
+        run: bash scripts/publish-founders.sh --check
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          project_id: le-pacte-ludificateur
+          workload_identity_provider: projects/48298108779/locations/global/workloadIdentityPools/pacte-github/providers/pacte-release
+          service_account: pacte-github-deploy@le-pacte-ludificateur.iam.gserviceaccount.com
+      - name: Publier les fonctions et la régie
+        run: npx -y firebase-tools@15.36.0 deploy --project le-pacte-ludificateur --only functions:pacte,hosting --non-interactive
+      - name: Vérifier les fichiers en production
+        shell: bash
+        run: |
+          set -euo pipefail
+          url=https://le-pacte-ludificateur.web.app
+          for file in founders-regie.html founders-print.js founders-live-ui.js; do
+            curl --fail --silent --show-error --retry 4 --retry-all-errors --max-time 20 "$url/$file" -o "$RUNNER_TEMP/$file"
+            cmp "$RUNNER_TEMP/$file" "dist/public/$file"
+          done
+          curl --fail --silent --show-error --retry 4 --retry-all-errors --max-time 20 "$url/api/catalog" -o "$RUNNER_TEMP/pacte-catalog.json"
+          node -e 'const data = require(process.argv[1]); if (data.authMode !== "firebase") process.exit(1)' "$RUNNER_TEMP/pacte-catalog.json"

@@ -12,3 +12,4 @@ coverage/
 functions/lib/
 functions/node_modules/
 .firebase/
+gha-creds-*.json

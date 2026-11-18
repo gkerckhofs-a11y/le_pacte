@@ -16,6 +16,9 @@ npm ci --prefix functions --ignore-scripts --no-audit --no-fund
 npm test
 npm run build:firebase
 node scripts/verify-cloud-build.mjs
+if [ "${1:-}" = "--check" ]; then
+  exit 0
+fi
 # Cloud Shell may already supply Application Default Credentials.
 # Do not force a second login or expose an authorization code.
 npx -y firebase-tools@latest deploy --project le-pacte-ludificateur --only functions:pacte,hosting --non-interactive
