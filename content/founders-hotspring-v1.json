@@ -2624,7 +2624,9 @@
         },
         "markers": {
           "pour": [
-            "BANQUE_CREDIT"
+            "BANQUE_CREDIT",
+            "HYPOTHEQUES",
+            "SPECULATION_ACTIVE"
           ],
           "contre": [
             "CREDIT_LIMITE"

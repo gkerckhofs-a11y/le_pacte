@@ -1,3 +1,4 @@
+import {CAMPAIGN_PHASES,setHotspringImage,renderTendencies,renderHotspringStage,campaignScoreText,hotspringWinners} from './founders-hotspring.js';
 import {decorateGauge,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
 import {renderVoteProgress} from './founders-vote-progress.js';
 import {commitmentLabel} from './founders-agreements.js';
@@ -13,7 +14,7 @@ let token=fragment.get('token')||sessionStorage.getItem(key)||'';
 if(token)sessionStorage.setItem(key,token);
 if(location.hash)history.replaceState(null,'',location.pathname+location.search);
 let current=null,busy=false,identityDirty=false;
-const nice={NEGOTIATION:'Négociation',READY:'Préparation',COUNCIL:'Conseil',AWAITING_REVEAL:'Vote clos',REVEALED:'Révélation',FINISHED:'Terminé'};
+const nice={...CAMPAIGN_PHASES,NEGOTIATION:'Négociation',READY:'Préparation',COUNCIL:'Conseil',AWAITING_REVEAL:'Vote clos',REVEALED:'Révélation',FINISHED:'Terminé'};
 const resources=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
 const set=(id,v)=>$(id).textContent=String(v??'');
 function notify(message){set('notice',message);}
@@ -65,6 +66,7 @@ function render(data){
  current=data;
  renderCouncilRoles($('councilRoles'),data);
  const self=data.self,c=data.council;
+ document.body.classList.toggle('campaign-hotspring',Boolean(data.campaign));
  applySkin(document.body,data.skin);applyTeamTheme(document.body,self.color,data.skin);
  set('teamIdentity',self.color.symbol+' Équipe '+self.color.label+' · Porte-parole');
  $('identityPanel').hidden=data.phase!=='READY';
@@ -76,12 +78,23 @@ function render(data){
  set('dilemmaText',data.dilemma?.public_text||'');
  set('question',data.dilemma?.vote_question||'');
  const image=$('familyDilemmaImage'),src=data.dilemma?.image?.url;
+ if(data.campaign){
+  renderHotspringStage($('hotspringStage'),data,charter=>command('supportCharter',{charter}));
+  renderTendencies($('hotspringTendencies'),data.phase==='REVEALED'?null:data.dilemma);
+  setHotspringImage(image,data.phase==='REVEALED'?data.reveal?.visual:data.dilemma?.image);
+ }else{
  image.hidden=!(typeof src==='string'&&/^https:\/\/\S+$/.test(src));
  if(!image.hidden){image.src=src;image.alt=data.dilemma.image.alt||data.dilemma.title;}else image.removeAttribute('src');
+ }
  set('influence',self.power);set('dollars',self.dollars);
  set('influenceLabel',data.skin.labels.influence);set('dollarLabel',data.skin.labels.currency);set('offerAmountLabel',data.skin.labels.currency+' proposés');
  set('objective',self.objective);
- if(data.goalCard&&data.goalProgress){
+ if(data.privateCampaign){
+  const own=data.privateCampaign;
+  set('goalTitle',own.role);
+  set('goalConditions',own.objectives.join(' · ')+' — '+own.trajectory);
+  set('goalStatus',own.score?own.score.total+'/'+own.score.maximum+' · '+campaignScoreText(own.score):'Les points sont affichés au bilan.');
+ }else if(data.goalCard&&data.goalProgress){
   const card=data.goalCard,progress=data.goalProgress;
   set('goalTitle',card.title);
   const direction=card.direction==='at_least'?'au moins':'au plus';
@@ -91,11 +104,20 @@ function render(data){
       ' · Points provisoires : '+progress.points+'/'+progress.maxPoints);
  }
  const final=$('personalResult');final.hidden=!data.finalResults;
- if(data.finalResults){
+ if(data.campaign&&data.finalResults){
+  const score=data.privateCampaign.score;
+  set('personalResultText',hotspringWinners(data));
+  set('personalScoreBreakdown',score.total+'/'+score.maximum+' · '+campaignScoreText(score));
+ }else if(data.finalResults){
   const r=data.finalResults.ranking.find(item=>item.family===self.id);
   set('personalResultText',r.rank===1?'Votre famille remporte Le Pacte !':'Classement : '+r.rank+' / '+data.families.length+'. Vainqueur : '+teamLabel(data,data.finalResults.ranking[0].family));
   set('personalScoreBreakdown','Objectif secret '+r.score.secret+' · '+data.skin.labels.currency+' '+r.score.wealth+
       ' · Votes '+r.score.council+' · Influence '+r.score.influence+' = '+r.score.total+' points');
+ }
+ for(const b of $('firstVote').querySelectorAll('[data-vote="pour"],[data-vote="contre"]')){
+  const side=b.dataset.vote;
+  if(!b.dataset.defaultLabel)b.dataset.defaultLabel=b.textContent;
+  b.textContent=data.campaign&&data.dilemma?' '+side.toUpperCase()+' · '+data.dilemma.labels[side]:b.dataset.defaultLabel;
  }
  set('familyStats',self.members+' membre(s) · Maire : '+teamLabel(data,data.leader)+' · Shérif : '+teamLabel(data,data.moderator));
  set('committed',self.choice?'Votre position : '+self.choice+' · Mise engagée : '+self.bid:'Aucun vote engagé pour ce dilemme.');
@@ -130,11 +152,11 @@ function render(data){
  }
  if(Array.from(target.options).some(x=>x.value===prev))target.value=prev;
  const reveal=$('lastReveal');reveal.hidden=!data.reveal;
- if(data.reveal){set('resultTitle',data.reveal.winner==='pour'?'Proposition adoptée':'Proposition rejetée');set('resultNarration',data.reveal.narration);}
+ if(data.reveal){set('resultTitle',data.campaign?data.reveal.chronicle.title:data.reveal.winner==='pour'?'Proposition adoptée':'Proposition rejetée');set('resultNarration',data.reveal.narration);}
  gauge(data);offers(data);renderOfferDialog(data);
  if(data.phase==='FINISHED'){const board=$('boardPanel');board.prepend($('familyEpilogue'));board.prepend($('personalResult'));if(finishing){selectTab(0);$('personalResult').scrollIntoView({block:'start'});}}
- $('familyEpilogue').hidden=!data.narrativeEnding;$('familyEpilogue').replaceChildren();
- if(data.narrativeEnding){const h=document.createElement('h2');h.textContent=data.narrativeEnding.title;$('familyEpilogue').append(h);for(const t of data.narrativeEnding.paragraphs){const p=document.createElement('p');p.textContent=t;$('familyEpilogue').append(p);}}
+ $('familyEpilogue').hidden=!data.narrativeEnding||Boolean(data.campaign);$('familyEpilogue').replaceChildren();
+ if(data.narrativeEnding&&!data.campaign){const h=document.createElement('h2');h.textContent=data.narrativeEnding.title;$('familyEpilogue').append(h);for(const t of data.narrativeEnding.paragraphs){const p=document.createElement('p');p.textContent=t;$('familyEpilogue').append(p);}}
 }
 function renderOfferDialog(data){
  const dialog=$('offerDialog');const offer=data.offers.find(o=>o.to===data.self.id&&o.status==='pending');

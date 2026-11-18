@@ -1,6 +1,6 @@
 <!doctype html><html lang="fr">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Le Pacte des Fondateurs — Régie narrative</title><link rel="stylesheet" href="/founders-live.css">
+<title>Le Pacte des Fondateurs — Régie narrative</title><link rel="stylesheet" href="/founders-live.css"><link rel="stylesheet" href="/hotspring.css">
 <script type="module" src="/founders-regie.js"></script></head>
 <body class="regie-dashboard" data-skin="western">
 <header class="top">
@@ -30,7 +30,7 @@
     <a id="preparePublicLink" class="regie-projection-link" href="#" target="_blank" rel="noopener">Ouvrir l’écran à projeter ↗</a>
     <p class="small muted">Le lancement fige les noms des familles et ouvre le premier dilemme.</p>
    </div>
-   <p id="dilemmaInfo" class="muted"></p>
+   <p id="dilemmaInfo" class="muted"></p><div id="hotspringStage" class="hotspring-stage" hidden></div><div id="hotspringTendencies" class="hotspring-tendencies" hidden></div>
    <details><summary class="small muted">Priorité en cas d’égalité finale</summary><p id="tiePriority" class="small muted"></p></details>
    <div id="reservePanel" class="card" hidden>
     <label for="nextDilemma">Prochain chapitre admissible</label>
@@ -48,7 +48,7 @@
    <div class="row"><a href="#printKit">Cartes et QR à imprimer ↓</a><a id="publicLink" href="#" target="_blank" rel="noopener">Ouvrir l'écran public</a></div>
   </div>
   <section class="panel" id="v2Controls" hidden><h2>Animation et chronos</h2><div class="row"><button id="pauseGame" type="button">Pause</button><button id="resumeGame" type="button" hidden>Reprendre</button><button id="addTime" type="button" class="secondary">+ 1 minute</button><button id="removeTime" type="button" class="secondary">− 1 minute</button></div>
-<form id="timingForm"><div class="grid2"><label>Négociation (secondes)<input id="negotiationSeconds" type="number" min="5" max="7200" required></label><label>Vote (secondes)<input id="voteSeconds" type="number" min="5" max="7200" required></label><label>Résolution (secondes)<input id="resolutionSeconds" type="number" min="5" max="7200" required></label><label>Seuils des jauges<input id="gaugeThresholds" required value="2,4,6,8"></label></div><label><input id="autoAdvance" type="checkbox"> Passer automatiquement de la négociation au vote et du résultat au chapitre suivant</label><p class="small">Le chrono du vote signale le temps écoulé ; les familles et le Shérif terminent leurs décisions. Les durées enregistrées s’appliquent aux prochaines phases. Les boutons ± 1 minute ajustent le chrono actuel.</p><button type="submit">Enregistrer les réglages</button></form>
+<form id="timingForm"><div class="grid2"><label id="presentationTiming" hidden>Lecture (secondes)<input id="presentationSeconds" type="number" min="5" max="7200" disabled></label><label>Négociation (secondes)<input id="negotiationSeconds" type="number" min="5" max="7200" required></label><label>Vote (secondes)<input id="voteSeconds" type="number" min="5" max="7200" required></label><label>Résolution (secondes)<input id="resolutionSeconds" type="number" min="5" max="7200" required></label><label>Seuils des jauges<input id="gaugeThresholds" required value="2,4,6,8"></label></div><label><input id="autoAdvance" type="checkbox"> Passer automatiquement de la négociation au vote et du résultat au chapitre suivant</label><p class="small">Le chrono du vote signale le temps écoulé ; les familles et le Shérif terminent leurs décisions. Les durées enregistrées s’appliquent aux prochaines phases. Les boutons ± 1 minute ajustent le chrono actuel.</p><button type="submit">Enregistrer les réglages</button></form>
 <p id="pendingOffers"></p><details><summary>Correction exceptionnelle d’une ressource</summary><p class="small">Mettez la partie en pause. Les corrections sont conservées dans l’historique technique de la partie.</p><form id="correctionForm"><label>Famille<select id="correctFamily"></select></label><label>Ressource<select id="correctResource"><option value="power">Influence</option><option value="dollars">Argent</option></select></label><label>Nouvelle valeur<input id="correctValue" type="number" min="0" max="100000" required></label><button type="submit">Corriger la ressource</button></form></details><hr><button id="finishGame" type="button" class="danger">Terminer la partie</button></section>
 <section class="panel" id="printKit" style="margin-top:16px"><h2>Supports à imprimer</h2><p class="small muted">Cartes adaptées à cette partie. Les ambitions et les QR d’accès sont confidentiels : distribuez-les séparément à chaque famille.</p><div class="row"><button id="printFamilyCards" class="secondary" type="button">Imprimer les cartes des familles</button><button id="printRoleCards" class="secondary" type="button">Imprimer les rôles</button></div><label for="diplomatCopies">Cartes Diplomate par famille (en plus du porte-parole)</label><input id="diplomatCopies" type="number" min="1" max="30" value="4"><p class="small muted">Rôles distribués librement. Augmentez le nombre de Diplomates selon votre groupe.</p><div class="row"><button id="prepareQR" type="button">Générer les fiches équipes</button><button id="printReadyQR" type="button" class="secondary" disabled>Imprimer les fiches équipes</button></div><p id="printStatus" class="small" role="status">Chaque terminal sera vérifié. Les accès absents ou expirés seront remplacés, ce qui invalidera leurs anciennes fiches. L’impression exige une fiche valide par équipe.</p></section>
   <div class="panel" id="finalPanel" style="margin-top:16px" hidden>
@@ -69,8 +69,8 @@
  </section>
  <aside>
   <div class="panel"><h2>Indicateurs de la ville</h2><div id="gauges"></div></div>
-  <div class="panel" style="margin-top:16px"><h2>Historique révélé</h2><div id="history"></div></div>
+  <section id="hotspringAdmin" class="panel" style="margin-top:16px" hidden></section><div class="panel" style="margin-top:16px"><h2>Historique révélé</h2><div id="history"></div></div>
  </aside>
  </div>
 </div><div id="notice" role="status" style="margin-top:18px"></div>
-</main><section id="printSheets" hidden aria-label="Feuilles à imprimer"></section><dialog id="finishDialog" aria-labelledby="finishHeading"><h2 id="finishHeading">Terminer définitivement la partie ?</h2><p>Cette action clôturera les votes en cours et affichera le résultat final sur tous les écrans.</p><p>Les mises du vote interrompu seront rendues. Seules les décisions déjà résolues compteront pour la ville et les scores.</p><div class="row"><button id="cancelFinish" class="secondary">Annuler</button><button id="confirmFinish" class="danger">Terminer la partie</button></div></dialog></body></html>
+</main><section id="printSheets" hidden aria-label="Feuilles à imprimer"></section><dialog id="finishDialog" aria-labelledby="finishHeading"><h2 id="finishHeading">Terminer définitivement la partie ?</h2><p id="finishDescription">Cette action clôturera les votes en cours et affichera le résultat final sur tous les écrans.</p><p>Les mises du vote interrompu seront rendues. Seules les décisions déjà résolues compteront pour la ville et les scores.</p><div class="row"><button id="cancelFinish" class="secondary">Annuler</button><button id="confirmFinish" class="danger">Terminer la partie</button></div></dialog></body></html>

@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hot Spring · Le Pacte des Fondateurs</title><link rel="stylesheet" href="/founders-live.css">
+<title>Hot Spring · Le Pacte des Fondateurs</title><link rel="stylesheet" href="/founders-live.css"><link rel="stylesheet" href="/hotspring.css">
 <script type="module" src="/founders-city.js"></script></head><body class="projection-dashboard">
 <header class="top"><div><span class="eyebrow" id="universeTitle">Le Pacte</span><h1 id="pageTitle">Hot Spring · 1876</h1></div><div class="row"><span class="chip" id="phase">En attente</span><span class="chip" id="connection">Connexion…</span><button id="projectionFullscreen" type="button" class="secondary" aria-pressed="false">Plein écran</button></div></header><div id="councilRoles" class="council-offices" aria-label="Maire et shérif du Conseil"></div>
 <section id="voteProgress" class="vote-progress" aria-label="Passage et clôture du vote" role="status" hidden></section>
@@ -11,7 +11,9 @@
  <h2 id="dilemmaTitle">Bienvenue au Conseil</h2>
  <img id="decisionImage" alt="" hidden>
  <p id="dilemmaText">Le Conseil attend le signal de la régie.</p>
- <p id="question" class="big"></p>
+ <p id="question" class="big hotspring-text"></p>
+ <div id="hotspringTendencies" class="hotspring-tendencies" hidden></div>
+ <div id="hotspringStage" class="hotspring-stage" hidden></div>
  <div id="outcome" class="card" hidden><div class="eyeline">Décision du Conseil</div><h3 id="outcomeTitle"></h3><p id="outcomeText"></p></div>
 </section>
 <section class="projection-city">
@@ -32,7 +34,7 @@
 <section id="finalResults" class="panel" style="margin-top:18px" hidden>
  <div class="eyeline">Épilogue · Conseil des Fondateurs</div>
  <h2 id="winnerTitle" style="font-size:clamp(22px,3vw,34px);margin-top:9px">La famille gagnante</h2>
- <p class="small muted">Classement final après les objectifs secrets, les ressources financières, les votes remportés et l’Influence restante.</p>
+ <p id="legacyScoreExplanation" class="small muted">Classement final après les objectifs secrets, les ressources financières, les votes remportés et l’Influence restante.</p>
  <div id="finalRanking"></div>
  <div id="narrativeEnding" class="card" hidden></div>
 </section>

@@ -1,3 +1,4 @@
+import {renderPanoramaSvg} from './hotspring-panorama.js';
 import {mountWorkspace,rememberAccess} from './founders-workspace.js';
 import {mountCity,updateCity} from './founders-city-scene.js';
 import {TEAM_COLORS,DEFAULT_TEAM_NAMES,DEFAULT_TEAM_COLORS,teamCaption} from './founders-identity.js';
@@ -36,7 +37,9 @@ $("load").addEventListener("click",async()=>{
   $("preview").hidden=true;$("empty").hidden=false;
   selectedPreview=null;
   state(catalog.scenarios.length+" scénario(s), "+catalog.skins.length+" skin(s).","success");
-  if(catalog.scenarios.some(s=>s.id==='hot-spring-reserve-hybride'))$('scenario').value='hot-spring-reserve-hybride';
+  const requested=new URLSearchParams(location.search).get('scenario');
+  if(catalog.scenarios.some(s=>s.id===requested))$('scenario').value=requested;
+  else if(catalog.scenarios.some(s=>s.id==='hot-spring-reserve-hybride'))$('scenario').value='hot-spring-reserve-hybride';
   autoSkin();
   $('load').textContent='Actualiser mon espace';
   await workspace.refresh();
@@ -78,7 +81,13 @@ $("config").addEventListener("submit",async event=>{
   $("storyInfo").textContent=p.scenario.scenario.location+" · "+p.scenario.scenario.year+" · version "+p.selection.scenarioVersion;
   $("skinTitle").textContent=p.skin.title;
   $("skinInfo").textContent=p.skin.description+" · version "+p.selection.skinVersion;
-  mountCity($('skinPreview'),p.skin.id);updateCity($('skinPreview'),p.game.city,p.skin.id,p.skin.labels.resources);
+  const scene=$('skinPreview');
+  if(p.scenario.campaign){
+   scene.innerHTML=renderPanoramaSvg({layers:[],scars:[],river:'claire',vegetation:'abondante',townX:44,townY:64});
+  }else{
+   scene.removeAttribute('data-skin');scene.replaceChildren();
+   mountCity(scene,p.skin.id);updateCity(scene,p.game.city,p.skin.id,p.skin.labels.resources);
+  }
   const previewSvg=$('skinPreview').querySelector('svg');if(previewSvg)previewSvg.style.cssText='width:100%;height:100%;object-fit:contain';
   $("countDilemmas").textContent=String(p.scenario.dilemmas.length);
   $("countMembers").textContent=String(p.settings.members.reduce((a,b)=>a+b,0));
@@ -234,7 +243,7 @@ $('createNarrative').addEventListener('click',async()=>{
  const code=$('gameCode').value.trim(),title=$('gameTitle').value.trim();
  const button=$('createNarrative');button.disabled=true;state('Création de la session…');
  try{
-  const result=await api('/api/founders/sessions','POST',{...selectedPreview,code,title,names,colors,objectives,goalCards,scoreRules});
+  const result=await api('/api/founders/sessions','POST',{...selectedPreview,code,title,names,colors,objectives,goalCards,scoreRules,...(campaignSetup()?{crisisMode:$('crisisMode').value}:{})});
   rememberAccess(result);
   if(!authSDK)sessionStorage.setItem('pacte-founder-organizer-key',$('token').value.trim());
   const links=$('createdLinks');links.replaceChildren();
@@ -322,19 +331,47 @@ const workspace=mountWorkspace({api,getCatalog:()=>catalog,
  collect:()=>({scenarioId:$('scenario').value,scenarioVersion:$('scenarioVersion').value,skinId:$('skin').value,
  members:$('members').value.split(',').map(Number),calibration:collectCalibration(),
  names:activeFamilyIds().map(id=>$('name-'+id).value.trim()),colors:activeFamilyIds().map(id=>$('color-'+id).value),
- objectives:activeFamilyIds().map(id=>$('goal-'+id).value.trim()),goalCards:collectGoalCards(),scoreRules:collectScoreRules()}),
+ objectives:activeFamilyIds().map(id=>$('goal-'+id).value.trim()),goalCards:collectGoalCards(),scoreRules:collectScoreRules(),...(campaignSetup()?{crisisMode:$('crisisMode').value}:{})}),
  apply:config=>{
   $('scenario').value=config.scenarioId;autoSkin();$('scenarioVersion').value=config.scenarioVersion;syncV2Setup();$('skin').value=config.skinId;
   $('familyCount').value=String(config.members.length);syncFamilyCount();$('members').value=config.members.join(',');activeFamilyIds().forEach((id,i)=>$('memberCount-'+id).value=config.members[i]);loadGoalPresets(config.goalCards,config.scoreRules,config.calibration);
+  if(campaignSetup())$('crisisMode').value=config.crisisMode??'standard';
   activeFamilyIds().forEach((id,i)=>{$('name-'+id).value=config.names[i];$('color-'+id).value=config.colors[i];$('color-'+id).dispatchEvent(new Event('change'));$('goal-'+id).value=config.objectives[i];});
   selectedPreview=null;$('preview').hidden=true;$('empty').hidden=false;$('gameCode').value='P'+crypto.randomUUID().replaceAll('-','').slice(0,7).toUpperCase();
   $('createNarrative').disabled=false;$('config').requestSubmit();
  }});
 $('gameCode').value='P'+crypto.randomUUID().replaceAll('-','').slice(0,7).toUpperCase();
 
-function isV2Setup(){return $('scenario').value==='hot-spring-reserve-hybride'&&$('scenarioVersion').value==='2.0.0';}
+const campaignSetup=()=>$('scenario').value==='les-colons-de-hotspring';
+const legacyNote=$('familySetupNote').textContent;
+let usedCampaignNames=false;
+function isV2Setup(){return campaignSetup()|| $('scenario').value==='hot-spring-reserve-hybride'&&$('scenarioVersion').value==='2.0.0';}
 function syncV2Setup(){
- if(!catalog)return;const v2=isV2Setup();
+ if(!catalog)return;const v2=isV2Setup(),campaign=campaignSetup(),changingCampaign=usedCampaignNames!==campaign;
+ const count=$('familyCount');
+ if(campaign)count.value='5';
+ count.disabled=campaign;
+ $('legacyScoring').hidden=campaign;$('crisisModeField').hidden=!campaign;
+ $('familySetupNote').textContent=campaign?'Cinq familles, ressources égales et objectifs confidentiels. Score maximal de 15 points.':legacyNote;
+ syncFamilyCount();
+ const familyNames=catalog.scenarios.find(s=>s.id===$('scenario').value)?.familyNames;
+ for(const [i,id] of FAMILY_IDS.entries()){
+  if(changingCampaign){
+   $('name-'+id).value=familyNames?.[i]??DEFAULT_TEAM_NAMES[DEFAULT_TEAM_COLORS[i]];
+   $('name-'+id).dispatchEvent(new Event('input'));
+  }
+  const settings=$('name-'+id).closest('details');
+  const keep=['name-'+id,'color-'+id];
+  for(const control of settings.querySelectorAll('input,textarea,select')){
+   if(keep.includes(control.id))continue;
+   control.hidden=campaign;
+   const label=settings.querySelector('label[for="'+control.id+'"]');if(label)label.hidden=campaign;
+  }
+  const countLabel=$('memberCount-'+id).parentElement;
+  countLabel.firstChild.textContent=campaign?familyNames?.[i]??'Famille '+id:DEFAULT_TEAM_NAMES[DEFAULT_TEAM_COLORS[i]];
+ }
+ if(changingCampaign)$('gameTitle').value=campaign?'Les Colons de Hotspring — Campagne':'Le Pacte des Fondateurs — Répétition';
+ usedCampaignNames=campaign;
  for(const k of ['economie','ecologie','securite','demographie','satisfaction','bien_etre','developpement','stabilite']){const input=$('city_'+k);if(input){const visible=v2?['economie','ecologie','securite','demographie'].includes(k):!['ecologie','demographie'].includes(k);input.parentElement.hidden=!visible;input.disabled=!visible;}}
  for(const id of FAMILY_IDS)for(const o of $('goalIndicator-'+id).options){const valid=v2?['economie','ecologie','securite','demographie'].includes(o.value):!['ecologie','demographie'].includes(o.value);o.hidden=!valid;o.disabled=!valid;}
  loadGoalPresets(v2?catalog.goalCardPresetsV2:catalog.goalCardPresets,catalog.scoreRulesPreset,v2?catalog.calibrationPresetV2:catalog.calibrationPreset);

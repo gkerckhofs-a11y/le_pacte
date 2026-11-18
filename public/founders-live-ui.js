@@ -1,3 +1,4 @@
+import {CAMPAIGN_PHASES} from './founders-hotspring.js';
 const levels=['Critique','Faible','Stable','Bon','Excellent'];
 const colors=['#d74747','#e78b36','#d6b83d','#76b45e','#26905f'];
 export function gaugeState(value,thresholds=[2,4,6,8]){const level=thresholds.filter(t=>value>t).length;return {label:levels[level],color:colors[level]};}
@@ -11,7 +12,7 @@ export function renderPhaseClock(root,s){
 function drawClock(root,{s,started}){
  const elapsed=performance.now()-started,clock=s.clock;
  const remaining=clock.paused?clock.remainingMs:clock.deadline===null?null:clock.deadline-(s.serverNow??s.updatedAt??Date.now())-elapsed;
- const labels={READY:'Préparation',NEGOTIATION:'Négociations en cours',COUNCIL:'Vote',REVEALED:'Résolution',FINISHED:'Partie terminée'};
+ const labels={...CAMPAIGN_PHASES,READY:'Préparation',NEGOTIATION:'Négociations en cours',COUNCIL:'Vote',REVEALED:'Résolution',FINISHED:'Partie terminée'};
  const seconds=remaining===null?null:Math.max(0,Math.ceil(remaining/1000));
  root.textContent=(labels[s.phase]??s.phase)+(clock.paused?' — PAUSE':seconds===null?'':' — '+String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0'))+(seconds===0?' — TEMPS ÉCOULÉ':'');
  root.classList.toggle('time-up',seconds===0);root.classList.toggle('clock-paused',clock.paused);

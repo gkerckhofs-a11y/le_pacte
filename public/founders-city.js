@@ -1,3 +1,4 @@
+import {CAMPAIGN_PHASES,landscapeSummary,renderHotspringPanorama,setHotspringImage,renderTendencies,renderHotspringStage,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
 import {decorateGauge,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
 import {renderVoteProgress} from './founders-vote-progress.js';
 import {renderCouncilRoles,appendFamilyRoles} from './founders-role-badges.js';
@@ -12,7 +13,7 @@ const sessionId=param.get('session');
 const resources=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
 let lastRevision=null,previousCityStates=null,mountedSkin=null;
 
-const pretty={NEGOTIATION:'Négociations',READY:'Préparation',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'Vote clos',REVEALED:'Conséquences révélées',FINISHED:'Fin de partie'};
+const pretty={...CAMPAIGN_PHASES,NEGOTIATION:'Négociations',READY:'Préparation',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'Vote clos',REVEALED:'Conséquences révélées',FINISHED:'Fin de partie'};
 function text(id,value){$(id).textContent=String(value??'');}
 function drawGauges(s){
  const root=$('gauges');root.replaceChildren();
@@ -38,17 +39,33 @@ function render(s){
  renderPhaseClock($('phaseClock'),s);
  const totals=voteTotals(s);
  renderCouncilRoles($('councilRoles'),s);
- applySkin(document.body,s.skin);text('universeTitle','Le Pacte · '+s.skin.title);
+ applySkin(document.body,s.skin);document.body.classList.toggle('campaign-hotspring',Boolean(s.campaign));text('universeTitle',s.campaign?s.story.title:'Le Pacte · '+s.skin.title);
  lastRevision=s.revision;
  text('pageTitle',s.story.location+' · '+s.story.year);text('phase',pretty[s.phase]||s.phase);
  text('chapter',s.dilemma?(s.dilemma.sequence?'Conseil '+s.dilemma.sequence:'Chapitre '+s.dilemma.chapter):'Le Conseil des Fondateurs');
+ $('tiePriority').hidden=Boolean(s.campaign);
  text('tiePriority','Départage final si égalité parfaite : '+s.finalTieOrder.map(id=>teamLabel(s,id)).join(' → '));
  text('turn',s.council.turn?'À LA PAROLE : '+teamLabel(s,s.council.turn):['await_moderator','await_leader'].includes(s.council.phase)?'À LA PAROLE : '+teamLabel(s,s.moderator):s.phase==='NEGOTIATION'?'NÉGOCIATIONS EN COURS':'Maire '+teamLabel(s,s.leader));
+ const sceneOnly=s.campaign&&['INTRO','CHECKPOINT','SUSPENDED','EPILOGUE','FINISHED'].includes(s.phase);
+ $('dilemmaTitle').hidden=Boolean(sceneOnly);$('dilemmaText').hidden=Boolean(sceneOnly);
  text('dilemmaTitle',s.dilemma?.title||(s.phase==='FINISHED'?'La ville entre dans l’histoire':'Bienvenue au Conseil'));
  text('dilemmaText',s.dilemma?.public_text||(s.phase==='FINISHED'?'Les délibérations sont terminées.':'Le Conseil attend le signal de la régie.'));
  text('question',s.dilemma?.vote_question||'');
  drawGauges(s);
  renderChronicle($('cityChronicle'),s);
+ if(s.campaign){
+  renderHotspringPanorama($('city'),s);
+  renderHotspringStage($('hotspringStage'),s);
+  renderTendencies($('hotspringTendencies'),s.phase==='REVEALED'?null:s.dilemma);
+  text('cityEvolution',landscapeSummary(s.campaign.landscape)+(s.campaign.relation?' · '+s.campaign.relation:''));
+  const details=$('cityDetails');details.replaceChildren();
+  for(const layer of s.campaign.landscape.layers){
+   const item=document.createElement('p');item.textContent=layer.label+(layer.state==='damaged'?' · endommagé':'');details.append(item);
+  }
+  if(s.campaign.landscape.scars.length){
+   const scars=document.createElement('p');scars.textContent='Cicatrices : '+s.campaign.landscape.scars.join(', ');details.append(scars);
+  }
+ }else{
  if(mountedSkin!==s.skin.id){mountCity($('city'),s.skin.id);mountedSkin=s.skin.id;previousCityStates=null;}
  const cityStates=updateCity($('city'),s.city,s.skin.id,s.skin.labels.resources);
  const changes=Object.entries(cityStates).filter(([key,state])=>previousCityStates&&state.level!==previousCityStates[key].level).map(([,state])=>state.description);
@@ -60,11 +77,13 @@ function render(s){
   heading.textContent=state.label+' · '+state.value+'/10';description.textContent=state.description;
   item.append(heading,description);details.append(item);
  }
+ }
  const image=$('decisionImage'),src=s.dilemma?.image?.url;
- if(typeof src==='string'&&/^https:\/\/\S+$/.test(src)){image.src=src;image.alt=s.dilemma.image.alt||s.dilemma.title;image.hidden=false;}
+ if(s.campaign)setHotspringImage(image,s.phase==='REVEALED'?null:s.dilemma?.image);
+ else if(typeof src==='string'&&/^https:\/\/\S+$/.test(src)){image.src=src;image.alt=s.dilemma.image.alt||s.dilemma.title;image.hidden=false;}
  else {image.hidden=true;image.removeAttribute('src');}
  const out=$('outcome');out.hidden=!s.reveal;
- if(s.reveal){text('outcomeTitle',s.reveal.winner==='pour'?'PROPOSITION ADOPTÉE':'PROPOSITION REJETÉE');text('outcomeText',s.reveal.narration);}
+ if(s.reveal){text('outcomeTitle',s.campaign?s.reveal.chronicle.title:s.reveal.winner==='pour'?'PROPOSITION ADOPTÉE':'PROPOSITION REJETÉE');text('outcomeText',s.reveal.narration);}
  text('voteForTotal',totals.yes);text('voteAgainstTotal',totals.no);text('voteAbstentions',totals.abstentions);
  text('voteSummary',s.reveal?'Influence engagée · '+s.reveal.yes+' POUR / '+s.reveal.no+' CONTRE':'Influence engagée · rapport de force en direct');
  const ballots=$('ballots');ballots.replaceChildren();
@@ -83,13 +102,19 @@ function render(s){
   s.phase==='REVEALED'?'Le Conseil attend le prochain dilemme.':
   s.phase==='FINISHED'?'Les décisions finales ont été proclamées.':'La séance n’a pas encore commencé.');
  const final=$('finalResults');final.hidden=!s.finalResults;
- if(s.phase==='FINISHED'){final.parentElement.prepend(final);if(finishing)final.scrollIntoView({block:'start'});}
- const epilogue=$('narrativeEnding');epilogue.hidden=!s.narrativeEnding;epilogue.replaceChildren();
- if(s.narrativeEnding){
+ if(s.phase==='FINISHED'){if(!s.campaign)final.parentElement.prepend(final);if(finishing)final.scrollIntoView({block:'start'});}
+ const epilogue=$('narrativeEnding');epilogue.hidden=!s.narrativeEnding||Boolean(s.campaign);epilogue.replaceChildren();
+ if(s.narrativeEnding&&!s.campaign){
   const title=document.createElement('h3');title.textContent=s.narrativeEnding.title;epilogue.append(title);
   for(const paragraph of s.narrativeEnding.paragraphs){const p=document.createElement('p');p.textContent=paragraph;epilogue.append(p);}
  }
- if(s.finalResults){
+ $('legacyScoreExplanation').hidden=Boolean(s.campaign);
+ if(s.campaign&&s.finalResults){
+  text('winnerTitle',hotspringWinners(s));
+  const root=$('finalRanking');root.replaceChildren();
+  const revealText=document.createElement('p');revealText.textContent=s.finalResults.text;root.append(revealText);
+  renderCampaignRanking(root,s.finalResults.rows,true);
+ }else if(s.finalResults){
   const ranking=s.finalResults.ranking;
   text('winnerTitle','Victoire de '+teamLabel(s,ranking[0].family)+' · '+ranking[0].score.total+' points');
   const root=$('finalRanking');root.replaceChildren();

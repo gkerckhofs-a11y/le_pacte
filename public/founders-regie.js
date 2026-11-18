@@ -1,3 +1,4 @@
+import {CAMPAIGN_PHASES,renderHotspringStage,renderTendencies,renderCampaignAdmin,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
 import {decorateGauge,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
 import {mountPrintKit} from './founders-print.js';
 import {renderCouncilMonitor} from './founders-council-monitor.js';
@@ -7,7 +8,7 @@ import {teamCaption,teamLabel,colorize} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id),p=new URLSearchParams(location.search);
 const sid=p.get('session');let authSDK=null,cloud=false,token='',current=null,busy=false,initialized=false,authenticating=false,waitingForLogin=false;
-const labels={NEGOTIATION:'Négociations',READY:'Prêt',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'En attente de la révélation',REVEALED:'Résultat annoncé',FINISHED:'Partie terminée'};
+const labels={...CAMPAIGN_PHASES,NEGOTIATION:'Négociations',READY:'Prêt',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'En attente de la révélation',REVEALED:'Résultat annoncé',FINISHED:'Partie terminée'};
 const gaugeIds=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
 const set=(id,v)=>$(id).textContent=String(v??'');
 const secure=()=>validNarrativeSession(sid);
@@ -102,6 +103,9 @@ function gauge(s){
 function render(s){
  applySkin(document.body,s.skin);
  current=s;
+ document.body.classList.toggle('campaign-hotspring',Boolean(s.campaign));
+ renderCampaignAdmin($('hotspringAdmin'),s,command);
+ if(s.campaign){renderHotspringStage($('hotspringStage'),s);renderTendencies($('hotspringTendencies'),s.phase==='REVEALED'?null:s.dilemma);}
  printKit.sync(s);renderPhaseClock($('phaseClock'),s);renderV2Controls(s);
  renderCouncilMonitor($('councilMonitor'),s);
  const guidance=councilGuidance(s);step(guidance.step);set('stageTitle',guidance.title);set('stageHint',guidance.hint);
@@ -116,6 +120,11 @@ function render(s){
  $('reveal').hidden=s.phase!=='AWAITING_REVEAL';
  $('next').hidden=s.phase!=='REVEALED';
  $('next').textContent=(s.progression?s.progression.terminal:s.reveal?.nextId===null)?'Terminer la partie':'Dilemme suivant';
+ if(s.campaign){
+  $('next').hidden=!['INTRO','PRESENTATION','REVEALED','CHECKPOINT'].includes(s.phase);
+  $('next').textContent=({INTRO:'Présenter le dilemme',PRESENTATION:'Ouvrir la négociation',REVEALED:s.reveal?.id==='D30'?'Lire l’épilogue':'Poursuivre',CHECKPOINT:s.campaign.chapter===6?'Qualifier les chartes':'Reprendre — chapitre suivant'})[s.phase]??'Poursuivre';
+ }
+ $('tiePriority').hidden=Boolean(s.campaign);
  $('next').disabled=Boolean(s.progression?.blocked);
  $('reservePanel').hidden=!s.progression||s.progression.terminal;
  const choice=$('nextDilemma'),previousChoice=choice.value;choice.replaceChildren();
@@ -142,7 +151,11 @@ function render(s){
   el.append(details);families.append(el);
  }
  const final=$('finalPanel');final.hidden=!s.finalResults;
- if(s.finalResults){
+ if(s.campaign&&s.finalResults){
+  set('finalWinner',hotspringWinners(s));
+  const root=$('ranking');root.replaceChildren();
+  renderCampaignRanking(root,s.finalResults.rows,true);
+ }else if(s.finalResults){
   set('finalWinner',teamLabel(s,s.finalResults.ranking[0].family)+' remporte la partie ('+s.finalResults.ranking[0].score.total+' pts)');
   const root=$('ranking');root.replaceChildren();
   for(const r of s.finalResults.ranking){
@@ -167,7 +180,7 @@ async function command(kind,data={}){
  busy=true;set('actionMessage','Enregistrement…');$('actions').querySelectorAll('button').forEach(b=>b.disabled=true);
  try{
   const s=await api('/commands','POST',{kind,data,expectedRevision:current.revision});
-  render(s);set('actionMessage',kind==='reveal'?'Décision révélée sur la projection.':s.phase==='FINISHED'?'Partie terminée : classement affiché.':'Le prochain dilemme est ouvert.');
+  render(s);set('actionMessage',kind==='reveal'?'Décision révélée sur la projection.':s.phase==='FINISHED'?'Partie terminée : classement affiché.':s.campaign?(labels[s.phase]??s.phase)+'.':'Le prochain dilemme est ouvert.');
  }catch(e){set('actionMessage',e.message);try{render(await api(''));}catch{}}
  finally{busy=false;$('actions').querySelectorAll('button').forEach(b=>b.disabled=false);$('next').disabled=Boolean(current?.progression?.blocked);}
 }
@@ -175,7 +188,7 @@ async function rotate(family){
  if(busy)return;busy=true;set('notice','Renouvellement du jeton…');
  try{
   const result=await api('/access/'+family,'POST',{});
-  const url=new URL('/founders-family.html?session='+sid,location.origin);
+  const url=new URL('/founders-family.html?session='+sid+'&family='+family,location.origin);
   url.hash='token='+encodeURIComponent(result.token);
   printKit.remember(family,result.token);
   $('newAccessLink').value=url.href;$('accessOutput').hidden=false;
@@ -223,7 +236,14 @@ function renderV2Controls(s){
  $('v2Controls').hidden=s.experienceVersion!==2;
  $('beginVote').hidden=s.phase!=='NEGOTIATION';
  $('pauseGame').hidden=Boolean(s.clock?.paused);$('resumeGame').hidden=!s.clock?.paused;
- $('finishGame').disabled=s.phase==='FINISHED';
+ $('finishGame').disabled=['EPILOGUE','FINISHED'].includes(s.phase);
+ $('finishDescription').textContent=s.campaign&&s.phase==='CHECKPOINT'&&s.campaign.chapter>=5?
+  'La régie ouvrira la prochaine étape du final. Les familles décideront du gouvernement et de la charte.':
+  s.campaign?'La régie ouvrira l’épilogue avec les décisions déjà prises. Les objectifs seront révélés ensuite.':
+  'Cette action clôture la partie et affiche le résultat. Les mises d’un vote en cours sont rendues.';
+ $('finishGame').textContent=s.campaign?'Terminer l’histoire':'Terminer la partie';
+ $('presentationTiming').hidden=!s.campaign;$('presentationSeconds').disabled=!s.campaign;
+ if(!document.activeElement?.closest('#timingForm'))$('presentationSeconds').value=s.campaignAdmin?.presentationSeconds??'';
  const fields={negotiationSeconds:s.timing?.negotiationSeconds,voteSeconds:s.timing?.voteSeconds,resolutionSeconds:s.timing?.resolutionSeconds};
  if(!document.activeElement?.closest('#timingForm')){for(const [id,value] of Object.entries(fields))$(id).value=value??'';$('autoAdvance').checked=s.timing?.autoAdvance??false;$('gaugeThresholds').value=(s.gaugeThresholds??[2,4,6,8]).join(',');}
  if(!document.activeElement?.closest('#correctionForm')){
@@ -237,8 +257,8 @@ $('pauseGame').addEventListener('click',()=>command('pause'));
 $('resumeGame').addEventListener('click',()=>command('resume'));
 $('addTime').addEventListener('click',()=>command('adjustTime',{seconds:60}));
 $('removeTime').addEventListener('click',()=>command('adjustTime',{seconds:-60}));
-$('timingForm').addEventListener('submit',event=>{event.preventDefault();command('configureTiming',{timing:{negotiationSeconds:Number($('negotiationSeconds').value),voteSeconds:Number($('voteSeconds').value),resolutionSeconds:Number($('resolutionSeconds').value),autoAdvance:$('autoAdvance').checked},gaugeThresholds:$('gaugeThresholds').value.split(',').map(Number)});});
+$('timingForm').addEventListener('submit',event=>{event.preventDefault();command('configureTiming',{timing:{negotiationSeconds:Number($('negotiationSeconds').value),voteSeconds:Number($('voteSeconds').value),resolutionSeconds:Number($('resolutionSeconds').value),autoAdvance:$('autoAdvance').checked},gaugeThresholds:$('gaugeThresholds').value.split(',').map(Number),...(current?.campaign?{presentationSeconds:Number($('presentationSeconds').value)}:{})});});
 $('correctionForm').addEventListener('submit',event=>{event.preventDefault();command('correctResource',{family:$('correctFamily').value,resource:$('correctResource').value,value:Number($('correctValue').value)});});
 $('finishGame').addEventListener('click',()=>$('finishDialog').showModal());
 $('cancelFinish').addEventListener('click',()=>$('finishDialog').close());
-$('confirmFinish').addEventListener('click',async()=>{await command('finish',{confirm:true});if(current?.phase==='FINISHED')$('finishDialog').close();});
+$('confirmFinish').addEventListener('click',async()=>{await command('finish',{confirm:true});if(current&&['EPILOGUE','FINISHED','INTRO','CHARTER_SUPPORT'].includes(current.phase))$('finishDialog').close();});

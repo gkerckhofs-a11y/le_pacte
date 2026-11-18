@@ -21,7 +21,15 @@ export function mountPrintKit({session,view,request,renew}){
  $('printFamilyCards').addEventListener('click',()=>{
   const s=view();if(!s)return;const root=shell();
   for(const f of s.families){
-   const goal=s.goalCards[f.id],c=card(root,f,'Ambition secrète · confidentiel');
+   const c=card(root,f,'Ambition secrète · confidentiel');
+   if(s.privateFamilies?.[f.id]){
+    const family=s.privateFamilies[f.id];
+    c.append(node('p',family.role),node('p',family.briefing),node('p',family.trajectory));
+    const list=node('ol');for(const goal of family.objectives)list.append(node('li',goal));
+    c.append(list,node('p','Jusqu’à 10 points de chapitre, 2 de trajectoire et 3 d’héritage.'));
+    continue;
+   }
+   const goal=s.goalCards[f.id];
    c.append(node('h3',goal.title),node('p',s.familyGoals[f.id]));
    if(goal.description!==s.familyGoals[f.id])c.append(node('p',goal.description));
    const label=s.skin.labels.resources[goal.indicator]||goal.indicator;
@@ -71,9 +79,10 @@ export function mountPrintKit({session,view,request,renew}){
     c.append(node('p','Session '+s.code+' · Équipe '+f.id,'print-reference'));
     const instructions=node('ol');for(const t of ['Scannez le QR code.','Vérifiez le nom de votre famille et le code de session affichés.','Gardez cette page ouverte pendant toute la partie.','Un seul terminal officiel est utilisé pour votre famille.'])instructions.append(node('li',t));c.append(instructions);
     c.append(node('h3','Votre application'));
-    for(const [title,body] of [['Accueil','« Ma table » : votre situation et vos ressources.'],['Vote','« Votre décision politique » : POUR, CONTRE ou ABSTENTION, puis ajout d’Influence ou passage.'],['Négociation et finances','« Vos négociations » : envoyez une proposition, acceptez ou refusez une somme ; vos fonds sont dans « Vos ressources ».'],['Objectifs','Votre ambition secrète et ses paliers se trouvent sur « Ma table ».']])c.append(node('p',title+' — '+body));
+    for(const [title,body] of [['Accueil','« Ma table » : votre situation et vos ressources.'],['Vote','« Votre décision politique » : POUR, CONTRE ou ABSTENTION, puis ajout d’Influence ou passage.'],['Négociation et finances','« Vos négociations » : envoyez une proposition, acceptez ou refusez une somme ; vos fonds sont dans « Vos ressources ».'],['Objectifs',s.campaign?'Votre briefing et vos objectifs de chapitre se trouvent sur « Ma table ». Gardez-les confidentiels.':'Votre ambition secrète et ses paliers se trouvent sur « Ma table ».']])c.append(node('p',title+' — '+body));
     c.append(node('p','Le porte-parole utilise l’interface officielle. Les autres membres de l’équipe peuvent librement négocier avec les autres familles.'));
     const link=node('a','Ouvrir le terminal de '+f.name);link.href=data.link;c.append(link);
+    if(s.campaign)c.append(node('p',data.link,'small hotspring-text print-url'));
     c.append(node('p','Confidentiel. Accès valable 24 h après sa création. Régénérer un accès invalide le QR précédent.','small'));
    }
    prepared={fingerprint:stamp,cards};$('printReadyQR').disabled=false;

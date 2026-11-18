@@ -42,7 +42,7 @@ export function renderChronicle(root,view){
   return node;
  };
  const image=chapter.image;
- if(typeof image?.url==='string'&&/^https:\/\/\S+$/.test(image.url)){
+ if(typeof image?.url==='string'&&(/^https:\/\/\S+$/.test(image.url)||view.campaign&&/^\/assets\/hotspring\/v1\/[\w/-]+\.webp$/.test(image.url))){
   const img=el('img','chronicle-image');img.src=image.url;
   img.alt=image.alt||'Illustration du dilemme résolu : '+chapter.title;
   // Reuse the dilemma artwork until an outcome-specific illustration is authored.
