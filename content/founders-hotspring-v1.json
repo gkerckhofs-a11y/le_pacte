@@ -1,0 +1,3774 @@
+{
+  "schema_version": "1.0.0",
+  "scenario": {
+    "id": "les-colons-de-hotspring",
+    "title": "Les Colons de Hotspring",
+    "universe": "western",
+    "location": "Hotspring",
+    "year": 1872,
+    "entry_dilemma": "D01",
+    "status": "prototype"
+  },
+  "dilemmas": [
+    {
+      "id": "D01",
+      "chapter": 1,
+      "title": "Où fonder Hotspring ?",
+      "public_text": "Deux emplacements s’offrent à vous. Près de la rivière, le terrain est plat, l’eau accessible et la construction rapide. Mais les marques sur les saules montrent que les crues peuvent monter bien plus haut qu’on ne l’imagine.\nSur la terrasse, le sol est sec et la vue dégagée. En revanche, chaque baril d’eau devra être remonté et la piste prolongée. Demain, vous déchargerez les chariots : il faut choisir ce soir.",
+      "vote_question": "« Nous établirons Hotspring sur les terres basses, au plus près de la rivière. »",
+      "labels": {
+        "pour": "Les terres basses",
+        "contre": "La terrasse haute"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les constructions coûtent moins d’efforts et l’accès à l’eau attire rapidement de nouveaux arrivants.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D02",
+          "chronicle": {
+            "title": "La ville basse est choisie.",
+            "summary": "Les constructions coûtent moins d’efforts et l’accès à l’eau attire rapidement de nouveaux arrivants."
+          }
+        },
+        "contre": {
+          "narration": "La ville est moins exposée aux crues et conserve davantage de distance avec les berges.",
+          "effects": [
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D02",
+          "chronicle": {
+            "title": "La terrasse haute est choisie.",
+            "summary": "La ville est moins exposée aux crues et conserve davantage de distance avec les berges."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D02",
+      "chapter": 1,
+      "title": "Le premier puits",
+      "public_text": "Trois semaines plus tard, la rivière suffit aux bêtes, mais son eau devient boueuse après la pluie et trouble sous la chaleur. Hotspring a besoin d’un puits.\nSilas Reed propose de le construire immédiatement, à ses frais, contre une concession de dix ans et le droit de fixer le prix de l’eau. L’autre solution est de financer un puits communal : plus lent, plus coûteux, mais sous le contrôle de tous. La question n’est pas s’il faut un puits, mais qui le possédera.",
+      "vote_question": "« Hotspring accorde à Silas Reed la concession exclusive du principal puits pour dix ans. »",
+      "labels": {
+        "pour": "Concession privée",
+        "contre": "Puits communal"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le puits est construit vite. L’eau devient payante et son exploitation appartient à Silas Reed pour dix ans.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D03",
+          "chronicle": {
+            "title": "La concession privée est accordée.",
+            "summary": "Le puits est construit vite. L’eau devient payante et son exploitation appartient à Silas Reed pour dix ans."
+          }
+        },
+        "contre": {
+          "narration": "Les familles financent ensemble le forage. Le chantier prend davantage de temps, mais l’accès à l’eau reste collectif.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D03",
+          "chronicle": {
+            "title": "La concession est refusée : le puits sera communal.",
+            "summary": "Les familles financent ensemble le forage. Le chantier prend davantage de temps, mais l’accès à l’eau reste collectif."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D03",
+      "chapter": 1,
+      "title": "La rue et les lots",
+      "public_text": "Un géomètre arrive pour tracer les rues et numéroter les parcelles. Aussitôt, marchands et spéculateurs offrent d’acheter les meilleurs emplacements près du puits et de la piste. Leur argent permettrait de bâtir plus vite.\nMais si la ville vend tout son centre aujourd’hui, où construira-t-elle demain son école, son dispensaire ou sa mairie ? Les réserver ne rapporte rien ; les racheter plus tard pourrait coûter une fortune. Il faut décider avant que le géomètre ne pose ses lignes.",
+      "vote_question": "« Hotspring met immédiatement en vente les meilleurs lots du centre afin de financer son développement. »",
+      "labels": {
+        "pour": "Vendre les lots",
+        "contre": "Réserver les lots publics"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Des capitaux entrent et plusieurs bâtiments privés peuvent apparaître rapidement.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            }
+          ],
+          "next_id": "D04",
+          "chronicle": {
+            "title": "La vente immédiate est approuvée.",
+            "summary": "Des capitaux entrent et plusieurs bâtiments privés peuvent apparaître rapidement."
+          }
+        },
+        "contre": {
+          "narration": "La croissance immédiate ralentit, mais Hotspring conserve des emplacements pour ses futurs services.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D04",
+          "chronicle": {
+            "title": "La ville réserve plusieurs lots centraux.",
+            "summary": "La croissance immédiate ralentit, mais Hotspring conserve des emplacements pour ses futurs services."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D04",
+      "chapter": 2,
+      "title": "La scierie de la rive nord",
+      "public_text": "Les charpentiers manquent déjà de bois sec. Abel Dunn propose d’installer une scierie à vapeur sur la rive nord. En échange d’une coupe presque libre pendant cinq ans, il promet des planches bon marché et des emplois dès l’été.\nSans cet accord, la ville devra limiter les abattages, faire venir une partie du bois par chariot et accepter des chantiers plus lents. La forêt restera debout ; Hotspring grandira moins vite.",
+      "vote_question": "« Hotspring autorise Abel Dunn à exploiter intensivement le bois de la rive nord et à y installer une scierie à vapeur. »",
+      "labels": {
+        "pour": "Scierie à vapeur",
+        "contre": "Coupe limitée"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Dès l’été, la vallée résonne du battement de la scie. Les planches sortent plus vite que les maisons ne montent. Hotspring grandit ; sur la rive nord, la lisière recule chaque semaine.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": "D05",
+          "chronicle": {
+            "title": "La concession est accordée.",
+            "summary": "Dès l’été, la vallée résonne du battement de la scie. Les planches sortent plus vite que les maisons ne montent. Hotspring grandit ; sur la rive nord, la lisière recule chaque semaine."
+          }
+        },
+        "contre": {
+          "narration": "Les charpentiers protestent contre le prix du bois et plusieurs chantiers attendent. Sur la rive nord, cependant, les arbres restent serrés et les berges conservent leur ombre.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": 2
+            }
+          ],
+          "next_id": "D05",
+          "chronicle": {
+            "title": "La coupe intensive est refusée.",
+            "summary": "Les charpentiers protestent contre le prix du bois et plusieurs chantiers attendent. Sur la rive nord, cependant, les arbres restent serrés et les berges conservent leur ombre."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D05",
+      "chapter": 2,
+      "title": "Une école pour Hotspring",
+      "public_text": "Douze enfants vivent désormais à Hotspring. Miss Eleanor Price propose d’enseigner à tous dans une école publique, à condition que la ville bâtisse une salle et lui garantisse deux années de salaire.\nLes commerçants rappellent que les caisses sont faibles et que l’argent manque déjà pour les routes et les entrepôts. Reporter l’école permettrait de construire ailleurs. Plusieurs familles préviennent toutefois qu’elles ne resteront pas sans instruction pour leurs enfants.",
+      "vote_question": "« Hotspring finance cette année une école publique et garantit le salaire de l’institutrice pendant deux ans. »",
+      "labels": {
+        "pour": "Financer l’école",
+        "contre": "Reporter l’école"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "À l’automne, une cloche sonne pour la première fois. La salle est petite, les bancs dépareillés, mais Hotspring vient de construire un lieu qui n’appartient à aucune famille seule.",
+          "effects": [
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D06",
+          "chronicle": {
+            "title": "L’école est approuvée.",
+            "summary": "À l’automne, une cloche sonne pour la première fois. La salle est petite, les bancs dépareillés, mais Hotspring vient de construire un lieu qui n’appartient à aucune famille seule."
+          }
+        },
+        "contre": {
+          "narration": "Les planches prévues sont vendues à d’autres chantiers. Avant les premières neiges, un chariot chargé de meubles quitte la ville : une famille a choisi de chercher ailleurs ce que Hotspring n’a pas voulu financer.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D06",
+          "chronicle": {
+            "title": "L’école est reportée.",
+            "summary": "Les planches prévues sont vendues à d’autres chantiers. Avant les premières neiges, un chariot chargé de meubles quitte la ville : une famille a choisi de chercher ailleurs ce que Hotspring n’a pas voulu financer."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D06",
+      "chapter": 2,
+      "title": "Le saloon de Main Street",
+      "public_text": "Ephraim Cole veut bâtir sur Main Street un saloon avec chambres, repas, musique et tables de jeu. Il promet une licence généreuse, des emplois et un vrai relais pour les voyageurs.\nSes opposants n’exigent pas une ville sèche : ils proposent une auberge sans jeux, avec fermeture nocturne. Elle rapporterait moins, mais éviterait que l’alcool, les dettes et les querelles ne deviennent le cœur de la rue principale.",
+      "vote_question": "« Hotspring accorde à Ephraim Cole une licence complète pour exploiter un saloon, des jeux et des chambres sur Main Street. »",
+      "labels": {
+        "pour": "Licence complète",
+        "contre": "Auberge réglementée"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le saloon ouvre avant l’hiver. On y trouve des lits, des nouvelles, des contrats et des jeux. L’argent circule jusque tard dans la nuit ; les premières dettes et la première bagarre aussi.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D07",
+          "chronicle": {
+            "title": "La licence complète est accordée.",
+            "summary": "Le saloon ouvre avant l’hiver. On y trouve des lits, des nouvelles, des contrats et des jeux. L’argent circule jusque tard dans la nuit ; les premières dettes et la première bagarre aussi."
+          }
+        },
+        "contre": {
+          "narration": "L’établissement sert des repas, loue des chambres et ferme à heure fixe. Main Street gagne un toit pour les voyageurs, mais pas le grand foyer d’activité que Cole avait promis.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D07",
+          "chronicle": {
+            "title": "La licence complète est refusée ; une auberge réglementée est autorisée.",
+            "summary": "L’établissement sert des repas, loue des chambres et ferme à heure fixe. Main Street gagne un toit pour les voyageurs, mais pas le grand foyer d’activité que Cole avait promis."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D07",
+      "chapter": 2,
+      "title": "Un médecin à demeure",
+      "public_text": "Après un accident de charrette, le docteur Samuel Avery soigne trois blessés avec les moyens de son coffre de voyage. Il accepterait de rester si Hotspring finance un petit dispensaire et lui garantit deux années de salaire.\nSes traitements ne feront pas de miracles. Mais sans lui, chaque accouchement difficile, plaie infectée ou maladie contagieuse dépendra d’un voyage de plusieurs jours — quand la route est praticable.",
+      "vote_question": "« Hotspring finance un dispensaire permanent et garantit deux années de salaire au docteur Samuel Avery. »",
+      "labels": {
+        "pour": "Financer le dispensaire",
+        "contre": "Reporter le dispensaire"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Avery s’installe dans deux pièces simples. Il ne promet pas de tout guérir ; il promet d’être là quand la ville aura besoin de quelqu’un.",
+          "effects": [
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D08",
+          "chronicle": {
+            "title": "Le dispensaire est financé.",
+            "summary": "Avery s’installe dans deux pièces simples. Il ne promet pas de tout guérir ; il promet d’être là quand la ville aura besoin de quelqu’un."
+          }
+        },
+        "contre": {
+          "narration": "Avery referme son coffre et reprend la piste. Hotspring conserve son argent et perd la seule personne capable d’assurer des soins réguliers. Rien ne change aujourd’hui ; la prochaine crise dira ce que cette économie aura réellement coûté.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D08",
+          "chronicle": {
+            "title": "Le financement est refusé.",
+            "summary": "Avery referme son coffre et reprend la piste. Hotspring conserve son argent et perd la seule personne capable d’assurer des soins réguliers. Rien ne change aujourd’hui ; la prochaine crise dira ce que cette économie aura réellement coûté."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D08",
+      "chapter": 2,
+      "title": "La rue coupe-feu",
+      "public_text": "Les maisons se serrent autour de Main Street. Entre les poêles, les lampes, le foin et les cheminées mal montées, un charpentier affirme qu’un grand feu n’est plus une possibilité, mais une question de temps.\nIl propose d’élargir la rue, d’espacer les nouvelles façades, d’inspecter les cheminées, de creuser une citerne et d’organiser une brigade de seaux. Les marchands répondent que ces règles ralentiront chaque chantier et feront perdre de précieux emplacements.",
+      "vote_question": "« Hotspring adopte immédiatement un règlement de prévention des incendies : rues élargies, bâtiments espacés, cheminées inspectées, citerne et brigade de seaux. »",
+      "labels": {
+        "pour": "Adopter le règlement",
+        "contre": "Garder les constructions serrées"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "La rue s’élargit, une citerne est creusée et une cloche est suspendue. Les commerçants perdent quelques mètres de façade ; la ville gagne du temps, de l’eau et une organisation pour le jour où le feu viendra.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 3
+            }
+          ],
+          "next_id": "D09",
+          "chronicle": {
+            "title": "Le règlement est adopté.",
+            "summary": "La rue s’élargit, une citerne est creusée et une cloche est suspendue. Les commerçants perdent quelques mètres de façade ; la ville gagne du temps, de l’eau et une organisation pour le jour où le feu viendra."
+          }
+        },
+        "contre": {
+          "narration": "Les façades montent vite et Main Street se remplit. Les toits se touchent presque, les arrière-cours accumulent le bois et le foin. Hotspring paraît enfin dense et prospère — et beaucoup plus facile à brûler.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": "D09",
+          "chronicle": {
+            "title": "Le règlement est rejeté.",
+            "summary": "Les façades montent vite et Main Street se remplit. Les toits se touchent presque, les arrière-cours accumulent le bois et le foin. Hotspring paraît enfin dense et prospère — et beaucoup plus facile à brûler."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D09",
+      "chapter": 3,
+      "title": "L’accord de la rivière",
+      "public_text": "Les clôtures de Hotspring atteignent maintenant la rive orientale. Une délégation de la communauté voisine demande qu’un corridor le long de la rivière reste libre de claims et de clôtures. Ce passage relie plusieurs points d’eau et une route utilisée bien avant la fondation de la ville.\nEn échange, ses représentants proposent un commerce régulier et un accès négocié au marché. Le géomètre rappelle que le bureau territorial considère ces terres comme ouvertes. Réserver le corridor coûtera des lots à Hotspring. Refuser ne déclenchera pas une guerre ; cela dira simplement ce que vaut la parole de la ville avant même qu’elle ne soit donnée.",
+      "vote_question": "« Hotspring reconnaît un corridor de passage et d’usage le long de la rivière, interdit aux nouveaux claims et aux clôtures permanentes. »",
+      "labels": {
+        "pour": "Reconnaître le corridor",
+        "contre": "Étendre la ville vers la rivière"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le géomètre recule ses piquets. Le passage reste ouvert et une limite est tracée à l’expansion de Hotspring. Cet accord ne règle ni la politique fédérale ni tous les conflits de terre ; il crée une promesse locale que la ville pourra désormais tenir — ou rompre.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D10",
+          "chronicle": {
+            "title": "Le corridor est reconnu.",
+            "summary": "Le géomètre recule ses piquets. Le passage reste ouvert et une limite est tracée à l’expansion de Hotspring. Cet accord ne règle ni la politique fédérale ni tous les conflits de terre ; il crée une promesse locale que la ville pourra désormais tenir — ou rompre."
+          }
+        },
+        "contre": {
+          "narration": "Les lignes d’arpentage atteignent la rivière et les premiers lots sont réclamés avant la fin de la semaine. La délégation replie sa carte et repart. Aucun coup de feu n’est tiré ; chacun comprend néanmoins que Hotspring a choisi l’expansion.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D10",
+          "chronicle": {
+            "title": "L’accord est refusé.",
+            "summary": "Les lignes d’arpentage atteignent la rivière et les premiers lots sont réclamés avant la fin de la semaine. La délégation replie sa carte et repart. Aucun coup de feu n’est tiré ; chacun comprend néanmoins que Hotspring a choisi l’expansion."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D10",
+      "chapter": 3,
+      "title": "Le passage des troupeaux",
+      "public_text": "Harlan Webb conduit près de deux mille têtes vers un marché du nord. Le trajet le plus court suit la rivière, traverse les pâturages de la vallée et passe à portée des commerces de Hotspring. Webb promet des droits de passage, des achats et plusieurs jours d’activité.\nLe détour par la crête ajouterait presque une semaine. Il préserverait les berges et éloignerait le troupeau des habitations. Si Hotspring a reconnu le corridor de la rivière, le passage direct traverserait précisément la zone qu’elle s’est engagée à laisser libre.",
+      "vote_question": "« Hotspring autorise les troupeaux de Harlan Webb à emprunter le passage direct le long de la rivière et à utiliser ses points d’eau. »",
+      "labels": {
+        "pour": "Autoriser le passage direct",
+        "contre": "Imposer le détour"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Pendant trois jours, les cornes, la poussière et les achats remplissent Hotspring. Le troupeau abreuve à la rivière, défonce une clôture et laisse les berges nues. Si un accord existait, la ville vient de montrer qu’une promesse peut céder devant une bonne affaire.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": -2
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D11",
+          "chronicle": {
+            "title": "Le passage direct est autorisé.",
+            "summary": "Pendant trois jours, les cornes, la poussière et les achats remplissent Hotspring. Le troupeau abreuve à la rivière, défonce une clôture et laisse les berges nues. Si un accord existait, la ville vient de montrer qu’une promesse peut céder devant une bonne affaire."
+          }
+        },
+        "contre": {
+          "narration": "Les cowboys protestent et les commerçants comptent les ventes perdues. Le troupeau contourne la vallée par la crête. La rivière reste claire ; si Hotspring avait donné sa parole, elle vient de prouver que cette parole avait un coût réel.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D11",
+          "chronicle": {
+            "title": "Le détour est imposé.",
+            "summary": "Les cowboys protestent et les commerçants comptent les ventes perdues. Le troupeau contourne la vallée par la crête. La rivière reste claire ; si Hotspring avait donné sa parole, elle vient de prouver que cette parole avait un coût réel."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D11",
+      "chapter": 3,
+      "title": "Le comptoir de la vallée",
+      "public_text": "Les échanges se multiplient : outils, chevaux, farine, peaux, laine, sel et informations circulent déjà, souvent dans des arrière-cours et sans poids communs. Les désaccords sur les prix et les dettes deviennent plus fréquents.\nDes représentants proposent un comptoir ouvert aux deux communautés, avec une balance publique, des règles affichées et deux registres concordants. Les négociants de Hotspring préfèrent des licences réservées aux commerces de la ville : ils verseraient davantage de taxes, mais garderaient la maîtrise des prix et du crédit.",
+      "vote_question": "« Hotspring cofinance un comptoir de vallée à gestion partagée, doté de poids publics et accessible aux commerçants des deux communautés. »",
+      "labels": {
+        "pour": "Ouvrir un comptoir commun",
+        "contre": "Garder le commerce local"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le nouveau comptoir n’abolit ni la méfiance ni la dureté des négociations. Il impose toutefois des poids visibles, des comptes comparables et un lieu où un désaccord peut être discuté avant de devenir un conflit.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D12",
+          "chronicle": {
+            "title": "Le comptoir commun est approuvé.",
+            "summary": "Le nouveau comptoir n’abolit ni la méfiance ni la dureté des négociations. Il impose toutefois des poids visibles, des comptes comparables et un lieu où un désaccord peut être discuté avant de devenir un conflit."
+          }
+        },
+        "contre": {
+          "narration": "Trois entrepôts de Hotspring concentrent désormais l’essentiel des échanges. Les taxes entrent et les affaires prospèrent. Les plaintes sur les prix, les balances et les dettes s’accumulent derrière les portes fermées.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D12",
+          "chronicle": {
+            "title": "Le commerce reste sous licences locales.",
+            "summary": "Trois entrepôts de Hotspring concentrent désormais l’essentiel des échanges. Les taxes entrent et les affaires prospèrent. Les plaintes sur les prix, les balances et les dettes s’accumulent derrière les portes fermées."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D12",
+      "chapter": 3,
+      "title": "La route du territoire",
+      "public_text": "Caleb Morton, agent du territoire, propose de faire passer une route carrossable par Hotspring. La ville doit céder une bande de terrain, fournir des vivres aux équipes et accueillir un relais accompagné d’un petit poste de patrouille.\nEn échange, la diligence, le courrier et les convois réguliers passeront par la ville. Refuser préservera l’autonomie locale, mais la nouvelle route contournera Hotspring. Morton précise qu’il ne garantit pas que l’administration reconnaîtra les accords fonciers conclus ici sans son autorité.",
+      "vote_question": "« Hotspring cède le terrain demandé, contribue au chantier et accepte l’installation d’un relais territorial avec poste de patrouille. »",
+      "labels": {
+        "pour": "Accepter le poste territorial",
+        "contre": "Conserver l’autonomie"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "La route est nivelée, le relais ouvre et la première diligence entre à Hotspring. La ville se rapproche des marchés et de la loi territoriale. Ses décisions locales figurent désormais dans des dossiers que les familles ne maîtrisent pas.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D13",
+          "chronicle": {
+            "title": "La proposition territoriale est acceptée.",
+            "summary": "La route est nivelée, le relais ouvre et la première diligence entre à Hotspring. La ville se rapproche des marchés et de la loi territoriale. Ses décisions locales figurent désormais dans des dossiers que les familles ne maîtrisent pas."
+          }
+        },
+        "contre": {
+          "narration": "Hotspring conserve son autonomie. L’équipe de survey repart et la diligence prend une autre vallée. Le courrier continue d’arriver à cheval, avec retard ; aucune patrouille extérieure ne viendra rapidement si la route devient dangereuse.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D13",
+          "chronicle": {
+            "title": "La proposition est refusée.",
+            "summary": "Hotspring conserve son autonomie. L’équipe de survey repart et la diligence prend une autre vallée. Le courrier continue d’arriver à cheval, avec retard ; aucune patrouille extérieure ne viendra rapidement si la route devient dangereuse."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D13",
+      "chapter": 3,
+      "title": "Les piquets interdits",
+      "public_text": "Six familles arrivent avec des reçus du bureau foncier et plantent leurs piquets à l’intérieur du corridor de la rivière. Elles affirment avoir payé leurs droits au territoire, pas à Hotspring. Deux cabanes sont déjà en construction.\nLes représentants de la communauté voisine demandent que la ville applique l’accord signé. Faire déplacer les familles coûtera des lots, de l’argent et peut-être des habitants. Tolérer leurs claims fera grandir Hotspring — et transformera sa promesse en simple papier.",
+      "vote_question": "« Hotspring fait respecter l’accord de la rivière, retire les nouveaux claims du corridor et propose aux familles des lots de remplacement hors de la zone protégée. »",
+      "labels": {
+        "pour": "Respecter l’accord",
+        "contre": "Maintenir les parcelles"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Quatre familles acceptent d’autres lots ; deux reprennent la piste. Le corridor est rouvert. Hotspring ne gagne rien aujourd’hui, sinon la preuve que sa parole résiste lorsqu’elle devient coûteuse.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D14A",
+          "chronicle": {
+            "title": "L’accord est appliqué.",
+            "summary": "Quatre familles acceptent d’autres lots ; deux reprennent la piste. Le corridor est rouvert. Hotspring ne gagne rien aujourd’hui, sinon la preuve que sa parole résiste lorsqu’elle devient coûteuse."
+          }
+        },
+        "contre": {
+          "narration": "Les toits se ferment et les clôtures barrent progressivement le passage. La ville gagne des habitants et des terrains bâtis. Les représentants retirent de la carte la marque commune de l’accord : la rupture est désormais publique.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D14A",
+          "chronicle": {
+            "title": "Les claims sont maintenus.",
+            "summary": "Les toits se ferment et les clôtures barrent progressivement le passage. La ville gagne des habitants et des terrains bâtis. Les représentants retirent de la carte la marque commune de l’accord : la rupture est désormais publique."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D14A",
+      "chapter": 3,
+      "title": "L’hiver des réserves",
+      "public_text": "L’hiver ferme les cols trois semaines plus tôt que prévu. Hotspring dispose encore de farine, de sel et de médicaments, mais manque de viande et de fourrage. La communauté voisine a d’autres réserves, mais pas ce dont ses familles ont le plus besoin.\nSes représentants proposent un accord temporaire : stocks comptés ensemble, échanges à valeur convenue et rationnement commun jusqu’au dégel. Plusieurs marchands refusent d’ouvrir des réserves achetées à leurs risques. Personne ne demande la charité ; chacun demande si la confiance accumulée vaut assez pour traverser le même hiver.",
+      "vote_question": "« Hotspring ouvre ses réserves à un accord d’échange et de rationnement commun avec la communauté voisine jusqu’au dégel. »",
+      "labels": {
+        "pour": "Partager les réserves",
+        "contre": "Garder les réserves"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les réserves sont pesées, échangées et rationnées. Personne ne sort indemne de l’hiver, mais aucune communauté ne le traverse seule. Au printemps, une coopération pratique existe là où il n’y avait auparavant que des accords de circonstance.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D14B",
+          "chronicle": {
+            "title": "L’accord d’hiver est conclu.",
+            "summary": "Les réserves sont pesées, échangées et rationnées. Personne ne sort indemne de l’hiver, mais aucune communauté ne le traverse seule. Au printemps, une coopération pratique existe là où il n’y avait auparavant que des accords de circonstance."
+          }
+        },
+        "contre": {
+          "narration": "Hotspring protège ses stocks et évite les réquisitions. La communauté voisine déplace ses routes d’hiver et cesse de compter sur la ville. Il n’y a ni attaque ni vengeance : seulement deux groupes plus isolés lorsque la prochaine crise viendra.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D14B",
+          "chronicle": {
+            "title": "Les réserves restent fermées.",
+            "summary": "Hotspring protège ses stocks et évite les réquisitions. La communauté voisine déplace ses routes d’hiver et cesse de compter sur la ville. Il n’y a ni attaque ni vengeance : seulement deux groupes plus isolés lorsque la prochaine crise viendra."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D14B",
+      "chapter": 3,
+      "title": "Les chevaux disparus",
+      "public_text": "Dix-huit chevaux disparaissent pendant la nuit. Les traces suivent la rivière, se divisent près des collines puis deviennent illisibles. Plusieurs familles exigent une posse immédiate vers les campements voisins.\nDes représentants proposent une enquête conjointe de quarante-huit heures. Ce délai peut permettre aux voleurs de s’éloigner. Une expédition armée peut récupérer plus vite les bêtes — ou transformer des soupçons en affrontement avant même de savoir qui a volé quoi.",
+      "vote_question": "« Hotspring suspend toute expédition armée pendant quarante-huit heures et accepte une enquête conjointe sur le vol des chevaux. »",
+      "labels": {
+        "pour": "Enquêter ensemble",
+        "contre": "Organiser une recherche séparée"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Après trente-six heures, les enquêteurs trouvent une bande mêlant des hommes des deux communautés et des voyageurs de passage. Douze chevaux sont récupérés. Hotspring perd du temps et apprend surtout que le vol n’était pas l’ordre d’un peuple entier.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D15",
+          "chronicle": {
+            "title": "L’enquête conjointe est menée.",
+            "summary": "Après trente-six heures, les enquêteurs trouvent une bande mêlant des hommes des deux communautés et des voyageurs de passage. Douze chevaux sont récupérés. Hotspring perd du temps et apprend surtout que le vol n’était pas l’ordre d’un peuple entier."
+          }
+        },
+        "contre": {
+          "narration": "La posse rattrape une partie de la bande, récupère huit chevaux et arrête deux voleurs. Un échange de tirs tue un homme et en blesse un autre. L’incursion armée est retenue plus longtemps que les chevaux retrouvés : la vallée entre dans une hostilité ouverte.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 2
+            }
+          ],
+          "next_id": "D15",
+          "chronicle": {
+            "title": "La posse part immédiatement.",
+            "summary": "La posse rattrape une partie de la bande, récupère huit chevaux et arrête deux voleurs. Un échange de tirs tue un homme et en blesse un autre. L’incursion armée est retenue plus longtemps que les chevaux retrouvés : la vallée entre dans une hostilité ouverte."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D15",
+      "chapter": 4,
+      "title": "La gare",
+      "public_text": "La Western Continental Railroad veut traverser la vallée. Elle installera une gare à Hotspring si la ville cède le terrain du dépôt, fournit bois et main-d’œuvre et lui abandonne trente lots autour des voies.\nEn échange, la compagnie promet fret, courrier et voyageurs chaque semaine. Si Hotspring refuse, la ligne passera cinq milles plus au sud. Le train restera visible depuis les hauteurs ; il ne s’arrêtera simplement pas ici.",
+      "vote_question": "« Hotspring accepte les conditions de la Western Continental Railroad et cède les terrains nécessaires à la construction de sa gare. »",
+      "labels": {
+        "pour": "Accorder la gare",
+        "contre": "Conserver les terres"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le premier sifflet retentit avant même que le quai soit achevé. Marchands, ouvriers et spéculateurs se pressent autour du dépôt. Hotspring entre dans le réseau national ; la compagnie possède désormais un nouveau quartier au cœur de son expansion.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 3
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D16",
+          "chronicle": {
+            "title": "La gare est accordée.",
+            "summary": "Le premier sifflet retentit avant même que le quai soit achevé. Marchands, ouvriers et spéculateurs se pressent autour du dépôt. Hotspring entre dans le réseau national ; la compagnie possède désormais un nouveau quartier au cœur de son expansion."
+          }
+        },
+        "contre": {
+          "narration": "Les terrains restent sous contrôle local. Plusieurs négociants déplacent leurs projets vers la future station du sud. La locomotive passera à l’horizon ; Hotspring continuera de dépendre des chariots, des diligences et de ses propres routes.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D16",
+          "chronicle": {
+            "title": "La ligne contourne Hotspring.",
+            "summary": "Les terrains restent sous contrôle local. Plusieurs négociants déplacent leurs projets vers la future station du sud. La locomotive passera à l’horizon ; Hotspring continuera de dépendre des chariots, des diligences et de ses propres routes."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D16",
+      "chapter": 4,
+      "title": "La concession minière",
+      "public_text": "Les analyses de Black Ridge confirment un filon riche en argent et en cuivre. La Black Ridge Consolidated propose un chevalement à vapeur, un atelier de broyage et plusieurs centaines d’emplois.\nElle réclame une concession de vingt-cinq ans, un accès prioritaire à l’eau et le droit de déposer les résidus dans le ravin. Refuser ne fermera pas la montagne : les petits claims continueront, plus lentement, avec moins de capitaux et moins de contrôle central.",
+      "vote_question": "« Hotspring accorde à la Black Ridge Consolidated une concession industrielle de vingt-cinq ans ainsi que l’accès à l’eau nécessaire au traitement du minerai. »",
+      "labels": {
+        "pour": "Accorder la grande concession",
+        "contre": "Limiter la taille des mines"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les machines arrivent, les équipes se relaient et la cloche de changement de poste sonne avant l’aube. La mine devient le principal moteur de Hotspring — et une part croissante de son eau, de ses salaires et de ses espoirs dépend désormais de la même compagnie.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 3
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": -3
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D17",
+          "chronicle": {
+            "title": "La grande concession est accordée.",
+            "summary": "Les machines arrivent, les équipes se relaient et la cloche de changement de poste sonne avant l’aube. La mine devient le principal moteur de Hotspring — et une part croissante de son eau, de ses salaires et de ses espoirs dépend désormais de la même compagnie."
+          }
+        },
+        "contre": {
+          "narration": "Des galeries modestes s’ouvrent sous plusieurs noms. Les profits sont irréguliers et les moyens de secours limités, mais aucun conseil d’administration ne peut fermer à lui seul toute l’activité de la montagne. Hotspring grandit moins vite et reste moins dépendante.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D17",
+          "chronicle": {
+            "title": "L’exploitation reste morcelée.",
+            "summary": "Des galeries modestes s’ouvrent sous plusieurs noms. Les profits sont irréguliers et les moyens de secours limités, mais aucun conseil d’administration ne peut fermer à lui seul toute l’activité de la montagne. Hotspring grandit moins vite et reste moins dépendante."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D17",
+      "chapter": 4,
+      "title": "Le quartier des ouvriers",
+      "public_text": "La gare ou les mines attirent plus de travailleurs que Hotspring ne peut en loger. Les loyers doublent ; des familles dorment sous les chariots et dans les arrière-salles.\nDes entrepreneurs promettent un quartier de baraquements achevé avant les premières neiges, sur les terrains bas, sans drainage ni réseau d’eau durable. Le plan municipal exige des rues espacées, des fossés, des latrines et des points d’eau — mais il coûtera plus cher et logera moins de monde cette année.",
+      "vote_question": "« Hotspring autorise pour trois ans la construction d’un quartier de baraquements sur les terrains bas, sans drainage ni réseau d’eau permanent. »",
+      "labels": {
+        "pour": "Autoriser le quartier provisoire",
+        "contre": "Planifier le quartier"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "En quelques semaines, les baraques couvrent les terrains bas. Elles offrent enfin un toit, mais partagent quelques pompes, des latrines débordantes et des passages trop étroits pour les chariots de secours. Le mot « provisoire » est déjà peint sur des bâtiments qui semblent destinés à durer.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D18",
+          "chronicle": {
+            "title": "Le quartier provisoire est autorisé.",
+            "summary": "En quelques semaines, les baraques couvrent les terrains bas. Elles offrent enfin un toit, mais partagent quelques pompes, des latrines débordantes et des passages trop étroits pour les chariots de secours. Le mot « provisoire » est déjà peint sur des bâtiments qui semblent destinés à durer."
+          }
+        },
+        "contre": {
+          "narration": "Les chantiers avancent plus lentement et certains ouvriers repartent. Des rues, fossés, latrines et points d’eau précèdent néanmoins les maisons. Hotspring construit moins vite, mais chaque nouvelle habitation s’insère dans un quartier que la ville pourra encore desservir.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D18",
+          "chronicle": {
+            "title": "Le quartier planifié est imposé.",
+            "summary": "Les chantiers avancent plus lentement et certains ouvriers repartent. Des rues, fossés, latrines et points d’eau précèdent néanmoins les maisons. Hotspring construit moins vite, mais chaque nouvelle habitation s’insère dans un quartier que la ville pourra encore desservir."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D18",
+      "chapter": 4,
+      "title": "La banque de Hotspring",
+      "public_text": "Silas P. Merritt veut ouvrir la Hotspring Bank. Il promet des prêts pour les maisons, les commerces, les machines et les terrains ; les habitants n’auront plus à attendre les capitaux venus de l’Est.\nPour obtenir sa charte territoriale, Merritt demande que la ville souscrive au capital de départ et y dépose sa trésorerie. Sans banque, le crédit restera limité aux marchands, aux familles et aux prêteurs extérieurs. La croissance ralentira, mais l’argent public ne garantira aucune hypothèque privée.",
+      "vote_question": "« Hotspring souscrit au capital de la Hotspring Bank, y dépose sa trésorerie et demande au territoire d’en approuver la charte. »",
+      "labels": {
+        "pour": "Ouvrir la banque",
+        "contre": "Limiter le crédit"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Le coffre reçoit la trésorerie municipale, puis les titres de lots, de mine et de commerce s’empilent derrière le guichet. Des maisons et des entreprises sortent de terre grâce aux prêts. La ville possède enfin son propre crédit — et découvre que plusieurs fortunes reposent sur les mêmes garanties.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D19",
+          "chronicle": {
+            "title": "La Hotspring Bank ouvre ses portes.",
+            "summary": "Le coffre reçoit la trésorerie municipale, puis les titres de lots, de mine et de commerce s’empilent derrière le guichet. Des maisons et des entreprises sortent de terre grâce aux prêts. La ville possède enfin son propre crédit — et découvre que plusieurs fortunes reposent sur les mêmes garanties."
+          }
+        },
+        "contre": {
+          "narration": "Merritt repart avec son coffre vide. Les marchands continuent de prêter sur registre et certaines constructions sont reportées. Hotspring conserve sa trésorerie hors d’une banque locale ; elle renonce aussi à une croissance financée par des hypothèques faciles.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D19",
+          "chronicle": {
+            "title": "La ville refuse de garantir la banque.",
+            "summary": "Merritt repart avec son coffre vide. Les marchands continuent de prêter sur registre et certaines constructions sont reportées. Hotspring conserve sa trésorerie hors d’une banque locale ; elle renonce aussi à une croissance financée par des hypothèques faciles."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D19",
+      "chapter": 4,
+      "title": "Les parcs à bétail",
+      "public_text": "Une association d’éleveurs propose de construire de grands parcs, des balances et un abattoir sur les lots bas, entre la voie de fret — ou la route des convois — et la rivière. Elle promet emplois, peaux, suif et viande expédiée vers les marchés.\nLe médecin et le géomètre proposent un site plus éloigné, sur terrain sec, avec fosses étanches, inspection et aucune évacuation directe vers l’eau. Il coûtera davantage et ralentira les chargements. Le commerce restera rentable, mais moins spectaculaire.",
+      "vote_question": "« Hotspring autorise les grands parcs à bétail et l’abattoir sur les lots bas situés entre la voie de fret et la rivière. »",
+      "labels": {
+        "pour": "Autoriser les parcs centraux",
+        "contre": "Éloigner les installations"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les enclos se remplissent, les wagons repartent chargés et les ateliers utilisent peaux et suif. La rivière reçoit cependant ce que les entreprises ne veulent ni stocker ni payer pour traiter.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": -2
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D20",
+          "chronicle": {
+            "title": "Les parcs centraux sont autorisés.",
+            "summary": "Les enclos se remplissent, les wagons repartent chargés et les ateliers utilisent peaux et suif. La rivière reçoit cependant ce que les entreprises ne veulent ni stocker ni payer pour traiter."
+          }
+        },
+        "contre": {
+          "narration": "Les parcs sont construits hors des quartiers et reliés par une piste ou un embranchement. Les fosses et drains réduisent les rejets ; les inspections ralentissent parfois le travail. Hotspring gagne une industrie moins rentable, mais plus facile à séparer de ses maisons et de son eau.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D20",
+          "chronicle": {
+            "title": "Les installations sont éloignées et réglementées.",
+            "summary": "Les parcs sont construits hors des quartiers et reliés par une piste ou un embranchement. Les fosses et drains réduisent les rejets ; les inspections ralentissent parfois le travail. Hotspring gagne une industrie moins rentable, mais plus facile à séparer de ses maisons et de son eau."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D20",
+      "chapter": 4,
+      "title": "Le magasin de la compagnie",
+      "public_text": "Le plus grand employeur de Hotspring veut ouvrir son propre magasin et avancer nourriture, outils et logement aux travailleurs. Pour financer cette expansion, il propose de payer jusqu’à la moitié des salaires en bons utilisables dans ses bâtiments.\nCes bons permettront d’acheter avant la paie, mais pas de régler un impôt, de commercer librement ni de quitter facilement la ville. Les commerçants et plusieurs ouvriers exigent un salaire intégral en espèces, quitte à ralentir les embauches et les nouveaux chantiers.",
+      "vote_question": "« Hotspring autorise le principal employeur à verser jusqu’à la moitié des salaires en bons utilisables uniquement dans son magasin, ses logements et ses services. »",
+      "labels": {
+        "pour": "Autoriser les bons",
+        "contre": "Exiger le salaire en espèces"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Des jetons frappés au nom de la compagnie circulent entre la paie, le loyer et le magasin. Les travailleurs obtiennent immédiatement nourriture et crédit ; leurs dettes restent dans le même registre que leur salaire. Une part croissante de Hotspring fonctionne désormais comme une extension de l’entreprise.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D21",
+          "chronicle": {
+            "title": "Le paiement en bons est autorisé.",
+            "summary": "Des jetons frappés au nom de la compagnie circulent entre la paie, le loyer et le magasin. Les travailleurs obtiennent immédiatement nourriture et crédit ; leurs dettes restent dans le même registre que leur salaire. Une part croissante de Hotspring fonctionne désormais comme une extension de l’entreprise."
+          }
+        },
+        "contre": {
+          "narration": "La compagnie réduit son programme de construction et cherche davantage de numéraire. Le jour de paie, les pièces et billets circulent ensuite dans plusieurs commerces de la ville. Les travailleurs restent exposés aux dettes et aux retards, mais aucun jeton privé ne limite l’endroit où leur salaire peut être dépensé.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D21",
+          "chronicle": {
+            "title": "Le paiement en espèces est imposé.",
+            "summary": "La compagnie réduit son programme de construction et cherche davantage de numéraire. Le jour de paie, les pièces et billets circulent ensuite dans plusieurs commerces de la ville. Les travailleurs restent exposés aux dettes et aux retards, mais aucun jeton privé ne limite l’endroit où leur salaire peut être dépensé."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D21",
+      "chapter": 5,
+      "title": "Qui fait respecter la loi ?",
+      "public_text": "Deux diligences ont été attaquées en un mois. Les commerçants réclament des patrouilles, une prison et un homme présent chaque jour. Un ancien deputy propose de devenir marshal de Hotspring avec deux adjoints.\nLes familles peuvent aussi conserver la posse : des volontaires armés, réunis seulement en cas de besoin. Elle coûte moins cher et reste sous contrôle local, mais sa force dépend de ceux qui acceptent de se présenter.",
+      "vote_question": "« Hotspring crée un service permanent de marshal, avec deux adjoints et une petite prison, financé pour un an par une taxe sur les licences et les propriétés. »",
+      "labels": {
+        "pour": "Financer un marshal",
+        "contre": "Garder la posse"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Une étoile est remise, deux adjoints prêtent serment et une petite prison reçoit ses premières serrures. Hotspring possède désormais une autorité qui ne disparaît pas après chaque poursuite — mais elle devra surveiller ceux auxquels elle vient de confier ce pouvoir.",
+          "effects": [
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 3
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D22",
+          "chronicle": {
+            "title": "Le bureau du marshal ouvre.",
+            "summary": "Une étoile est remise, deux adjoints prêtent serment et une petite prison reçoit ses premières serrures. Hotspring possède désormais une autorité qui ne disparaît pas après chaque poursuite — mais elle devra surveiller ceux auxquels elle vient de confier ce pouvoir."
+          }
+        },
+        "contre": {
+          "narration": "La ville conserve son argent et ses familles gardent leurs armes. Lorsqu’une cloche sonne, certains hommes arrivent vite, d’autres pas du tout. Hotspring peut encore réunir une force ; elle ne possède toujours ni permanence, ni procédure commune, ni responsabilité clairement établie.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": "D22",
+          "chronicle": {
+            "title": "La posse est maintenue.",
+            "summary": "La ville conserve son argent et ses familles gardent leurs armes. Lorsqu’une cloche sonne, certains hommes arrivent vite, d’autres pas du tout. Hotspring peut encore réunir une force ; elle ne possède toujours ni permanence, ni procédure commune, ni responsabilité clairement établie."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D22",
+      "chapter": 5,
+      "title": "Ce que la ville rejette",
+      "public_text": "La chaleur révèle ce que l’hiver cachait. Les fossés stagnent, plusieurs latrines sont trop proches des pompes et les déchets des ateliers, des enclos ou de la mine finissent dans les mêmes bas-fonds.\nUn médecin et un géomètre proposent des drains, des latrines déplacées, un chariot de collecte et l’éloignement des rejets les plus sales. Les travaux coûteront cher et obligeront plusieurs entreprises à modifier leurs installations.",
+      "vote_question": "« Hotspring finance un programme d’assainissement : drainage des rues, latrines éloignées des points d’eau, collecte des déchets et déplacement des rejets polluants. »",
+      "labels": {
+        "pour": "Financer l’assainissement",
+        "contre": "Maintenir les usages actuels"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les fossés sont recreusés, les latrines déplacées et un chariot enlève chaque matin les déchets. Les ateliers doivent revoir leurs conduites. Hotspring perd de l’argent et du temps, mais cesse progressivement de traiter la rivière et les rues comme un espace sans propriétaire.",
+          "effects": [
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": 3
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -2
+            }
+          ],
+          "next_id": "D23",
+          "chronicle": {
+            "title": "Le programme d’assainissement est adopté.",
+            "summary": "Les fossés sont recreusés, les latrines déplacées et un chariot enlève chaque matin les déchets. Les ateliers doivent revoir leurs conduites. Hotspring perd de l’argent et du temps, mais cesse progressivement de traiter la rivière et les rues comme un espace sans propriétaire."
+          }
+        },
+        "contre": {
+          "narration": "Les plans sont roulés et les entreprises reprennent leur rythme. Après la première pluie, les eaux des fossés traversent les quartiers bas. Les habitants gardent leurs taxes ; ils conservent aussi les odeurs, les mouches et la proximité dangereuse entre rejets, latrines et pompes.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": -2
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D23",
+          "chronicle": {
+            "title": "Les travaux sont refusés.",
+            "summary": "Les plans sont roulés et les entreprises reprennent leur rythme. Après la première pluie, les eaux des fossés traversent les quartiers bas. Les habitants gardent leurs taxes ; ils conservent aussi les odeurs, les mouches et la proximité dangereuse entre rejets, latrines et pompes."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D23",
+      "chapter": 5,
+      "title": "Qui paie Hotspring ?",
+      "public_text": "Jusqu’ici, Hotspring a payé ses besoins par des licences, des dons et des appels d’urgence. Chaque école, patrouille, pompe ou médecin dépend d’une nouvelle négociation entre les mêmes familles.\nLe greffier propose un impôt annuel sur les propriétés et les principales licences commerciales, accompagné d’un budget public. Les opposants y voient le début d’une administration permanente et d’une charge qui continuera même les bonnes années.",
+      "vote_question": "« Hotspring adopte un impôt local régulier sur les propriétés et les principales licences, avec un budget publié chaque trimestre. »",
+      "labels": {
+        "pour": "Créer l’impôt local",
+        "contre": "Financer au cas par cas"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Un receveur ouvre un registre, les évaluations sont affichées et chaque service connaît enfin son budget. Hotspring paiera désormais pour exister entre deux crises — et les contribuables demanderont des comptes à ceux qui dépensent leur argent.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D24",
+          "chronicle": {
+            "title": "L’impôt local est adopté.",
+            "summary": "Un receveur ouvre un registre, les évaluations sont affichées et chaque service connaît enfin son budget. Hotspring paiera désormais pour exister entre deux crises — et les contribuables demanderont des comptes à ceux qui dépensent leur argent."
+          }
+        },
+        "contre": {
+          "narration": "Les habitants évitent une taxe annuelle. La prochaine réparation dépendra d’une licence, d’une collecte ou d’un grand donateur. Les services restent visibles, mais leur continuité repose sur des promesses privées et sur la capacité des familles à ouvrir leur bourse au bon moment.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D24",
+          "chronicle": {
+            "title": "Le financement ponctuel est maintenu.",
+            "summary": "Les habitants évitent une taxe annuelle. La prochaine réparation dépendra d’une licence, d’une collecte ou d’un grand donateur. Les services restent visibles, mais leur continuité repose sur des promesses privées et sur la capacité des familles à ouvrir leur bourse au bon moment."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D24",
+      "chapter": 5,
+      "title": "Le grand incendie",
+      "public_text": "Peu après minuit, une flamme apparaît derrière Main Street. Le vent la pousse vers les toits, les écuries et les piles de bois. La brigade comprend vite qu’elle ne pourra pas tenir deux lignes à la fois.\nElle peut défendre le centre économique — magasins, banque et entrepôts — ou se replier vers les maisons, l’école et le dispensaire. Le quartier abandonné au vent brûlera presque certainement.",
+      "vote_question": "« La brigade concentre ses hommes, son eau et ses pompes sur Main Street et les entrepôts, afin de sauver le centre économique. »",
+      "labels": {
+        "pour": "Sauver Main Street",
+        "contre": "Sauver les quartiers"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "La pompe et les seaux tiennent devant les commerces. Derrière eux, le vent gagne les maisons du quartier bas. Au matin, les coffres et les stocks existent encore, mais des familles campent devant des cheminées noircies.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": -3
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D25",
+          "chronicle": {
+            "title": "Main Street est sauvée.",
+            "summary": "La pompe et les seaux tiennent devant les commerces. Derrière eux, le vent gagne les maisons du quartier bas. Au matin, les coffres et les stocks existent encore, mais des familles campent devant des cheminées noircies."
+          }
+        },
+        "contre": {
+          "narration": "La brigade forme sa ligne devant les maisons, l’école et le dispensaire. Main Street brûle par blocs. Au matin, les habitants ont encore un toit, mais les vitrines, les registres et plusieurs entrepôts ne sont plus que des façades calcinées.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -3
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D25",
+          "chronicle": {
+            "title": "Les quartiers habités sont sauvés.",
+            "summary": "La brigade forme sa ligne devant les maisons, l’école et le dispensaire. Main Street brûle par blocs. Au matin, les habitants ont encore un toit, mais les vitrines, les registres et plusieurs entrepôts ne sont plus que des façades calcinées."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D25",
+      "chapter": 5,
+      "title": "La fièvre de l’été",
+      "public_text": "En huit jours, plusieurs foyers signalent la même forte fièvre. Le médecin soupçonne l’eau ou les aliments, sans pouvoir désigner une seule source. Les travailleurs continuent pourtant d’arriver à la mine, à la gare et au marché.\nIl demande vingt et un jours de fermeture des lieux de rassemblement, l’isolement des malades et l’inspection des puits. Les commerçants préviennent qu’une telle mesure ruinera la saison et poussera des familles à repartir.",
+      "vote_question": "« Hotspring impose pendant vingt et un jours la fermeture des lieux de rassemblement, l’isolement des malades et l’inspection de tous les points d’eau. »",
+      "labels": {
+        "pour": "Imposer la quarantaine",
+        "contre": "Laisser la ville ouverte"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les portes des lieux publics ferment, les malades sont regroupés et les pompes inspectées. Le commerce chute et certains travailleurs repartent, mais le nombre de nouveaux cas ralentit avant la fin des trois semaines.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -2
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D26A",
+          "chronicle": {
+            "title": "La quarantaine est imposée.",
+            "summary": "Les portes des lieux publics ferment, les malades sont regroupés et les pompes inspectées. Le commerce chute et certains travailleurs repartent, mais le nombre de nouveaux cas ralentit avant la fin des trois semaines."
+          }
+        },
+        "contre": {
+          "narration": "Le marché et les quarts de travail sont maintenus. Puis les absences se multiplient, les chambres ferment une à une et les diligences évitent Hotspring. La ville n’a pas perdu trois semaines d’activité ; elle en perd davantage, avec plus de malades et moins de confiance.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": -3
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D26A",
+          "chronicle": {
+            "title": "L’activité continue.",
+            "summary": "Le marché et les quarts de travail sont maintenus. Puis les absences se multiplient, les chambres ferment une à une et les diligences évitent Hotspring. La ville n’a pas perdu trois semaines d’activité ; elle en perd davantage, avec plus de malades et moins de confiance."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D26A",
+      "chapter": 5,
+      "title": "La rivière reprend sa place",
+      "public_text": "Après trois jours de pluie et une fonte précoce, la rivière dépasse ses anciennes marques. L’eau entre dans les fossés, coupe la route basse et atteint les premières maisons.\nLes ingénieurs peuvent ouvrir le remblai de la route pour détourner le courant vers les entrepôts et les parcs de fret. Cela sauverait les quartiers habités, mais détruirait des stocks, des voies et peut-être le pont. Refuser protège les biens aussi longtemps que les digues tiennent.",
+      "vote_question": "« Hotspring ordonne l’évacuation des quartiers bas et ouvre le remblai afin de détourner la crue vers les entrepôts et les terrains de fret. »",
+      "labels": {
+        "pour": "Évacuer les habitants",
+        "contre": "Protéger le fret"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les quartiers bas se vident avant la nuit. Le remblai est ouvert et la crue traverse les terrains de fret. Des stocks disparaissent et le pont est endommagé, mais la majorité des habitants passe la nuit sur les hauteurs.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -3
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D26B",
+          "chronicle": {
+            "title": "L’évacuation est ordonnée.",
+            "summary": "Les quartiers bas se vident avant la nuit. Le remblai est ouvert et la crue traverse les terrains de fret. Des stocks disparaissent et le pont est endommagé, mais la majorité des habitants passe la nuit sur les hauteurs."
+          }
+        },
+        "contre": {
+          "narration": "Les hommes restent près des entrepôts et du pont. Lorsque la digue cède, l’eau entre dans les rues habitées. Une partie des stocks est sauvée, mais l’évacuation tardive laisse des maisons ruinées et pousse des familles hors de la vallée.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": -3
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D26B",
+          "chronicle": {
+            "title": "Les digues sont maintenues.",
+            "summary": "Les hommes restent près des entrepôts et du pont. Lorsque la digue cède, l’eau entre dans les rues habitées. Une partie des stocks est sauvée, mais l’évacuation tardive laisse des maisons ruinées et pousse des familles hors de la vallée."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D26B",
+      "chapter": 5,
+      "title": "La soif de Hotspring",
+      "public_text": "La pluie n’est pas venue. Les pompes remontent du sable et la citerne perd chaque matin plusieurs pouces. La mine, les locomotives, les stockyards et les ateliers consomment encore la plus grande part de l’eau disponible.\nLe médecin demande de réserver l’eau aux foyers, à l’école et au dispensaire, quitte à suspendre les activités industrielles pendant un mois. Les employeurs préviennent qu’une fermeture fera partir les capitaux et laissera des centaines d’ouvriers sans paie.",
+      "vote_question": "« Hotspring réserve l’eau disponible aux habitants et suspend pendant trente jours les usages industriels non essentiels. »",
+      "labels": {
+        "pour": "Priorité aux habitants",
+        "contre": "Laisser acheter l’eau"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les machines s’arrêtent, les quarts sont annulés et les salaires diminuent. Des citernes distribuent une ration quotidienne. Hotspring perd un mois de production, mais aucune famille ne doit choisir entre boire et payer le tarif du jour.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -3
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": -1
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D27",
+          "chronicle": {
+            "title": "L’eau est réservée aux habitants.",
+            "summary": "Les machines s’arrêtent, les quarts sont annulés et les salaires diminuent. Des citernes distribuent une ration quotidienne. Hotspring perd un mois de production, mais aucune famille ne doit choisir entre boire et payer le tarif du jour."
+          }
+        },
+        "contre": {
+          "narration": "La mine et les trains gardent leurs réserves. Les habitants attendent aux pompes ou achètent des barils privés. Les prix montent, des disputes éclatent et plusieurs familles quittent la ville avant le retour des pluies.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": -3
+            },
+            {
+              "indicator": "ecologie",
+              "operation": "delta",
+              "value": -2
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D27",
+          "chronicle": {
+            "title": "Les activités continuent.",
+            "summary": "La mine et les trains gardent leurs réserves. Les habitants attendent aux pompes ou achètent des barils privés. Les prix montent, des disputes éclatent et plusieurs familles quittent la ville avant le retour des pluies."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D27",
+      "chapter": 5,
+      "title": "Sous la montagne",
+      "public_text": "À l’aube, un effondrement bloque le troisième niveau de Black Ridge. Les équipes de secours ramènent des survivants et plusieurs familles attendent encore devant la cage.\nLa compagnie veut rouvrir les galeries intactes sous quarante-huit heures. Elle affirme qu’un mois d’arrêt condamnerait les salaires et les commandes. Les mineurs réclament une inspection indépendante, de nouveaux étaiements, une ventilation et un fonds de secours.",
+      "vote_question": "« Hotspring suspend l’exploitation jusqu’à une inspection indépendante et impose de nouveaux étaiements, une ventilation contrôlée et un fonds de secours. »",
+      "labels": {
+        "pour": "Fermer et inspecter la mine",
+        "contre": "Reprendre immédiatement"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Des inspecteurs descendent avec les équipes, les galeries sont étayées et un poste de secours est créé. Les paies diminuent et la compagnie menace de reporter ses investissements, mais la réouverture se fera sous des règles que la ville pourra contrôler.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -2
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 2
+            }
+          ],
+          "next_id": "D28",
+          "chronicle": {
+            "title": "La mine reste fermée.",
+            "summary": "Des inspecteurs descendent avec les équipes, les galeries sont étayées et un poste de secours est créé. Les paies diminuent et la compagnie menace de reporter ses investissements, mais la réouverture se fera sous des règles que la ville pourra contrôler."
+          }
+        },
+        "contre": {
+          "narration": "Le sifflet retentit deux jours plus tard. Une partie des ouvriers redescend, d’autres restent devant les grilles. La production reprend avant que le rapport soit terminé. Hotspring conserve les emplois — et transforme l’accident en conflit de travail.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -2
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D28",
+          "chronicle": {
+            "title": "La reprise rapide est autorisée.",
+            "summary": "Le sifflet retentit deux jours plus tard. Une partie des ouvriers redescend, d’autres restent devant les grilles. La production reprend avant que le rapport soit terminé. Hotspring conserve les emplois — et transforme l’accident en conflit de travail."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D28",
+      "chapter": 5,
+      "title": "La panique au guichet",
+      "public_text": "Un télégramme annonce la chute d’une compagnie de l’Est. Avant midi, une file se forme devant la Hotspring Bank. Chacun veut retirer ses dépôts avant les autres.\nLa banque a prêté l’argent dans les maisons, la mine, les commerces et les terrains du rail. Son directeur demande à la ville de garantir les petits dépôts et de suspendre les paiements pendant soixante-douze heures. Sans garantie, il fermera le guichet et liquidera ses garanties.",
+      "vote_question": "« Hotspring garantit temporairement les petits dépôts et accepte une suspension de soixante-douze heures des retraits afin d’éviter la faillite immédiate de la banque. »",
+      "labels": {
+        "pour": "Garantir la banque",
+        "contre": "Laisser la banque fermer"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "La ville engage sa trésorerie, les familles signent une garantie et le guichet suspend les paiements. La file se disperse sans certitude. La banque survit, les hypothèques ne sont pas saisies immédiatement — et Hotspring porte désormais une dette contractée pour sauver son crédit.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -2
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            }
+          ],
+          "next_id": "D29",
+          "chronicle": {
+            "title": "La garantie est accordée.",
+            "summary": "La ville engage sa trésorerie, les familles signent une garantie et le guichet suspend les paiements. La file se disperse sans certitude. La banque survit, les hypothèques ne sont pas saisies immédiatement — et Hotspring porte désormais une dette contractée pour sauver son crédit."
+          }
+        },
+        "contre": {
+          "narration": "Les portes ferment et les avis de saisie apparaissent sur les maisons, les commerces et les lots hypothéqués. La trésorerie municipale reste intacte, mais des économies disparaissent, des entreprises ferment et plusieurs familles quittent la ville avant les ventes aux enchères.",
+          "effects": [
+            {
+              "indicator": "economie",
+              "operation": "delta",
+              "value": -3
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": -2
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D29",
+          "chronicle": {
+            "title": "La banque est abandonnée à la liquidation.",
+            "summary": "Les portes ferment et les avis de saisie apparaissent sur les maisons, les commerces et les lots hypothéqués. La trésorerie municipale reste intacte, mais des économies disparaissent, des entreprises ferment et plusieurs familles quittent la ville avant les ventes aux enchères."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D29",
+      "chapter": 6,
+      "title": "Qui gouvernera Hotspring ?",
+      "public_text": "Depuis vingt ans, les familles fondatrices choisissent les dépenses, arbitrent les conflits et parlent au nom de Hotspring. Elles connaissent chaque dette de la ville et chaque promesse faite en son nom.\nMais la population a grandi. Commerçants, ouvriers, éleveurs et nouveaux propriétaires réclament un conseil municipal élu selon la loi du territoire. Les familles conserveraient leur prestige et leurs sièges comme citoyens ; elles perdraient toutefois tout droit permanent de veto.",
+      "vote_question": "« Hotspring transfère la conduite municipale à un conseil élu par les électeurs reconnus par la loi territoriale, sans droit de veto permanent pour les familles fondatrices. »",
+      "labels": {
+        "pour": "Conseil élu",
+        "contre": "Conseil des Fondateurs"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les fondateurs signent la fin de leur droit permanent de veto. Les premières listes se forment aussitôt : commerçants, ouvriers, propriétaires et hommes de loi découvrent que représenter la ville signifie aussi promettre, convaincre et rendre des comptes.",
+          "effects": [
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": 2
+            },
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D30",
+          "chronicle": {
+            "title": "Le conseil élu est adopté.",
+            "summary": "Les fondateurs signent la fin de leur droit permanent de veto. Les premières listes se forment aussitôt : commerçants, ouvriers, propriétaires et hommes de loi découvrent que représenter la ville signifie aussi promettre, convaincre et rendre des comptes."
+          }
+        },
+        "contre": {
+          "narration": "Les cinq sceaux familiaux restent au-dessus de la table. L’administration continue sans interruption, mais une partie de la ville comprend qu’elle pourra travailler, payer et mourir à Hotspring sans jamais posséder le même poids que ceux arrivés en premier.",
+          "effects": [
+            {
+              "indicator": "securite",
+              "operation": "delta",
+              "value": 1
+            },
+            {
+              "indicator": "demographie",
+              "operation": "delta",
+              "value": -1
+            }
+          ],
+          "next_id": "D30",
+          "chronicle": {
+            "title": "Le Conseil des Fondateurs demeure.",
+            "summary": "Les cinq sceaux familiaux restent au-dessus de la table. L’administration continue sans interruption, mais une partie de la ville comprend qu’elle pourra travailler, payer et mourir à Hotspring sans jamais posséder le même poids que ceux arrivés en premier."
+          }
+        }
+      },
+      "status": "active",
+      "tags": []
+    },
+    {
+      "id": "D30",
+      "chapter": 6,
+      "title": "La charte de Hotspring",
+      "public_text": "Les projets de charte sont enfin ouverts. Chacun reprend une part réelle de l’histoire de Hotspring : ses commerces, ses services, son goût de l’autonomie, ses institutions, ses ressources ou ses accords dans la vallée.\nAucune charte ne réparera toutes les erreurs. Chacune protégera certains intérêts et en exposera d’autres. Les familles doivent maintenant choisir l’héritage qui guidera les décisions après leur départ.",
+      "vote_question": "Quelle charte Hotspring adoptera-t-elle ?",
+      "labels": {
+        "pour": "Première charte",
+        "contre": "Seconde charte"
+      },
+      "image": {
+        "url": null,
+        "alt": "",
+        "license": null,
+        "credit": null
+      },
+      "outcomes": {
+        "pour": {
+          "narration": "Les projets de charte sont enfin ouverts. Chacun reprend une part réelle de l’histoire de Hotspring : ses commerces, ses services, son goût de l’autonomie, ses institutions, ses ressources ou ses accords dans la vallée.\nAucune charte ne réparera toutes les erreurs. Chacune protégera certains intérêts et en exposera d’autres. Les familles doivent maintenant choisir l’héritage qui guidera les décisions après leur départ.",
+          "effects": [],
+          "next_id": null
+        },
+        "contre": {
+          "narration": "Les projets de charte sont enfin ouverts. Chacun reprend une part réelle de l’histoire de Hotspring : ses commerces, ses services, son goût de l’autonomie, ses institutions, ses ressources ou ses accords dans la vallée.\nAucune charte ne réparera toutes les erreurs. Chacune protégera certains intérêts et en exposera d’autres. Les familles doivent maintenant choisir l’héritage qui guidera les décisions après leur départ.",
+          "effects": [],
+          "next_id": null
+        }
+      },
+      "status": "active",
+      "tags": []
+    }
+  ],
+  "campaign": {
+    "version": 1,
+    "intros": {
+      "1": {
+        "title": "1872 — La vallée",
+        "text": "Après des semaines de piste, cinq convois atteignent une vallée traversée par une rivière. Il y a de l’eau, un peu de bois et des terres exploitables. Continuer vers l’ouest coûterait encore des semaines et peut-être des vies.\nMais la vallée n’est pas vide. Une communauté autochtone y circule et en utilise les ressources ; marchands, trappeurs et troupeaux empruntent déjà la piste. Personne ne vous a promis cette terre, ni qu’elle vous nourrirait.\nPourtant, ce soir-là, une idée s’impose : ne plus repartir. Quelqu’un prononce un nom pour la première fois : Hotspring."
+      },
+      "2": {
+        "title": "Bâtir",
+        "text": "Le premier hiver a laissé des tombes, des dettes et quelques familles de plus. Hotspring a tenu. Mais tenir n’est pas bâtir.\nIl faut désormais des planches, des services et des règles. Chaque construction attirera certains habitants, en repoussera d’autres et donnera à la ville un visage qu’elle ne pourra plus facilement effacer."
+      },
+      "3": {
+        "title": "Partager la vallée",
+        "text": "Hotspring a survécu, puis elle a bâti. Ses rues, ses clôtures et ses affaires débordent désormais bien au-delà des premiers lots.\nLa vallée, elle, était déjà parcourue avant l’arrivée des chariots. On y suit l’eau, le gibier, les saisons et les routes de commerce. À présent, chaque troupeau, chaque piquet et chaque nouvelle route pose la même question : Hotspring peut-elle partager ce qu’elle commence déjà à considérer comme sien ?"
+      },
+      "4": {
+        "title": "La fièvre",
+        "text": "La vallée connaît maintenant le nom de Hotspring. Des cartes circulent dans les bureaux de chemin de fer, les salles de vente et les camps de prospecteurs. Les terrains changent de prix avant même de changer de mains.\nEn quelques années, la ville peut gagner une gare, une mine, une banque et des milliers d’habitants. Elle peut aussi devenir dépendante d’entreprises assez riches pour repartir le jour où leurs comptes ne leur conviennent plus."
+      },
+      "5": {
+        "title": "Le prix du succès",
+        "text": "Hotspring n’est plus une halte entre deux pistes. On y règle des salaires, des loyers et des dettes. Les rues portent des noms ; les terrains ont des propriétaires ; les entreprises ont des horaires.\nLa croissance a toutefois rapproché les maisons, les déchets, les machines et les intérêts. La ville ne manque plus seulement de bâtiments. Elle manque de règles capables de protéger les habitants lorsque tout fonctionne mal en même temps."
+      },
+      "6": {
+        "title": "Hotspring se choisit",
+        "text": "Vingt et une années ont passé depuis l’arrêt des premiers chariots. Hotspring possède désormais des rues, des propriétés, des dettes, des souvenirs et peut-être des ruines.\nLa ville a longtemps été dirigée comme un camp : par ceux qui étaient là les premiers et qui avaient les moyens de décider. Mais les fondateurs ne sont plus seuls. Les nouveaux habitants demandent une voix, tandis que les familles rappellent ce qu’elles ont risqué pour bâtir Hotspring."
+      }
+    },
+    "checkpoints": {
+      "1": {
+        "title": "Hotspring, première année",
+        "text": "À l’approche de l’hiver, Hotspring existe enfin : une rue, quelques toits, des fenêtres allumées. Mais la ville reste façonnée par trois décisions prises dans l’urgence : son emplacement, son eau et ses terres.\nNul ne sait encore si elle deviendra prospère ou disparaîtra des cartes. Si vous revenez, vous ne recommencerez pas : vous reprendrez ici, avec les conséquences de vos choix."
+      },
+      "2": {
+        "title": "Hotspring prend forme",
+        "text": "Deux années ont passé. Hotspring possède désormais une rue, des ateliers et des habitudes. Selon vos choix, les enfants y apprennent à lire — ou les familles repartent. Les voyageurs y trouvent un saloon ou une auberge. Les blessés ont un médecin, ou plusieurs jours de piste devant eux.\nLa ville a grandi assez pour qu’un accident, une pénurie ou un incendie ne touche plus seulement cinq familles. La prochaine étape sera plus difficile : Hotspring devra partager une vallée qu’elle n’a jamais été seule à occuper."
+      },
+      "3": {
+        "title": "La vallée garde la mémoire",
+        "text": "Hotspring ne se résume plus à ses bâtiments. La ville possède maintenant des frontières, des routes, des accords — ou des ruptures que personne n’a oubliées.\nLa vallée sait désormais ce que valent vos promesses lorsque l’argent, la peur ou de nouveaux arrivants les mettent à l’épreuve. La prochaine étape apportera le rail, la mine et une croissance que plus aucune famille ne pourra entièrement contrôler."
+      },
+      "4": {
+        "title": "La ville-champignon",
+        "text": "En six ans, Hotspring a appris à vivre au rythme des horaires, des quarts de travail et des prix affichés chaque matin. Ses rues peuvent désormais conduire à une gare, une mine, une banque, des enclos ou une forêt de baraquements.\nLa ville a grandi plus vite que ses institutions. Le prochain chapitre ne demandera plus comment attirer la prospérité, mais qui paiera pour l’ordre, l’eau propre, la santé — et les promesses faites pendant la fièvre."
+      },
+      "5": {
+        "title": "Le prix du succès",
+        "text": "Hotspring a appris qu’une ville ne se mesure pas seulement à ses bâtiments. Elle se mesure à ce qui reste ouvert lorsque l’argent manque, à ceux que l’on protège quand les moyens ne suffisent pas et aux traces laissées après chaque crise.\nSes rues portent désormais des institutions, des dettes et peut-être des cicatrices. La prochaine étape ne demandera plus comment administrer l’urgence, mais qui aura le droit de gouverner la ville ainsi construite."
+      },
+      "6": {
+        "title": "Le gouvernement choisi",
+        "text": "Hotspring sait désormais qui parlera en son nom. La ville n’a pas encore décidé ce qu’elle défendra.\nLes chartes restent scellées sur la table. Elles promettent toutes un avenir ; aucune ne promet d’en éviter le prix. La prochaine séance commencera par la question que les fondateurs ont repoussée depuis l’arrivée des chariots : quelle ville voulons-nous laisser derrière nous ?"
+      }
+    },
+    "rules": {
+      "D01": {
+        "tendencies": {
+          "pour": [
+            "Installation rapide près de l’eau.",
+            "Économie ↑ · Démographie ↑",
+            "Compromis annoncé : la ville sera davantage exposée aux risques liés à la rivière."
+          ],
+          "contre": [
+            "Installation plus lente sur la terrasse haute.",
+            "Sécurité ↑ · Écologie ↑",
+            "Compromis annoncé : l’acheminement de l’eau et des marchandises sera plus difficile."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "VILLE_BASSE"
+          ],
+          "contre": [
+            "VILLE_HAUTE"
+          ]
+        }
+      },
+      "D02": {
+        "tendencies": {
+          "pour": [
+            "Le puits est construit rapidement, sans dépense collective immédiate.",
+            "Économie ↑ · Démographie ↑",
+            "Choix durable annoncé : l’eau devient payante et dépend d’un opérateur privé."
+          ],
+          "contre": [
+            "Le puits est financé et administré par la communauté.",
+            "Économie ↓ · Écologie ↑",
+            "Choix durable annoncé : le chantier sera plus lent, mais l’accès à l’eau restera collectif."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "EAU_PRIVEE"
+          ],
+          "contre": [
+            "EAU_COMMUNALE"
+          ]
+        }
+      },
+      "D03": {
+        "tendencies": {
+          "pour": [
+            "Les meilleurs terrains sont vendus immédiatement.",
+            "Économie ↑",
+            "Choix durable annoncé : des bâtiments privés apparaîtront vite, mais le centre sera largement privatisé."
+          ],
+          "contre": [
+            "La ville conserve plusieurs terrains au centre.",
+            "Économie ↓ · Démographie ↑",
+            "Choix durable annoncé : la croissance sera plus lente, mais des emplacements resteront disponibles pour les services publics."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "CENTRE_PRIVE"
+          ],
+          "contre": [
+            "RESERVES_PUBLIQUES"
+          ]
+        }
+      },
+      "D04": {
+        "tendencies": {
+          "pour": [
+            "Bois abondant et constructions accélérées.",
+            "Économie ↑ · Démographie ↑ · Écologie ↓↓",
+            "Compromis annoncé : la forêt reculera rapidement autour de la ville."
+          ],
+          "contre": [
+            "Coupe limitée et achats extérieurs.",
+            "Économie ↓ · Écologie ↑↑",
+            "Compromis annoncé : les bâtiments coûteront plus cher et certains chantiers seront retardés."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "SCIERIE_INTENSIVE"
+          ],
+          "contre": [
+            "COUPE_REGULEE"
+          ]
+        }
+      },
+      "D05": {
+        "tendencies": {
+          "pour": [
+            "Une institution commune et un argument pour retenir les familles.",
+            "Économie ↓ · Démographie ↑↑",
+            "Coût annoncé : plus élevé si les lots centraux ont déjà été vendus."
+          ],
+          "contre": [
+            "Les fonds restent disponibles pour les chantiers productifs.",
+            "Économie ↑ · Démographie ↓",
+            "Compromis annoncé : certaines familles pourraient quitter Hotspring."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "ECOLE"
+          ],
+          "contre": [
+            "ECOLE_REPORTEE"
+          ]
+        }
+      },
+      "D06": {
+        "tendencies": {
+          "pour": [
+            "Un établissement très rentable, animé et attractif pour les voyageurs.",
+            "Économie ↑↑ · Démographie ↑ · Sécurité ↓",
+            "Compromis annoncé : le saloon concentrera aussi jeux, alcool et conflits."
+          ],
+          "contre": [
+            "Une auberge réglementée, moins rentable mais plus calme.",
+            "Économie ↑ · Sécurité ↑",
+            "Compromis annoncé : Hotspring perd une part de l’activité nocturne et des recettes de licence."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "GRAND_SALOON"
+          ],
+          "contre": [
+            "AUBERGE_REGLEMENTEE"
+          ]
+        }
+      },
+      "D07": {
+        "tendencies": {
+          "pour": [
+            "Un service médical permanent et une meilleure capacité à traverser accidents et maladies.",
+            "Économie ↓ · Sécurité ↑↑ · Démographie ↑",
+            "Coût annoncé : plus élevé si la ville ne possède plus de terrain central."
+          ],
+          "contre": [
+            "Aucune dépense publique et maintien des fonds disponibles.",
+            "Économie ↑",
+            "Risque annoncé : Hotspring restera dépendante de soins occasionnels et lointains."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "DISPENSAIRE"
+          ],
+          "contre": [
+            "SANS_MEDECIN"
+          ]
+        }
+      },
+      "D08": {
+        "tendencies": {
+          "pour": [
+            "Construction plus lente et moins dense, avec moyens collectifs de lutte contre le feu.",
+            "Économie ↓ · Sécurité ↑↑↑",
+            "Choix durable annoncé : certains lots perdront de la valeur ou devront être déplacés."
+          ],
+          "contre": [
+            "Construction rapide et utilisation maximale de Main Street.",
+            "Économie ↑↑ · Démographie ↑ · Sécurité ↓↓",
+            "Risque annoncé : un incendie futur se propagera plus facilement."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "REGLEMENT_INCENDIE"
+          ],
+          "contre": [
+            "CONSTRUCTION_SERREE"
+          ]
+        }
+      },
+      "D09": {
+        "tendencies": {
+          "pour": [
+            "Un accord local limite l’expansion sur la rive.",
+            "Économie ↓ · Écologie ↑↑ · Sécurité ↑",
+            "Relation avec la communauté voisine ↑↑",
+            "Compromis annoncé : moins de lots disponibles près de l’eau."
+          ],
+          "contre": [
+            "Les terres riveraines restent ouvertes aux claims.",
+            "Économie ↑ · Démographie ↑ · Écologie ↓",
+            "Relation avec la communauté voisine ↓↓",
+            "Compromis annoncé : la ville gagne de l’espace mais renonce à un accord préventif."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "ACCORD_RIVIERE"
+          ],
+          "contre": [
+            "EXPANSION_RIVIERE"
+          ]
+        }
+      },
+      "D10": {
+        "tendencies": {
+          "pour": [
+            "Le troupeau traverse Hotspring et dépense en ville.",
+            "Économie ↑↑ · Démographie ↑ · Écologie ↓↓ · Sécurité ↓",
+            "Relation ↓ si un accord riverain existe.",
+            "Compromis annoncé : profits rapides contre dégradation et risque de débordement."
+          ],
+          "contre": [
+            "Le troupeau est détourné hors de la vallée centrale.",
+            "Économie ↓ · Écologie ↑ · Sécurité ↑",
+            "Relation ↑ si l’accord riverain est respecté.",
+            "Compromis annoncé : la ville renonce aux recettes du passage."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "PASSAGE_DIRECT"
+          ],
+          "contre": [
+            "DETOUR_TROUPEAUX"
+          ]
+        }
+      },
+      "D11": {
+        "tendencies": {
+          "pour": [
+            "Commerce plus régulier et contrôles partagés.",
+            "Économie ↑ · Démographie ↑ · Sécurité ↑",
+            "Relation ↑↑",
+            "Compromis annoncé : coût public et marges plus faibles pour les négociants de Hotspring."
+          ],
+          "contre": [
+            "Licences réservées aux négociants de Hotspring.",
+            "Économie ↑↑ · Sécurité ↓",
+            "Relation ↓",
+            "Compromis annoncé : recettes supérieures, mais dépendance à quelques intermédiaires."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "COMPTOIR_COMMUN"
+          ],
+          "contre": [
+            "MONOPOLE_LOCAL"
+          ]
+        }
+      },
+      "D12": {
+        "tendencies": {
+          "pour": [
+            "Route, courrier et patrouilles régulières.",
+            "Économie ↑↑ · Sécurité ↑↑ · Écologie ↓",
+            "Autonomie locale ↓ ; pression extérieure sur les accords existants.",
+            "Compromis annoncé : la ville entre dans un réseau qu’elle ne contrôle pas entièrement."
+          ],
+          "contre": [
+            "La route contourne Hotspring.",
+            "Économie ↓ · Sécurité ↓ · Écologie ↑",
+            "Autonomie locale ↑",
+            "Compromis annoncé : moins de trafic, de courrier et d’aide extérieure."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "POSTE_TERRITORIAL"
+          ],
+          "contre": [
+            "AUTONOMIE_LOCALE"
+          ]
+        }
+      },
+      "D13": {
+        "tendencies": {
+          "pour": [
+            "La ville assume le coût de sa promesse.",
+            "Économie ↓ · Démographie ↓ · Sécurité ↑",
+            "Relation ↑↑↑",
+            "Compromis annoncé : relogement, colère et possible départ de plusieurs familles."
+          ],
+          "contre": [
+            "Les claims territoriaux sont reconnus.",
+            "Économie ↑ · Démographie ↑↑ · Sécurité ↓",
+            "Relation ↓↓↓",
+            "Compromis annoncé : croissance immédiate au prix d’une rupture explicite de l’accord."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "ACCORD_RESPECTE"
+          ],
+          "contre": [
+            "ACCORD_ROMPU"
+          ]
+        }
+      },
+      "D14A": {
+        "tendencies": {
+          "pour": [
+            "Réserves partagées et entraide organisée.",
+            "Économie ↓ · Sécurité ↑↑ · Démographie ↑",
+            "Relation ↑↑",
+            "Compromis annoncé : Hotspring consommera une part de ses stocks privés et publics."
+          ],
+          "contre": [
+            "Les réserves de Hotspring restent sous contrôle local.",
+            "Économie ↑ · Sécurité ↓",
+            "Relation ↓↓",
+            "Compromis annoncé : la ville conserve ses stocks mais traverse l’hiver sans réseau d’entraide."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "ALLIANCE_VALLEE"
+          ],
+          "contre": [
+            "RESERVES_GARDEES"
+          ]
+        }
+      },
+      "D14B": {
+        "tendencies": {
+          "pour": [
+            "Enquête avant intervention armée.",
+            "Économie ↓ · Sécurité ↑ à terme",
+            "Relation ↑↑",
+            "Risque annoncé : certains voleurs et chevaux peuvent disparaître pendant le délai."
+          ],
+          "contre": [
+            "Posse immédiate et récupération plus rapide possible.",
+            "Économie ↑ · Sécurité ↑↑",
+            "Relation ↓↓↓",
+            "Risque annoncé : incursion armée et affrontement fondés sur des preuves incomplètes."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "ENQUETE_CONJOINTE",
+            "DETENTE_PRUDENTE"
+          ],
+          "contre": [
+            "HOSTILITE_OUVERTE"
+          ]
+        }
+      },
+      "D15": {
+        "tendencies": {
+          "pour": [
+            "Une gare relie Hotspring aux grands marchés.",
+            "Économie ↑↑↑ · Démographie ↑↑ · Écologie ↓",
+            "Spéculation et dépendance à la compagnie ↑↑",
+            "Compromis annoncé : trente lots et une partie du futur centre passent sous contrôle ferroviaire."
+          ],
+          "contre": [
+            "La ligne contourne Hotspring.",
+            "Économie ↓ · Démographie ↓ · Écologie ↑",
+            "Terrains et autonomie locale préservés",
+            "Compromis annoncé : voyageurs, courrier et fret s’arrêteront dans une autre localité."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "CHEMIN_DE_FER",
+            "TERRAINS_COMPAGNIE"
+          ],
+          "contre": [
+            "SANS_GARE",
+            "TERRES_CONSERVEES"
+          ]
+        }
+      },
+      "D16": {
+        "tendencies": {
+          "pour": [
+            "Une compagnie industrialise Black Ridge.",
+            "Économie ↑↑↑ · Démographie ↑↑ · Écologie ↓↓↓ · Sécurité ↓",
+            "Emplois et capitaux immédiats",
+            "Compromis annoncé : eau, déchets et activité de la ville deviennent dépendants d’un seul grand employeur."
+          ],
+          "contre": [
+            "Les claims restent limités et dispersés.",
+            "Économie ↑ · Démographie ↑ · Écologie ↓",
+            "Contrôle local et diversité des exploitants ↑",
+            "Compromis annoncé : moins d’emplois et de recettes, sans supprimer les accidents ni les atteintes au paysage."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "GRANDE_MINE"
+          ],
+          "contre": [
+            "PETITES_MINES"
+          ]
+        }
+      },
+      "D17": {
+        "tendencies": {
+          "pour": [
+            "Les nouveaux arrivants sont logés immédiatement.",
+            "Économie ↑↑ · Démographie ↑↑ · Écologie ↓ · Sécurité ↓",
+            "Loyers et campements sauvages diminuent",
+            "Compromis annoncé : forte vulnérabilité au feu, aux maladies et aux crues."
+          ],
+          "contre": [
+            "La ville impose un quartier planifié et équipé.",
+            "Économie ↓ · Démographie ↑ · Écologie ↑ · Sécurité ↑",
+            "Croissance plus lente et loyers élevés à court terme",
+            "Compromis annoncé : certaines familles chercheront du travail ailleurs avant la fin des travaux."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "QUARTIER_PROVISOIRE"
+          ],
+          "contre": [
+            "QUARTIER_PLANIFIE"
+          ]
+        }
+      },
+      "D18": {
+        "tendencies": {
+          "pour": [
+            "Le crédit finance maisons, entreprises et équipements.",
+            "Économie ↑↑ · Démographie ↑",
+            "Hypothèques et spéculation ↑↑",
+            "Compromis annoncé : la trésorerie de la ville et les économies des habitants deviennent exposées aux terrains, à la mine et au rail."
+          ],
+          "contre": [
+            "Le crédit reste limité et dispersé.",
+            "Économie ↓ · Démographie ↓",
+            "Endettement collectif et risque de panique ↓↓",
+            "Compromis annoncé : moins de propriétaires, moins d’entreprises nouvelles et des prêteurs privés toujours présents."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "BANQUE_CREDIT"
+          ],
+          "contre": [
+            "CREDIT_LIMITE"
+          ]
+        }
+      },
+      "D19": {
+        "tendencies": {
+          "pour": [
+            "Le bétail et la viande transitent au cœur de la ville.",
+            "Économie ↑↑ · Démographie ↑ · Écologie ↓↓ · Sécurité ↓",
+            "Synergie forte avec le rail et le passage direct",
+            "Compromis annoncé : odeurs, déchets, animaux échappés et pression sur l’eau."
+          ],
+          "contre": [
+            "Les installations sont éloignées et réglementées.",
+            "Économie ↑ · Écologie ↑ · Sécurité ↑",
+            "Coûts de transport et de contrôle plus élevés",
+            "Compromis annoncé : moins d’activité près de Main Street et investissement public supplémentaire."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "ABATTOIR_CENTRAL"
+          ],
+          "contre": [
+            "ABATTOIR_ELOIGNE"
+          ]
+        }
+      },
+      "D20": {
+        "tendencies": {
+          "pour": [
+            "La compagnie finance rapidement vivres, logements et embauches.",
+            "Économie ↑↑ · Démographie ↑ · Sécurité ↓",
+            "Dépendance des travailleurs et pouvoir de l’employeur ↑↑↑",
+            "Compromis annoncé : les commerces indépendants perdent une partie des salaires locaux."
+          ],
+          "contre": [
+            "Les salaires doivent être versés en espèces.",
+            "Économie ↓ · Sécurité ↑",
+            "Commerce indépendant et mobilité des travailleurs ↑",
+            "Compromis annoncé : l’employeur ralentit certains investissements et peut retarder les paies."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "SCRIP",
+            "MAGASIN_COMPAGNIE",
+            "DETTE_OUVRIERE"
+          ],
+          "contre": [
+            "SALAIRE_ESPECES"
+          ]
+        }
+      },
+      "D21": {
+        "tendencies": {
+          "pour": [
+            "Un service permanent patrouille et applique des procédures.",
+            "Sécurité ↑↑↑ · Économie ↓",
+            "Continuité de l’autorité ↑ · pouvoir concentré ↑",
+            "Compromis annoncé : la ville paie des salaires et confie durablement des armes et des pouvoirs à quelques hommes."
+          ],
+          "contre": [
+            "La posse de volontaires reste le principal moyen d’intervention.",
+            "Économie ↑ · autonomie des familles ↑",
+            "Sécurité ↓↓ · application inégale de la loi ↑",
+            "Compromis annoncé : la réponse dépendra de la disponibilité et des intérêts des volontaires."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "MARSHAL",
+            "PRISON_LOCALE"
+          ],
+          "contre": [
+            "POSSE",
+            "ARMES_FAMILLES"
+          ]
+        }
+      },
+      "D22": {
+        "tendencies": {
+          "pour": [
+            "La ville investit dans l’eau, les rues et la salubrité.",
+            "Écologie ↑↑↑ · Démographie ↑ · Économie ↓↓",
+            "Risque sanitaire ↓↓",
+            "Compromis annoncé : travaux, taxes et déplacements imposés aux activités les plus polluantes."
+          ],
+          "contre": [
+            "Le système actuel est maintenu.",
+            "Économie ↑ à court terme",
+            "Écologie ↓↓ · Démographie ↓ · risque sanitaire ↑↑",
+            "Compromis annoncé : les entreprises évitent les coûts, mais les déchets continuent de s’accumuler près des habitations et de l’eau."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "ASSAINISSEMENT",
+            "COLLECTE_DECHETS"
+          ],
+          "contre": [
+            "DECHETS_LIBRES",
+            "REJETS_NON_REGLEMENTES"
+          ]
+        }
+      },
+      "D23": {
+        "tendencies": {
+          "pour": [
+            "Les services disposent d’un financement stable.",
+            "Économie ↓ · Sécurité ↑ · continuité des services ↑↑",
+            "Pouvoir administratif ↑",
+            "Compromis annoncé : propriétaires et entreprises paient chaque année, même sans crise immédiate."
+          ],
+          "contre": [
+            "La ville conserve licences, dons et contributions ponctuelles.",
+            "Économie ↑ · autonomie privée ↑",
+            "Sécurité ↓ · services instables ↓↓",
+            "Compromis annoncé : les urgences dépendront encore des familles capables ou désireuses de payer."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "IMPOT_LOCAL",
+            "BUDGET_PUBLIC"
+          ],
+          "contre": [
+            "FINANCEMENT_PONCTUEL",
+            "DONATEURS_DOMINANTS"
+          ]
+        }
+      },
+      "D24": {
+        "tendencies": {
+          "pour": [
+            "Le centre économique est défendu.",
+            "Économie relativement protégée · Démographie ↓↓↓ · Sécurité ↓",
+            "Maisons et services de quartier exposés",
+            "Compromis annoncé : des familles perdront leur logement pour préserver commerces, réserves et crédit."
+          ],
+          "contre": [
+            "La priorité va aux maisons et aux services publics.",
+            "Démographie relativement protégée · Économie ↓↓↓ · Sécurité ↓",
+            "Centre, magasins et entrepôts exposés",
+            "Compromis annoncé : la ville sauve ses habitants mais perd une part de son activité et de ses stocks."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "CENTRE_SAUVE",
+            "QUARTIER_BRULE",
+            "CICATRICES_INCENDIE"
+          ],
+          "contre": [
+            "QUARTIERS_SAUVES",
+            "CENTRE_BRULE",
+            "CICATRICES_INCENDIE"
+          ]
+        }
+      },
+      "D25": {
+        "tendencies": {
+          "pour": [
+            "La ville limite les contacts et organise les soins.",
+            "Économie ↓↓ · Démographie relativement protégée · Sécurité ↑",
+            "Durée de l’épidémie ↓",
+            "Compromis annoncé : salaires, marchés, école et divertissements sont interrompus pendant trois semaines."
+          ],
+          "contre": [
+            "L’activité est maintenue.",
+            "Économie protégée à très court terme",
+            "Démographie ↓↓↓ · Sécurité ↓ · durée de l’épidémie ↑",
+            "Compromis annoncé : la ville accepte une propagation plus large pour éviter la fermeture immédiate."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "EPIDEMIE_CONTENUE",
+            "QUARANTAINE_21_JOURS"
+          ],
+          "contre": [
+            "EPIDEMIE_DIFFUSE"
+          ]
+        }
+      },
+      "D26A": {
+        "tendencies": {
+          "pour": [
+            "Les habitants sont évacués et le courant est détourné.",
+            "Démographie relativement protégée · Sécurité ↑",
+            "Économie ↓↓↓",
+            "Compromis annoncé : entrepôts, stockyards, rails ou ponts peuvent être sacrifiés volontairement."
+          ],
+          "contre": [
+            "La ville tente de tenir les digues et de protéger les biens.",
+            "Économie relativement protégée",
+            "Démographie ↓↓↓ · Sécurité ↓",
+            "Compromis annoncé : si les ouvrages cèdent, l’eau atteindra les maisons avant que l’évacuation soit complète."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "EVACUATION_ORDONNEE",
+            "FRET_SACRIFIE",
+            "MARQUES_DE_CRUE"
+          ],
+          "contre": [
+            "QUARTIERS_INONDES",
+            "MARQUES_DE_CRUE"
+          ]
+        }
+      },
+      "D26B": {
+        "tendencies": {
+          "pour": [
+            "L’eau est rationnée au profit des habitants.",
+            "Économie ↓↓↓ · Démographie relativement protégée",
+            "Écologie ↑ · Sécurité ↑",
+            "Compromis annoncé : mine, abattoir, locomotives et ateliers ralentissent ou ferment pendant un mois."
+          ],
+          "contre": [
+            "L’industrie conserve son approvisionnement.",
+            "Économie ↑ à court terme",
+            "Démographie ↓↓↓ · Écologie ↓↓ · Sécurité ↓",
+            "Compromis annoncé : les foyers dépendront des prix, des files et des réserves privées."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "RATIONNEMENT_HABITANTS",
+            "INDUSTRIE_SUSPENDUE"
+          ],
+          "contre": [
+            "EAU_AU_PLUS_OFFRANT",
+            "PENURIE_EAU"
+          ]
+        }
+      },
+      "D27": {
+        "tendencies": {
+          "pour": [
+            "La mine ferme jusqu’à la mise en conformité.",
+            "Économie ↓↓ · Sécurité ↑↑",
+            "Confiance des travailleurs ↑ · risque de départ du capital ↑",
+            "Compromis annoncé : les salaires s’arrêtent pendant les travaux et la compagnie peut réduire ses investissements."
+          ],
+          "contre": [
+            "Les galeries intactes rouvrent rapidement.",
+            "Économie ↑↑ · Sécurité ↓↓ · Démographie ↓",
+            "Risque de grève et de nouvel accident ↑↑",
+            "Compromis annoncé : les emplois reprennent, mais les causes de l’accident ne sont pas entièrement traitées."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "SECURITE_MINIERE",
+            "FONDS_SECOURS",
+            "RAPPORT_ACCIDENT"
+          ],
+          "contre": [
+            "REPRISE_IMMEDIATE",
+            "GREVE_IMMINENTE",
+            "RAPPORT_ACCIDENT"
+          ]
+        }
+      },
+      "D28": {
+        "tendencies": {
+          "pour": [
+            "La ville soutient la banque et ralentit la panique.",
+            "Économie ↓↓ maintenant · Sécurité ↑",
+            "Faillites et saisies évitées à court terme",
+            "Compromis annoncé : les pertes privées deviennent une dette publique et les dirigeants de la banque sont secourus avec les déposants."
+          ],
+          "contre": [
+            "La ville refuse de garantir la banque.",
+            "Trésorerie publique préservée",
+            "Économie ↓↓↓ · Démographie ↓↓ · Sécurité ↓",
+            "Compromis annoncé : la banque, ses débiteurs et les déposants assument immédiatement la liquidation."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "SAUVETAGE_BANQUE",
+            "DETTE_PUBLIQUE",
+            "BANQUE_SOUS_CONTROLE"
+          ],
+          "contre": [
+            "FAILLITES_EN_CHAINE",
+            "SAISIES",
+            "BANQUE_FERMEE"
+          ]
+        }
+      },
+      "D29": {
+        "tendencies": {
+          "pour": [
+            "Un conseil élu remplace le gouvernement permanent des fondateurs.",
+            "Démographie ↑↑ · légitimité publique ↑",
+            "Sécurité ↓ à court terme · rivalités électorales ↑",
+            "Compromis annoncé : la ville élargit la représentation, mais ouvre une période de campagne, de coalitions et d’incertitude."
+          ],
+          "contre": [
+            "Les cinq familles conservent chacune un siège et un veto collectif sur les grandes décisions.",
+            "Sécurité ↑ · continuité administrative ↑",
+            "Démographie ↓ · sentiment d’exclusion ↑",
+            "Compromis annoncé : la ville garde une direction stable, mais accepte que ses nouveaux habitants restent politiquement secondaires."
+          ]
+        },
+        "markers": {
+          "pour": [
+            "CONSEIL_ELU"
+          ],
+          "contre": [
+            "CONSEIL_FONDATEURS",
+            "VETO_FONDATEURS"
+          ]
+        }
+      }
+    },
+    "charters": [
+      {
+        "id": "A",
+        "title": "La charte de l’entreprise",
+        "quote": "« Hotspring doit rester ouverte à ceux qui construisent, investissent et transportent. »",
+        "tendencies": [
+          "Priorité aux contrats, au fret, aux concessions et à l’investissement privé.",
+          "Économie ↑↑ · Démographie ↑",
+          "Écologie ↓ · dépendance aux grands employeurs ↑"
+        ],
+        "effects": [
+          {
+            "indicator": "economie",
+            "operation": "delta",
+            "value": 2
+          },
+          {
+            "indicator": "demographie",
+            "operation": "delta",
+            "value": 1
+          },
+          {
+            "indicator": "ecologie",
+            "operation": "delta",
+            "value": -1
+          }
+        ],
+        "narration": "Les permis et terrains commerciaux sont accélérés. Les services non rentables doivent justifier chaque dépense devant le conseil.",
+        "marker": "CHARTE_ENTREPRISE"
+      },
+      {
+        "id": "B",
+        "title": "La charte civique",
+        "quote": "« Une ville ne vaut que si les habitants peuvent y apprendre, se soigner et rester. »",
+        "tendencies": [
+          "Priorité à l’école, à l’eau, aux soins, aux logements et aux espaces communs.",
+          "Démographie ↑↑ · Sécurité ↑",
+          "Économie ↓ · dépenses municipales ↑"
+        ],
+        "effects": [
+          {
+            "indicator": "demographie",
+            "operation": "delta",
+            "value": 2
+          },
+          {
+            "indicator": "securite",
+            "operation": "delta",
+            "value": 1
+          },
+          {
+            "indicator": "economie",
+            "operation": "delta",
+            "value": -1
+          }
+        ],
+        "narration": "Un budget minimal est réservé aux services collectifs. Les nouveaux projets doivent contribuer aux équipements communs.",
+        "marker": "CHARTE_CIVIQUE"
+      },
+      {
+        "id": "C",
+        "title": "La charte de la frontière libre",
+        "quote": "« La ville doit protéger les accords et les propriétés, puis laisser chacun répondre de ses choix. »",
+        "tendencies": [
+          "Peu de taxes, peu de permis et forte autonomie des familles et propriétaires.",
+          "Économie ↑ · autonomie locale ↑",
+          "Sécurité ↓ · services inégaux ↑"
+        ],
+        "effects": [
+          {
+            "indicator": "economie",
+            "operation": "delta",
+            "value": 1
+          },
+          {
+            "indicator": "securite",
+            "operation": "delta",
+            "value": -1
+          }
+        ],
+        "narration": "Les impôts et obligations municipales sont réduits. Les routes, secours et protections reposent davantage sur contrats, associations et contributions volontaires.",
+        "marker": "CHARTE_FRONTIERE_LIBRE"
+      },
+      {
+        "id": "D",
+        "title": "La charte de la ville moderne",
+        "quote": "« Hotspring ne sera plus administrée comme un campement agrandi. »",
+        "tendencies": [
+          "Administration permanente, travaux publics, inspections et règles communes.",
+          "Sécurité ↑↑ · Écologie ↑ · Démographie ↑",
+          "Économie ↓↓ à court terme · bureaucratie ↑"
+        ],
+        "effects": [
+          {
+            "indicator": "securite",
+            "operation": "delta",
+            "value": 2
+          },
+          {
+            "indicator": "ecologie",
+            "operation": "delta",
+            "value": 1
+          },
+          {
+            "indicator": "demographie",
+            "operation": "delta",
+            "value": 1
+          },
+          {
+            "indicator": "economie",
+            "operation": "delta",
+            "value": -2
+          }
+        ],
+        "narration": "La ville crée des services stables, des inspections et un calendrier de travaux. Les entreprises supportent davantage de taxes et de délais.",
+        "marker": "CHARTE_VILLE_MODERNE"
+      },
+      {
+        "id": "E",
+        "title": "Le pacte de la vallée",
+        "quote": "« Hotspring ne prospérera pas en prétendant être seule dans la vallée. »",
+        "tendencies": [
+          "Reconnaissance durable des passages, de l’accord sur les ressources et d’une instance régulière de négociation.",
+          "Écologie ↑↑ · Sécurité ↑",
+          "Économie ↓ · expansion foncière ↓ · Démographie ↓"
+        ],
+        "effects": [
+          {
+            "indicator": "ecologie",
+            "operation": "delta",
+            "value": 2
+          },
+          {
+            "indicator": "securite",
+            "operation": "delta",
+            "value": 1
+          },
+          {
+            "indicator": "economie",
+            "operation": "delta",
+            "value": -1
+          },
+          {
+            "indicator": "demographie",
+            "operation": "delta",
+            "value": -1
+          }
+        ],
+        "narration": "La charte protège le corridor, encadre les usages de l’eau et crée un conseil de liaison. Certains terrains cessent définitivement d’être disponibles à la colonisation.",
+        "marker": "PACTE_VALLEE_FINAL"
+      },
+      {
+        "id": "F",
+        "title": "La charte des ressources communes",
+        "quote": "« L’eau, le bois et les pâturages doivent durer plus longtemps que les concessions qui les exploitent. »",
+        "tendencies": [
+          "Protection du bassin d’eau, coupes et pâturages réglementés, réserve foncière et suivi des rejets.",
+          "Écologie ↑↑ · Démographie ↑",
+          "Économie ↓↓ · rythme de croissance ↓"
+        ],
+        "effects": [
+          {
+            "indicator": "ecologie",
+            "operation": "delta",
+            "value": 2
+          },
+          {
+            "indicator": "demographie",
+            "operation": "delta",
+            "value": 1
+          },
+          {
+            "indicator": "economie",
+            "operation": "delta",
+            "value": -2
+          }
+        ],
+        "narration": "Les ressources stratégiques passent sous règles communes et limites annuelles. Les concessions existantes doivent financer la restauration ou réduire leur activité.",
+        "marker": "CHARTE_RESSOURCES"
+      }
+    ],
+    "epilogue": {
+      "economie": [
+        {
+          "label": "Effondrée",
+          "text": "Les vitrines vides se multiplient et les bâtiments saisis changent de mains sans trouver preneur. Hotspring possède encore des rues, mais de moins en moins de raisons d’y ouvrir une porte chaque matin."
+        },
+        {
+          "label": "Fragile",
+          "text": "Les affaires continuent, au rythme des dettes reportées et des saisons incertaines. Un bon convoi ou une bonne récolte suffit encore à ranimer la ville ; une mauvaise nouvelle peut l’arrêter."
+        },
+        {
+          "label": "Stable",
+          "text": "Les ateliers, commerces et transports assurent à Hotspring une activité régulière. La ville ne promet pas la fortune à tous, mais elle permet à suffisamment de familles de prévoir le prochain hiver."
+        },
+        {
+          "label": "Prospère",
+          "text": "Les quais, entrepôts, ateliers et comptoirs travaillent presque sans relâche. L’argent arrive vite à Hotspring — et repart tout aussi vite vers ceux qui possèdent les terres, les titres et les moyens de transport."
+        }
+      ],
+      "ecologie": [
+        {
+          "label": "Dégradée",
+          "text": "La rivière porte les traces des rejets, les berges cèdent et la forêt s’est éloignée des premières rues. Chaque nouvelle activité coûte désormais davantage parce que le territoire ne fournit plus gratuitement ce qu’il donnait autrefois."
+        },
+        {
+          "label": "Sous pression",
+          "text": "La vallée tient encore, mais chaque saison laisse une marque supplémentaire : eau trouble, sols tassés, bois plus lointain ou pâturages disputés. Hotspring doit réparer plus vite qu’elle n’abîme."
+        },
+        {
+          "label": "Préservée par endroits",
+          "text": "L’exploitation a transformé la vallée sans la rendre méconnaissable. Des ressources restent accessibles parce que certains choix ont limité, déplacé ou organisé leur usage."
+        },
+        {
+          "label": "Durable",
+          "text": "L’eau, les berges, les bois et les pâturages demeurent visibles autour de la ville. Cette préservation n’est pas un état naturel retrouvé : elle est le résultat coûteux de limites imposées à la croissance."
+        }
+      ],
+      "securite": [
+        {
+          "label": "Instable",
+          "text": "Après la tombée du jour, les rues se vident avant les saloons et les portes se ferment avant les bureaux. La loi existe surtout lorsque quelqu’un possède assez d’alliés pour la faire appliquer."
+        },
+        {
+          "label": "Précaire",
+          "text": "Hotspring sait répondre aux troubles ordinaires, mais une grande crise suffit encore à dépasser ses hommes, ses réserves ou ses procédures. L’ordre dépend de quelques personnes dont l’absence se remarque immédiatement."
+        },
+        {
+          "label": "Tenue",
+          "text": "La ville connaît ses conflits, ses vols et ses abus, mais elle dispose de moyens assez réguliers pour empêcher qu’ils gouvernent entièrement la vie quotidienne."
+        },
+        {
+          "label": "Solide",
+          "text": "Les rues, transports et bâtiments disposent de procédures, de patrouilles ou de réseaux de volontaires capables d’agir rapidement. La sécurité est réelle ; la question demeure de savoir qui surveille ceux qui l’exercent."
+        }
+      ],
+      "demographie": [
+        {
+          "label": "En déclin",
+          "text": "Les maisons abandonnées apparaissent entre les bâtiments encore occupés. Ceux qui restent connaissent chaque départ par son nom et mesurent la ville à ce qu’elle n’a pas réussi à retenir."
+        },
+        {
+          "label": "Clairsemée",
+          "text": "Hotspring conserve un noyau d’habitants fidèles, mais les nouveaux chariots sont moins nombreux que ceux qui poursuivent leur route. Certains services survivent grâce à quelques familles seulement."
+        },
+        {
+          "label": "Établie",
+          "text": "De nouvelles familles arrivent assez régulièrement pour remplacer les départs. Les rues ont désormais plusieurs générations, des habitudes et des conflits qui ne disparaissent pas avec une saison difficile."
+        },
+        {
+          "label": "En pleine croissance",
+          "text": "Chaque semaine apporte de nouveaux ouvriers, commerçants, enfants et pensionnaires. Hotspring devient plus diverse et plus dense — assez grande pour que personne ne puisse encore prétendre connaître toute la ville."
+        }
+      ],
+      "memories": {
+        "VILLE_BASSE": "Hotspring a grandi près de la rivière qui l’avait nourrie dès le premier jour — et qui lui a plusieurs fois rappelé qu’une rive n’appartient jamais tout à fait à ceux qui la bâtissent.",
+        "VILLE_HAUTE": "La ville domine encore la vallée depuis la terrasse choisie par les premiers chariots. Chaque conduite, citerne et baril rappelle le prix de cette sécurité.",
+        "EAU_PRIVEE": "Pendant des années, l’eau de Hotspring eut un propriétaire, un tarif et des registres. Même après les crises, personne n’oublia que la soif pouvait figurer sur une facture.",
+        "EAU_COMMUNALE": "Le premier puits communal demeure l’un des rares lieux où l’histoire de Hotspring peut se raconter sans commencer par le nom d’une famille ou d’une compagnie.",
+        "ACCORD_RESPECTE": "La parole donnée dans la vallée survécut à l’arrivée des troupeaux, des routes et des nouveaux colons. Elle ne supprima pas les conflits ; elle empêcha qu’ils deviennent la seule relation possible.",
+        "ACCORD_ROMPU": "Les anciens accords sont encore conservés dans les archives, avec des limites que la ville choisit un jour de ne plus respecter. La vallée se souvient autrement que les registres.",
+        "CHEMIN_DE_FER": "Le premier train transforma en quelques minutes la distance qui séparait Hotspring du reste du pays. Il apporta des marchés, des habitants et des décisions prises très loin de la ville.",
+        "GRANDE_MINE": "Sous la montagne, des hommes ont extrait la richesse qui changea Hotspring. Certains noms figurent sur les bâtiments ; d’autres seulement sur les listes de paie, de grève ou d’accident.",
+        "CENTRE_BRULE": "Le centre reconstruit ne suit plus exactement les anciennes fondations. Quelques parcelles vides et pierres noircies rappellent encore ce que la ville choisit de sauver lorsque le feu prit de l’avance.",
+        "EPIDEMIE_CONTENUE": "Une cloche, un registre de malades ou un ancien bâtiment de quarantaine rappelle l’été où Hotspring accepta de ralentir pour éviter de perdre davantage des siens.",
+        "FAILLITES_EN_CHAINE": "Les enchères de la panique bancaire ont changé les propriétaires sans déplacer les bâtiments. Certaines familles vivent encore dans une ville dont elles ont payé deux fois les mêmes murs.",
+        "SAUVETAGE_BANQUE": "La banque rouvrit ses portes, mais la dette publique resta dans les registres. Hotspring avait sauvé ses dépôts en acceptant que les pertes privées deviennent une affaire commune.",
+        "CHARTE_FRONTIERE_LIBRE": "La ville choisit de laisser davantage de décisions à ceux qui possèdent les terres, les outils ou les voisins prêts à aider. L’autonomie y demeure une force — et une responsabilité inégalement répartie.",
+        "PACTE_VALLEE_FINAL": "Sur les cartes finales, Hotspring n’occupe pas toute la vallée. Un passage, des usages et une autre autorité y restent reconnus, preuve que grandir ne signifia pas partout remplacer."
+      },
+      "cross": [
+        "Hotspring a réussi à transformer presque chaque ressource en revenu. Elle doit maintenant découvrir combien coûte une prospérité qui a consommé son propre paysage.",
+        "La vallée demeure capable de nourrir, abreuver et entourer la ville. Reste à savoir si Hotspring trouvera assez d’activité pour retenir ceux qui devraient en prendre soin.",
+        "La population a grandi plus vite que les institutions, les rues et les accords. Hotspring n’est plus petite ; elle n’est pas encore capable de protéger tout ce qu’elle est devenue.",
+        "L’ordre règne avec une efficacité que peu contestent ouvertement. La ville sait toutefois que la stabilité et le consentement ne sont pas le même résultat.",
+        "Les machines, titres et marchandises produisent encore de la richesse, mais une part croissante de cette prospérité appartient à une ville dont les habitants sont partis.",
+        "Hotspring a construit une relation capable de survivre aux crises, sans choisir d’en faire le fondement de sa charte. L’avenir dira si les habitudes seront aussi solides que les textes.",
+        "Lorsque l’eau se raréfie ou se salit, son prix augmente avant même que son débit ne baisse. À Hotspring, les plus anciennes décisions continuent de passer de main en main avec les factures.",
+        "La ville a conservé son autonomie jusque dans le danger. Chacun peut encore défendre ses intérêts ; personne ne peut garantir que les intérêts défendus seront ceux de tous."
+      ],
+      "revealText": "Hotspring possède désormais son gouvernement et sa charte. La ville continuera sans demander la permission à ceux qui l’ont fondée.\nIl reste pourtant une dernière vérité à établir. Pendant que chacun parlait d’intérêt commun, chaque famille poursuivait aussi ses propres ambitions. Ouvrez vos objectifs. Il est temps de mesurer l’influence laissée dans la ville."
+    },
+    "families": {
+      "mercer": {
+        "name": "Les Mercer",
+        "publicRole": "Négociants, entrepreneurs et investisseurs",
+        "pitch": "Pour les Mercer, Hotspring ne survivra que si elle devient indispensable : une ville reliée, financée, fréquentée et capable de transformer chaque occasion en marché.",
+        "briefing": "Vous voulez que Hotspring grandisse vite et devienne le centre économique de la région. Vous acceptez les concessions et les risques lorsqu’ils ouvrent des routes, attirent des capitaux ou protègent l’activité. Votre faiblesse : une ville riche peut devenir dépendante de ceux qui l’ont financée.",
+        "objectives": [
+          {
+            "title": "Le premier capital",
+            "required": 2,
+            "groups": [
+              [
+                "VILLE_BASSE"
+              ],
+              [
+                "EAU_PRIVEE"
+              ],
+              [
+                "CENTRE_PRIVE"
+              ]
+            ]
+          },
+          {
+            "title": "Une rue qui rapporte",
+            "required": 2,
+            "groups": [
+              [
+                "SCIERIE_INTENSIVE"
+              ],
+              [
+                "GRAND_SALOON"
+              ],
+              [
+                "CONSTRUCTION_SERREE"
+              ],
+              [
+                "ECOLE_REPORTEE"
+              ]
+            ]
+          },
+          {
+            "title": "Les routes ouvertes",
+            "required": 2,
+            "groups": [
+              [
+                "EXPANSION_RIVIERE"
+              ],
+              [
+                "PASSAGE_DIRECT"
+              ],
+              [
+                "MONOPOLE_LOCAL"
+              ],
+              [
+                "POSTE_TERRITORIAL"
+              ]
+            ]
+          },
+          {
+            "title": "La ville-champignon",
+            "required": 3,
+            "groups": [
+              [
+                "CHEMIN_DE_FER"
+              ],
+              [
+                "GRANDE_MINE"
+              ],
+              [
+                "QUARTIER_PROVISOIRE"
+              ],
+              [
+                "BANQUE_CREDIT"
+              ],
+              [
+                "ABATTOIR_CENTRAL"
+              ],
+              [
+                "SCRIP"
+              ]
+            ]
+          },
+          {
+            "title": "Maintenir l’activité",
+            "required": 2,
+            "groups": [
+              [
+                "MARSHAL"
+              ],
+              [
+                "FINANCEMENT_PONCTUEL"
+              ],
+              [
+                "CENTRE_SAUVE"
+              ],
+              [
+                "REPRISE_IMMEDIATE"
+              ],
+              [
+                "SAUVETAGE_BANQUE"
+              ]
+            ]
+          }
+        ],
+        "trajectory": "economie"
+      },
+      "doyle": {
+        "name": "Les Doyle",
+        "publicRole": "Ouvriers, artisans et bâtisseurs",
+        "pitch": "Les Doyle construisent Hotspring de leurs mains. Ils veulent du travail, mais aussi une ville dans laquelle les familles peuvent rester lorsque le chantier, la mine ou la saison se terminent.",
+        "briefing": "Vous ne refusez pas la croissance : vous refusez qu’elle transforme les habitants en matériel remplaçable. Cherchez les emplois, les logements, les soins, l’école et les protections qui permettent aux travailleurs de devenir des citoyens.",
+        "objectives": [
+          {
+            "title": "Des fondations communes",
+            "required": 2,
+            "groups": [
+              [
+                "VILLE_BASSE"
+              ],
+              [
+                "EAU_COMMUNALE"
+              ],
+              [
+                "RESERVES_PUBLIQUES"
+              ]
+            ]
+          },
+          {
+            "title": "Travail et services",
+            "required": 2,
+            "groups": [
+              [
+                "SCIERIE_INTENSIVE"
+              ],
+              [
+                "ECOLE"
+              ],
+              [
+                "DISPENSAIRE"
+              ],
+              [
+                "REGLEMENT_INCENDIE"
+              ]
+            ]
+          },
+          {
+            "title": "Des échanges équitables",
+            "required": 2,
+            "groups": [
+              [
+                "ACCORD_RIVIERE"
+              ],
+              [
+                "COMPTOIR_COMMUN"
+              ],
+              [
+                "POSTE_TERRITORIAL"
+              ],
+              [
+                "ACCORD_RESPECTE",
+                "ALLIANCE_VALLEE",
+                "ENQUETE_CONJOINTE"
+              ]
+            ]
+          },
+          {
+            "title": "Grandir sans enfermer",
+            "required": 3,
+            "groups": [
+              [
+                "CHEMIN_DE_FER"
+              ],
+              [
+                "GRANDE_MINE"
+              ],
+              [
+                "QUARTIER_PLANIFIE"
+              ],
+              [
+                "BANQUE_CREDIT"
+              ],
+              [
+                "ABATTOIR_ELOIGNE"
+              ],
+              [
+                "SALAIRE_ESPECES"
+              ]
+            ]
+          },
+          {
+            "title": "Protéger les habitants",
+            "required": 2,
+            "groups": [
+              [
+                "MARSHAL"
+              ],
+              [
+                "ASSAINISSEMENT"
+              ],
+              [
+                "IMPOT_LOCAL"
+              ],
+              [
+                "QUARTIERS_SAUVES"
+              ],
+              [
+                "EPIDEMIE_CONTENUE"
+              ],
+              [
+                "SECURITE_MINIERE"
+              ]
+            ]
+          }
+        ],
+        "trajectory": "demographie"
+      },
+      "vance": {
+        "name": "Les Vance",
+        "publicRole": "Juristes, financiers prudents et relais de l’autorité territoriale",
+        "pitch": "Les Vance pensent qu’une ville n’existe vraiment que lorsqu’elle possède des registres, des procédures, une autorité responsable et des ressources capables de survivre aux crises.",
+        "briefing": "Vous cherchez moins la popularité que la continuité. Favorisez les décisions qui transforment les arrangements provisoires en institutions durables. Mais prenez garde : l’ordre peut devenir une fin en soi et concentrer trop de pouvoir.",
+        "objectives": [
+          {
+            "title": "Mesurer avant de bâtir",
+            "required": 2,
+            "groups": [
+              [
+                "VILLE_HAUTE"
+              ],
+              [
+                "EAU_COMMUNALE"
+              ],
+              [
+                "RESERVES_PUBLIQUES"
+              ]
+            ]
+          },
+          {
+            "title": "Prévenir plutôt que réparer",
+            "required": 2,
+            "groups": [
+              [
+                "ECOLE"
+              ],
+              [
+                "DISPENSAIRE"
+              ],
+              [
+                "AUBERGE_REGLEMENTEE"
+              ],
+              [
+                "REGLEMENT_INCENDIE"
+              ]
+            ]
+          },
+          {
+            "title": "Une autorité reconnue",
+            "required": 2,
+            "groups": [
+              [
+                "POSTE_TERRITORIAL"
+              ],
+              [
+                "DETOUR_TROUPEAUX"
+              ],
+              [
+                "COMPTOIR_COMMUN"
+              ],
+              [
+                "ACCORD_RESPECTE",
+                "ENQUETE_CONJOINTE"
+              ]
+            ]
+          },
+          {
+            "title": "Encadrer la croissance",
+            "required": 3,
+            "groups": [
+              [
+                "CHEMIN_DE_FER"
+              ],
+              [
+                "GRANDE_MINE"
+              ],
+              [
+                "BANQUE_CREDIT"
+              ],
+              [
+                "QUARTIER_PLANIFIE"
+              ],
+              [
+                "ABATTOIR_ELOIGNE"
+              ],
+              [
+                "SALAIRE_ESPECES"
+              ]
+            ]
+          },
+          {
+            "title": "Une ville permanente",
+            "required": 2,
+            "groups": [
+              [
+                "MARSHAL"
+              ],
+              [
+                "ASSAINISSEMENT"
+              ],
+              [
+                "IMPOT_LOCAL"
+              ],
+              [
+                "EVACUATION_ORDONNEE"
+              ],
+              [
+                "SECURITE_MINIERE"
+              ],
+              [
+                "SAUVETAGE_BANQUE"
+              ]
+            ]
+          }
+        ],
+        "trajectory": "securite"
+      },
+      "caldwell": {
+        "name": "Les Caldwell",
+        "publicRole": "Éleveurs, propriétaires terriens et familles de la frontière",
+        "pitch": "Les Caldwell veulent une ville assez forte pour défendre ses terres, mais pas assez lourde pour dicter à chaque famille comment vivre, bâtir, emprunter ou protéger ses biens.",
+        "briefing": "Vous défendez la propriété, les routes du bétail et la capacité des familles à régler elles-mêmes leurs affaires. Vous n’êtes pas opposés à toute règle : vous soutenez celles qui protègent durablement les terres et les foyers sans remettre Hotspring à une compagnie ou à une administration lointaine.",
+        "objectives": [
+          {
+            "title": "La terre entre des mains identifiables",
+            "required": 2,
+            "groups": [
+              [
+                "VILLE_HAUTE"
+              ],
+              [
+                "EAU_PRIVEE"
+              ],
+              [
+                "CENTRE_PRIVE"
+              ]
+            ]
+          },
+          {
+            "title": "Protéger les familles de la frontière",
+            "required": 2,
+            "groups": [
+              [
+                "COUPE_REGULEE"
+              ],
+              [
+                "ECOLE"
+              ],
+              [
+                "AUBERGE_REGLEMENTEE"
+              ],
+              [
+                "REGLEMENT_INCENDIE"
+              ]
+            ]
+          },
+          {
+            "title": "Garder la maîtrise de la vallée",
+            "required": 2,
+            "groups": [
+              [
+                "PASSAGE_DIRECT"
+              ],
+              [
+                "MONOPOLE_LOCAL"
+              ],
+              [
+                "AUTONOMIE_LOCALE"
+              ],
+              [
+                "EXPANSION_RIVIERE"
+              ]
+            ]
+          },
+          {
+            "title": "Croître sans perdre ses terres",
+            "required": 3,
+            "groups": [
+              [
+                "CHEMIN_DE_FER"
+              ],
+              [
+                "PETITES_MINES"
+              ],
+              [
+                "CREDIT_LIMITE"
+              ],
+              [
+                "ABATTOIR_CENTRAL"
+              ],
+              [
+                "SALAIRE_ESPECES"
+              ],
+              [
+                "QUARTIER_PLANIFIE"
+              ]
+            ]
+          },
+          {
+            "title": "Se défendre sans gouvernement permanent",
+            "required": 2,
+            "groups": [
+              [
+                "POSSE"
+              ],
+              [
+                "FINANCEMENT_PONCTUEL"
+              ],
+              [
+                "QUARTIERS_SAUVES"
+              ],
+              [
+                "RATIONNEMENT_HABITANTS"
+              ],
+              [
+                "EPIDEMIE_CONTENUE"
+              ]
+            ]
+          }
+        ],
+        "trajectory": "autonomy"
+      },
+      "whitmore": {
+        "name": "Les Whitmore",
+        "publicRole": "Cultivateurs, bateliers et médiateurs de la vallée",
+        "pitch": "Les Whitmore vivent de la rivière, des terres cultivables et des routes de la vallée. Ils savent qu’une ville peut épuiser en quelques années ce dont elle dépend depuis des générations.",
+        "briefing": "Vous voulez que Hotspring survive à sa propre réussite. Protégez l’eau, les sols, les ressources et la parole donnée. Vous n’êtes pas hostiles au commerce, mais vous refusez qu’un bénéfice immédiat rende la vallée inhabitable ou transforme chaque accord en simple obstacle.",
+        "objectives": [
+          {
+            "title": "Préserver les ressources de départ",
+            "required": 2,
+            "groups": [
+              [
+                "VILLE_HAUTE"
+              ],
+              [
+                "EAU_COMMUNALE"
+              ],
+              [
+                "RESERVES_PUBLIQUES"
+              ]
+            ]
+          },
+          {
+            "title": "Bâtir sans épuiser",
+            "required": 2,
+            "groups": [
+              [
+                "COUPE_REGULEE"
+              ],
+              [
+                "ECOLE"
+              ],
+              [
+                "DISPENSAIRE"
+              ],
+              [
+                "REGLEMENT_INCENDIE"
+              ]
+            ]
+          },
+          {
+            "title": "La parole de la vallée",
+            "required": 2,
+            "groups": [
+              [
+                "ACCORD_RIVIERE"
+              ],
+              [
+                "DETOUR_TROUPEAUX"
+              ],
+              [
+                "COMPTOIR_COMMUN"
+              ],
+              [
+                "ACCORD_RESPECTE",
+                "ALLIANCE_VALLEE",
+                "ENQUETE_CONJOINTE"
+              ]
+            ]
+          },
+          {
+            "title": "Limiter la dépendance",
+            "required": 3,
+            "groups": [
+              [
+                "SANS_GARE"
+              ],
+              [
+                "PETITES_MINES"
+              ],
+              [
+                "QUARTIER_PLANIFIE"
+              ],
+              [
+                "CREDIT_LIMITE"
+              ],
+              [
+                "ABATTOIR_ELOIGNE"
+              ],
+              [
+                "SALAIRE_ESPECES"
+              ]
+            ]
+          },
+          {
+            "title": "Réparer ce qui a été abîmé",
+            "required": 2,
+            "groups": [
+              [
+                "ASSAINISSEMENT"
+              ],
+              [
+                "IMPOT_LOCAL"
+              ],
+              [
+                "QUARTIERS_SAUVES"
+              ],
+              [
+                "EPIDEMIE_CONTENUE"
+              ],
+              [
+                "RATIONNEMENT_HABITANTS"
+              ],
+              [
+                "SECURITE_MINIERE"
+              ]
+            ]
+          }
+        ],
+        "trajectory": "ecologie"
+      }
+    }
+  }
+}
