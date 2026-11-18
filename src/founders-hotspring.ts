@@ -341,7 +341,7 @@ export function campaignEpilogue(s){
   ecologie<=2&&m.has('EAU_PRIVEE'),securite<=2&&m.has('CHARTE_FRONTIERE_LIBRE')];
  const cross=matches.indexOf(true);
  if(cross>=0)paragraphs.push(e.cross[cross]);
- paragraphs.push('Qu’avez-vous fait de Hotspring ?');
+ paragraphs.push(e.closing,'Qu’avez-vous fait de Hotspring ?');
  return {title:a?.title??'Épilogue de Hotspring',paragraphs,city:copy(city)};
 }
 
