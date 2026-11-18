@@ -218,6 +218,8 @@ export function campaignCheckpoint(s,now,chapterBonus){
 
 export function startCharter(s){
  const ids=availableCharters(s).map(c=>c.id);
+ s.campaign.charterSeed={game:copy(s.game),corrections:copy(s.corrections??[]),markers:[...s.campaign.markers],
+  history:copy(s.revealedHistory),offers:copy(s.offers),reveal:copy(s.lastReveal)};
  s.currentDilemmaId='D30';s.lastReveal=null;
  s.campaign.qualification={round:1,candidates:ids,available:ids,supports:{},rounds:[],qualified:[]};
  s.phase='CHARTER_SUPPORT';
@@ -227,7 +229,11 @@ const publicCharter=({id,title,quote,tendencies})=>({id,title,quote,tendencies})
 
 export function campaignDilemma(s,d){
  if(!['PRESENTATION','NEGOTIATION','COUNCIL','REVEALED','CHARTER_SUPPORT'].includes(s.phase))return null;
- const c=s.campaign,scene=hotspringArt(d.id);
+ const c=s.campaign;
+ let variant=null;
+ if(d.id==='D05')variant=c.markers.includes('CENTRE_PRIVE')?'variant_D05_CENTRE_PRIVE':'variant_D05_RESERVES_PUBLIQUES';
+ if(d.id==='D20'&&!c.markers.includes('GRANDE_MINE'))variant='variant_D20_CHEMIN_DE_FER';
+ const scene=(variant?hotspringArt(variant):null)??hotspringArt(d.id)??{url:null,status:'temporaire',alt:d.title};
  if(d.id==='D30'&&c.finalists){
   const [a,b]=c.finalists.map(id=>publicCharter(s.scenario.campaign.charters.find(x=>x.id===id)));
   return {image:scene,tendencies:{pour:a.tendencies,contre:b.tendencies},
@@ -253,8 +259,8 @@ export function campaignPresentation(s){
  const intro=s.phase==='INTRO'?{...copy(content.intros[c.chapter]),visual:hotspringArt('opening_'+c.chapter)}:null;
  const stopsAtCheckpoint=s.phase==='CHECKPOINT'||c.suspension?.phase==='CHECKPOINT';
  return {
-  chapter:c.chapter,version:c.version,relation:c.chapter>=3?relationLabel(c.trust,c.markers):null,
-  landscape:hotspringLandscape(s),intro,recap:intro?summary:[],
+  chapter:c.chapter,version:c.version,familyPitches:s.phase==='READY'?Object.values(content.families).map(f=>({role:f.publicRole,text:f.pitch})):null,relation:c.chapter>=3?relationLabel(c.trust,c.markers):null,
+  landscape:hotspringLandscape(s),intro,recap:intro||c.justResumed?summary:[],
   checkpoint:chapterScreen?{title:stopsAtCheckpoint?checkpoint?.name:'Hotspring — Fin de séance',
    text:stopsAtCheckpoint?content.checkpoints[c.chapter].text:'L’histoire de Hotspring se poursuit…',
    decisions:stopsAtCheckpoint?s.revealedHistory.filter(h=>h.chapter===c.chapter).map(h=>({
@@ -266,7 +272,7 @@ export function campaignPresentation(s){
    round:q.round,candidates:s.scenario.campaign.charters.filter(a=>q.candidates.includes(a.id)).map(publicCharter),
    supports:copy(q.supports),qualified:copy(q.qualified),previous:copy(q.rounds.at(-1)??null)
   }:null,
-  archive:s.phase==='FINISHED'?{at:c.archivedAt,charter:c.charter}:null
+  archive:s.phase==='FINISHED'?{at:c.archivedAt,charter:c.charter,governance:c.markers.includes('CONSEIL_ELU')?'Conseil élu':c.markers.includes('CONSEIL_FONDATEURS')?'Conseil des Fondateurs':null}:null
  };
 }
 
@@ -274,8 +280,25 @@ export function campaignFamily(s,family){
  const index=activeFounders(s.game).indexOf(family);
  const def=Object.values(s.scenario.campaign.families)[index];
  const current=['CHECKPOINT','SUSPENDED','FINISHED'].includes(s.phase);
+ const labels=new Map();
+ for(const d of s.scenario.dilemmas){
+  for(const [side,marks] of Object.entries(s.scenario.campaign.rules[d.id]?.markers??{})){
+   for(const m of marks)labels.set(m,d.labels[side]);
+  }
+ }
+ for(const [marker,label] of Object.entries({
+  CENTRE_SAUVE:'Sauver le centre',QUARTIERS_SAUVES:'Sauver les quartiers',EPIDEMIE_CONTENUE:'Contenir l’épidémie',
+  EVACUATION_ORDONNEE:'Ordonner l’évacuation',SECURITE_MINIERE:'Renforcer la sécurité minière',
+  SAUVETAGE_BANQUE:'Sauver la banque',RATIONNEMENT_HABITANTS:'Réserver l’eau aux habitants',
+  ACCORD_RESPECTE:'Respecter l’accord de la rivière',ALLIANCE_VALLEE:'Conclure l’alliance de la vallée',
+  ENQUETE_CONJOINTE:'Mener une enquête conjointe'
+ }))labels.set(marker,label);
+ const objectives=def.objectives.map(o=>{
+  const options=o.groups.map(group=>group.map(mark=>labels.get(mark)).filter(Boolean).join(' ou '));
+  return o.title+' ('+o.required+' choix) — '+options.join(', ')+'.';
+ });
  const score=current?hotspringScores(s,{final:s.phase==='FINISHED'}).rows.find(r=>r.family===family):null;
- return {role:def.publicRole,briefing:def.briefing,objectives:def.objectives.map(o=>o.title),
+ return {role:def.publicRole,briefing:def.briefing,objectives,
   trajectory:def.trajectory==='autonomy'?'Atteindre un indice d’autonomie d’au moins 2.':
    'Améliorer la jauge '+cityLabels[def.trajectory]+' par rapport à sa valeur de départ.',
   score,maySupport:!s.clock?.paused&&s.phase==='CHARTER_SUPPORT'&&!Object.hasOwn(s.campaign.qualification.supports,family)};
@@ -286,7 +309,7 @@ export function campaignOrganizer(s){
  return {trust:c.trust,markers:[...c.markers],autonomy:autonomyIndex(m),
   crises:c.chapter>=5?crisisCandidates(s):[],crisisMode:c.crisisMode,crisesThisSitting:c.crisesThisSitting,
   mayResumeCrises:s.phase==='CHECKPOINT'&&c.chapter===5&&crisisReport(s).length>0,
-  presentationSeconds:c.presentationSeconds,
+  presentationSeconds:c.presentationSeconds,mayCreateVariant:s.phase==='FINISHED'&&Boolean(c.charterSeed),
   progression:[
    {id:'D13',available:m.has('ACCORD_RIVIERE'),reason:m.has('ACCORD_RIVIERE')?'Accord de la rivière conclu.':'Accord de la rivière absent.'},
    {id:c.trust>=3||m.has('ACCORD_RESPECTE')?'D14A':'D14B',available:true,reason:'Confiance et respect de l’accord de la rivière.'},

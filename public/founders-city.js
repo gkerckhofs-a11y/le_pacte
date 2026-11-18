@@ -103,8 +103,8 @@ function render(s){
   s.phase==='FINISHED'?'Les décisions finales ont été proclamées.':'La séance n’a pas encore commencé.');
  const final=$('finalResults');final.hidden=!s.finalResults;
  if(s.phase==='FINISHED'){if(!s.campaign)final.parentElement.prepend(final);if(finishing)final.scrollIntoView({block:'start'});}
- const epilogue=$('narrativeEnding');epilogue.hidden=!s.narrativeEnding||Boolean(s.campaign);epilogue.replaceChildren();
- if(s.narrativeEnding&&!s.campaign){
+ const epilogue=$('narrativeEnding');epilogue.hidden=!s.narrativeEnding;epilogue.replaceChildren();
+ if(s.narrativeEnding){
   const title=document.createElement('h3');title.textContent=s.narrativeEnding.title;epilogue.append(title);
   for(const paragraph of s.narrativeEnding.paragraphs){const p=document.createElement('p');p.textContent=paragraph;epilogue.append(p);}
  }

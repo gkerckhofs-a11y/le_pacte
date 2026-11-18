@@ -24,6 +24,7 @@ export const GOALS_V2=Object.fromEntries([
 ].map(([id,title,description,indicator,direction,firstTarget,secondTarget])=>[id,{id:'F_'+id,title,description,indicator,direction,firstTarget,secondTarget}]));
 export function setPhaseClock(s,now){
  if(!isV2(s))return;
+ if(isHotspring(s))s.campaign.justResumed=false;
  const reading=['INTRO','PRESENTATION'].includes(s.phase);
  const seconds=reading?s.campaign.presentationSeconds:s.phase==='NEGOTIATION'?s.timing.negotiationSeconds:s.phase==='COUNCIL'?s.timing.voteSeconds:s.phase==='REVEALED'?s.timing.resolutionSeconds:null;
  s.clock={phase:s.phase,deadline:seconds===null?null:now+seconds*1000,remainingMs:seconds===null?null:seconds*1000,paused:false};
@@ -101,7 +102,7 @@ export function resumeHotspring(s,now){
  const c=s.campaign,{phase,clock}=c.suspension;
  s.phase=phase;s.clock=clock;
  if(!clock.paused&&clock.remainingMs!==null)clock.deadline=now+clock.remainingMs;
- c.suspension=null;c.crisesThisSitting=0;
+ c.suspension=null;c.crisesThisSitting=0;c.justResumed=true;
  if(phase!=='CHECKPOINT')c.publicRanking=null;
 }
 

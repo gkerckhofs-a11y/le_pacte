@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {activeFounders} from '../src/founders.ts';
-import {narrativePublicView,narrativeFamilyView,narrativeOrganizerView} from '../src/founders-live.ts';
+import {narrativePublicView,narrativeFamilyView,narrativeOrganizerView,duplicateHotspringFinal} from '../src/founders-live.ts';
 import {advanceNarrativeTime} from '../src/founders-v2.ts';
 import {availableCharters,crisisCandidates,hotspringOutcome} from '../src/founders-hotspring.ts';
 import {autonomyIndex,chapterObjective,hotspringScores} from '../src/hotspring-scoring.ts';
@@ -123,6 +123,16 @@ test('Hotspring : qualification sans mise, nouveau tour et fermeture explicite',
  g.command('showResults');
  assert.equal(g.state.phase,'FINISHED');assert.equal(g.state.finalResults.rows[0].maximum,15);
  assert.throws(()=>g.command('start'),/déjà lancée/);
+ const archived=g.state;
+ const variant=duplicateHotspringFinal(archived,{id:'b'.repeat(24),code:'VAR',ownerId:'organizer',now:50000});
+ assert.equal(variant.phase,'CHECKPOINT');
+ assert.equal(variant.campaign.parentArchive,archived.id);
+ assert.equal(variant.campaign.charter,null);
+ assert.equal(variant.finalResults,null);
+ assert.deepEqual(variant.game.city,archived.campaign.charterSeed.game.city);
+ assert.equal(archived.campaign.charter,'B');
+ assert.equal(archived.phase,'FINISHED');
+ assert.throws(()=>duplicateHotspringFinal(archived,{ownerId:'another'}),/Accès régie/);
 });
 
 test('Hotspring : Terminer l’histoire produit un épilogue anticipé et rembourse une mise',()=>{

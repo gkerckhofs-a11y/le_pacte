@@ -158,10 +158,14 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
      json(201,created);return;
     }
    }
-   const narrativeMatch=path.match(/^\/api\/founders\/sessions\/([a-f0-9]{24})(?:\/(commands|access)(?:\/([A-F]))?)?$/);
+   const narrativeMatch=path.match(/^\/api\/founders\/sessions\/([a-f0-9]{24})(?:\/(commands|access|variant)(?:\/([A-F]))?)?$/);
    if(narrativeMatch){
     if(!store.narrative)throw new Error('Parties narratives non disponibles');
     const [,sessionId,verb,family]=narrativeMatch;
+    if(verb==='variant'&&!family&&req.method==='POST'){
+     const actor=await requireOrg(req);
+     json(201,await store.narrative.duplicate(sessionId,actor.id,now));return;
+    }
     if(verb==='access'&&family&&req.method==='POST'){
      const actor=await requireOrg(req);
      json(200,await store.narrative.rotate(sessionId,family,actor.id,now));return;

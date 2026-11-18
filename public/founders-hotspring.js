@@ -102,8 +102,15 @@ export function renderTendencies(root,dilemma){
 
 export function renderHotspringStage(root,s,support){
  root.replaceChildren();
- const {intro,recap,checkpoint,qualification,relation}=s.campaign;
- root.hidden=!intro&&!checkpoint&&!qualification&&!s.narrativeEnding;
+ const {intro,recap,checkpoint,qualification,relation,familyPitches}=s.campaign;
+ root.hidden=!intro&&!checkpoint&&!qualification&&!s.narrativeEnding&&!familyPitches&&!recap.length;
+ if(familyPitches){
+  const section=node('details');section.append(node('summary','Les familles de Hotspring'));
+  for(const [i,family] of s.families.entries()){
+   section.append(node('h3',family.name),node('p',familyPitches[i].role,'small'),node('p',familyPitches[i].text));
+  }
+  root.append(section);
+ }
  if(intro){
   root.append(node('h2',intro.title));
   const cover=document.createElement('img');setHotspringImage(cover,intro.visual);root.append(cover);
@@ -112,6 +119,11 @@ export function renderHotspringStage(root,s,support){
    root.append(node('h3','Précédemment à Hotspring…'));
    for(const decision of recap.slice(-3))root.append(node('p',decision.title));
   }
+ }
+ if(!intro&&!checkpoint&&recap.length){
+  const earlier=node('details');earlier.append(node('summary','Précédemment à Hotspring…'));
+  for(const decision of recap.slice(-3))earlier.append(node('p',decision.title+' '+decision.summary));
+  root.append(earlier);
  }
  if(checkpoint){
   root.append(node('h2',checkpoint.title),node('p',checkpoint.text,'hotspring-text'));
@@ -180,9 +192,12 @@ export function hotspringWinners(s){
  return (names.length===1?'Famille la plus influente — ':'Co-victoire — ')+names.join(', ');
 }
 
-export function renderCampaignAdmin(root,s,command){
- root.hidden=!s.campaignAdmin;root.replaceChildren();
- if(root.hidden)return;
+export function renderCampaignAdmin(root,s,command,newVariant){
+ root.hidden=!s.campaignAdmin;
+ if(root.hidden){root.replaceChildren();return;}
+ const open=[...root.querySelectorAll('details')].map(d=>d.open);
+ const scene=root.querySelector('.hotspring-panorama');
+ root.replaceChildren();
  const a=s.campaignAdmin;
  root.append(node('h2','Campagne · Chapitre '+s.campaign.chapter));
  const action=(label,kind)=>{
@@ -203,10 +218,14 @@ export function renderCampaignAdmin(root,s,command){
    link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   });
   root.append(exported);
+  if(a.mayCreateVariant){
+   const clone=node('button','Créer une variante au dernier conseil','secondary');
+   clone.type='button';clone.addEventListener('click',newVariant);root.append(clone);
+  }
  }
  root.append(node('p','Confiance '+a.trust+' · Autonomie '+a.autonomy+' · Crises cette séance '+a.crisesThisSitting));
- const map=node('div');renderHotspringPanorama(map,s);root.append(map);
- const detail=node('details');
+ const map=scene??node('div');renderHotspringPanorama(map,s);root.append(map);
+ const detail=node('details');detail.open=Boolean(open[0]);
  detail.append(node('summary','Embranchements et sauvegardes'));
  for(const entry of [...a.progression,...a.crises]){
   detail.append(node('p',entry.id+' · '+(entry.played?'traitée':entry.contained?'contenue':entry.available?'disponible':'indisponible')+
@@ -224,7 +243,7 @@ export function renderCampaignAdmin(root,s,command){
   }
  }
  root.append(detail);
- const privateView=node('details');
+ const privateView=node('details');privateView.open=Boolean(open[1]);
  privateView.append(node('summary','Objectifs confidentiels et scores'));
  for(const r of a.scores.rows){
   privateView.append(node('h3',r.name+' · '+r.total+'/'+r.maximum),node('p',s.privateFamilies[r.family].briefing),

@@ -1,3 +1,4 @@
+import {rememberAccess} from './founders-workspace.js';
 import {CAMPAIGN_PHASES,renderHotspringStage,renderTendencies,renderCampaignAdmin,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
 import {decorateGauge,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
 import {mountPrintKit} from './founders-print.js';
@@ -104,7 +105,7 @@ function render(s){
  applySkin(document.body,s.skin);
  current=s;
  document.body.classList.toggle('campaign-hotspring',Boolean(s.campaign));
- renderCampaignAdmin($('hotspringAdmin'),s,command);
+ renderCampaignAdmin($('hotspringAdmin'),s,command,newVariant);
  if(s.campaign){renderHotspringStage($('hotspringStage'),s);renderTendencies($('hotspringTendencies'),s.phase==='REVEALED'?null:s.dilemma);}
  printKit.sync(s);renderPhaseClock($('phaseClock'),s);renderV2Controls(s);
  renderCouncilMonitor($('councilMonitor'),s);
@@ -183,6 +184,16 @@ async function command(kind,data={}){
   render(s);set('actionMessage',kind==='reveal'?'Décision révélée sur la projection.':s.phase==='FINISHED'?'Partie terminée : classement affiché.':s.campaign?(labels[s.phase]??s.phase)+'.':'Le prochain dilemme est ouvert.');
  }catch(e){set('actionMessage',e.message);try{render(await api(''));}catch{}}
  finally{busy=false;$('actions').querySelectorAll('button').forEach(b=>b.disabled=false);$('next').disabled=Boolean(current?.progression?.blocked);}
+}
+async function newVariant(){
+ if(busy)return;
+ busy=true;
+ try{
+  const result=await api('/variant','POST',{});
+  rememberAccess(result);
+  location.assign('/founders-regie.html?session='+encodeURIComponent(result.id));
+ }catch(e){set('actionMessage',e.message);}
+ finally{busy=false;}
 }
 async function rotate(family){
  if(busy)return;busy=true;set('notice','Renouvellement du jeton…');

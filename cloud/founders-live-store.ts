@@ -2,7 +2,7 @@ import {advanceNarrativeTime} from '../src/founders-v2.ts';
 import {activeFounders} from '../src/founders.ts';
 import {randomBytes} from 'node:crypto';
 import {tokenHash,shuffle} from '../server/security.ts';
-import {createNarrativeSession,applyNarrativeCommand,narrativeView} from '../src/founders-live.ts';
+import {createNarrativeSession,duplicateHotspringFinal,applyNarrativeCommand,narrativeView} from '../src/founders-live.ts';
 import {Pipelines} from '@google-cloud/firestore';
 
 const check=(ok,m)=>{if(!ok)throw new Error(m);};
@@ -42,6 +42,17 @@ export class FirestoreNarrativeSessions{
   check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
   const id=randomBytes(12).toString('hex');
   const s=createNarrativeSession(preview,{id,ownerId,code,title,objectives,names,colors,goalCards,scoreRules,timing,gaugeThresholds,crisisMode,presentationSeconds,initiativeOrder:shuffle(activeFounders(preview.game)),now});
+  return this.insert(s);
+ }
+ async duplicate(id,ownerId,now){
+  const result=await this.ref(id).get();
+  check(result.exists,'Partie introuvable');
+  const s=duplicateHotspringFinal(JSON.parse(result.data().stateJson),{id:randomBytes(12).toString('hex'),
+   code:'V'+randomBytes(4).toString('hex').toUpperCase(),ownerId,now});
+  return this.insert(s);
+ }
+ async insert(s){
+  const {id,code,ownerId,createdAt:now}=s;
   const access=activeFounders(s.game).map(family=>({family,token:randomBytes(32).toString('base64url')}));
   const ref=this.ref(id),codeRef=this.db.doc('pacteNarrativeCodes/'+code);
   await this.db.runTransaction(async tx=>{

@@ -82,6 +82,20 @@ export function createNarrativeSession(preview,{id,ownerId,code,title,objectives
  check(Buffer.byteLength(JSON.stringify(session),'utf8')<=720000,'Partie trop volumineuse pour le stockage');
  return session;
 }
+export function duplicateHotspringFinal(input,{id,code,ownerId,now}){
+ check(input.ownerId===ownerId,'Accès régie refusé');
+ check(isHotspring(input)&&input.phase==='FINISHED'&&input.campaign.charterSeed,'Archive Hotspring finale requise');
+ const s=copy(input),c=s.campaign,seed=c.charterSeed;
+ Object.assign(s,{id,code,title:('Variante — '+s.title).slice(0,100),phase:'CHECKPOINT',
+  currentDilemmaId:'D29',game:seed.game,revealedHistory:seed.history,offers:seed.offers,lastReveal:seed.reveal,
+  finalResults:null,narrativeEnding:null,revision:0,createdAt:now,updatedAt:now});
+ Object.assign(c,{markers:seed.markers,charter:null,qualification:null,finalists:null,archivedAt:null,charterSeed:null});
+ c.parentArchive=input.id;
+ c.publicRanking=c.checkpoints.at(-1)?.scores.rows.map(r=>({family:r.family,name:r.name,total:r.total,maximum:r.maximum}))??null;
+ setPhaseClock(s,now);
+ return s;
+}
+
 const dilemma=s=>{
  const d=s.scenario.dilemmas.find(item=>item.id===s.currentDilemmaId);
  check(d,'Dilemme absent du scénario figé');return d;

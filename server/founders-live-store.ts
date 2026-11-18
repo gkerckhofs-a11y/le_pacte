@@ -2,7 +2,7 @@ import {advanceNarrativeTime} from '../src/founders-v2.ts';
 import {activeFounders} from '../src/founders.ts';
 import {randomBytes} from 'node:crypto';
 import {tokenHash,shuffle} from './security.ts';
-import {createNarrativeSession,applyNarrativeCommand,narrativeView} from '../src/founders-live.ts';
+import {createNarrativeSession,duplicateHotspringFinal,applyNarrativeCommand,narrativeView} from '../src/founders-live.ts';
 
 const check=(condition,message)=>{if(!condition)throw new Error(message);};
 const familyIds=['A','B','C','D','E','F'];
@@ -45,13 +45,22 @@ export class LocalNarrativeSessions{
   return this.transaction(()=>{
    const id=randomBytes(12).toString('hex');
    const s=createNarrativeSession(preview,{id,ownerId,code,title,objectives,names,colors,goalCards,scoreRules,timing,gaugeThresholds,crisisMode,presentationSeconds,initiativeOrder:shuffle(activeFounders(preview.game)),now});
+   return this.insert(s);
+  });
+ }
+ duplicate(id,ownerId,now){
+  return this.transaction(()=>this.insert(duplicateHotspringFinal(this.get(id),{
+   id:randomBytes(12).toString('hex'),code:'V'+randomBytes(4).toString('hex').toUpperCase(),ownerId,now
+  })));
+ }
+ insert(s){
+   const {id,code,ownerId,createdAt:now}=s;
    const access=activeFounders(s.game).map(family=>({family,token:randomBytes(32).toString('base64url')}));
    this.db.prepare('INSERT INTO founders_sessions(id,code,owner_id,state_json,updated) VALUES(?,?,?,?,?)')
     .run(id,code,ownerId,JSON.stringify(s),now);
    const stmt=this.db.prepare('INSERT INTO founders_access(session_id,family,hash,expires) VALUES(?,?,?,?)');
    for(const a of access)stmt.run(id,a.family,tokenHash(a.token),now+86400000);
    return {id,code,access};
-  });
  }
  authenticate(id,token,now){
   check(typeof token==='string'&&/^[a-zA-Z0-9_-]{43}$/.test(token),'Accès famille invalide');
