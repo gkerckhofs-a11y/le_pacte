@@ -1,4 +1,6 @@
 // Display recipes for circumstances the city has already encountered.
+export const hotspringRiverSites = {corridor:[25.5,59.2], crossing:[33,55]} as const;
+
 export const HOTSPRING_DETAIL_RULES = [
  {dilemma:'D10', marker:'ACCORD_RIVIERE', kind:'boundary', anchor:'corridor', label:'Tracé du corridor riverain'},
  {dilemma:'D12', marker:'ACCORD_RIVIERE', kind:'boundary', anchor:'corridor', label:'Limite du passage négocié'},
@@ -19,10 +21,10 @@ export const HOTSPRING_DETAIL_RULES = [
  {dilemma:'D24', marker:'SCIERIE_INTENSIVE', kind:'chimney-smoke', anchor:'sawmill', label:'Fumée au-dessus des piles de bois'},
  {dilemma:'D25', marker:'DECHETS_LIBRES', kind:'standing-water', anchor:'sanitation', label:'Eau stagnante près des dépôts'},
  {dilemma:'D25', marker:'QUARTIER_PROVISOIRE', kind:'notice', anchor:'housing', label:'Habitations signalées pour les soins'},
- {dilemma:'D26A', marker:'ALLIANCE_VALLEE', kind:'relief', anchor:'corridor', label:'Guides de la vallée au passage de la crue', fixed:[24,52]},
+ {dilemma:'D26A', marker:'ALLIANCE_VALLEE', kind:'relief', anchor:'corridor', label:'Guides de la vallée au passage de la crue', fixed:hotspringRiverSites.corridor},
  {dilemma:'D26B', marker:'EAU_COMMUNALE', kind:'ledger', anchor:'well', label:'Registre de distribution au puits communal'},
  {dilemma:'D26B', marker:'EAU_PRIVEE', kind:'signpost', anchor:'well', label:'Panneau de la concession d’eau'},
- {dilemma:'D26B', marker:'ALLIANCE_VALLEE', kind:'relief', anchor:'crossing', label:'Ravitaillement proposé par les partenaires de la vallée', fixed:[33,52]},
+ {dilemma:'D26B', marker:'ALLIANCE_VALLEE', kind:'relief', anchor:'crossing', label:'Ravitaillement proposé par les partenaires de la vallée', fixed:hotspringRiverSites.crossing},
  {dilemma:'D28', marker:'CENTRE_BRULE', kind:'embers', anchor:'bank', label:'Décombres du centre près de la banque'},
  {dilemma:'D28', marker:'SECURITE_MINIERE', kind:'inspection', anchor:'mine', label:'Barrière d’inspection de la mine'}
 ] as const;

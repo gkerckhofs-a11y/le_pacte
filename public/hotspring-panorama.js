@@ -38,9 +38,6 @@ function camp(wagonGraphic,tentGraphic=tent){
  return row([[-30,2,.7],[-10,-12,.65],[12,-14,.65],[27,0,.68],[4,17,.7]],wagonGraphic)+row([[-16,12,.65],[16,8,.7]],tentGraphic);
 }
 const building={
- road:path('M-70 24Q-26 1 75 -19', 'none','#ac8e67',7),
- roadwide:path('M-78 25Q-27 1 76 -19', 'none','#bc9e76',13),
- camp:camp(wagon),
  cottages:row([[-21,-7,.67],[7,-14,.68],[28,-5,.56],[-2,10,.82]],cabin(27,14)),
  well:path('M-9 0l6 -6 14 1 -4 5z',timber)+path('M0 -5v-13l7 -2m-7 4 6 3','none','#635b50',2.5),
  tower,
@@ -54,14 +51,10 @@ const building={
  logging:row([[-13,0,.8],[0,-6,.6],[12,4,.7]],path('M-10 0h20v4h-20z',timber)),
  shops:row([[-14,-4,.86],[19,0,.8]],cabin(26,18,'#a68163')),
  vacant:posts,
- corridor:at(23,14,path('M-31 15Q-22 -4 17 -15L13 -21Q-21 -17 -38 10z','#9e8864','none')),
  fence:posts,
- trail:path('M-39 11Q-20 6 -15 -2T27 -15','none','#9f805c',4),
  trade:cabin(25,12)+at(16,4,posts,.65),
  office:cabin(30,20,'#aa927b')+path('M-19 -28h38v4h-38z','#7c6651'),
  bell:path('M-7 0v-17h12V0M-3 -14v5h4v-5z','none','#554736',1.75),
- rail:path('M-77 19l154 -39 m-155 44l155 -40','none','#5b5147',1.9)+
-  Array.from({length:18},(_,i)=>path(`M${-77+i*8} ${17-i*2}l2 8`,'none','#685848',1.45)).join(''),
  station:cabin(44,18,'#a88d6b')+path('M-25 1h53l8 5H-31z',timber),
  mine:cabin(46,16,'#6d594b')+at(20,-9,pole,.95)+path('M-28 -3v-14h16v14z',shade)+path('M-29 3l26 8','none','#75634c',2),
  workshop:cabin(23,12,'#8e7661'),
@@ -77,24 +70,29 @@ const building={
  refuge:row([[0,0],[16,-2,.8],[-16,4,.8]],tent),
  protected:at(0,0,posts,1.5)
 };
-const river='M-6 486 C 72 451 155 357 257 310 S 390 260 382 228 S 350 216 393 201 S 422 185 451 180';
-const riverBands={
- claire:[],
- degradee:[['#918346',14],['#9f9b59',5]],
- polluee:[['#514832',19],['#746440',7]],
- basse:[['#ae8a59',18],['#5d6559',5]],
- crue:[['#897050',35],['#a99171',23],['#c7af85',3]]
+// These contours follow the painted waterline and the floodplain on the valley plate.
+const riverBed='M-14 488C16 470 25 436 50 415S105 394 130 364 184 342 220 321 246 300 283 289 336 268 372 256 439 242 418 229 373 218 364 208Q354 201 386 198L402 188Q325 191 315 202C314 211 351 216 371 229S345 245 315 263 250 275 219 291 172 321 139 324 66 346 45 356 6 367-14 374Z';
+const overflow='M-14 490C20 477 34 444 59 424S113 400 144 371 192 353 225 333 256 314 280 318 315 306 331 294Q350 276 383 263C411 250 448 246 423 228S374 214 371 208Q361 204 404 192L386 198Q354 201 364 208C373 218 398 216 418 229S408 245 372 256 318 269 283 289 243 300 220 321 168 333 130 364 76 393 50 415 15 471-14 488Z';
+const waterPigments={
+ degradee:['#978959',.23],
+ polluee:['#625b3b',.40],
+ basse:['#a48966',.32],
+ crue:['#98795c',.39]
 };
-const terrainStages={
+const terrainRoutes={
  road:{
-  building:path('M-72 25Q-25 4 75 -19','none','#a88b68',3)+row([[-61,18],[-21,6],[19,-7],[64,-17]],path('M0 0v-6','none','#d1b58a',2)),
-  damaged:path('M-70 22Q-40 4 -20 8 M-4 6Q25 -13 75 -19','none','#988366',7)
+  low:'M306 390C342 379 389 367 426 362S508 358 554 359 623 358 641 343',
+  high:'M613 195C646 201 663 207 699 207S787 207 838 203 925 188 966 186'
  },
  rail:{
-  building:path('M-77 21l144 -36','none','#af9070',5)+path('M-77 18l67 -17m-67 21 69 -18','none','#6c5744',1.8)+
-   row([[-68,20],[-57,17],[-45,14],[-32,11],[-18,7],[-5,4],[7,1],[20,-2]],path('M-2 -4l4 8','none','#625345',1.8)),
-  damaged:path('M-77 19l51 -13m18 2 19 -16m17 0 49 -12M-77 23l52 -13m49 -13 53 -13','none','#61564c',2.2)
+  low:'M310 348C379 336 442 334 503 337S601 348 638 342',
+  high:'M573 163C654 159 702 164 751 164S851 159 894 159 943 154 984 149'
  },
+ corridor:'M62 456C81 425 125 416 155 383S199 359 225 337 286 315 326 300',
+ trail:'M144 392C190 357 234 346 281 335S344 309 385 301 424 302 450 306',
+ ridgeTrail:'M523 184Q547 177 580 176T675 168Q733 161 768 144'
+};
+const terrainStages={
  drains:{
   building:path('M-32 6l24 -7 9 -8 18 -8','none','#ac8e67',5)+path('M-19 2l4 8m6 -11 4 8','none','#625544',1.5),
   damaged:path('M-34 7l19 -5m13 -1 11 -13 19 -8','none','#6d5e4f',5)+path('M-14 3l3 -5 7 1 5 5z','#b2a084')
@@ -107,11 +105,51 @@ const stateScreen={
  abandoned:path('M-9 0l8 -12m-9 0L0 0M9 -17l8 7m0 -7l-8 7','none','#43392f',2.2),
  inspection:at(0,5,posts,.6)
 };
-function renderLayer(layer,textureFor){
+
+let panoramaId=0;
+function groundContact(width,paint){
+ return `<ellipse cx="${width*.09}" cy="1.6" rx="${width*.47}" ry="${Math.min(7,width*.11)}"
+ fill="url(#${paint}-contact)" transform="rotate(7)"/>`;
+}
+
+function renderTerrain(layer,high){
+ const {kind,state}=layer;
+ const route=terrainRoutes[kind==='roadwide'?'road':kind];
+ if(!route)return null;
+ const d=typeof route==='string'?route:route[high?'high':'low'];
+ const stroke=(color,width,opacity,extra='')=>
+  `<path d="${d}" fill="none" stroke="${color}" stroke-width="${width}" opacity="${opacity}" ${extra}/>`;
+ const softStroke=(color,width,opacity)=>
+  stroke(color,width+2.4,opacity*.24,'stroke-linecap="round"')+
+  stroke(color,width,opacity*.76,'stroke-linecap="round"');
+ if(kind==='rail'){
+  const gauge=high?1:1.45;
+  const breaks=state==='damaged'?' stroke-dasharray="37 14 25 21"':'';
+  const bed=softStroke('#8e7459',high?6:8,.42);
+  if(state==='building')return bed+stroke('#5e5042',gauge,.63,'stroke-dasharray="52 220"');
+  return bed+stroke('#695747',gauge*4.2,.69,'stroke-dasharray="1.1 3.8"')+
+   stroke('#504538',.9,.72,`transform="translate(0 ${gauge})"${breaks}`)+
+   stroke('#504538',.9,.72,`transform="translate(0 ${-gauge})"${breaks}`);
+ }
+ const road=kind==='road'||kind==='roadwide';
+ const width=road?(kind==='roadwide'?10:7)*(high?.74:1):kind==='trail'?4.6:3.2;
+ const opacity=state==='building'?.20:road?.42:.31;
+ const soil=softStroke(road?'#b49b7a':'#a58d6b',width,opacity);
+ if(!road||state==='building')return soil;
+ const ruts=state==='damaged'?' stroke-dasharray="16 7 24 10"':'';
+ return soil+stroke('#826b53',.9,.33,`transform="translate(0 ${width*.21})"${ruts}`)+
+  stroke('#826b53',.9,.29,`transform="translate(0 ${-width*.21})"${ruts}`);
+}
+
+function renderLayer(layer,textureFor,high,paint){
+ const route=renderTerrain(layer,high);
+ const attrs=`data-layer="${escapeXML(layer.id)}" data-kind="${escapeXML(layer.kind)}" data-state="${escapeXML(layer.state)}"`;
+ const title=`<title>${escapeXML(layer.label)}</title>`;
+ if(route)return `<g ${attrs}>${title}${route}</g>`;
  const painted=textureFor(layer.kind);
- const graphic=layer.kind==='camp'?camp(textureFor('wagon')??wagon,textureFor('tent')??tent):
+ const graphic=layer.kind==='camp'?groundedCamp(textureFor,paint):
   painted??building[layer.kind]??'';
- const terrain=terrainStages[layer.kind==='roadwide'?'road':layer.kind]?.[layer.state];
+ const terrain=terrainStages[layer.kind]?.[layer.state];
  const inProgress=layer.state==='building',damaged=layer.state==='damaged';
  const remainder=painted&&(inProgress||damaged)?
   partialStructure(painted,layer.kind,damaged?.28:.36):graphic;
@@ -120,25 +158,46 @@ function renderLayer(layer,textureFor){
  const scale=(spriteSize[layer.kind]?.[0]??38)/45;
  const embellishment=props?at(damaged?8:0,damaged?4:0,props,Math.min(1.5,Math.max(.56,scale))):
   stateScreen[layer.state]??'';
- const body=terrain??`<g opacity="${opacity}">${remainder}</g>${embellishment}`;
- return `<g data-layer="${escapeXML(layer.id)}" data-kind="${escapeXML(layer.kind)}" data-state="${escapeXML(layer.state)}"
- transform="translate(${layer.x*10} ${layer.y*5.625}) scale(${layer.scale})"><title>${escapeXML(layer.label)}</title>${body}</g>`;
+ const footprint=layer.kind==='drains'?0:spriteSize[layer.kind]?.[0];
+ const contact=footprint?groundContact(footprint,paint):'';
+ const body=terrain??`${contact}<g opacity="${opacity}">${remainder}</g>${embellishment}`;
+ return `<g ${attrs} transform="translate(${layer.x*10} ${layer.y*5.625}) scale(${layer.scale})">${title}${body}</g>`;
+}
+
+function groundedCamp(textureFor,paint){
+ return camp(groundContact(32,paint)+(textureFor('wagon')??wagon),
+  groundContact(22,paint)+(textureFor('tent')??tent));
+}
+
+function renderWater(scene){
+ const tint=(d,color,opacity)=>`<path d="${d}" fill="${color}" fill-opacity="${opacity}"
+  stroke="${color}" stroke-width="5" stroke-linejoin="round" stroke-opacity="${opacity*.17}"/>`;
+ const pigment=waterPigments[scene.river];
+ const tinted=pigment?tint(riverBed,...pigment):'';
+ const bank=scene.river==='crue'||scene.scars.includes('Crue')?
+  tint(overflow,'#8c735a',scene.river==='crue'?.48:.18):'';
+ return `<g data-river="${escapeXML(scene.river)}">${tinted}${bank}</g>`;
 }
 
 export function renderPanoramaSvg(scene,{background=VALLEY_PLATE,sprites=scene.sprites??{},campMemory=false}={}){
+ const paint='hotspring-paint-'+(++panoramaId);
+ const high=scene.location==='terrasse';
  const hasScars=scene.scars.length>0;
- const riverLayer=(riverBands[scene.river]??[]).map(([pigment,w])=>path(river,'none',pigment,w)).join('');
- const floodMark=scene.scars.includes('Crue')?path('M 46 440Q 117 407 140 365T 243 324','none','#958467',3):'';
- const stumps=[[325,211],[369,173],[297,232],[435,161],[335,220],[380,180],[322,232],[401,177],[310,248],[284,259]];
+ const stumps=[[208,198,.52],[256,201,.48],[265,194,.48],[224,204,.56],[197,204,.56],
+  [228,194,.46],[285,198,.50],[240,210,.55],[189,209,.60],[269,205,.55]];
  const visibleStumps=scene.vegetation==='abondante'?[]:scene.vegetation==='réduite'?stumps.slice(0,4):stumps;
  const wood=row(visibleStumps,path('M-6 0l1 -6 7 -3 4 2 -1 6z','#786b53','#51483a',.7));
  const textureFor=kind=>sprites[kind]&&spriteSize[kind]?texture(sprites[kind],kind):null;
  const trees=textureFor('grove');
  const groves=trees&&scene.vegetation!=='fortement dégradée'
   ?row(scene.vegetation==='abondante'?[[276,315,.68],[364,248,.53],[417,212,.40]]:[[276,315,.55]],trees):'';
- const buildings=scene.layers.filter(layer=>layer.state!=='absent').map(layer=>renderLayer(layer,textureFor)).join('');
+ const layers=scene.layers.filter(layer=>layer.state!=='absent');
+ const isRoute=layer=>(layer.kind==='roadwide'||layer.kind in terrainRoutes);
+ const trails=layers.filter(isRoute).map(layer=>renderLayer(layer,textureFor,high,paint)).join('');
+ const buildings=layers.filter(layer=>!isRoute(layer)).map(layer=>renderLayer(layer,textureFor,high,paint)).join('');
  const count=scene.location&&scene.street!=='vide'?({faible:2,moyenne:6,forte:12}[scene.density]??0):0;
- const group=textureFor('people');
+ const peopleTexture=textureFor('people');
+ const group=peopleTexture?groundContact(17,paint)+peopleTexture:null;
  const people=group
   ?Array.from({length:Math.ceil(count/3)},(_,i)=>at(scene.townX*10-43+i*23,scene.townY*5.625+22+(i%3)*7,group)).join('')
   :Array.from({length:count},(_,i)=>at(scene.townX*10-57+i*11,scene.townY*5.625+20+(i%3)*6,person,.64+(i%3)*.13)).join('');
@@ -164,14 +223,21 @@ export function renderPanoramaSvg(scene,{background=VALLEY_PLATE,sprites=scene.s
  const filters=tone?`<ellipse cx="${scene.townX*10}" cy="${scene.townY*5.625}" rx="125" ry="75" fill="${tone}" opacity=".13"/>`:'';
  const ending=scene.epilogue?'<rect width="1000" height="563" fill="#cc8853" opacity=".10"/>':'';
  const memory=campMemory&&scene.epilogue?`<g class="hotspring-camp-memory" aria-hidden="true">
-  ${at(scene.epilogue.origin[0]*10,scene.epilogue.origin[1]*5.625,camp(textureFor('wagon')??wagon,textureFor('tent')??tent))}
+  ${at(scene.epilogue.origin[0]*10,scene.epilogue.origin[1]*5.625,groundedCamp(textureFor,paint))}
  </g>`:'';
  const labels=(scene.details??[]).map(detail=>detail.label);
  const description='Vallée de Hotspring'+(scene.location?' — ville sur '+scene.location:'')+
   (hasScars?'. Cicatrices : '+scene.scars.join(', '):'')+(labels.length?'. '+labels.join('. '):'');
  return `<svg class="hotspring-map" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 562.5" role="img" aria-label="${escapeXML(description)}">
+ <defs>
+  <radialGradient id="${paint}-contact">
+   <stop offset="0" stop-color="#332a1f" stop-opacity=".64"/>
+   <stop offset=".6" stop-color="#332a1f" stop-opacity=".25"/>
+   <stop offset="1" stop-color="#332a1f" stop-opacity="0"/>
+  </radialGradient>
+ </defs>
  <image href="${escapeXML(background)}" width="1000" height="562.5" preserveAspectRatio="none"/>
- <g data-river="${escapeXML(scene.river)}" opacity=".55">${riverLayer}${floodMark}</g>${filters}
+ ${renderWater(scene)}${filters}${trails}
  <g data-vegetation="${escapeXML(scene.vegetation)}">${groves}${wood}</g>${buildings}
  <g class="street-detail" data-street="${escapeXML(scene.street)}" data-density="${escapeXML(scene.density)}"
   data-mood="${escapeXML(scene.mood)}" data-prosperity="${escapeXML(scene.prosperity)}">
@@ -192,7 +258,7 @@ function renderDetail(detail,textureFor){
  const clean=detail.clean;
  const ditch=path('M-35 14q14-9 27-8t28-17,24-4','none',clean?'#81958b':'#6f6951',clean?2.5:4);
  const detailGraphics={
-  boundary:at(23,14,path('M-39 13Q-22 5 -12 -5t41 -17','none','#cbb084',2.2)+at(-8,3,posts,.58)),
+  boundary:at(9,9,path('M-21 5v-4m17 -2v-5m21 -3v-4','none','#89745e',1.3)),
   signpost:at(12,8,sign,1.30),
   pennant:at(18,-10,path('M0 10v-22l15 3 -5 6L0 -7','none','#cdb08d',2),1.35),
   freight:at(24,3,cart,.9),

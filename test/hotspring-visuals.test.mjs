@@ -89,6 +89,29 @@ test('Hotspring : les calques évoluent, ancrages invariants, rendu 1080p et 4K'
  }
 });
 
+test('Hotspring : les deux sites gardent les bâtiments sur la terre ferme et les voies sous les façades',()=>{
+ const g=newCampaign();
+ const markers=['CENTRE_PRIVE','SCIERIE_INTENSIVE','COMPTOIR_COMMUN','CHEMIN_DE_FER'];
+ const maps=['VILLE_BASSE','VILLE_HAUTE'].map(location=>{
+  g.state.campaign.markers=[location,...markers];
+  return narrativePublicView(g.state).campaign.landscape;
+ });
+ for(const map of maps){
+  const layer=id=>map.layers.find(l=>l.id===id);
+  // These fixed parcels lie on the western clearing and the meadow east of the bend.
+  assert.deepEqual([layer('sawmill').x,layer('sawmill').y],[23.5,35.4]);
+  assert.deepEqual([layer('trade').x,layer('trade').y],[43.5,52.1]);
+  const {document}=parseHTML(renderPanoramaSvg(map));
+  const ids=[...document.querySelectorAll('[data-layer]')].map(node=>node.getAttribute('data-layer'));
+  assert.ok(ids.indexOf('surveyed')<ids.indexOf('homes'));
+  assert.ok(ids.indexOf('rail')<ids.indexOf('depot'));
+  assert.ok(document.querySelector('[data-layer="trade"] ellipse'));
+ }
+ const route=map=>parseHTML(renderPanoramaSvg(map)).document
+  .querySelector('[data-layer="surveyed"] path').getAttribute('d');
+ assert.notEqual(route(maps[0]),route(maps[1]));
+});
+
 test('Hotspring : tendances lisibles et prologue sur la projection et le terminal',()=>{
  const {document}=parseHTML('<div id="stage"></div><div id="tendencies"></div>');
  const original=globalThis.document,previousImage=globalThis.Image;
@@ -197,7 +220,9 @@ test('Hotspring : l’épilogue conserve le site du premier camp et utilise les 
  try{
   const map=document.getElementById('map');
   renderHotspringPanorama(map,s);
-  assert.ok(map.querySelector('.hotspring-epilogue .hotspring-camp-memory'),map.innerHTML.slice(0,250));
+  const epilogue=map.querySelector('.hotspring-epilogue');
+  assert.ok(epilogue.querySelector('.hotspring-camp-memory'),map.innerHTML.slice(0,250));
+  assert.equal(epilogue.style.transformOrigin,s.campaign.landscape.epilogue.origin.map(value=>value+'%').join(' '));
   assert.equal(map.querySelectorAll('.hotspring-epilogue-scene img').length,3);
   renderHotspringPanorama(map,narrativePublicView(state));
   assert.equal(map.querySelector('.hotspring-camp-memory'),null);

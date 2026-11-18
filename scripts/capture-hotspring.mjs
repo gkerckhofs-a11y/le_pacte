@@ -3,6 +3,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {Resvg} from '@resvg/resvg-js';
+import {PNG} from 'pngjs';
 import {simulateCampaign,trajectories} from '../test/helpers/hotspring.mjs';
 import {visualComposition} from '../test/helpers/hotspring-visual-compositions.mjs';
 import {hotspringLandscape} from '../src/hotspring-landscape.ts';
@@ -27,11 +28,24 @@ function capture(landscape,width,point=[50,50],zoom=1){
  const w=Math.round(1000/zoom),h=w*9/16;
  const left=Math.max(0,Math.min(1000-w,point[0]*10-w/2));
  const top=Math.max(0,Math.min(562.5-h,point[1]*5.625-h*.66));
- const svg=renderPanoramaSvg(landscape,{background,sprites}).replace('viewBox="0 0 1000 562.5"',
-  'viewBox="'+[left,top,w,h].join(' ')+'"');
- const raster=new Resvg(svg,{fitTo:{mode:'width',value:width}}).render();
- if(raster.width!==width||raster.height!==width*9/16)throw Error('Dimensions inattendues pour le panorama.');
- return raster.asPng();
+ const svg=renderPanoramaSvg(landscape,{background,sprites});
+ const height=width*9/16;
+ const raster=new Resvg(svg,{fitTo:{mode:'width',value:Math.ceil(width*1000/w)}}).render();
+ if(zoom===1){
+  if(raster.width!==width||raster.height!==height)throw Error('Dimensions inattendues pour le panorama.');
+  return raster.asPng();
+ }
+ // Crop the raster so out-of-frame SVG paths cannot upset the enlarged viewport.
+ const scale=raster.width/1000;
+ const x=Math.min(raster.width-width,Math.round(left*scale));
+ const y=Math.min(raster.height-height,Math.round(top*scale));
+ const cropped=new PNG({width,height});
+ const pixels=raster.pixels;
+ for(let row=0;row<height;row++){
+  const start=((y+row)*raster.width+x)*4;
+  pixels.copy(cropped.data,row*width*4,start,start+width*4);
+ }
+ return PNG.sync.write(cropped);
 }
 
 function captureCampaign(){
@@ -43,7 +57,7 @@ function captureCampaign(){
   ['02-premiers-batiments',snapshots[2],1920,'Premières institutions'],
   ['03-corridor-et-comptoir',snapshots[3],1920,'Corridor et comptoir de la vallée'],
   ['04-rail-et-quartiers',snapshots[4],1920,'Rail et quartiers'],
-  ['05-crises-et-services',low[5],1920,'Traces des crises et services'],
+  ['05-crises-et-services',low[5],1920,'Traces des crises et services · autre partie, dans les terres basses'],
   ['06-charte-et-epilogue',snapshots.at(-1),3840,'Panorama de l’épilogue']
  ];
  for(const [name,s,w] of captures){

@@ -59,7 +59,7 @@
 @keyframes hotspring-arrival{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.hotspring-prologue [data-layer="camp"]>g>g{animation:none}}
 
-.hotspring-epilogue {animation:hotspring-epilogue 10s ease-in-out both;transform-origin:58% 52%}
+.hotspring-epilogue {animation:hotspring-epilogue 10s ease-in-out both}
 .hotspring-camp-memory {animation:hotspring-memory 2.6s ease-in-out both}
 .hotspring-local-smoke {animation:hotspring-smoke 4.8s ease-in-out 2 alternate both;transform-box:fill-box;transform-origin:50% 95%}
 .hotspring-epilogue-scene {

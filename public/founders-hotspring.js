@@ -58,6 +58,7 @@ export function renderHotspringPanorama(root,s){
  if(s.phase==='INTRO'&&s.campaign.chapter===1)current.classList.add('hotspring-prologue');
  if(ending){
   current.classList.add('hotspring-epilogue');
+  current.style.transformOrigin=map.epilogue.origin.map(value=>value+'%').join(' ');
   for(const [i,entry] of (s.campaign.epilogueRecap??[]).entries()){
    const figure=node('figure',null,'hotspring-epilogue-scene');
    const picture=node('img');
