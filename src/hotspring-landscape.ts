@@ -1,3 +1,5 @@
+import art from '../content/hotspring-art-index-v1.json' with {type:'json'};
+
 // Coordinates are percentage points on the fixed valley plate, ordered from the ridge to the foreground.
 const footprints={
  surveyed:[3,0],homes:[0,4],shops:[4,5],well:[-5,5],school:[1,8],saloon:[7,7],clinic:[-7,9],
@@ -20,8 +22,8 @@ export function hotspringLandscape(s){
  const layers=[];
  function add(id,kind,label,{fixed,state='complete',scale=1}={}){
   const [dx,dy]=footprints[id];
-  const x=fixed?.[0]??townX+dx*(high?.72:1),y=fixed?.[1]??townY+dy*(high?.58:1);
-  layers.push({id,kind,label,x,y,state:scars.includes(id)?'damaged':state,scale:scale*(high&&!fixed?.length?0.74:1)});
+  const x=fixed?.[0]??townX+dx*(high?0.82:1),y=fixed?.[1]??townY+dy*(high?0.68:1);
+  layers.push({id,kind,label,x,y,state:scars.includes(id)?'damaged':state,scale:scale*(high&&!fixed?0.90:1)});
  }
  const surveyed=h('CENTRE_PRIVE')||h('RESERVES_PUBLIQUES');
  if(s.phase!=='READY'&&!surveyed)add('camp','camp','Chariots et tentes des fondateurs',{fixed:founded?null:[58,52]});
@@ -93,7 +95,9 @@ export function hotspringLandscape(s){
   h('EPIDEMIE_CONTENUE')||h('EPIDEMIE_DIFFUSE')?'Épidémie':null,
   h('RAPPORT_ACCIDENT')?'Accident minier':null,h('SAISIES')?'Saisies bancaires':null
  ].filter(Boolean);
+ const usedKinds=new Set(layers.map(l=>l.kind==='camp'?'wagon':l.kind));
+ const sprites=Object.fromEntries([...usedKinds].filter(kind=>art['sprite_'+kind]).map(kind=>[kind,art['sprite_'+kind].url]));
  const charter={A:'commerce',B:'services',C:'ateliers',D:'inspection',E:'liaison',F:'réserves'}[s.campaign.charter]??null;
  return {location:founded?(high?'terrasse':'terres basses'):null,townX,townY,layers:layers.sort((a,b)=>a.y-b.y),
-  river,vegetation,density,street,mood,prosperity,scars:scarList,charter};
+  river,vegetation,density,street,mood,prosperity,scars:scarList,charter,sprites};
 }

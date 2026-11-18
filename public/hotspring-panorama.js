@@ -24,10 +24,18 @@ const wagon=path('M-12 0v-7q0 -12 12 -12t19 12v7z',canvas)+
 const pole=path('M-15 0l3 -21m18 0 4 21m-20 -9 18 7m-1 -7 -18 7','none','#5d4a37',2.5);
 const tower=pole+path('M-13 -23v-15l23 1v14z',timber)+path('M-16 -37l14 -8 15 8z',roof);
 const posts=path('M-30 0v-8m12 6v-8m15 6v-8m16 6v-8m14 6v-8m-57 4l57 -8','none','#746047',1.8);
+const spriteSize={wagon:[42,27],well:[28,22],tower:[36,47],school:[52,49],saloon:[56,43],clinic:[49,33],mill:[70,48],station:[60,38],bank:[57,36],mine:[76,48]};
+function texture(url,kind){
+ const [width,height]=spriteSize[kind];
+ return `<image href="${escapeXML(url)}" x="${-width/2}" y="${-height}" width="${width}" height="${height}" preserveAspectRatio="xMidYMax meet"/>`;
+}
+function camp(wagonGraphic){
+ return row([[-30,2,.7],[-10,-12,.65],[12,-14,.65],[27,0,.68],[4,17,.7]],wagonGraphic)+row([[-16,12,.65],[16,8,.7]],tent);
+}
 const building={
  road:path('M-70 24Q-26 1 75 -19', 'none','#ac8e67',7),
  roadwide:path('M-78 25Q-27 1 76 -19', 'none','#bc9e76',13),
- camp:row([[-30,2,.7],[-10,-12,.65],[12,-14,.65],[27,0,.68],[4,17,.7]],wagon)+row([[-16,12,.65],[16,8,.7]],tent),
+ camp:camp(wagon),
  cottages:row([[-21,-7,.67],[7,-14,.68],[28,-5,.56],[-2,10,.82]],cabin(27,14)),
  well:path('M-9 0l6 -6 14 1 -4 5z',timber)+path('M0 -5v-13l7 -2m-7 4 6 3','none','#635b50',2.5),
  tower,
@@ -73,14 +81,18 @@ const stateScreen={
  abandoned:path('M-9 0l8 -12m-9 0L0 0M9 -17l8 7m0 -7l-8 7','none','#43392f',2.2),
  inspection:at(0,5,posts,.6)
 };
-export function renderPanoramaSvg(scene,{background=VALLEY_PLATE}={}){
+export function renderPanoramaSvg(scene,{background=VALLEY_PLATE,sprites=scene.sprites??{}}={}){
  const hasScars=scene.scars.length>0;
  const pigment=pigments[scene.river];
  const riverLayer=pigment?path(river,'none',pigment,scene.river==='crue'?30:14):'';
  const wood=scene.vegetation!=='abondante'?row([[325,211],[369,173],[297,232],[435,161]],
   path('M-6 0l1 -6 7 -3 4 2 -1 6z','#786b53','#51483a',.7)):'';
  const buildings=scene.layers.map(layer=>{
-  const graphic=building[layer.kind]??'';
+  const bitmap=sprites[layer.kind];
+  const campBitmap=layer.kind==='camp'&&sprites.wagon;
+  const complete=layer.state==='complete'||layer.state==='inspection';
+  const graphic=complete&&campBitmap?camp(texture(campBitmap,'wagon')):
+   complete&&bitmap&&spriteSize[layer.kind]?texture(bitmap,layer.kind):building[layer.kind]??'';
   const extra=stateScreen[layer.state]??'';
   const main=layer.state==='building'?'':graphic;
   const opacity=layer.state==='damaged'?.43:layer.state==='abandoned'?.57:1;

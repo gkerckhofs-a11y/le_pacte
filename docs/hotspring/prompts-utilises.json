@@ -1,0 +1,67 @@
+{
+  "parts": [
+    {
+      "path": "prompts-entetes.json",
+      "ids": [
+        "valley_base",
+        "opening_1",
+        "D01",
+        "D02",
+        "D03",
+        "D04",
+        "D05",
+        "D06",
+        "D07",
+        "D08",
+        "D09",
+        "D10",
+        "D11",
+        "D12",
+        "D13",
+        "D14A",
+        "D14B",
+        "D15",
+        "D16",
+        "D17",
+        "D18",
+        "D19",
+        "D20",
+        "D21",
+        "D22",
+        "D23",
+        "D24",
+        "D25",
+        "D26A",
+        "D26B",
+        "D27",
+        "D28",
+        "D29",
+        "D30"
+      ]
+    },
+    {
+      "path": "prompts-resultats.json",
+      "ids": [
+        "D01_pour",
+        "D01_contre"
+      ]
+    },
+    {
+      "path": "prompts-calques.json",
+      "ids": [
+        "sprite_wagon",
+        "sprite_school",
+        "sprite_station",
+        "sprite_mill"
+      ]
+    },
+    {
+      "path": "prompts-variantes.json",
+      "ids": [
+        "variant_D05_CENTRE_PRIVE",
+        "variant_D05_RESERVES_PUBLIQUES",
+        "variant_D20_CHEMIN_DE_FER"
+      ]
+    }
+  ]
+}

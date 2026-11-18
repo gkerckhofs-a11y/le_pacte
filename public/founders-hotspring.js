@@ -50,6 +50,7 @@ export function renderHotspringPanorama(root,s){
  if(state.key===key&&state.effectKey===effectKey)return;
  const previous=root.querySelector('.hotspring-map');
  root.innerHTML=renderPanoramaSvg(map);
+ root.append(node('span','Panorama de travail','hotspring-map-status'));
  state.key=key;state.effectKey=effectKey;
  const current=root.querySelector('.hotspring-map');
  if(!reveal)return;

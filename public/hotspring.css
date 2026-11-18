@@ -47,3 +47,4 @@
  .hotspring-panorama .hotspring-result-still{animation:none;inset:auto 2% 4% auto;width:32%;height:auto;border:1px solid #c1b193;border-radius:4px}
 }
 .print-url{overflow-wrap:anywhere;word-break:break-word}
+.hotspring-map-status{position:absolute;right:10px;bottom:8px;z-index:4;padding:3px 7px;border-radius:4px;background:#2d271ee0;color:#f3eadc;font-size:.73rem}

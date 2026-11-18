@@ -1,1 +1,296 @@
-{}
+{
+  "opening_1": {
+    "url": "/assets/hotspring/v1/headers/opening_1.webp",
+    "alt": "1872 — La vallée à Hotspring.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D01": {
+    "url": "/assets/hotspring/v1/headers/d01_header_river_location.webp",
+    "alt": "Les familles et leurs chariots observent les terres basses et la terrasse.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D01_pour": {
+    "url": "/assets/hotspring/v1/results/d01_result_for_lowlands.webp",
+    "alt": "La ville basse est choisie.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D01_contre": {
+    "url": "/assets/hotspring/v1/results/d01_result_against_highlands.webp",
+    "alt": "La terrasse haute est choisie.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D02": {
+    "url": "/assets/hotspring/v1/headers/d02_header_water_rights.webp",
+    "alt": "Reed présente un projet de puits autour d’un tonneau presque vide.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D03": {
+    "url": "/assets/hotspring/v1/headers/d03_header_land_survey.webp",
+    "alt": "Un géomètre et les familles examinent le plan des parcelles.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D04": {
+    "url": "/assets/hotspring/v1/headers/d04_header_la_scierie_de_la_rive_nord.webp",
+    "alt": "Des troncs marqués et les plans de la scierie sur la rive nord.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D05": {
+    "url": "/assets/hotspring/v1/headers/d05_header_une_ecole_pour_hotspring.webp",
+    "alt": "Eleanor Price et des enfants examinent le terrain où l’école pourrait être bâtie.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D06": {
+    "url": "/assets/hotspring/v1/headers/d06_header_le_saloon_de_main_street.webp",
+    "alt": "Cole présente deux projets d’établissement dans Main Street au crépuscule.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D07": {
+    "url": "/assets/hotspring/v1/headers/d07_header_un_medecin_a_demeure.webp",
+    "alt": "Un médecin et les habitants examinent les moyens d’ouvrir un dispensaire.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D08": {
+    "url": "/assets/hotspring/v1/headers/d08_header_la_rue_coupe_feu.webp",
+    "alt": "Des habitants examinent l’espace entre les bâtiments de bois de Main Street.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D09": {
+    "url": "/assets/hotspring/v1/headers/d09_header_laccord_de_la_riviere.webp",
+    "alt": "Deux délégations se rencontrent pour délimiter les usages de la rivière.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D10": {
+    "url": "/assets/hotspring/v1/headers/d10_header_le_passage_des_troupeaux.webp",
+    "alt": "Un troupeau attend près du passage de la rivière.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D11": {
+    "url": "/assets/hotspring/v1/headers/d11_header_le_comptoir_de_la_vallee.webp",
+    "alt": "Des négociateurs apportent des marchandises au lieu de rencontre.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D12": {
+    "url": "/assets/hotspring/v1/headers/d12_header_la_route_du_territoire.webp",
+    "alt": "Un agent territorial examine avec les habitants le tracé d’une route.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D13": {
+    "url": "/assets/hotspring/v1/headers/d13_header_les_piquets_interdits.webp",
+    "alt": "Des habitants discutent des piquets de propriété proches de la rivière.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D14A": {
+    "url": "/assets/hotspring/v1/headers/d14a_header_lhiver_des_reserves.webp",
+    "alt": "Deux délégations comparent leurs réserves sous un auvent enneigé.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D14B": {
+    "url": "/assets/hotspring/v1/headers/d14b_header_les_chevaux_disparus.webp",
+    "alt": "Des habitants examinent des traces de chevaux au matin.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D15": {
+    "url": "/assets/hotspring/v1/headers/d15_header_la_gare.webp",
+    "alt": "Des arpenteurs de la compagnie présentent le tracé ferroviaire.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D16": {
+    "url": "/assets/hotspring/v1/headers/d16_header_la_concession_miniere.webp",
+    "alt": "Un plan minier est présenté au pied de la montagne.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D17": {
+    "url": "/assets/hotspring/v1/headers/d17_header_le_quartier_des_ouvriers.webp",
+    "alt": "Des travailleurs et leurs familles attendent près des abris provisoires.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D18": {
+    "url": "/assets/hotspring/v1/headers/d18_header_la_banque_de_hotspring.webp",
+    "alt": "Les fondateurs examinent des prêts et des titres écrits dans un registre.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D19": {
+    "url": "/assets/hotspring/v1/headers/d19_header_les_parcs_a_betail.webp",
+    "alt": "Un convoi de bovins attend pendant la discussion sur les enclos.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D20": {
+    "url": "/assets/hotspring/v1/headers/d20_header_le_magasin_de_la_compagnie.webp",
+    "alt": "Des travailleurs examinent des bons de paiement devant des caisses de marchandises.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D21": {
+    "url": "/assets/hotspring/v1/headers/d21_header_qui_fait_respecter_la_loi.webp",
+    "alt": "Des habitants délibèrent autour d’un registre et d’une cloche de mobilisation.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D22": {
+    "url": "/assets/hotspring/v1/headers/d22_header_ce_que_la_ville_rejette.webp",
+    "alt": "Des habitants observent les fossés et les rejets le long de la rue.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D23": {
+    "url": "/assets/hotspring/v1/headers/d23_header_qui_paie_hotspring.webp",
+    "alt": "Des registres de dépenses sont ouverts devant les familles.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D24": {
+    "url": "/assets/hotspring/v1/headers/d24_header_le_grand_incendie.webp",
+    "alt": "Les habitants préparent les secours alors que les bâtiments de bois brûlent.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D25": {
+    "url": "/assets/hotspring/v1/headers/d25_header_la_fievre_de_lete.webp",
+    "alt": "Un médecin et des habitants échangent près d’un lieu de soins temporaire.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D26A": {
+    "url": "/assets/hotspring/v1/headers/d26a_header_la_riviere_reprend_sa_place.webp",
+    "alt": "La rivière monte auprès des bâtiments et de la piste.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D26B": {
+    "url": "/assets/hotspring/v1/headers/d26b_header_la_soif_de_hotspring.webp",
+    "alt": "Les habitants attendent autour des dernières réserves d’eau.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D27": {
+    "url": "/assets/hotspring/v1/headers/d27_header_sous_la_montagne.webp",
+    "alt": "Les habitants attendent devant l’entrée de la mine après l’accident.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D28": {
+    "url": "/assets/hotspring/v1/headers/d28_header_la_panique_au_guichet.webp",
+    "alt": "Des déposants se rassemblent devant le guichet de la banque.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D29": {
+    "url": "/assets/hotspring/v1/headers/d29_header_qui_gouvernera_hotspring.webp",
+    "alt": "Les cinq familles et les habitants se réunissent autour de l’urne de bois.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "D30": {
+    "url": "/assets/hotspring/v1/headers/d30_header_la_charte_de_hotspring.webp",
+    "alt": "Plusieurs projets de charte scellés entourent le plan de Hotspring.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_wagon": {
+    "url": "/assets/hotspring/v1/characters/wagon_complete.webp",
+    "alt": "Chariot bâché des convois",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_school": {
+    "url": "/assets/hotspring/v1/buildings/school_complete.webp",
+    "alt": "École publique de Hotspring",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_station": {
+    "url": "/assets/hotspring/v1/buildings/station_complete.webp",
+    "alt": "Gare et quai en bois",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_mill": {
+    "url": "/assets/hotspring/v1/buildings/mill_complete.webp",
+    "alt": "Scierie à vapeur de la rive nord",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "variant_D05_CENTRE_PRIVE": {
+    "url": "/assets/hotspring/v1/headers/d05_centre_prive.webp",
+    "alt": "Remplacer la pancarte publique par une clôture et par le piquet du propriétaire.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "variant_D05_RESERVES_PUBLIQUES": {
+    "url": "/assets/hotspring/v1/headers/d05_reserves_publiques.webp",
+    "alt": "Conserver l’emplacement central et ses piquets; l’école apparaît ensuite sur ce lot.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "variant_D20_CHEMIN_DE_FER": {
+    "url": "/assets/hotspring/v1/headers/d20_chemin_de_fer.webp",
+    "alt": "Montrer la gare et le fret là où la voie ferrée existe.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  }
+}

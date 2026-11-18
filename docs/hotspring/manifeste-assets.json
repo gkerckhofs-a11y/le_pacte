@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "campaignVersion": "1.0.0",
+  "promptStyles": {
+    "cinema": "Plan horizontal 16:9, Far West historique crédible, illustration cinématographique réaliste 1872–1893. Lumière et palette terre, gris de bois et sauge. Composer une zone libre dans le tiers haut gauche. Aucune typographie ajoutée, aucun logo, filigrane, détail anachronique ou emblème panindien générique. Reprendre la géographie du panorama de référence. Garder les bâtiments optionnels hors champ lorsqu’ils dépendent d’un vote.",
+    "alpha": "Calque isolé en alpha transparent, angle plongeant oblique de la vallée, lumière latérale gauche, bois et tissu gris patinés, détails historiques à l’échelle. Aucun texte, logo, filigrane, décor de fond ou objet moderne. Conserver un point d’ancrage au sol."
+  },
+  "parts": [
+    {
+      "path": "manifeste-entetes.json",
+      "count": 39,
+      "kinds": [
+        "en-tête",
+        "ouverture",
+        "panorama"
+      ]
+    },
+    {
+      "path": "manifeste-resultats.json",
+      "count": 68,
+      "kinds": [
+        "charte",
+        "résultat"
+      ]
+    },
+    {
+      "path": "manifeste-calques.json",
+      "count": 119,
+      "kinds": [
+        "calque"
+      ]
+    },
+    {
+      "path": "manifeste-variantes.json",
+      "count": 28,
+      "kinds": [
+        "variante"
+      ]
+    }
+  ]
+}
