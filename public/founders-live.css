@@ -185,3 +185,31 @@ html:fullscreen{overflow-y:auto;background:#15191b}
 .vote-progress strong{font-size:clamp(17px,1.5vw,24px);line-height:1.5;display:block}
 .vote-progress p{margin:6px 0 0}
 .projection-dashboard .vote-progress p{font-size:clamp(15px,1.2vw,20px)}
+/* Printable team kit: one family per A4 page, black QR on an opaque white quiet zone. */
+#printSheets{color:#111;background:#fff;margin:24px auto;max-width:190mm}
+.print-card{color:#111;background:#fff;border:2px solid #333;padding:10mm;margin:12px 0;break-inside:avoid;font:11pt/1.4 system-ui,sans-serif}
+.print-card h2{font-size:23pt;margin:4mm 0}.print-card h3{font-size:14pt}.print-card p{margin:3mm 0}
+.print-card .small,.print-kicker{font-size:9pt}.print-kicker{letter-spacing:.06em}.print-qr{background:#fff;width:58mm;height:58mm;margin:5mm auto}
+.print-qr svg{display:block;width:100%;height:100%}.print-reference{text-align:center;font-weight:700}
+@media print{
+ @page{size:A4 portrait;margin:10mm}
+ body.printing-kit{background:#fff!important;color:#111!important}
+ body.printing-kit>*:not(#printSheets){display:none!important}
+ body.printing-kit #printSheets{display:block!important;width:100%;max-width:none;margin:0}
+ body.printing-kit .print-card{min-height:265mm;margin:0;break-after:page;page-break-after:always;border-color:#333!important;box-sizing:border-box}
+ body.printing-kit .print-card:last-child{break-after:auto;page-break-after:auto}
+ body.printing-kit .print-card a{color:#111;overflow-wrap:anywhere}
+ body.printing-kit .print-qr{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+}
+.phase-clock{position:sticky;top:0;z-index:5;background:#253e45;color:#fff;padding:12px 24px;font-size:clamp(20px,3vw,34px);font-weight:800;text-align:center;border-bottom:3px solid #e5b867;font-variant-numeric:tabular-nums}
+.time-up{background:#782626}.clock-paused{background:#4c465b}.vote-progress strong{font-size:clamp(20px,3vw,32px)}
+dialog{max-width:620px;background:var(--panel);color:var(--paper);border:2px solid var(--gold);padding:28px;border-radius:12px}dialog::backdrop{background:#000b}
+button.danger{background:#a83333!important;color:#fff!important;border-color:#a83333!important}
+#v2Controls input[type=checkbox]{width:auto;display:inline-block}#v2Controls form{margin:16px 0}#v2Controls label{display:block;margin:10px 0}
+.city-v2-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:16px;background:var(--panel)}.city-v2-summary article{padding:10px;border-left:4px solid var(--gold);background:var(--panel2)}.city-v2-summary strong{display:block;font-size:20px}
+/* Dilemma delta is separate from the gauge's absolute health colour. */
+.gauge-delta{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:5px;font-size:15px;font-weight:900;line-height:1.3;border:1px solid currentColor;font-variant-numeric:tabular-nums}
+.gauge-delta-positive{color:#8ce6a8;background:#123b24}.gauge-delta-negative{color:#ffaaa4;background:#481e1c}.gauge-delta-neutral{color:#d0d5da;background:#343a41}
+.projection-dashboard.game-finished .dilemma-panel,.projection-dashboard.game-finished .projection-foot,.projection-dashboard.game-finished .projection-results>.panel:first-child{display:none}
+.projection-dashboard.game-finished .projection-grid{display:block}.projection-dashboard.game-finished #finalResults{margin:0 0 20px!important}
+.family-dashboard.game-finished #boardPanel>.layout{display:none}.family-dashboard.game-finished #familyEpilogue{margin-top:20px}

@@ -1,3 +1,4 @@
+import {decorateGauge,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
 import {renderVoteProgress} from './founders-vote-progress.js';
 import {commitmentLabel} from './founders-agreements.js';
 import {renderCouncilRoles,appendFamilyRoles} from './founders-role-badges.js';
@@ -6,13 +7,13 @@ import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
 import {teamCaption,teamLabel} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id),params=new URLSearchParams(location.search);
-const sessionId=params.get('session'),key='pacte-founder-family-'+sessionId;
+const sessionId=params.get('session'),expectedFamily=params.get('family'),key='pacte-founder-family-'+sessionId+(expectedFamily?'-'+expectedFamily:'');
 const fragment=new URLSearchParams(location.hash.slice(1));
 let token=fragment.get('token')||sessionStorage.getItem(key)||'';
 if(token)sessionStorage.setItem(key,token);
 if(location.hash)history.replaceState(null,'',location.pathname+location.search);
 let current=null,busy=false,identityDirty=false;
-const nice={READY:'Préparation',COUNCIL:'Conseil',AWAITING_REVEAL:'Vote clos',REVEALED:'Révélation',FINISHED:'Terminé'};
+const nice={NEGOTIATION:'Négociation',READY:'Préparation',COUNCIL:'Conseil',AWAITING_REVEAL:'Vote clos',REVEALED:'Révélation',FINISHED:'Terminé'};
 const resources=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
 const set=(id,v)=>$(id).textContent=String(v??'');
 function notify(message){set('notice',message);}
@@ -22,18 +23,19 @@ async function call(method='GET',payload){
  {method,headers:{Authorization:'Bearer '+token,...(payload?{'Content-Type':'application/json'}:{})},body:payload?JSON.stringify(payload):undefined,cache:'no-store'});
  const data=await r.json();
  if(!r.ok)throw new Error(data.error||'Accès refusé');
+ if(expectedFamily&&data.self?.id!==expectedFamily)throw new Error('Ce lien ne correspond pas à votre famille. Demandez une nouvelle fiche à l’organisateur.');
  return data;
 }
 function gauge(data){
  const root=$('gauges');root.replaceChildren();
- for(const indicator of resources){
+ for(const indicator of Object.keys(data.city)){
   const item=document.createElement('div');item.className='gauge';
   const top=document.createElement('div');top.className='gauge-head';
   const name=document.createElement('span');name.textContent=data.skin.labels.resources[indicator]||indicator;
-  const n=document.createElement('strong');n.textContent=data.city[indicator]+'/10';top.append(name,n);
+  const n=document.createElement('strong');n.textContent=data.city[indicator]+'/10';appendGaugeDelta(n,data,indicator);top.append(name,n);
   const bar=document.createElement('div');bar.className='track';
   const inside=document.createElement('div');inside.className='bar';inside.style.width=data.city[indicator]*10+'%';
-  bar.append(inside);item.append(top,bar);root.append(item);
+  decorateGauge(inside,name,data.city[indicator],data);bar.append(inside);item.append(top,bar);root.append(item);
  }
 }
 function offers(data){
@@ -56,7 +58,10 @@ function offers(data){
  }
 }
 function render(data){
+ const finishing=data.phase==='FINISHED'&&!document.body.classList.contains('game-finished');document.body.classList.toggle('game-finished',data.phase==='FINISHED');
  renderVoteProgress($('voteProgress'),data);
+ renderPhaseClock($('phaseClock'),data);
+ set('familyVoteTotals',(()=>{const t=voteTotals(data);return 'POUR '+t.yes+' · CONTRE '+t.no+' · ABSTENTIONS '+t.abstentions;})());
  current=data;
  renderCouncilRoles($('councilRoles'),data);
  const self=data.self,c=data.council;
@@ -64,8 +69,8 @@ function render(data){
  set('teamIdentity',self.color.symbol+' Équipe '+self.color.label+' · Porte-parole');
  $('identityPanel').hidden=data.phase!=='READY';
  if(!identityDirty&&document.activeElement!==$('chosenName'))$('chosenName').value=self.name==='Nom à choisir'?'':self.name;
- set('familyName',self.name);appendFamilyRoles($('familyName'),data,self.id);set('phase',nice[data.phase]||data.phase);
- set('turn',data.phase==='COUNCIL'?(c.turn===self.id?'À vous !':c.turn?'À '+teamLabel(data,c.turn):c.phase==='await_moderator'?'Arbitrage':'Choix du Maire'):'—');
+ set('terminalSession','Session '+data.code+' · Équipe '+self.id);set('familyName',self.name);appendFamilyRoles($('familyName'),data,self.id);set('phase',nice[data.phase]||data.phase);
+ set('turn',data.phase==='COUNCIL'?(c.turn===self.id?'C’est à vous.':c.turn?'En attente — '+teamLabel(data,c.turn)+' joue actuellement.':c.phase==='await_moderator'?'Arbitrage':'Choix du Maire'):'—');
  set('dilemmaLabel',data.dilemma?'Chapitre '+data.dilemma.chapter:'Conseil des Fondateurs');
  set('dilemmaTitle',data.dilemma?.title||(data.phase==='FINISHED'?'Fin de la campagne':'Conseil en préparation'));
  set('dilemmaText',data.dilemma?.public_text||'');
@@ -88,7 +93,7 @@ function render(data){
  const final=$('personalResult');final.hidden=!data.finalResults;
  if(data.finalResults){
   const r=data.finalResults.ranking.find(item=>item.family===self.id);
-  set('personalResultText',r.rank===1?'Votre famille remporte Le Pacte !':'Classement : '+r.rank+' / 6. Vainqueur : '+teamLabel(data,data.finalResults.ranking[0].family));
+  set('personalResultText',r.rank===1?'Votre famille remporte Le Pacte !':'Classement : '+r.rank+' / '+data.families.length+'. Vainqueur : '+teamLabel(data,data.finalResults.ranking[0].family));
   set('personalScoreBreakdown','Objectif secret '+r.score.secret+' · '+data.skin.labels.currency+' '+r.score.wealth+
       ' · Votes '+r.score.council+' · Influence '+r.score.influence+' = '+r.score.total+' points');
  }
@@ -97,6 +102,7 @@ function render(data){
  set('voteHint',self.mayVote?'Votre famille doit décider maintenant.':data.phase==='COUNCIL'?'Vous pouvez négocier en attendant votre tour.':'Le Conseil attend la prochaine phase.');
  $('firstVote').hidden=!(self.mayVote&&self.choice===null);
  $('raiseVote').hidden=!(self.mayVote&&self.choice!==null);
+ $('voteAmount').max=self.power;$('raiseAmount').max=self.power;
  $('raiseAmount').closest('.field').hidden=!['pour','contre'].includes(self.choice);
  $('raiseVote').querySelector('[data-vote="augmenter"]').hidden=!['pour','contre'].includes(self.choice);
  const lock=data.voteCommitment;
@@ -112,7 +118,12 @@ function render(data){
  if(self.mayChooseLeader)for(const id of c.pendingLeaderChoices){
   const b=document.createElement('button');b.textContent='Désigner '+teamLabel(data,id);b.addEventListener('click',()=>command('chooseLeader',{family:id}));candidate.append(b);
  }
- $('offerForm').hidden=data.phase!=='COUNCIL';
+ $('offerForm').hidden=!['NEGOTIATION','COUNCIL'].includes(data.phase);
+ $('offerCommitmentFields').hidden=data.experienceVersion===2;
+ $('offerBindingHelp').hidden=data.experienceVersion===2;
+ $('offerReason').required=data.experienceVersion!==2;
+ if(data.experienceVersion===2)$('offerCommitment').value='gift';
+ $('rulesLegacy').hidden=data.experienceVersion===2;$('rulesV2').hidden=data.experienceVersion!==2;
  const target=$('targetFamily'),prev=target.value;target.replaceChildren();
  for(const f of data.families.filter(f=>f.id!==self.id)){
   const option=document.createElement('option');option.value=f.id;option.textContent=teamCaption(f);target.append(option);
@@ -120,17 +131,31 @@ function render(data){
  if(Array.from(target.options).some(x=>x.value===prev))target.value=prev;
  const reveal=$('lastReveal');reveal.hidden=!data.reveal;
  if(data.reveal){set('resultTitle',data.reveal.winner==='pour'?'Proposition adoptée':'Proposition rejetée');set('resultNarration',data.reveal.narration);}
- gauge(data);offers(data);
+ gauge(data);offers(data);renderOfferDialog(data);
+ if(data.phase==='FINISHED'){const board=$('boardPanel');board.prepend($('familyEpilogue'));board.prepend($('personalResult'));if(finishing){selectTab(0);$('personalResult').scrollIntoView({block:'start'});}}
+ $('familyEpilogue').hidden=!data.narrativeEnding;$('familyEpilogue').replaceChildren();
+ if(data.narrativeEnding){const h=document.createElement('h2');h.textContent=data.narrativeEnding.title;$('familyEpilogue').append(h);for(const t of data.narrativeEnding.paragraphs){const p=document.createElement('p');p.textContent=t;$('familyEpilogue').append(p);}}
 }
+function renderOfferDialog(data){
+ const dialog=$('offerDialog');const offer=data.offers.find(o=>o.to===data.self.id&&o.status==='pending');
+ if(!offer||data.clock?.paused){if(dialog.open)dialog.close();return;}
+ if(dialog.dataset.offer===offer.id&&dialog.open)return;
+ dialog.dataset.offer=offer.id;
+ set('receivedOffer',teamLabel(data,offer.from)+' vous propose '+offer.amount+' '+data.skin.labels.currency+'.');
+ set('receivedMessage',offer.reason);set('receivedCommitment',data.experienceVersion===2?'L’acceptation ne vous engage pas à voter.':commitmentLabel(offer.commitment));
+ if(!dialog.open)dialog.showModal();
+}
+$('offerAccept').addEventListener('click',()=>command('acceptOffer',{id:$('offerDialog').dataset.offer}));
+$('offerReject').addEventListener('click',()=>command('rejectOffer',{id:$('offerDialog').dataset.offer}));
 async function refresh(){
  if(busy)return;
- try{const data=await call();if(busy||data.revision<(current?.revision??-1))return;if(data.revision!==current?.revision)render(data);notify('');}
+ try{const data=await call();if(busy||data.revision<(current?.revision??-1))return;if(data.revision!==current?.revision)render(data);else renderPhaseClock($('phaseClock'),data);notify('');}
  catch(e){notify(e.message);}
 }
 async function command(kind,data){
  if(!current||busy)return;
  busy=true;notify('Enregistrement…');
- try{const result=await call('POST',{kind,data,expectedRevision:current.revision});render(result);notify('Décision enregistrée.');}
+ try{const result=await call('POST',{kind,data,expectedRevision:current.revision});render(result);notify(kind==='acceptOffer'?'Proposition acceptée : transfert effectué.':kind==='rejectOffer'?'Proposition refusée : aucun transfert.':'Décision enregistrée.');}
  catch(e){notify(e.message);try{const latest=await call();render(latest);}catch{ /* Keep original failure visible. */ }}
  finally{busy=false;}
 }

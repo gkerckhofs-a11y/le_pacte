@@ -4,7 +4,7 @@
 <script type="module" src="/founders-city.js"></script></head><body class="projection-dashboard">
 <header class="top"><div><span class="eyebrow" id="universeTitle">Le Pacte</span><h1 id="pageTitle">Hot Spring · 1876</h1></div><div class="row"><span class="chip" id="phase">En attente</span><span class="chip" id="connection">Connexion…</span><button id="projectionFullscreen" type="button" class="secondary" aria-pressed="false">Plein écran</button></div></header><div id="councilRoles" class="council-offices" aria-label="Maire et shérif du Conseil"></div>
 <section id="voteProgress" class="vote-progress" aria-label="Passage et clôture du vote" role="status" hidden></section>
-<main class="page">
+<div id="phaseClock" class="phase-clock" role="timer" hidden></div><main class="page">
 <div class="projection-grid">
 <section class="panel dilemma-panel">
  <div class="row between"><span class="eyeline" id="chapter">Conseil des fondateurs</span><span class="chip" id="turn">—</span></div>
@@ -19,7 +19,7 @@
  <p id="cityEvolution" class="small city-evolution" role="status" aria-live="polite"></p>
  <div class="projection-results">
   <div class="panel"><h2>Résultat du vote</h2>
-   <div class="vote-totals"><div><span>POUR</span><strong id="voteForTotal">—</strong></div><div><span>CONTRE</span><strong id="voteAgainstTotal">—</strong></div></div>
+   <div class="vote-totals"><div><span>ABSTENTIONS</span><strong id="voteAbstentions">0</strong></div><div><span>POUR</span><strong id="voteForTotal">—</strong></div><div><span>CONTRE</span><strong id="voteAgainstTotal">—</strong></div></div>
    <p id="voteSummary" class="small muted">Sommes de l’influence engagée</p>
    <div id="ballots"></div>
   </div>

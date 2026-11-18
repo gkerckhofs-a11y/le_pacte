@@ -4,9 +4,9 @@
  * Les six objectifs valent au maximum 8 points, plus dollars (3), Conseil (3),
  * et Influence disponible (2). Aucun barème n'est considéré équilibré sans test humain.
  */
-import {FOUNDERS,FOUNDERS_DEFAULT_CALIBRATION} from './founders.ts';
+import {FOUNDERS,activeFounders,FOUNDERS_DEFAULT_CALIBRATION} from './founders.ts';
 
-const METRICS=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
+const METRICS=['ecologie','demographie','economie','securite','satisfaction','bien_etre','developpement','stabilite'];
 const DIRECTIONS=['at_least','at_most'];
 const copy=x=>structuredClone(x);
 const check=(ok,m)=>{if(!ok)throw new Error(m);};
@@ -98,9 +98,9 @@ export function calculateFoundersFinal(s){
  const errors=validateGoalCards(cards);check(!errors.length,errors.join(' ; '));
  const rule=s.scoreRules??DEFAULT_SCORE_RULES;
  const ruleErrors=validateScoreRules(rule);check(!ruleErrors.length,ruleErrors.join(' ; '));
- const order=s.initiativeOrder??FOUNDERS;
- check(Array.isArray(order)&&order.length===6&&new Set(order).size===6&&order.every(x=>FOUNDERS.includes(x)),'Tirage de départ invalide');
- const results=FOUNDERS.map(id=>{
+ const ids=activeFounders(s.game),order=s.initiativeOrder??ids;
+ check(Array.isArray(order)&&order.length===ids.length&&new Set(order).size===ids.length&&order.every(x=>ids.includes(x)),'Tirage de départ invalide');
+ const results=ids.map(id=>{
   const family=s.game.families[id],goal=evaluateGoal(cards[id],s.game.city,rule);
   check(integer(family.dollars,0,100000)&&integer(family.power,0,100000),'Trésorerie invalide');
   const wins=s.game.history.filter(h=>h.winner&&h.choices?.[id]===h.winner&&(h.bids?.[id]??0)>=1).length;

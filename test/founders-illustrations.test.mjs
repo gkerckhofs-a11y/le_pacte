@@ -32,7 +32,7 @@ test('Artwork does not change calibrated effects or past releases',()=>{
  assert.deepEqual(illustrated,bare);
  const previous=foundersPreview({scenarioId:'hot-spring-reserve-hybride',scenarioVersion:'1.2.0',skinId:'western'});
  assert.equal(previous.scenario.dilemmas[0].outcomes.pour.chronicle.image,undefined);
- const latest=foundersPreview({scenarioId:'hot-spring-reserve-hybride',skinId:'western'});
+ const latest=foundersPreview({scenarioId:'hot-spring-reserve-hybride',scenarioVersion:'1.3.0',skinId:'western'});
  assert.equal(latest.selection.scenarioVersion,'1.3.0');
  assert.match(latest.scenario.dilemmas[0].outcomes.pour.chronicle.image.url,/d01-pour.webp$/);
 });

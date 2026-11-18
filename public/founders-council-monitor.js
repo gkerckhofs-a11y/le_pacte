@@ -32,7 +32,7 @@ export function renderCouncilMonitor(root,s){
  root.append(roles,el('p',m.action,'council-prompt'));
  const progress=el('div',null,'vote-progress');renderVoteProgress(progress,s);root.append(progress);
  const totals=el('div',null,'council-totals');
- for(const t of [`POUR : ${m.yes}`,`CONTRE : ${m.no}`,`Réserve : ${m.pool}`])totals.append(el('strong',t));
+ for(const t of [`POUR : ${m.yes}`,`CONTRE : ${m.no}`,`Abstentions : ${s.families.filter(f=>['passe_pouvoir','passe_moderateur'].includes(s.council.choices[f.id])).length} · Réserve : ${m.pool}`])totals.append(el('strong',t));
  root.append(totals,el('p',m.balance+(m.closed?' · Mises du vote terminé':' · Mises cumulées, résultat encore provisoire'),'small'));
  const scroll=el('div',null,'council-table-scroll'),table=el('table',null,'council-table');
  const head=el('thead'),hr=el('tr');

@@ -1,3 +1,4 @@
+import {CITY_V2,GOALS_V2} from './founders-v2.ts';
 /**
  * Le Pacte V2.7 — deterministic policy laboratory.
  * NOT a forecast or a measured success probability. These are synthetic
@@ -42,7 +43,7 @@ const makeCity=(base,effects)=>{
   if(e.operation==='delta')city[e.indicator]=Math.max(0,Math.min(10,city[e.indicator]+e.value));
   else if(e.operation==='toward_center')city.stabilite+=Math.sign(5-city.stabilite);
   else if(e.operation==='away_from_center')city.stabilite+=city.stabilite<=5?-1:1;
-  city.stabilite=Math.max(0,Math.min(10,city.stabilite));
+  if(Object.hasOwn(city,'stabilite'))city.stabilite=Math.max(0,Math.min(10,city.stabilite));
  }
  return city;
 };
@@ -73,11 +74,12 @@ const replayMode=(random,policy,power,choice,want)=>{
  if(random()<pressure&&choice===want.choice)return {kind:'augmenter',amount:1};
  return {kind:'maintien'};
 };
-function oneRun(story,goals,rule,calibration,seed,mode,maxDilemmas) {
+function oneRun(story,goals,rule,calibration,seed,mode,maxDilemmas,members) {
+ const ids=FOUNDERS.slice(0,members.length);
  const random=makeRandom(seed);
- const order=shuffle(random,FOUNDERS);
- const policies=Object.fromEntries(FOUNDERS.map(id=>[id,chooseMode(random,mode)]));
- let game=createFoundersGame({calibration});
+ const order=shuffle(random,ids);
+ const policies=Object.fromEntries(ids.map(id=>[id,chooseMode(random,mode)]));
+ let game=createFoundersGame({calibration,members});if(Object.hasOwn(calibration.city,'ecologie'))game.auctionMode='continuous';
  let id=story.scenario.entry_dilemma;
  const index=new Map(story.dilemmas.map(d=>[d.id,d]));
  const trace=[],outcomes={pour:0,contre:0};
@@ -86,14 +88,14 @@ function oneRun(story,goals,rule,calibration,seed,mode,maxDilemmas) {
   check(chapter<maxDilemmas,'Trop de dilemmes ou boucle narrative');
   const dilemma=index.get(id);check(dilemma,'Branchement introuvable : '+id);
   game=openFoundersDilemma(game,id);
-  const intentions=Object.fromEntries(FOUNDERS.map(fid=>[fid,preferred(random,goals[fid],game.city,dilemma)]));
+  const intentions=Object.fromEntries(ids.map(fid=>[fid,preferred(random,goals[fid],game.city,dilemma)]));
   const pledged={};
   const proposed=mode==='prudent'?0:mode==='ambitieux'?2:1;
   for(let n=0;n<proposed;n++){
    if(random()<.55){
-    const donors=FOUNDERS.filter(fid=>game.families[fid].dollars>=1&&game.families[fid].power>=1);
+    const donors=ids.filter(fid=>game.families[fid].dollars>=1&&game.families[fid].power>=1);
     const donor=donors.length?pick(random,donors):null;
-    const targets=FOUNDERS.filter(fid=>fid!==donor&&game.families[fid].power>=1&&!pledged[fid]);
+    const targets=ids.filter(fid=>fid!==donor&&game.families[fid].power>=1&&!pledged[fid]);
     if(donor&&targets.length){
      const receiver=pick(random,targets);
      const amount=Math.min(game.families[donor].dollars,1+Math.floor(random()*3));
@@ -106,7 +108,7 @@ function oneRun(story,goals,rule,calibration,seed,mode,maxDilemmas) {
   }
   let actions=0;
   while(game.vote!==null){
-   check(++actions<=80,'Vote bloqué ou nombre de surenchères dépassé');
+   check(++actions<=1000,'Vote bloqué ou nombre de surenchères dépassé');
    if(game.vote.phase==='await_moderator'){
     const mod=game.moderator;
     const winner=intentions[mod].choice;
@@ -119,7 +121,7 @@ function oneRun(story,goals,rule,calibration,seed,mode,maxDilemmas) {
     continue;
    }
    const fid=game.vote.turn;
-   check(FOUNDERS.includes(fid),'Tour de vote invalide');
+   check(ids.includes(fid),'Tour de vote invalide');
    const past=game.vote.choices[fid];
    const action=past===undefined?
      firstAction(random,policies[fid],game.families[fid].power,intentions[fid],pledged[fid]):
@@ -143,7 +145,7 @@ function oneRun(story,goals,rule,calibration,seed,mode,maxDilemmas) {
  const finished={
   kind:'founders-live-session-v2.5',phase:'FINISHED',
   game,goalCards:goals,scoreRules:rule,initiativeOrder:order,
-  names:Object.fromEntries(FOUNDERS.map(f=>[f,'Famille '+f]))
+  names:Object.fromEntries(ids.map(f=>[f,'Famille '+f]))
  };
  return {final:calculateFoundersFinal(finished),trace,
   stats:{offersAccepted,powerActions,councils,
@@ -151,10 +153,13 @@ function oneRun(story,goals,rule,calibration,seed,mode,maxDilemmas) {
 }
 export function simulateFoundersPolicies(story,{
  cards=DEFAULT_GOAL_CARDS,rule=DEFAULT_SCORE_RULES,
- calibration=FOUNDERS_DEFAULT_CALIBRATION,
+ calibration=FOUNDERS_DEFAULT_CALIBRATION,members=[5,5,5,5,5,5],
  runs=36,seed=20261103,mode='mixte',maxDilemmas=30,includeSamples=false
 }={}){
  check(story?.scenario?.entry_dilemma&&Array.isArray(story.dilemmas)&&story.dilemmas.length>=1,'Scénario invalide');
+ const v2=story.dilemmas.some(d=>d.outcomes.pour.effects.some(e=>e.indicator==='ecologie'));
+ if(v2){if(cards===DEFAULT_GOAL_CARDS)cards=GOALS_V2;if(!Object.hasOwn(calibration.city,'ecologie'))calibration={...calibration,city:{...CITY_V2,economie:calibration.city.economie,securite:calibration.city.securite}};}
+ const metrics=Object.keys(calibration.city);
  check(!validateGoalCards(cards).length,'Objectifs invalides');
  check(!validateScoreRules(rule).length,'Barème invalide');
  check(!validateFoundersCalibration(calibration).length,'Calibrage initial invalide');
@@ -162,17 +167,19 @@ export function simulateFoundersPolicies(story,{
  check(integer(seed,0,4294967295),'Graine numérique non valide');
  check(MODES.includes(mode),'Politique inconnue');
  check(integer(maxDilemmas,1,50),'Limite de dilemmes invalide');
- const familyTotals=Object.fromEntries(FOUNDERS.map(id=>[id,{wins:0,points:0,goal:0,money:0,power:0}]));
- const cityTotal=Object.fromEntries(METRICS.map(id=>[id,0]));
+ createFoundersGame({members,calibration});
+ const ids=FOUNDERS.slice(0,members.length);
+ const familyTotals=Object.fromEntries(ids.map(id=>[id,{wins:0,points:0,goal:0,money:0,power:0}]));
+ const cityTotal=Object.fromEntries(metrics.map(id=>[id,0]));
  const examples=[],samples=[];
  let completed=0,failed=0,offers=0,voteActions=0,dilemmas=0;
  const failures={};
  for(let i=0;i<runs;i++){
   try{
-   const x=oneRun(story,cards,rule,calibration,(seed+i*1013904223)>>>0,mode,maxDilemmas);
+   const x=oneRun(story,cards,rule,calibration,(seed+i*1013904223)>>>0,mode,maxDilemmas,members);
    if(includeSamples)samples.push({city:x.final.city,ranking:x.final.ranking,trace:x.trace});
    completed++;offers+=x.stats.offersAccepted;voteActions+=x.stats.powerActions;dilemmas+=x.stats.councils;
-   for(const metric of METRICS)cityTotal[metric]+=x.final.city[metric];
+   for(const metric of metrics)cityTotal[metric]+=x.final.city[metric];
    for(const row of x.final.ranking){
     const v=familyTotals[row.family];v.points+=row.score.total;v.goal+=row.score.secret;
     v.money+=row.dollars;v.power+=row.influenceRemaining;
@@ -189,13 +196,13 @@ export function simulateFoundersPolicies(story,{
  }
  return {
   mode,seed,attempts:runs,completed,failed,failures,
-  families:Object.fromEntries(FOUNDERS.map(id=>{
+  families:Object.fromEntries(ids.map(id=>{
    const f=familyTotals[id];
    return [id,{wins:f.wins,winShare:completed?f.wins/completed:null,
      meanPoints:average(f.points,completed),meanGoalPoints:average(f.goal,completed),
      meanFinalDollars:average(f.money,completed),meanFinalInfluence:average(f.power,completed)}];
   })),
-  meanCity:Object.fromEntries(METRICS.map(k=>[k,average(cityTotal[k],completed)])),
+  meanCity:Object.fromEntries(metrics.map(k=>[k,average(cityTotal[k],completed)])),
   meanCouncils:average(dilemmas,completed),
   meanVoteActionsPerCouncil:dilemmas?average(voteActions,dilemmas):null,
   meanOffersAcceptedPerGame:average(offers,completed),

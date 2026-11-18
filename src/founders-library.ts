@@ -1,3 +1,4 @@
+import {CITY_V2,LABELS_V2} from './founders-v2.ts';
 import {nativeSkinScene} from '../public/founders-skin-theme.js';
 import {validateHybridStory,isHybrid} from './founders-progression.ts';
 /**
@@ -9,7 +10,7 @@ import {validateHybridStory,isHybrid} from './founders-progression.ts';
 import {createFoundersGame,FOUNDERS_DEFAULT_CALIBRATION,validateFoundersCalibration} from './founders.ts';
 
 export const FOUNDERS_RESOURCE_IDS = Object.freeze([
-  'economie','securite','satisfaction','bien_etre','developpement','stabilite'
+  'ecologie','demographie','economie','securite','satisfaction','bien_etre','developpement','stabilite'
 ]);
 const OUTCOMES=['pour','contre'];
 const STORY_RE=/^[a-z0-9][a-z0-9_-]{2,79}$/;
@@ -119,7 +120,7 @@ export function validateFoundersSkin(skin) {
  else {
   error(txt(skin.labels.currency,1,60),'skin.labels.currency',errors);
   error(txt(skin.labels.influence,1,60),'skin.labels.influence',errors);
-  error(keys(skin.labels.resources,FOUNDERS_RESOURCE_IDS)&&FOUNDERS_RESOURCE_IDS.every(k=>txt(skin.labels.resources[k],1,70)),'skin.labels.resources',errors);
+  error(keys(skin.labels.resources,FOUNDERS_RESOURCE_IDS)&&['economie','securite','satisfaction','bien_etre','developpement','stabilite'].every(k=>txt(skin.labels.resources[k],1,70)),'skin.labels.resources',errors);
  }
  if(!keys(skin.theme,['background','foreground','accent']))errors.push('skin.theme : structure');
  else for(const key of ['background','foreground','accent'])error(HEX_RE.test(skin.theme[key]),'skin.theme.'+key,errors);
@@ -186,9 +187,13 @@ export function prepareFoundersSession(input,{scenarioId,scenarioVersion,skinId,
  const skin=Object.hasOwn(input.skins,skinId)?input.skins[skinId]:undefined;
  if(!skin||skin.status==='archived')throw new Error('Skin inconnue ou archivée');
  // This is only a preview. The running session persistence layer is not wired.
+ const v2=selectedVersion==='2.0.0'&&scenarioId==='hot-spring-reserve-hybride';
+ if(v2&&!Object.hasOwn(calibration.city??{},'ecologie'))calibration={...calibration,city:{...CITY_V2,economie:calibration.city.economie,securite:calibration.city.securite}};
  const calibrationErrors=validateFoundersCalibration(calibration);
  if(calibrationErrors.length)throw new Error(calibrationErrors.join(' ; '));
  const game=createFoundersGame({members,calibration});
+ if(v2)game.auctionMode='continuous';
+ const selectedSkin=clone(skin);if(v2)selectedSkin.labels.resources=clone(LABELS_V2);
  const warnings=[];
  if(skin.universe!==release.payload.scenario.universe)warnings.push('Univers différent : le visuel ne traduit pas automatiquement le texte narratif.');
  if(skin.status==='prototype')warnings.push('Skin en cours de conception, affichage non final.');
@@ -202,7 +207,7 @@ export function prepareFoundersSession(input,{scenarioId,scenarioVersion,skinId,
   settings:{members:clone(members),calibration:clone(calibration),spokespersonVotingAccessPerFamily:1},
   scenario:clone(release.payload),
   source:clone(release.source),
-  skin:clone(skin),
+  skin:selectedSkin,
   game,
   warnings
  };

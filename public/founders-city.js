@@ -1,3 +1,4 @@
+import {decorateGauge,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
 import {renderVoteProgress} from './founders-vote-progress.js';
 import {renderCouncilRoles,appendFamilyRoles} from './founders-role-badges.js';
 import {setupProjectionFullscreen} from './founders-fullscreen.js';
@@ -11,34 +12,38 @@ const sessionId=param.get('session');
 const resources=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
 let lastRevision=null,previousCityStates=null,mountedSkin=null;
 
-const pretty={READY:'Préparation',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'Vote clos',REVEALED:'Conséquences révélées',FINISHED:'Fin de partie'};
+const pretty={NEGOTIATION:'Négociations',READY:'Préparation',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'Vote clos',REVEALED:'Conséquences révélées',FINISHED:'Fin de partie'};
 function text(id,value){$(id).textContent=String(value??'');}
 function drawGauges(s){
  const root=$('gauges');root.replaceChildren();
- for(const key of resources){
+ for(const key of Object.keys(s.city)){
   const g=document.createElement('div');g.className='gauge';
   const row=document.createElement('div');row.className='gauge-head';
   const label=document.createElement('span');label.textContent=s.skin.labels.resources[key]||key;
   const score=document.createElement('strong'),before=s.reveal?.cityBefore?.[key],delta=Number.isFinite(before)?s.city[key]-before:0;
-  score.textContent=(delta?before+' → ':'')+s.city[key]+'/10'+(delta?' ('+(delta>0?'+':'')+delta+')':'');
+  score.textContent=s.city[key]+'/10';appendGaugeDelta(score,s,key);
   row.append(label,score);g.append(row);
   const track=document.createElement('div');track.className='track';
   const bar=document.createElement('div');bar.className='bar';
   bar.style.width=((Number.isFinite(before)?before:s.city[key])*10)+'%';
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{bar.style.width=(s.city[key]*10)+'%';}));bar.style.background=key==='stabilite'?'#85b4a1':s.skin.theme.accent;
+  decorateGauge(bar,label,s.city[key],s);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{bar.style.width=(s.city[key]*10)+'%';}));
   track.append(bar);g.append(track);root.append(g);
  }
 
 }
 function render(s){
+ const finishing=s.phase==='FINISHED'&&!document.body.classList.contains('game-finished');document.body.classList.toggle('game-finished',s.phase==='FINISHED');
  renderVoteProgress($('voteProgress'),s);
+ renderPhaseClock($('phaseClock'),s);
+ const totals=voteTotals(s);
  renderCouncilRoles($('councilRoles'),s);
  applySkin(document.body,s.skin);text('universeTitle','Le Pacte · '+s.skin.title);
  lastRevision=s.revision;
  text('pageTitle',s.story.location+' · '+s.story.year);text('phase',pretty[s.phase]||s.phase);
  text('chapter',s.dilemma?(s.dilemma.sequence?'Conseil '+s.dilemma.sequence:'Chapitre '+s.dilemma.chapter):'Le Conseil des Fondateurs');
  text('tiePriority','Départage final si égalité parfaite : '+s.finalTieOrder.map(id=>teamLabel(s,id)).join(' → '));
- text('turn',s.council.turn?'Tour de '+teamLabel(s,s.council.turn):'Maire '+teamLabel(s,s.leader));
+ text('turn',s.council.turn?'À LA PAROLE : '+teamLabel(s,s.council.turn):['await_moderator','await_leader'].includes(s.council.phase)?'À LA PAROLE : '+teamLabel(s,s.moderator):s.phase==='NEGOTIATION'?'NÉGOCIATIONS EN COURS':'Maire '+teamLabel(s,s.leader));
  text('dilemmaTitle',s.dilemma?.title||(s.phase==='FINISHED'?'La ville entre dans l’histoire':'Bienvenue au Conseil'));
  text('dilemmaText',s.dilemma?.public_text||(s.phase==='FINISHED'?'Les délibérations sont terminées.':'Le Conseil attend le signal de la régie.'));
  text('question',s.dilemma?.vote_question||'');
@@ -60,8 +65,8 @@ function render(s){
  else {image.hidden=true;image.removeAttribute('src');}
  const out=$('outcome');out.hidden=!s.reveal;
  if(s.reveal){text('outcomeTitle',s.reveal.winner==='pour'?'PROPOSITION ADOPTÉE':'PROPOSITION REJETÉE');text('outcomeText',s.reveal.narration);}
- text('voteForTotal',s.reveal?.yes??'—');text('voteAgainstTotal',s.reveal?.no??'—');
- text('voteSummary',s.reveal?'Influence engagée · '+s.reveal.yes+' POUR / '+s.reveal.no+' CONTRE':'Influence engagée · résultat disponible après révélation');
+ text('voteForTotal',totals.yes);text('voteAgainstTotal',totals.no);text('voteAbstentions',totals.abstentions);
+ text('voteSummary',s.reveal?'Influence engagée · '+s.reveal.yes+' POUR / '+s.reveal.no+' CONTRE':'Influence engagée · rapport de force en direct');
  const ballots=$('ballots');ballots.replaceChildren();
  for(const f of s.families){
   const row=document.createElement('div');row.className='ballot';
@@ -78,6 +83,7 @@ function render(s){
   s.phase==='REVEALED'?'Le Conseil attend le prochain dilemme.':
   s.phase==='FINISHED'?'Les décisions finales ont été proclamées.':'La séance n’a pas encore commencé.');
  const final=$('finalResults');final.hidden=!s.finalResults;
+ if(s.phase==='FINISHED'){final.parentElement.prepend(final);if(finishing)final.scrollIntoView({block:'start'});}
  const epilogue=$('narrativeEnding');epilogue.hidden=!s.narrativeEnding;epilogue.replaceChildren();
  if(s.narrativeEnding){
   const title=document.createElement('h3');title.textContent=s.narrativeEnding.title;epilogue.append(title);
@@ -102,7 +108,7 @@ async function tick(){
   const r=await fetch('/api/founders/sessions/'+sessionId,{cache:'no-store'});
   if(!r.ok)throw new Error('Session indisponible ('+r.status+')');
   const s=await r.json();
-  if(s.revision!==lastRevision)render(s);
+  if(s.revision!==lastRevision)render(s);else renderPhaseClock($('phaseClock'),s);
   text('connection','● Synchronisé');text('notice','');
  }catch(e){text('connection','○ Hors ligne');text('notice',e.message);}
 }
