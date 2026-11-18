@@ -957,5 +957,40 @@
     "status": "validé",
     "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
     "license": null
+  },
+  "sprite_shops": {
+    "url": "/assets/hotspring/v1/buildings/shops_complete.webp",
+    "alt": "Deux petites devantures en bois et leur trottoir de planches",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_relief_cart": {
+    "url": "/assets/hotspring/v1/effects/relief_cart.webp",
+    "alt": "Charrette de ravitaillement chargée de barils et de caisses",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_grove": {
+    "url": "/assets/hotspring/v1/panorama/grove.webp",
+    "alt": "Petit bosquet de peupliers de la rive",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_scaffolding": {
+    "url": "/assets/hotspring/v1/effects/construction_frame.webp",
+    "alt": "Ossature et plancher d’un bâtiment en travaux",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_debris": {
+    "url": "/assets/hotspring/v1/effects/structure_debris.webp",
+    "alt": "Planches et chevrons tombés au pied d’un bâtiment endommagé",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
   }
 }

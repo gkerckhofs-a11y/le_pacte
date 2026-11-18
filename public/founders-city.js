@@ -62,6 +62,9 @@ function render(s){
   for(const layer of s.campaign.landscape.layers){
    const item=document.createElement('p');item.textContent=layer.label+(layer.state==='damaged'?' · endommagé':'');details.append(item);
   }
+  for(const feature of s.campaign.landscape.details??[]){
+   const item=document.createElement('p');item.textContent=feature.label;details.append(item);
+  }
   if(s.campaign.landscape.scars.length){
    const scars=document.createElement('p');scars.textContent='Cicatrices : '+s.campaign.landscape.scars.join(', ');details.append(scars);
   }

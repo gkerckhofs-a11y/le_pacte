@@ -1,4 +1,7 @@
 import art from '../content/hotspring-art-index-v1.json' with {type:'json'};
+import {HOTSPRING_DETAIL_RULES, visibleDilemma} from './hotspring-detail-rules.ts';
+
+export const CAMP_ORIGIN = [58, 52] as const;
 
 // Coordinates are percentage points on the fixed valley plate, ordered from the ridge to the foreground.
 const footprints={
@@ -6,17 +9,20 @@ const footprints={
  sawmill:[-19,-21],territory:[-8,-2],trade:[-15,-13],rail:[10,-3],mine:[28,-30],housing:[12,11],
  bank:[2,3],stockyard:[-10,10],store:[-3,2],marshal:[-8,2],jail:[-7,5],sanitation:[5,14],
  tax:[8,1],council:[-2,-2],camp:[-3,5],fields:[-18,-6],corridor:[-14,-17],crossing:[-15,-22],
- refuge:[10,8],depot:[9,-1]
+ refuge:[10,8],waterReserve:[5,12],depot:[9,-1]
 };
 const districts={
  CENTRE_BRULE:['shops','bank','saloon','store','tax'],
  QUARTIER_BRULE:['housing','homes'],
- QUARTIERS_INONDES:['housing','well','stockyard','saloon']
+ QUARTIERS_INONDES:['housing','well','stockyard','saloon'],
+ FRET_SACRIFIE:['rail','depot','stockyard']
 };
 
 export function hotspringLandscape(s){
  const marks=new Set(s.campaign.markers),h=mark=>marks.has(mark);
  const high=h('VILLE_HAUTE'),low=h('VILLE_BASSE'),founded=high||low;
+ const dilemma=visibleDilemma(s.phase,s.currentDilemmaId);
+ const ending=Boolean(s.campaign.charter&&['EPILOGUE','FINISHED'].includes(s.phase));
  const [townX,townY]=high?[73,39]:[44,64];
  const scars=Object.entries(districts).filter(([key])=>h(key)).flatMap(([,ids])=>ids);
  const layers=[];
@@ -26,7 +32,7 @@ export function hotspringLandscape(s){
   layers.push({id,kind,label,x,y,state:scars.includes(id)?'damaged':state,scale:scale*(high&&!fixed?0.90:1)});
  }
  const surveyed=h('CENTRE_PRIVE')||h('RESERVES_PUBLIQUES');
- if(s.phase!=='READY'&&!surveyed)add('camp','camp','Chariots et tentes des fondateurs',{fixed:founded?null:[58,52]});
+ if(s.phase!=='READY'&&!surveyed)add('camp','camp','Chariots et tentes des fondateurs',{fixed:founded?null:CAMP_ORIGIN});
  if(s.revealedHistory.some(d=>d.id==='D02')&&!surveyed)add('homes','cottages','Premiers abris',{scale:.75,state:'building'});
  if(surveyed){
   add('surveyed',h('REGLEMENT_INCENDIE')?'roadwide':'road','Main Street');
@@ -79,11 +85,12 @@ export function hotspringLandscape(s){
  if(h('CONSEIL_ELU')||h('CONSEIL_FONDATEURS'))
   add('council',h('CONSEIL_ELU')?'hall':'office',h('CONSEIL_ELU')?'Salle du conseil élu':'Conseil des Fondateurs');
  if(h('QUARANTAINE_21_JOURS'))add('refuge','refuge','Ancien site de quarantaine',{scale:.85});
- if(h('RATIONNEMENT_HABITANTS'))add('refuge','tower','Réserve d’eau de crise',{scale:.65});
+ if(h('RATIONNEMENT_HABITANTS'))add('waterReserve','tower','Réserve d’eau de crise',{scale:.65});
  if(h('PACTE_VALLEE_FINAL')||h('CHARTE_RESSOURCES'))
   add('fields','protected','Bornes de protection de la vallée',{fixed:[20,59]});
  const city=s.game.city;
- const river=s.phase==='REVEALED'&&s.lastReveal?.id==='D26A'?'crue':h('PENURIE_EAU')||h('RATIONNEMENT_HABITANTS')?'basse':city.ecologie<=2?'polluee':city.ecologie<=4?'degradee':'claire';
+ const river=dilemma==='D26A'?'crue':dilemma==='D26B'||h('PENURIE_EAU')||h('RATIONNEMENT_HABITANTS')?'basse':
+  city.ecologie<=2?'polluee':city.ecologie<=4?'degradee':'claire';
  const vegetation=city.ecologie<=2?'fortement dégradée':city.ecologie<=4||h('SCIERIE_INTENSIVE')?'réduite':'abondante';
  const density=!founded||city.demographie<=4?'faible':city.demographie<=7?'moyenne':'forte';
  const street=h('HOSTILITE_OUVERTE')&&city.securite<=3?'barricadée':city.demographie>=8?'surpeuplée':city.demographie>=5?'active':'vide';
@@ -95,14 +102,32 @@ export function hotspringLandscape(s){
   h('EPIDEMIE_CONTENUE')||h('EPIDEMIE_DIFFUSE')?'Épidémie':null,
   h('RAPPORT_ACCIDENT')?'Accident minier':null,h('SAISIES')?'Saisies bancaires':null
  ].filter(Boolean);
+ const footprintsById=new Map(layers.map(layer=>[layer.id,[layer.x,layer.y]]));
+ const details=[];
+ for(const recipe of HOTSPRING_DETAIL_RULES){
+  if(recipe.dilemma!==dilemma||!h(recipe.marker))continue;
+  const point=footprintsById.get(recipe.anchor)??('fixed' in recipe?recipe.fixed:null);
+  if(point)details.push({kind:recipe.kind,label:recipe.label,anchor:recipe.anchor,x:point[0],y:point[1],
+   ...(recipe.dilemma==='D22'?{clean:h('ASSAINISSEMENT')}: {})});
+ }
  const usedKinds=new Set(layers.map(l=>l.kind));
- if(usedKinds.has('camp')){usedKinds.add('wagon');usedKinds.add('tent');}
- if(founded)usedKinds.add('people');
+ if(usedKinds.has('camp')||ending){usedKinds.add('wagon');usedKinds.add('tent');}
+ if(founded){
+  usedKinds.add('people');
+  usedKinds.add('scaffolding');
+  usedKinds.add('debris');
+ }
+ if(vegetation!=='fortement dégradée')usedKinds.add('grove');
+ for(const detail of details){
+  if(detail.kind==='relief'||detail.kind==='freight')usedKinds.add('relief_cart');
+  if(detail.kind==='embers')usedKinds.add('fire');
+ }
  const disasters={'Incendie':'fire','Crue':'flood','Sécheresse':'drought','Épidémie':'quarantine',
   'Accident minier':'mine_accident','Saisies bancaires':'bankruptcy'};
  for(const kind of scarList)usedKinds.add(disasters[kind]);
  const sprites=Object.fromEntries([...usedKinds].filter(kind=>art['sprite_'+kind]).map(kind=>[kind,art['sprite_'+kind].url]));
  const charter={A:'commerce',B:'services',C:'ateliers',D:'inspection',E:'liaison',F:'réserves'}[s.campaign.charter]??null;
  return {location:founded?(high?'terrasse':'terres basses'):null,townX,townY,layers:layers.sort((a,b)=>a.y-b.y),
-  river,vegetation,density,street,mood,prosperity,scars:scarList,charter,sprites};
+  river,vegetation,density,street,mood,prosperity,scars:scarList,charter,sprites,details,
+  ...(ending?{epilogue:{origin:CAMP_ORIGIN}}:{})};
 }

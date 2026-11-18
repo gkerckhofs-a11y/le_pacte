@@ -147,7 +147,12 @@
         "sprite_drought",
         "sprite_quarantine",
         "sprite_mine_accident",
-        "sprite_bankruptcy"
+        "sprite_bankruptcy",
+        "sprite_shops",
+        "sprite_relief_cart",
+        "sprite_grove",
+        "sprite_scaffolding",
+        "sprite_debris"
       ]
     },
     {

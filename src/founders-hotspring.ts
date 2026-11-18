@@ -250,6 +250,19 @@ function relationLabel(trust,markers){
  return 'Confiance fragile';
 }
 
+function epilogueRecap(s){
+ if(s.phase!=='EPILOGUE'||!s.campaign.charter)return [];
+ const groups=[
+  ['D13','D14A','D14B','D11','D09'],
+  ['D16','D15','D17','D18','D19','D05'],
+  ['D24','D25','D26A','D26B','D27','D28']
+ ];
+ return groups.flatMap(ids=>{
+  const event=s.revealedHistory.findLast(h=>ids.includes(h.id)&&h.visual?.url);
+  return event?[{title:event.chronicle?.title??event.title,visual:copy(event.visual)}]:[];
+ });
+}
+
 export function campaignPresentation(s){
  const c=s.campaign,content=s.scenario.campaign;
  const checkpoint=c.checkpoints.at(-1);
@@ -260,7 +273,7 @@ export function campaignPresentation(s){
  const stopsAtCheckpoint=s.phase==='CHECKPOINT'||c.suspension?.phase==='CHECKPOINT';
  return {
   chapter:c.chapter,version:c.version,familyPitches:s.phase==='READY'?Object.values(content.families).map(f=>({role:f.publicRole,text:f.pitch})):null,relation:c.chapter>=3?relationLabel(c.trust,c.markers):null,
-  landscape:hotspringLandscape(s),intro,recap:intro||c.justResumed?summary:[],
+  landscape:hotspringLandscape(s),intro,recap:intro||c.justResumed?summary:[],epilogueRecap:epilogueRecap(s),
   checkpoint:chapterScreen?{title:stopsAtCheckpoint?checkpoint?.name:'Hotspring — Fin de séance',
    text:stopsAtCheckpoint?content.checkpoints[c.chapter].text:'L’histoire de Hotspring se poursuit…',
    decisions:stopsAtCheckpoint?s.revealedHistory.filter(h=>h.chapter===c.chapter).map(h=>({

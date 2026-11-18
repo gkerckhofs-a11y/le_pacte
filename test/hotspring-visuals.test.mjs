@@ -8,7 +8,8 @@ import {createGameServer} from '../server/http.ts';
 import {VALLEY_PLATE,renderPanoramaSvg} from '../public/hotspring-panorama.js';
 import {renderHotspringStage,renderTendencies,renderHotspringPanorama} from '../public/founders-hotspring.js';
 import {narrativePublicView} from '../src/founders-live.ts';
-import {newCampaign} from './helpers/hotspring.mjs';
+import {newCampaign,simulateCampaign,trajectories} from './helpers/hotspring.mjs';
+import {visualComposition} from './helpers/hotspring-visual-compositions.mjs';
 
 const source=path=>new URL('../'+path,import.meta.url);
 const manifest=JSON.parse(readFileSync(source('docs/hotspring/manifeste-assets.json')));
@@ -21,6 +22,7 @@ test('Hotspring : manifeste complet, formats WebP et galerie de contrôle',()=>{
  assert.equal(assets.filter(a=>a.kind==='ouverture').length,6);
  assert.equal(new Set(assets.map(a=>a.id)).size,assets.length);
  const gallery=readFileSync(source('docs/hotspring/galerie.html'),'utf8');
+ for(const part of manifest.parts)assert.equal(part.count,JSON.parse(readFileSync(source('docs/hotspring/'+part.path))).length);
  for(const a of assets){
   assert.ok(a.alt&&a.provenance&&a.rights&&a.condition&&a.prompt,a.id);
   assert.ok(gallery.includes(a.id),a.id);
@@ -35,7 +37,12 @@ test('Hotspring : manifeste complet, formats WebP et galerie de contrôle',()=>{
    assert.equal(webp.toString('ascii',0,4),'RIFF');
    assert.equal(webp.toString('ascii',8,12),'WEBP');
    assert.ok(webp.length<430*1024,a.id+' est trop lourd pour la projection');
-  }else if(!a.id.endsWith('_absent'))assert.equal(a.status,'temporaire',a.id);
+  }else{
+   assert.equal(a.status,'validé',a.id);
+   assert.ok(a.composition?.preview?.file,a.id);
+   assert.ok(!a.plannedPath,a.id+' doit référencer son rendu réel');
+   assert.ok(statSync(source('docs/hotspring/'+a.composition.preview.file)).size>0,a.id);
+  }
  }
 });
 
@@ -119,4 +126,98 @@ test('Hotspring : la révélation présente le plan fixe du bon choix et conserv
   assert.match(map.querySelector('.hotspring-result-still').src,/d01_result_against_highlands/);
   assert.ok(!map.innerHTML.includes('result_for_lowlands'));
  }finally{[globalThis.document,globalThis.Image]=previous;}
+});
+
+
+
+test('Hotspring : chaque état de la galerie correspond à un rendu effectif du panorama',()=>{
+ for(const a of assets.filter(asset=>asset.composition)){
+  const {scene,rendered}=visualComposition(a);
+  const {preview,...recipe}=a.composition;
+  assert.deepEqual(rendered,recipe,a.id);
+  const svg=renderPanoramaSvg(scene);
+  const {document}=parseHTML(svg);
+  if(rendered.type==='building'){
+   const layer=document.querySelector('[data-layer="'+rendered.anchor+'"]');
+   if(rendered.state==='absent')assert.equal(layer,null,a.id);
+   else{
+    assert.equal(layer?.getAttribute('data-state'),rendered.state,a.id);
+    if(rendered.kind)assert.equal(layer?.getAttribute('data-kind'),rendered.kind,a.id);
+   }
+  }else if(rendered.type==='detail'){
+   const layer=document.querySelector('[data-detail="'+rendered.kind+'"][data-anchor="'+rendered.anchor+'"]');
+   assert.equal(layer?.querySelector('title')?.textContent,a.alt,a.id);
+  }else if(rendered.type==='scar'){
+   assert.ok(document.querySelector('[data-scar="'+rendered.scar+'"] image'),a.id);
+  }else if(rendered.type==='environment'){
+   const value=document.querySelector('[data-'+rendered.key+']')?.getAttribute('data-'+rendered.key);
+   assert.equal(value,rendered.value,a.id);
+  }else{
+   assert.ok(scene.epilogue&&scene.charter,a.id);
+  }
+  assert.ok(preview.column<preview.columns&&preview.row<preview.rows,a.id);
+ }
+});
+
+test('Hotspring : la variante d’eau réutilise les ancrages réellement révélés',()=>{
+ const g=newCampaign(),state=g.state;
+ state.phase='PRESENTATION';
+ state.currentDilemmaId='D26B';
+ state.campaign.markers=['VILLE_HAUTE','EAU_PRIVEE','ALLIANCE_VALLEE'];
+ const before=narrativePublicView(state).campaign.landscape;
+ const well=before.layers.find(layer=>layer.id==='well');
+ assert.equal(before.river,'basse');
+ assert.equal(well.kind,'tower');
+ assert.deepEqual(before.details.map(d=>d.kind),['signpost','relief']);
+ const marker=before.details[0];
+ assert.deepEqual([marker.x,marker.y],[well.x,well.y]);
+ assert.equal(JSON.stringify(before).includes('EAU_PRIVEE'),false);
+ state.campaign.markers=['VILLE_HAUTE','EAU_COMMUNALE'];
+ const after=narrativePublicView(state).campaign.landscape;
+ assert.deepEqual(after.details.map(d=>d.kind),['ledger']);
+ state.phase='CHECKPOINT';
+ assert.deepEqual(narrativePublicView(state).campaign.landscape.details,[]);
+});
+
+test('Hotspring : l’épilogue conserve le site du premier camp et utilise les vrais résultats',()=>{
+ const {snapshots,state}=simulateCampaign(trajectories.commerce);
+ const opening=narrativePublicView(snapshots[0]).campaign.landscape.layers.find(l=>l.id==='camp');
+ const s=narrativePublicView(snapshots.at(-1));
+ assert.equal(s.phase,'EPILOGUE');
+ assert.deepEqual(s.campaign.landscape.epilogue.origin,[opening.x,opening.y]);
+ assert.equal(s.finalResults,null);
+ assert.equal(s.campaign.epilogueRecap.length,3);
+ const voted=new Set(s.history.map(d=>d.visual?.url));
+ assert.ok(s.campaign.epilogueRecap.every(h=>voted.has(h.visual.url)));
+ assert.equal(narrativePublicView(state).campaign.epilogueRecap.length,0);
+ const {document}=parseHTML('<div id="map"></div>');
+ const previous=[globalThis.document,globalThis.Image];
+ globalThis.document=document;
+ globalThis.Image=class {};
+ try{
+  const map=document.getElementById('map');
+  renderHotspringPanorama(map,s);
+  assert.ok(map.querySelector('.hotspring-epilogue .hotspring-camp-memory'),map.innerHTML.slice(0,250));
+  assert.equal(map.querySelectorAll('.hotspring-epilogue-scene img').length,3);
+  renderHotspringPanorama(map,narrativePublicView(state));
+  assert.equal(map.querySelector('.hotspring-camp-memory'),null);
+  assert.ok(map.querySelector('[data-layer="council"]'));
+ }finally{[globalThis.document,globalThis.Image]=previous;}
+});
+
+
+
+test('Hotspring : les suites de crise laissent des traces aux installations concernées',()=>{
+ const g=newCampaign(),state=g.state;
+ state.phase='CHECKPOINT';
+ state.campaign.markers=['VILLE_BASSE','RESERVES_PUBLIQUES','CHEMIN_DE_FER','ABATTOIR_CENTRAL','FRET_SACRIFIE','MARQUES_DE_CRUE'];
+ const damaged=narrativePublicView(state).campaign.landscape.layers.filter(layer=>layer.state==='damaged');
+ assert.deepEqual(damaged.map(layer=>layer.id).sort(),['depot','rail','stockyard']);
+ state.campaign.markers=['VILLE_HAUTE','RESERVES_PUBLIQUES','EAU_COMMUNALE','QUARANTAINE_21_JOURS','RATIONNEMENT_HABITANTS'];
+ const high=narrativePublicView(state).campaign.landscape;
+ assert.equal(new Set(high.layers.map(layer=>layer.id)).size,high.layers.length);
+ const refuge=high.layers.find(layer=>layer.id==='refuge'),reserve=high.layers.find(layer=>layer.id==='waterReserve');
+ assert.equal(refuge.kind,'refuge');
+ assert.equal(reserve.kind,'tower');
+ assert.notDeepEqual([refuge.x,refuge.y],[reserve.x,reserve.y]);
 });

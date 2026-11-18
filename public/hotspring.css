@@ -47,7 +47,6 @@
  .hotspring-panorama .hotspring-result-still{animation:none;inset:auto 2% 4% auto;width:32%;height:auto;border:1px solid #c1b193;border-radius:4px}
 }
 .print-url{overflow-wrap:anywhere;word-break:break-word}
-.hotspring-map-status{position:absolute;right:10px;bottom:8px;z-index:4;padding:3px 7px;border-radius:4px;background:#2d271ee0;color:#f3eadc;font-size:.73rem}
 .hotspring-construction{position:absolute;inset:0;z-index:2;pointer-events:none;animation:hotspring-construction 7.5s ease-in-out both}
 @keyframes hotspring-construction{0%,13%{opacity:0}28%,50%{opacity:1}74%,100%{opacity:0;visibility:hidden}}
 @media (prefers-reduced-motion:reduce){.hotspring-construction{display:none;animation:none}}
@@ -59,3 +58,40 @@
 .hotspring-prologue [data-layer="camp"]>g>g:nth-child(n+6){animation-delay:3.5s}
 @keyframes hotspring-arrival{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.hotspring-prologue [data-layer="camp"]>g>g{animation:none}}
+
+.hotspring-epilogue {animation:hotspring-epilogue 10s ease-in-out both;transform-origin:58% 52%}
+.hotspring-camp-memory {animation:hotspring-memory 2.6s ease-in-out both}
+.hotspring-local-smoke {animation:hotspring-smoke 4.8s ease-in-out 2 alternate both;transform-box:fill-box;transform-origin:50% 95%}
+.hotspring-epilogue-scene {
+ position:absolute;
+ z-index:2;
+ right:4%;
+ bottom:6%;
+ width:min(42%,38rem);
+ margin:0;
+ background:#292018;
+ border:1px solid #ba9972;
+ border-radius:5px;
+ overflow:hidden;
+ animation:hotspring-vignette 1.65s ease-in-out var(--scene-delay) both;
+}
+.hotspring-epilogue-scene img {display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.hotspring-epilogue-scene figcaption {padding:.45rem .7rem;color:#f3eadc;font-size:clamp(.75rem,1.2vw,1.3rem)}
+@keyframes hotspring-epilogue {
+ 0% {transform:scale(1.17)}
+ 22% {transform:scale(1.11)}
+ 100% {transform:scale(1)}
+}
+@keyframes hotspring-memory {
+ 0%,30% {opacity:.82}
+ 99%,100% {opacity:0;visibility:hidden}
+}
+@keyframes hotspring-vignette {
+ 0%,100% {opacity:0;visibility:hidden}
+ 15%,82% {opacity:1;visibility:visible}
+}
+@keyframes hotspring-smoke {from {transform:scale(.92);opacity:.62} to {transform:scale(1.08);opacity:.78}}
+@media (prefers-reduced-motion:reduce) {
+ .hotspring-epilogue,.hotspring-local-smoke {animation:none}
+ .hotspring-camp-memory,.hotspring-epilogue-scene {display:none;animation:none}
+}

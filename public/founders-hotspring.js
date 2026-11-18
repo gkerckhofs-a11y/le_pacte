@@ -1,4 +1,4 @@
-import {renderPanoramaSvg,VALLEY_PLATE} from './hotspring-panorama.js';
+import {renderPanoramaSvg} from './hotspring-panorama.js';
 
 export const CAMPAIGN_PHASES={
  INTRO:'Ouverture du chapitre',PRESENTATION:'Lecture du dilemme',CHECKPOINT:'Bilan du chapitre',
@@ -47,15 +47,26 @@ export function renderHotspringPanorama(root,s){
  if(!state){root.replaceChildren();root.classList.add('hotspring-panorama');state={};panes.set(root,state);}
  const key=JSON.stringify(map);
  const reveal=s.phase==='REVEALED'?s.reveal:null;
- const effectKey=reveal?.id+'_'+reveal?.winner;
+ const ending=s.phase==='EPILOGUE'&&Boolean(map.epilogue);
+ const effectKey=reveal?reveal.id+'_'+reveal.winner:s.phase==='INTRO'||ending?s.phase:null;
  if(state.key===key&&state.effectKey===effectKey)return;
- const previous=root.querySelector('.hotspring-map');
+ const previous=root.querySelector('.hotspring-map:not(.hotspring-before)');
  const prior=state.map;
- root.innerHTML=renderPanoramaSvg(map);
- root.append(node('span','Panorama de travail','hotspring-map-status'));
+ root.innerHTML=renderPanoramaSvg(map,{campMemory:ending});
  state.key=key;state.effectKey=effectKey;state.map=map;
  const current=root.querySelector('.hotspring-map');
  if(s.phase==='INTRO'&&s.campaign.chapter===1)current.classList.add('hotspring-prologue');
+ if(ending){
+  current.classList.add('hotspring-epilogue');
+  for(const [i,entry] of (s.campaign.epilogueRecap??[]).entries()){
+   const figure=node('figure',null,'hotspring-epilogue-scene');
+   const picture=node('img');
+   setHotspringImage(picture,entry.visual);
+   figure.style.setProperty('--scene-delay',(2.5+1.65*i)+'s');
+   figure.append(picture,node('figcaption',entry.title));
+   root.append(figure);
+  }
+ }
  if(!reveal)return;
  const chosen=(cue[reveal.id]??['build','survey'])[reveal.winner==='pour'?0:1];
  current.classList.add('hotspring-after','scene-'+chosen);
