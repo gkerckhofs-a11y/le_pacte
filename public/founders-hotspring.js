@@ -197,16 +197,17 @@ export function renderHotspringStage(root,s,support){
  }
 }
 
-export function renderCampaignRanking(root,rows,final=false){
+export function renderCampaignRanking(root,rows,final=false,{compact=false}={}){
  const list=node('ol',null,'hotspring-ranking');
  for(const r of rows){
   const item=node('li');
   item.value=rows.findIndex(p=>p.total===r.total)+1;
   item.append(node('strong',r.name+' · '+r.total+' / '+r.maximum));
   if(final){
-   item.append(node('p',r.briefing),node('p',campaignScoreText(r),'small'));
    const goals=node('details');
-   goals.append(node('summary','Objectifs de la famille'));
+   goals.append(node('summary',compact?'Objectifs et détail des points':'Objectifs de la famille'));
+   const overview=compact?goals:item;
+   overview.append(node('p',r.briefing),node('p',campaignScoreText(r),'small'));
    const breakdown=node('ul');
    for(const [i,objective] of r.objectives.entries()){
     const result=r.chapterPoints.find(chapter=>chapter.chapter===i+1);

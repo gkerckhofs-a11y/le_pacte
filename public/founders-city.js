@@ -1,7 +1,7 @@
 import {CAMPAIGN_PHASES,landscapeSummary,renderHotspringPanorama,setHotspringImage,renderTendencies,renderHotspringStage,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
 import {decorateGauge,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
-import {renderVoteProgress} from './founders-vote-progress.js';
-import {renderCouncilRoles,appendFamilyRoles} from './founders-role-badges.js';
+import {voteProgress} from './founders-vote-progress.js';
+import {appendFamilyRoles} from './founders-role-badges.js';
 import {setupProjectionFullscreen} from './founders-fullscreen.js';
 import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
 import {mountCity,updateCity} from './founders-city-scene.js';
@@ -10,18 +10,21 @@ import {renderChronicle} from './founders-chronicle.js';
 "use strict";
 const $=id=>document.getElementById(id),param=new URLSearchParams(location.search);
 const sessionId=param.get('session');
-const resources=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
-let lastRevision=null,previousCityStates=null,mountedSkin=null;
+let latestView=null,previousCityStates=null,mountedSkin=null;
 
 const pretty={...CAMPAIGN_PHASES,NEGOTIATION:'Négociations',READY:'Préparation',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'Vote clos',REVEALED:'Conséquences révélées',FINISHED:'Fin de partie'};
 function text(id,value){$(id).textContent=String(value??'');}
+function status(id,value){
+ text(id,value);
+ $(id).hidden=!value;
+}
 function drawGauges(s){
  const root=$('gauges');root.replaceChildren();
  for(const key of Object.keys(s.city)){
   const g=document.createElement('div');g.className='gauge';
   const row=document.createElement('div');row.className='gauge-head';
   const label=document.createElement('span');label.textContent=s.skin.labels.resources[key]||key;
-  const score=document.createElement('strong'),before=s.reveal?.cityBefore?.[key],delta=Number.isFinite(before)?s.city[key]-before:0;
+  const score=document.createElement('strong'),before=s.reveal?.cityBefore?.[key];
   score.textContent=s.city[key]+'/10';appendGaugeDelta(score,s,key);
   row.append(label,score);g.append(row);
   const track=document.createElement('div');track.className='track';
@@ -34,79 +37,63 @@ function drawGauges(s){
 
 }
 function render(s){
- const finishing=s.phase==='FINISHED'&&!document.body.classList.contains('game-finished');document.body.classList.toggle('game-finished',s.phase==='FINISHED');
- renderVoteProgress($('voteProgress'),s);
+ document.body.classList.toggle('game-finished',Boolean(s.finalResults));
+ $('dilemmaPanel').hidden=Boolean(s.finalResults);
+ const stageReading=Boolean(s.campaign)&&['CHECKPOINT','SUSPENDED','CHARTER_SUPPORT','EPILOGUE'].includes(s.phase);
+ document.body.classList.toggle('projection-stage-reading',stageReading);
+ document.body.classList.toggle('projection-qualification',s.phase==='CHARTER_SUPPORT');
  renderPhaseClock($('phaseClock'),s);
+ $('phase').hidden=!$('phaseClock').hidden;
  const totals=voteTotals(s);
- renderCouncilRoles($('councilRoles'),s);
  applySkin(document.body,s.skin);document.body.classList.toggle('campaign-hotspring',Boolean(s.campaign));text('universeTitle',s.campaign?s.story.title:'Le Pacte · '+s.skin.title);
- lastRevision=s.revision;
  text('pageTitle',s.story.location+' · '+s.story.year);text('phase',pretty[s.phase]||s.phase);
  text('chapter',s.dilemma?(s.dilemma.sequence?'Conseil '+s.dilemma.sequence:'Chapitre '+s.dilemma.chapter):'Le Conseil des Fondateurs');
- $('tiePriority').hidden=Boolean(s.campaign);
- text('tiePriority','Départage final si égalité parfaite : '+s.finalTieOrder.map(id=>teamLabel(s,id)).join(' → '));
- text('turn',s.council.turn?'À LA PAROLE : '+teamLabel(s,s.council.turn):['await_moderator','await_leader'].includes(s.council.phase)?'À LA PAROLE : '+teamLabel(s,s.moderator):s.phase==='NEGOTIATION'?'NÉGOCIATIONS EN COURS':'Maire '+teamLabel(s,s.leader));
- const sceneOnly=s.campaign&&['INTRO','CHECKPOINT','SUSPENDED','EPILOGUE','FINISHED'].includes(s.phase);
- $('dilemmaTitle').hidden=Boolean(sceneOnly);$('dilemmaText').hidden=Boolean(sceneOnly);
+ const sceneOnly=s.campaign&&['INTRO','CHECKPOINT','SUSPENDED','CHARTER_SUPPORT','EPILOGUE','FINISHED'].includes(s.phase);
+ $('dilemmaTitle').hidden=Boolean(sceneOnly);$('dilemmaText').hidden=Boolean(sceneOnly||s.reveal);
  text('dilemmaTitle',s.dilemma?.title||(s.phase==='FINISHED'?'La ville entre dans l’histoire':'Bienvenue au Conseil'));
  text('dilemmaText',s.dilemma?.public_text||(s.phase==='FINISHED'?'Les délibérations sont terminées.':'Le Conseil attend le signal de la régie.'));
- text('question',s.dilemma?.vote_question||'');
+ text('question',sceneOnly?'':s.dilemma?.vote_question||'');
  drawGauges(s);
- renderChronicle($('cityChronicle'),s);
+ $('chronicleOpen').hidden=!(s.history?.length);
+ if($('chronicleDialog').open)renderChronicle($('cityChronicle'),s);
  if(s.campaign){
   renderHotspringPanorama($('city'),s);
   renderHotspringStage($('hotspringStage'),s);
-  renderTendencies($('hotspringTendencies'),s.phase==='REVEALED'?null:s.dilemma);
-  text('cityEvolution',landscapeSummary(s.campaign.landscape)+(s.campaign.relation?' · '+s.campaign.relation:''));
-  const details=$('cityDetails');details.replaceChildren();
-  for(const layer of s.campaign.landscape.layers){
-   const item=document.createElement('p');item.textContent=layer.label+(layer.state==='damaged'?' · endommagé':'');details.append(item);
-  }
-  for(const feature of s.campaign.landscape.details??[]){
-   const item=document.createElement('p');item.textContent=feature.label;details.append(item);
-  }
-  if(s.campaign.landscape.scars.length){
-   const scars=document.createElement('p');scars.textContent='Cicatrices : '+s.campaign.landscape.scars.join(', ');details.append(scars);
-  }
+  renderTendencies($('hotspringTendencies'),sceneOnly||s.reveal?null:s.dilemma);
+  status('cityEvolution',landscapeSummary(s.campaign.landscape)+(s.campaign.relation?' · '+s.campaign.relation:''));
  }else{
  if(mountedSkin!==s.skin.id){mountCity($('city'),s.skin.id);mountedSkin=s.skin.id;previousCityStates=null;}
  const cityStates=updateCity($('city'),s.city,s.skin.id,s.skin.labels.resources);
  const changes=Object.entries(cityStates).filter(([key,state])=>previousCityStates&&state.level!==previousCityStates[key].level).map(([,state])=>state.description);
- text('cityEvolution',changes.length?changes.join(' '):'Le paysage reflète les décisions révélées du Conseil.');
+ status('cityEvolution',changes.join(' '));
  previousCityStates=cityStates;
- const details=$('cityDetails');details.replaceChildren();
- for(const state of Object.values(cityStates)){
-  const item=document.createElement('p'),heading=document.createElement('strong'),description=document.createElement('span');
-  heading.textContent=state.label+' · '+state.value+'/10';description.textContent=state.description;
-  item.append(heading,description);details.append(item);
- }
  }
  const image=$('decisionImage'),src=s.dilemma?.image?.url;
- if(s.campaign)setHotspringImage(image,s.phase==='REVEALED'?null:s.dilemma?.image);
- else if(typeof src==='string'&&/^https:\/\/\S+$/.test(src)){image.src=src;image.alt=s.dilemma.image.alt||s.dilemma.title;image.hidden=false;}
+ if(s.campaign)setHotspringImage(image,sceneOnly||s.reveal?null:s.dilemma?.image);
+ else if(!s.reveal&&typeof src==='string'&&/^https:\/\/\S+$/.test(src)){image.src=src;image.alt=s.dilemma.image.alt||s.dilemma.title;image.hidden=false;}
  else {image.hidden=true;image.removeAttribute('src');}
  const out=$('outcome');out.hidden=!s.reveal;
  if(s.reveal){text('outcomeTitle',s.campaign?s.reveal.chronicle.title:s.reveal.winner==='pour'?'PROPOSITION ADOPTÉE':'PROPOSITION REJETÉE');text('outcomeText',s.reveal.narration);}
  text('voteForTotal',totals.yes);text('voteAgainstTotal',totals.no);text('voteAbstentions',totals.abstentions);
- text('voteSummary',s.reveal?'Influence engagée · '+s.reveal.yes+' POUR / '+s.reveal.no+' CONTRE':'Influence engagée · rapport de force en direct');
+ text('voteSummary',s.phase==='AWAITING_REVEAL'?'Résultat sous scellés · révélation par la régie':'Influence engagée');
+ const arbitrating=s.phase==='COUNCIL'&&['await_moderator','await_leader'].includes(s.council.phase);
+ const activeFamily=s.phase==='COUNCIL'?(arbitrating?s.moderator:s.council.turn):null;
+ status('councilPrompt',arbitrating?voteProgress(s)?.title:'');
  const ballots=$('ballots');ballots.replaceChildren();
  for(const f of s.families){
   const row=document.createElement('div');row.className='ballot';
-  const n=document.createElement('span');n.textContent=f.name;n.title=teamCaption(f);colorize(n,f);appendFamilyRoles(n,s,f.id);
+  if(f.id===activeFamily)row.setAttribute('aria-current','true');
+  const n=document.createElement('span');n.textContent=f.color?f.color.symbol+' '+f.name:f.name;
+  n.title=teamCaption(f);colorize(n,f);appendFamilyRoles(n,s,f.id);
   const v=document.createElement('strong');
   const choice=s.council.choices[f.id];
   v.textContent=choice===undefined?'—':choice==='pour'?'POUR':choice==='contre'?'CONTRE':'ABSTENTION';
   const amount=document.createElement('span');amount.textContent=s.council.bids[f.id]??0;
   row.append(n,v,amount);ballots.append(row);
  }
- text('councilStatus',s.phase==='COUNCIL'?
-  'Maire : '+teamLabel(s,s.leader)+' · Shérif : '+teamLabel(s,s.moderator)+' · '+(s.council.turn?'Au tour de '+teamLabel(s,s.council.turn):'Arbitrage en cours'):
-  s.phase==='AWAITING_REVEAL'?'Résultat sous scellés : la régie doit le révéler.':
-  s.phase==='REVEALED'?'Le Conseil attend le prochain dilemme.':
-  s.phase==='FINISHED'?'Les décisions finales ont été proclamées.':'La séance n’a pas encore commencé.');
- const final=$('finalResults');final.hidden=!s.finalResults;
- if(s.phase==='FINISHED'){if(!s.campaign)final.parentElement.prepend(final);if(finishing)final.scrollIntoView({block:'start'});}
- const epilogue=$('narrativeEnding');epilogue.hidden=!s.narrativeEnding;epilogue.replaceChildren();
+ $('finalResults').hidden=!s.finalResults;
+ $('narrativeEnding').hidden=!s.narrativeEnding;
+ const epilogue=$('endingText');epilogue.replaceChildren();
  if(s.narrativeEnding){
   const title=document.createElement('h3');title.textContent=s.narrativeEnding.title;epilogue.append(title);
   for(const paragraph of s.narrativeEnding.paragraphs){const p=document.createElement('p');p.textContent=paragraph;epilogue.append(p);}
@@ -118,10 +105,10 @@ function render(s){
   const revealText=document.createElement('p');revealText.textContent=s.finalResults.text;root.append(revealText);
   const archive=s.campaign.archive;
   if(archive?.governance){
-   const record=document.createElement('p');record.textContent=archive.governance+' · '+s.narrativeEnding.title;
+   const record=document.createElement('p');record.textContent=archive.governance;
    root.append(record);
   }
-  renderCampaignRanking(root,s.finalResults.rows,true);
+  renderCampaignRanking(root,s.finalResults.rows,true,{compact:true});
  }else if(s.finalResults){
   const ranking=s.finalResults.ranking;
   text('winnerTitle','Victoire de '+teamLabel(s,ranking[0].family)+' · '+ranking[0].score.total+' points');
@@ -141,9 +128,15 @@ async function tick(){
   const r=await fetch('/api/founders/sessions/'+sessionId,{cache:'no-store'});
   if(!r.ok)throw new Error('Session indisponible ('+r.status+')');
   const s=await r.json();
-  if(s.revision!==lastRevision)render(s);else renderPhaseClock($('phaseClock'),s);
+  if(s.revision!==latestView?.revision)render(s);else renderPhaseClock($('phaseClock'),s);
+  latestView=s;
   text('connection','● Synchronisé');text('notice','');
  }catch(e){text('connection','○ Hors ligne');text('notice',e.message);}
 }
+$('chronicleOpen').addEventListener('click',()=>{
+ $('chronicleDialog').showModal();
+ // Render the current chronicle even when opening it between two state revisions.
+ if(latestView)renderChronicle($('cityChronicle'),latestView);
+});
 setupProjectionFullscreen($('projectionFullscreen'),$('notice'));
 tick();setInterval(tick,2500);

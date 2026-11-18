@@ -32,8 +32,24 @@ for(const app of ['city','family','regie'])test(`Écran ${app} : quatre jauges, 
  assert.equal(live.document.querySelectorAll('#gauges .gauge-delta-positive').length,2);assert.equal(live.document.querySelectorAll('#gauges .gauge-delta-negative').length,2);
  const end=command(state,owner,'finish',{confirm:true}),finished=await screen(app,end);
  assert.equal(finished.errors.length,0);
- if(app==='city'){assert.ok(finished.document.body.classList.contains('game-finished'));assert.equal(finished.document.querySelector('main').firstElementChild.id,'finalResults');}
+ if(app==='city'){
+  assert.ok(finished.document.body.classList.contains('game-finished'));
+  assert.equal(finished.document.querySelector('.projection-grid > section:not([hidden])').id,'finalResults');
+ }
  if(app==='family'){assert.equal(finished.document.getElementById('boardPanel').firstElementChild.id,'personalResult');assert.equal(finished.document.getElementById('familyEpilogue').hidden,false);}
+});
+
+test('Projection : seul le cadre de la famille suit la parole du Conseil',async()=>{
+ const opening=command(command(state,owner,'next'),owner,'beginVote');
+ const passing=command(opening,{role:'team',family:opening.game.vote.turn},'vote',{kind:'passe_pouvoir'});
+ for(const current of [opening,passing]){
+  const {document}=await screen('city',current);
+  const speaker=current.game.vote.turn;
+  const rows=document.querySelectorAll('#ballots [aria-current=true]');
+  assert.equal(rows.length,1);
+  assert.equal([...document.querySelectorAll('#ballots .ballot')].indexOf(rows[0]),Object.keys(current.game.families).indexOf(speaker));
+  assert.equal(document.querySelector('#councilRoles, #voteProgress, #councilStatus, .city-legend'),null);
+ }
 });
 
 test('Configuration : la version V2 est proposée, quatre jauges et ambitions cohérentes à cinq familles',async()=>{
