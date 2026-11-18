@@ -37,3 +37,15 @@ Les tests décodent les SVG insérés dans les fiches avec un lecteur indépenda
 `bash scripts/publish-founders.sh` installe les dépendances, lance les tests, compile et publie uniquement les fonctions du codebase `pacte` et Hosting. Il utilise l’authentification disponible, notamment celle de Cloud Shell, sans forcer une nouvelle connexion. Aucun changement de règle, index ou rôle Firebase n’est requis.
 
 Après une publication vérifiée : `node scripts/reset-founders-test.mjs --reset-test` crée d’abord une nouvelle partie V2 à cinq joueurs, puis archive les parties narratives antérieures du compte organisateur nommé dans le script. Les états archivés sont conservés mais retirés de la liste et inaccessibles aux anciens liens. Les jetons privés ne sont jamais affichés ou enregistrés dans le dépôt. Le script affiche seulement les liens régie/projection de la nouvelle partie.
+
+Validation locale : 229 tests réussis, compilation Firebase et vérification des bundles réussies. Les tests d’écran exécutent les modules réels dans un DOM simulé (configuration V2, projection, famille, régie, offres et épilogue). Aucun contrôle visuel des nouveaux écrans dans un navigateur réel n’a encore été effectué : le navigateur ne peut pas joindre le serveur local et la publication est bloquée par l’absence de connexion Firebase CLI. Le site en production n’a pas été remplacé le 18 novembre à ce stade.
+
+La publication peut être lancée dans un Cloud Shell déjà connecté :
+
+```sh
+pacte_v2_dir=$(mktemp -d)
+git clone --depth 1 --single-branch --branch feat/five-or-six-families https://github.com/gkerckhofs-a11y/le_pacte.git "$pacte_v2_dir"
+bash "$pacte_v2_dir/scripts/publish-founders.sh" --reset-test
+```
+
+L’option `--reset-test` ne s’exécute qu’après la réussite de la publication et dans le même environnement Node 24. Elle utilise les identifiants applicatifs de Cloud Shell. Si elle échoue après publication, la V2 reste publiée et les anciennes parties restent accessibles jusqu’à la réussite de l’archivage. Aucun mot de passe ou code de connexion ne doit être envoyé dans la conversation.

@@ -18,4 +18,8 @@ npm run build:firebase
 node scripts/verify-cloud-build.mjs
 # Cloud Shell may already supply Application Default Credentials.
 # Do not force a second login or expose an authorization code.
-npx -y firebase-tools@latest deploy --project le-pacte-ludificateur --only functions:pacte,hosting
+npx -y firebase-tools@latest deploy --project le-pacte-ludificateur --only functions:pacte,hosting --non-interactive
+
+if [ "${1:-}" = "--reset-test" ]; then
+  node scripts/reset-founders-test.mjs --reset-test
+fi
