@@ -41,7 +41,7 @@ export function landscapeSummary(landscape){
  return 'Rivière '+river+' · Végétation '+landscape.vegetation+' · Rue '+landscape.street+' · Population '+landscape.density+' · Ville '+landscape.mood+' · '+landscape.prosperity;
 }
 
-export function renderHotspringPanorama(root,s){
+export function renderHotspringPanorama(root,s,{showResultStill=true}={}){
  const map=s.campaign.landscape;
  let state=panes.get(root);
  if(!state){root.replaceChildren();root.classList.add('hotspring-panorama');state={};panes.set(root,state);}
@@ -91,7 +91,7 @@ export function renderHotspringPanorama(root,s){
  }
  root.append(node('i',null,'hotspring-effect scene-'+chosen));
  const asset=reveal.visual;
- if(asset?.url){
+ if(showResultStill&&asset?.url){
   const stillImage=image(asset.url);
   if(stillImage){
    const show=()=>{

@@ -53,7 +53,7 @@ test('Projection : seul le cadre de la famille suit la parole du Conseil',async(
  }
 });
 
-test('Projection Hotspring : le grand cadre alterne entre le visuel et le panorama',async()=>{
+test('Projection Hotspring : le visuel du dilemme et le panorama coexistent',async()=>{
  const campaign=newCampaign();
  campaign.command('start');
  const intro=await screen('city',campaign.state);
@@ -62,23 +62,19 @@ test('Projection Hotspring : le grand cadre alterne entre le visuel et le panora
  campaign.command('next');
  const {document}=await screen('city',campaign.state);
  const artwork=document.getElementById('decisionImage'),city=document.getElementById('city');
- const button=document.getElementById('visualSwitch');
  assert.equal(artwork.hidden,false);
- assert.equal(city.hidden,true);
- button.click();
- assert.equal(artwork.hidden,true);
  assert.equal(city.hidden,false);
- button.click();
- assert.equal(artwork.hidden,false);
+ assert.equal(artwork.closest('#dilemmaPanel').id,'dilemmaPanel');
+ assert.equal(document.getElementById('dilemmaArtwork').hidden,false);
  assert.ok(document.getElementById('question').textContent);
  campaign.vote('pour');
  const reveal=await screen('city',campaign.state);
  assert.equal(reveal.document.getElementById('city').hidden,false);
- const revealSwitch=reveal.document.getElementById('visualSwitch');
- assert.equal(revealSwitch.hidden,false);
- revealSwitch.click();
  assert.match(reveal.document.getElementById('decisionImage').getAttribute('src'),/d01_result_for_lowlands/);
  assert.equal(reveal.document.getElementById('decisionImage').hidden,false);
+ artwork.dispatchEvent(new document.defaultView.Event('error'));
+ assert.equal(document.getElementById('dilemmaArtwork').hidden,true);
+ assert.equal(city.hidden,false);
 });
 
 test('Configuration : la version V2 est proposée, quatre jauges et ambitions cohérentes à cinq familles',async()=>{
