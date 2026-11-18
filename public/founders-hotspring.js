@@ -22,6 +22,7 @@ const cue={
  D23:['build','lamps'],D24:['smoke','fire'],D25:['dusk','dense'],D26A:['rain','water'],D26B:['dust','dusk'],
  D27:['smoke','dust'],D28:['lamps','barrier'],D29:['lamps','survey'],D30:['lamps','dusk']
 };
+const constructions=new Set(['well','tower','school','saloon','inn','clinic','mill','station','mine','planned','bank','stockyard','office','jail','drains','hall','trade']);
 const panes=new WeakMap();
 const cachedImages=new Map();
 
@@ -49,9 +50,10 @@ export function renderHotspringPanorama(root,s){
  const effectKey=reveal?.id+'_'+reveal?.winner;
  if(state.key===key&&state.effectKey===effectKey)return;
  const previous=root.querySelector('.hotspring-map');
+ const prior=state.map;
  root.innerHTML=renderPanoramaSvg(map);
  root.append(node('span','Panorama de travail','hotspring-map-status'));
- state.key=key;state.effectKey=effectKey;
+ state.key=key;state.effectKey=effectKey;state.map=map;
  const current=root.querySelector('.hotspring-map');
  if(!reveal)return;
  const chosen=(cue[reveal.id]??['build','survey'])[reveal.winner==='pour'?0:1];
@@ -61,6 +63,18 @@ export function renderHotspringPanorama(root,s){
   previous.classList.add('hotspring-before');
   previous.setAttribute('aria-hidden','true');
   root.prepend(previous);
+ }
+ if(prior){
+  const priorIds=new Set(prior.layers.map(l=>l.id));
+  const newBuildings=map.layers.filter(l=>l.state==='complete'&&constructions.has(l.kind)&&!priorIds.has(l.id));
+  if(newBuildings.length){
+   const ids=new Set(newBuildings.map(l=>l.id));
+   const construction=document.createElement('div');
+   construction.className='hotspring-construction';
+   construction.setAttribute('aria-hidden','true');
+   construction.innerHTML=renderPanoramaSvg({...map,layers:map.layers.map(l=>ids.has(l.id)?{...l,state:'building'}:l)});
+   root.append(construction);
+  }
  }
  root.append(node('i',null,'hotspring-effect scene-'+chosen));
  const asset=reveal.visual;

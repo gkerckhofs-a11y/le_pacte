@@ -95,7 +95,12 @@ export function hotspringLandscape(s){
   h('EPIDEMIE_CONTENUE')||h('EPIDEMIE_DIFFUSE')?'Épidémie':null,
   h('RAPPORT_ACCIDENT')?'Accident minier':null,h('SAISIES')?'Saisies bancaires':null
  ].filter(Boolean);
- const usedKinds=new Set(layers.map(l=>l.kind==='camp'?'wagon':l.kind));
+ const usedKinds=new Set(layers.map(l=>l.kind));
+ if(usedKinds.has('camp')){usedKinds.add('wagon');usedKinds.add('tent');}
+ if(founded)usedKinds.add('people');
+ const disasters={'Incendie':'fire','Crue':'flood','Sécheresse':'drought','Épidémie':'quarantine',
+  'Accident minier':'mine_accident','Saisies bancaires':'bankruptcy'};
+ for(const kind of scarList)usedKinds.add(disasters[kind]);
  const sprites=Object.fromEntries([...usedKinds].filter(kind=>art['sprite_'+kind]).map(kind=>[kind,art['sprite_'+kind].url]));
  const charter={A:'commerce',B:'services',C:'ateliers',D:'inspection',E:'liaison',F:'réserves'}[s.campaign.charter]??null;
  return {location:founded?(high?'terrasse':'terres basses'):null,townX,townY,layers:layers.sort((a,b)=>a.y-b.y),

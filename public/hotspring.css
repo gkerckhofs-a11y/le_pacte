@@ -48,3 +48,6 @@
 }
 .print-url{overflow-wrap:anywhere;word-break:break-word}
 .hotspring-map-status{position:absolute;right:10px;bottom:8px;z-index:4;padding:3px 7px;border-radius:4px;background:#2d271ee0;color:#f3eadc;font-size:.73rem}
+.hotspring-construction{position:absolute;inset:0;z-index:2;pointer-events:none;animation:hotspring-construction 7.5s ease-in-out both}
+@keyframes hotspring-construction{0%,13%{opacity:0}28%,50%{opacity:1}74%,100%{opacity:0;visibility:hidden}}
+@media (prefers-reduced-motion:reduce){.hotspring-construction{display:none;animation:none}}

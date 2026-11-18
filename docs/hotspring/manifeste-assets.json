@@ -8,7 +8,7 @@
   "parts": [
     {
       "path": "manifeste-entetes.json",
-      "count": 39,
+      "count": 40,
       "kinds": [
         "en-tête",
         "ouverture",
@@ -25,7 +25,7 @@
     },
     {
       "path": "manifeste-calques.json",
-      "count": 119,
+      "count": 131,
       "kinds": [
         "calque"
       ]

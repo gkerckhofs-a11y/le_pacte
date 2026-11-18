@@ -24,13 +24,17 @@ const wagon=path('M-12 0v-7q0 -12 12 -12t19 12v7z',canvas)+
 const pole=path('M-15 0l3 -21m18 0 4 21m-20 -9 18 7m-1 -7 -18 7','none','#5d4a37',2.5);
 const tower=pole+path('M-13 -23v-15l23 1v14z',timber)+path('M-16 -37l14 -8 15 8z',roof);
 const posts=path('M-30 0v-8m12 6v-8m15 6v-8m16 6v-8m14 6v-8m-57 4l57 -8','none','#746047',1.8);
-const spriteSize={wagon:[42,27],well:[28,22],tower:[36,47],school:[52,49],saloon:[56,43],clinic:[49,33],mill:[70,48],station:[60,38],bank:[57,36],mine:[76,48]};
+const spriteSize={
+ tent:[26,20],cottages:[95,63],inn:[54,38],shacks:[82,56],planned:[84,54],stockyard:[69,40],
+ office:[44,32],jail:[39,30],drains:[83,32],hall:[60,43],trade:[45,30],people:[19,13],
+ fire:[51,34],flood:[55,19],drought:[48,24],quarantine:[42,30],mine_accident:[44,26],bankruptcy:[36,25],
+ wagon:[42,27],well:[28,22],tower:[36,47],school:[52,49],saloon:[56,43],clinic:[49,33],mill:[70,48],station:[60,38],bank:[57,36],mine:[76,48]};
 function texture(url,kind){
  const [width,height]=spriteSize[kind];
  return `<image href="${escapeXML(url)}" x="${-width/2}" y="${-height}" width="${width}" height="${height}" preserveAspectRatio="xMidYMax meet"/>`;
 }
-function camp(wagonGraphic){
- return row([[-30,2,.7],[-10,-12,.65],[12,-14,.65],[27,0,.68],[4,17,.7]],wagonGraphic)+row([[-16,12,.65],[16,8,.7]],tent);
+function camp(wagonGraphic,tentGraphic=tent){
+ return row([[-30,2,.7],[-10,-12,.65],[12,-14,.65],[27,0,.68],[4,17,.7]],wagonGraphic)+row([[-16,12,.65],[16,8,.7]],tentGraphic);
 }
 const building={
  road:path('M-70 24Q-26 1 75 -19', 'none','#ac8e67',7),
@@ -88,19 +92,22 @@ export function renderPanoramaSvg(scene,{background=VALLEY_PLATE,sprites=scene.s
  const floodMark=scene.scars.includes('Crue')?path('M 46 440Q 117 407 140 365T 243 324','none','#958467',3):'';
  const wood=scene.vegetation!=='abondante'?row([[325,211],[369,173],[297,232],[435,161]],
   path('M-6 0l1 -6 7 -3 4 2 -1 6z','#786b53','#51483a',.7)):'';
+ const textureFor=kind=>sprites[kind]&&spriteSize[kind]?texture(sprites[kind],kind):null;
  const buildings=scene.layers.map(layer=>{
-  const bitmap=sprites[layer.kind];
-  const campBitmap=layer.kind==='camp'&&sprites.wagon;
-  const complete=layer.state==='complete'||layer.state==='inspection';
-  const graphic=complete&&campBitmap?camp(texture(campBitmap,'wagon')):
-   complete&&bitmap&&spriteSize[layer.kind]?texture(bitmap,layer.kind):building[layer.kind]??'';
+  const painted=textureFor(layer.kind);
+  const graphic=layer.kind==='camp'?camp(textureFor('wagon')??wagon,textureFor('tent')??tent):
+   painted??building[layer.kind]??'';
   const extra=stateScreen[layer.state]??'';
-  const main=layer.state==='building'?'':graphic;
+  const main=layer.state==='building'?painted?partialConstruction(painted,layer.kind):'':graphic;
   const opacity=layer.state==='damaged'?.43:layer.state==='abandoned'?.57:1;
   return `<g data-layer="${escapeXML(layer.id)}" transform="translate(${layer.x*10} ${layer.y*5.625}) scale(${layer.scale})"><title>${escapeXML(layer.label)}</title><g opacity="${opacity}">${main}</g>${extra}</g>`;
  }).join('');
  const count=!scene.location?0:{faible:2,moyenne:6,forte:12}[scene.density]??0;
- const people=Array.from({length:count},(_,i)=>at(scene.townX*10-57+i*11,scene.townY*5.625+20+(i%3)*6,person,.64+(i%3)*.13)).join('');
+ const group=textureFor('people');
+ const people=group
+  ?Array.from({length:Math.ceil(count/3)},(_,i)=>at(scene.townX*10-43+i*23,scene.townY*5.625+22+(i%3)*7,group)).join('')
+  :Array.from({length:count},(_,i)=>at(scene.townX*10-57+i*11,scene.townY*5.625+20+(i%3)*6,person,.64+(i%3)*.13)).join('');
+ const scars=placedScars(scene,textureFor);
  const street=scene.street==='barricadée'?at(scene.townX*10,scene.townY*5.625+20,posts,1.6):'';
  const showsCharter={
   commerce:at(scene.townX*10+34,scene.townY*5.625+8,boardsForCharter(),1.45),
@@ -115,7 +122,27 @@ export function renderPanoramaSvg(scene,{background=VALLEY_PLATE,sprites=scene.s
  return `<svg class="hotspring-map" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 562.5" role="img" aria-label="${escapeXML('Vallée de Hotspring'+(scene.location?' — ville sur '+scene.location:'')+(hasScars?'. Cicatrices : '+scene.scars.join(', '):''))}">
  <image href="${escapeXML(background)}" width="1000" height="562.5" preserveAspectRatio="none"/>
  <g opacity=".47">${riverLayer}${floodMark}</g>${filters}<g>${wood}</g>${buildings}
- <g class="street-detail">${street}${people}${showsCharter[scene.charter]??''}</g></svg>`;
+ <g class="street-detail">${scars}${street}${people}${showsCharter[scene.charter]??''}</g></svg>`;
 }
 
 function boardsForCharter(){return path('M-8 2v-9h14v4H-8m14 5v-9','none','#b29a75',1.5);}
+
+function partialConstruction(graphic,kind){
+ const [w,h]=spriteSize[kind],x=-w/2,y=-h*.39;
+ return `<svg x="${x}" y="${y}" width="${w}" height="${-y}" viewBox="${x} ${y} ${w} ${-y}" overflow="hidden">${graphic}</svg>`;
+}
+
+function placedScars(scene,textureFor){
+ const anchor=id=>scene.layers.find(layer=>layer.id===id);
+ const burned=scene.layers.find(l=>l.state==='damaged');
+ const stamps={
+  Incendie:['fire',burned,7,7],Crue:['flood',anchor('well'),-13,16],Sécheresse:['drought',anchor('well'),9,12],
+  Épidémie:['quarantine',anchor('refuge'),-9,4],'Accident minier':['mine_accident',anchor('mine'),15,4],
+  'Saisies bancaires':['bankruptcy',anchor('bank'),17,5]
+ };
+ return scene.scars.map(name=>{
+  const [kind,layer,dx,dy]=stamps[name];
+  const art=textureFor(kind);
+  return art?at((layer?.x??scene.townX)*10+dx,(layer?.y??scene.townY)*5.625+dy,art,.82):'';
+ }).join('');
+}
