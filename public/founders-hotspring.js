@@ -37,7 +37,7 @@ function image(url){
 
 export function landscapeSummary(landscape){
  const river={claire:'claire',degradee:'dégradée',polluee:'polluée',basse:'basse',crue:'marquée par la crue'}[landscape.river];
- return 'Rivière '+river+' · Population '+landscape.density+' · Activité : '+landscape.prosperity;
+ return 'Rivière '+river+' · Végétation '+landscape.vegetation+' · Rue '+landscape.street+' · Population '+landscape.density+' · '+landscape.prosperity;
 }
 
 export function renderHotspringPanorama(root,s){

@@ -125,7 +125,7 @@ function render(s){
   $('next').hidden=!['INTRO','PRESENTATION','REVEALED','CHECKPOINT'].includes(s.phase);
   $('next').textContent=({INTRO:'Présenter le dilemme',PRESENTATION:'Ouvrir la négociation',REVEALED:s.reveal?.id==='D30'?'Lire l’épilogue':'Poursuivre',CHECKPOINT:s.campaign.chapter===6?'Qualifier les chartes':'Reprendre — chapitre suivant'})[s.phase]??'Poursuivre';
  }
- $('tiePriority').hidden=Boolean(s.campaign);
+ $('tiePriority').closest('details').hidden=Boolean(s.campaign);
  $('next').disabled=Boolean(s.progression?.blocked);
  $('reservePanel').hidden=!s.progression||s.progression.terminal;
  const choice=$('nextDilemma'),previousChoice=choice.value;choice.replaceChildren();

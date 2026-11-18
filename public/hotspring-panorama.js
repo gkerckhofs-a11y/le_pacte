@@ -85,6 +85,7 @@ export function renderPanoramaSvg(scene,{background=VALLEY_PLATE,sprites=scene.s
  const hasScars=scene.scars.length>0;
  const pigment=pigments[scene.river];
  const riverLayer=pigment?path(river,'none',pigment,scene.river==='crue'?30:14):'';
+ const floodMark=scene.scars.includes('Crue')?path('M 46 440Q 117 407 140 365T 243 324','none','#958467',3):'';
  const wood=scene.vegetation!=='abondante'?row([[325,211],[369,173],[297,232],[435,161]],
   path('M-6 0l1 -6 7 -3 4 2 -1 6z','#786b53','#51483a',.7)):'';
  const buildings=scene.layers.map(layer=>{
@@ -113,7 +114,7 @@ export function renderPanoramaSvg(scene,{background=VALLEY_PLATE,sprites=scene.s
  const filters=tone?`<ellipse cx="${scene.townX*10}" cy="${scene.townY*5.625}" rx="125" ry="75" fill="${tone}" opacity=".13"/>`:'';
  return `<svg class="hotspring-map" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 562.5" role="img" aria-label="${escapeXML('Vallée de Hotspring'+(scene.location?' — ville sur '+scene.location:'')+(hasScars?'. Cicatrices : '+scene.scars.join(', '):''))}">
  <image href="${escapeXML(background)}" width="1000" height="562.5" preserveAspectRatio="none"/>
- <g opacity=".47">${riverLayer}</g>${filters}<g>${wood}</g>${buildings}
+ <g opacity=".47">${riverLayer}${floodMark}</g>${filters}<g>${wood}</g>${buildings}
  <g class="street-detail">${street}${people}${showsCharter[scene.charter]??''}</g></svg>`;
 }
 

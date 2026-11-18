@@ -83,7 +83,7 @@ export function hotspringLandscape(s){
  if(h('PACTE_VALLEE_FINAL')||h('CHARTE_RESSOURCES'))
   add('fields','protected','Bornes de protection de la vallée',{fixed:[20,59]});
  const city=s.game.city;
- const river=h('MARQUES_DE_CRUE')?'crue':h('PENURIE_EAU')||h('RATIONNEMENT_HABITANTS')?'basse':city.ecologie<=2?'polluee':city.ecologie<=4?'degradee':'claire';
+ const river=s.phase==='REVEALED'&&s.lastReveal?.id==='D26A'?'crue':h('PENURIE_EAU')||h('RATIONNEMENT_HABITANTS')?'basse':city.ecologie<=2?'polluee':city.ecologie<=4?'degradee':'claire';
  const vegetation=city.ecologie<=2?'fortement dégradée':city.ecologie<=4||h('SCIERIE_INTENSIVE')?'réduite':'abondante';
  const density=!founded||city.demographie<=4?'faible':city.demographie<=7?'moyenne':'forte';
  const street=h('HOSTILITE_OUVERTE')&&city.securite<=3?'barricadée':city.demographie>=8?'surpeuplée':city.demographie>=5?'active':'vide';
