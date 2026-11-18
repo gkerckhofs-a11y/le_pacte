@@ -128,7 +128,7 @@ export function renderTendencies(root,dilemma){
  }
 }
 
-export function renderHotspringStage(root,s,support){
+export function renderHotspringStage(root,s,support,{showIntroImage=true}={}){
  root.replaceChildren();
  const {intro,recap,checkpoint,qualification,relation,familyPitches}=s.campaign;
  root.hidden=!intro&&!checkpoint&&!qualification&&!s.narrativeEnding&&!familyPitches&&!recap.length;
@@ -141,7 +141,9 @@ export function renderHotspringStage(root,s,support){
  }
  if(intro){
   root.append(node('h2',intro.title));
-  const cover=document.createElement('img');setHotspringImage(cover,intro.visual);root.append(cover);
+  if(showIntroImage){
+   const cover=document.createElement('img');setHotspringImage(cover,intro.visual);root.append(cover);
+  }
   root.append(node('p',intro.text,'hotspring-text'));
   if(recap.length&&s.campaign.chapter>1){
    root.append(node('h3','Précédemment à Hotspring…'));

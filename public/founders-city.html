@@ -16,7 +16,6 @@
 <section id="dilemmaPanel" class="panel dilemma-panel">
  <div class="eyeline" id="chapter">Conseil des fondateurs</div>
  <h2 id="dilemmaTitle">Bienvenue au Conseil</h2>
- <img id="decisionImage" alt="" hidden>
  <p id="dilemmaText">Le Conseil attend le signal de la régie.</p>
  <p id="question" class="big hotspring-text"></p>
  <div id="hotspringTendencies" class="hotspring-tendencies" hidden></div>
@@ -34,8 +33,14 @@
 </section>
 <section class="projection-city">
  <div class="projection-visual">
-  <div class="projection-viewport"><div id="city" aria-label="Illustration évolutive de Hot Spring"></div></div>
-  <p id="cityEvolution" class="small city-evolution" role="status" hidden></p>
+  <div class="projection-viewport">
+   <div id="city" aria-label="Illustration évolutive de Hot Spring"></div>
+   <img id="decisionImage" alt="" hidden>
+  </div>
+  <div class="projection-caption">
+   <p id="cityEvolution" class="small city-evolution" role="status" hidden></p>
+   <button id="visualSwitch" class="secondary" type="button" aria-controls="city decisionImage" hidden>Voir le panorama</button>
+  </div>
  </div>
  <div class="projection-results">
   <div class="panel"><h2>Vote du Conseil</h2>

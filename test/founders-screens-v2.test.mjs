@@ -7,6 +7,7 @@ import {webcrypto} from 'node:crypto';
 import {parseHTML} from 'linkedom';
 import {foundersPreview,foundersCatalogFor} from '../server/founders-catalog.ts';
 import {createNarrativeSession,applyNarrativeCommand,narrativeView} from '../src/founders-live.ts';
+import {newCampaign} from './helpers/hotspring.mjs';
 const owner={role:'organizer',id:'host'};
 let state=createNarrativeSession(foundersPreview({scenarioId:'hot-spring-reserve-hybride',scenarioVersion:'2.0.0',skinId:'western',members:[1,1,1,1,1]}),{ownerId:'host',id:'1'.repeat(24),code:'SCREENV2',title:'Test écrans',now:1000});
 const command=(s,actor,kind,data={})=>applyNarrativeCommand(s,actor,{kind,data,expectedRevision:s.revision},2000);
@@ -21,7 +22,7 @@ async function screen(app,s){
  const actor=app==='city'?{role:'public'}:app==='family'?{role:'team',family:'A'}:owner;
  const data={...narrativeView(s,actor),serverNow:2000};
  const timers=[];const catalog=await foundersCatalogFor({},'host');
- const context=vm.createContext({document,window,DOMParser:window.DOMParser,location:{origin:'http://localhost',pathname:'/founders-'+app+'.html',search:'?session='+s.id+'&family=A',hash:''},history:{replaceState(){}},sessionStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},URL,URLSearchParams,Image:class{},crypto:webcrypto,performance:{now:()=>0},requestAnimationFrame:fn=>fn(),setInterval:fn=>{timers.push(fn);return {unref(){}};},fetch:async(path,options)=>({ok:true,json:async()=>path==='/api/catalog'?{authMode:'local'}:path==='/api/founders/catalog'?catalog:path==='/api/founders/preview'?foundersPreview(JSON.parse(options.body)):path==='/api/founders/configurations'?{configurations:[]}:path==='/api/founders/sessions'?{sessions:[]}:data}),console:{log(){},error:e=>errors.push(e)}});
+ const context=vm.createContext({document,window,DOMParser:window.DOMParser,location:{origin:'http://localhost',pathname:'/founders-'+app+'.html',search:'?session='+s.id+'&family=A',hash:''},history:{replaceState(){}},sessionStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},URL,URLSearchParams,Image:class{constructor(){return document.createElement('img');}},crypto:webcrypto,performance:{now:()=>0},requestAnimationFrame:fn=>fn(),setInterval:fn=>{timers.push(fn);return {unref(){}};},fetch:async(path,options)=>({ok:true,json:async()=>path==='/api/catalog'?{authMode:'local'}:path==='/api/founders/catalog'?catalog:path==='/api/founders/preview'?foundersPreview(JSON.parse(options.body)):path==='/api/founders/configurations'?{configurations:[]}:path==='/api/founders/sessions'?{sessions:[]}:data}),console:{log(){},error:e=>errors.push(e)}});
  const bundle=await build({entryPoints:['public/founders-'+app+'.js'],bundle:true,write:false,format:'iife',platform:'browser',logLevel:'silent'});
  vm.runInContext(bundle.outputFiles[0].text,context);
  for(let i=0;i<10;i++)await new Promise(r=>setImmediate(r));
@@ -50,6 +51,34 @@ test('Projection : seul le cadre de la famille suit la parole du Conseil',async(
   assert.equal([...document.querySelectorAll('#ballots .ballot')].indexOf(rows[0]),Object.keys(current.game.families).indexOf(speaker));
   assert.equal(document.querySelector('#councilRoles, #voteProgress, #councilStatus, .city-legend'),null);
  }
+});
+
+test('Projection Hotspring : le grand cadre alterne entre le visuel et le panorama',async()=>{
+ const campaign=newCampaign();
+ campaign.command('start');
+ const intro=await screen('city',campaign.state);
+ assert.equal(intro.document.getElementById('decisionImage').hidden,false);
+ assert.equal(intro.document.querySelector('#hotspringStage img'),null);
+ campaign.command('next');
+ const {document}=await screen('city',campaign.state);
+ const artwork=document.getElementById('decisionImage'),city=document.getElementById('city');
+ const button=document.getElementById('visualSwitch');
+ assert.equal(artwork.hidden,false);
+ assert.equal(city.hidden,true);
+ button.click();
+ assert.equal(artwork.hidden,true);
+ assert.equal(city.hidden,false);
+ button.click();
+ assert.equal(artwork.hidden,false);
+ assert.ok(document.getElementById('question').textContent);
+ campaign.vote('pour');
+ const reveal=await screen('city',campaign.state);
+ assert.equal(reveal.document.getElementById('city').hidden,false);
+ const revealSwitch=reveal.document.getElementById('visualSwitch');
+ assert.equal(revealSwitch.hidden,false);
+ revealSwitch.click();
+ assert.match(reveal.document.getElementById('decisionImage').getAttribute('src'),/d01_result_for_lowlands/);
+ assert.equal(reveal.document.getElementById('decisionImage').hidden,false);
 });
 
 test('Configuration : la version V2 est proposée, quatre jauges et ambitions cohérentes à cinq familles',async()=>{

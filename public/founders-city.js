@@ -11,12 +11,35 @@ import {renderChronicle} from './founders-chronicle.js';
 const $=id=>document.getElementById(id),param=new URLSearchParams(location.search);
 const sessionId=param.get('session');
 let latestView=null,previousCityStates=null,mountedSkin=null;
+let showIllustration=false;
 
 const pretty={...CAMPAIGN_PHASES,NEGOTIATION:'Négociations',READY:'Préparation',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'Vote clos',REVEALED:'Conséquences révélées',FINISHED:'Fin de partie'};
 function text(id,value){$(id).textContent=String(value??'');}
 function status(id,value){
  text(id,value);
  $(id).hidden=!value;
+}
+function syncProjectionVisual(){
+ const image=$('decisionImage');
+ const available=image.hasAttribute('src');
+ const showing=available&&showIllustration;
+ image.hidden=!showing;
+ $('city').hidden=showing;
+ $('visualSwitch').hidden=!available;
+ text('visualSwitch',showing?'Voir le panorama':'Voir l’illustration');
+}
+function drawIllustration(s,sceneOnly){
+ const image=$('decisionImage');
+ const previous=image.getAttribute('src');
+ const art=s.reveal?.visual??s.campaign?.intro?.visual??(!sceneOnly&&!s.reveal?s.dilemma?.image:null);
+ if(s.campaign)setHotspringImage(image,art);
+ else if(typeof art?.url==='string'&&/^https:\/\/\S+$/.test(art.url)){
+  if(previous!==art.url)image.src=art.url;
+  image.alt=art.alt||s.dilemma.title;
+ }else image.removeAttribute('src');
+ const source=image.getAttribute('src');
+ if(source!==previous||s.phase==='REVEALED'&&latestView?.phase!==s.phase)showIllustration=Boolean(source)&&!s.reveal;
+ syncProjectionVisual();
 }
 function drawGauges(s){
  const root=$('gauges');root.replaceChildren();
@@ -58,7 +81,7 @@ function render(s){
  if($('chronicleDialog').open)renderChronicle($('cityChronicle'),s);
  if(s.campaign){
   renderHotspringPanorama($('city'),s);
-  renderHotspringStage($('hotspringStage'),s);
+  renderHotspringStage($('hotspringStage'),s,undefined,{showIntroImage:false});
   renderTendencies($('hotspringTendencies'),sceneOnly||s.reveal?null:s.dilemma);
   status('cityEvolution',landscapeSummary(s.campaign.landscape)+(s.campaign.relation?' · '+s.campaign.relation:''));
  }else{
@@ -68,10 +91,7 @@ function render(s){
  status('cityEvolution',changes.join(' '));
  previousCityStates=cityStates;
  }
- const image=$('decisionImage'),src=s.dilemma?.image?.url;
- if(s.campaign)setHotspringImage(image,sceneOnly||s.reveal?null:s.dilemma?.image);
- else if(!s.reveal&&typeof src==='string'&&/^https:\/\/\S+$/.test(src)){image.src=src;image.alt=s.dilemma.image.alt||s.dilemma.title;image.hidden=false;}
- else {image.hidden=true;image.removeAttribute('src');}
+ drawIllustration(s,sceneOnly);
  const out=$('outcome');out.hidden=!s.reveal;
  if(s.reveal){text('outcomeTitle',s.campaign?s.reveal.chronicle.title:s.reveal.winner==='pour'?'PROPOSITION ADOPTÉE':'PROPOSITION REJETÉE');text('outcomeText',s.reveal.narration);}
  text('voteForTotal',totals.yes);text('voteAgainstTotal',totals.no);text('voteAbstentions',totals.abstentions);
@@ -133,6 +153,14 @@ async function tick(){
   text('connection','● Synchronisé');text('notice','');
  }catch(e){text('connection','○ Hors ligne');text('notice',e.message);}
 }
+$('visualSwitch').addEventListener('click',()=>{
+ showIllustration=!showIllustration;
+ syncProjectionVisual();
+});
+$('decisionImage').addEventListener('error',()=>{
+ $('decisionImage').removeAttribute('src');
+ syncProjectionVisual();
+});
 $('chronicleOpen').addEventListener('click',()=>{
  $('chronicleDialog').showModal();
  // Render the current chronicle even when opening it between two state revisions.
