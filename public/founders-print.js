@@ -14,7 +14,9 @@ export function mountPrintKit({session,view,request,renew}){
  function sync(s){if(prepared&&fingerprint(s)!==prepared.fingerprint){invalidate();$('printSheets').replaceChildren();$('printStatus').textContent='Les équipes ont changé. Préparez les fiches de nouveau.';}}
  function card(root,family,title){
   const c=node('article',undefined,'print-card');c.style.borderColor=family.color.hex;
-  c.append(node('p',view().title+' · '+view().code,'print-kicker'),node('h2',teamCaption(family)),node('h3',title));root.append(c);return c;
+  c.append(node('p',view().title+' · '+view().code,'print-kicker'),node('h2',teamCaption(family)));
+  if(title)c.append(node('h3',title));
+  root.append(c);return c;
  }
  function print(){if(!$('printSheets').childElementCount)return;document.body.classList.add('printing-kit');window.print();}
  window.addEventListener('afterprint',()=>document.body.classList.remove('printing-kit'));
@@ -72,15 +74,21 @@ export function mountPrintKit({session,view,request,renew}){
    if(new Set(cards.map(c=>c.token)).size!==s.families.length)throw new Error('Les accès des familles ne sont pas uniques');
    // All-or-nothing: never print a partial kit or silently skip a failed family.
    for(const {f,data} of cards){
-    const c=card(root,f,'Accès privé · terminal officiel');c.dataset.family=f.id;
+    const c=card(root,f,s.campaign?null:'Accès privé · terminal officiel');c.dataset.family=f.id;
     const image=node('div',undefined,'print-qr'),svg=new DOMParser().parseFromString(data.svg,'image/svg+xml').documentElement;
     if(svg.localName!=='svg'||svg.querySelector('parsererror'))throw new Error('Image QR invalide');
     image.append(document.importNode(svg,true));c.append(image);
     c.append(node('p','Session '+s.code+' · Équipe '+f.id,'print-reference'));
-    const instructions=node('ol');for(const t of ['Scannez le QR code.','Vérifiez le nom de votre famille et le code de session affichés.','Gardez cette page ouverte pendant toute la partie.','Un seul terminal officiel est utilisé pour votre famille.'])instructions.append(node('li',t));c.append(instructions);
-    c.append(node('h3','Votre application'));
-    for(const [title,body] of [['Accueil','« Ma table » : votre situation et vos ressources.'],['Vote','« Votre décision politique » : POUR, CONTRE ou ABSTENTION, puis ajout d’Influence ou passage.'],['Négociation et finances','« Vos négociations » : envoyez une proposition, acceptez ou refusez une somme ; vos fonds sont dans « Vos ressources ».'],['Objectifs',s.campaign?'Votre briefing et vos objectifs de chapitre se trouvent sur « Ma table ». Gardez-les confidentiels.':'Votre ambition secrète et ses paliers se trouvent sur « Ma table ».']])c.append(node('p',title+' — '+body));
-    c.append(node('p','Le porte-parole utilise l’interface officielle. Les autres membres de l’équipe peuvent librement négocier avec les autres familles.'));
+    if(s.campaign){
+     c.classList.add('print-hotspring');
+     c.append(node('p','Porte-parole : scannez le QR code, vérifiez la famille et la session. Gardez cette page ouverte.','print-scan'));
+     c.append($('hotspringQrReminder').content.cloneNode(true));
+    }else{
+     const instructions=node('ol');for(const t of ['Scannez le QR code.','Vérifiez le nom de votre famille et le code de session affichés.','Gardez cette page ouverte pendant toute la partie.','Un seul terminal officiel est utilisé pour votre famille.'])instructions.append(node('li',t));c.append(instructions);
+     c.append(node('h3','Votre application'));
+     for(const [title,body] of [['Accueil','« Ma table » : votre situation et vos ressources.'],['Vote','« Votre décision politique » : POUR, CONTRE ou ABSTENTION, puis ajout d’Influence ou passage.'],['Négociation et finances','« Vos négociations » : envoyez une proposition, acceptez ou refusez une somme ; vos fonds sont dans « Vos ressources ».'],['Objectifs','Votre ambition secrète et ses paliers se trouvent sur « Ma table ».']])c.append(node('p',title+' — '+body));
+     c.append(node('p','Le porte-parole utilise l’interface officielle. Les autres membres de l’équipe peuvent librement négocier avec les autres familles.'));
+    }
     const link=node('a','Ouvrir le terminal de '+f.name);link.href=data.link;c.append(link);
     if(s.campaign)c.append(node('p',data.link,'small hotspring-text print-url'));
     c.append(node('p','Confidentiel. Accès valable 24 h après sa création. Régénérer un accès invalide le QR précédent.','small'));

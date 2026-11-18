@@ -73,4 +73,88 @@
  </aside>
  </div>
 </div><div id="notice" role="status" style="margin-top:18px"></div>
-</main><section id="printSheets" hidden aria-label="Feuilles à imprimer"></section><dialog id="finishDialog" aria-labelledby="finishHeading"><h2 id="finishHeading">Terminer définitivement la partie ?</h2><p id="finishDescription">Cette action clôturera les votes en cours et affichera le résultat final sur tous les écrans.</p><p>Les mises du vote interrompu seront rendues. Seules les décisions déjà résolues compteront pour la ville et les scores.</p><div class="row"><button id="cancelFinish" class="secondary">Annuler</button><button id="confirmFinish" class="danger">Terminer la partie</button></div></dialog></body></html>
+</main>
+<template id="hotspringQrReminder">
+ <section class="print-reminder">
+  <header>
+   <h3>LES COLONS DE HOTSPRING</h3>
+   <p><strong>Pense-bête de votre famille</strong></p>
+  </header>
+  <div class="print-reminder-columns">
+   <div>
+    <section>
+     <h4>Votre but</h4>
+     <p>Devenir <strong>la famille la plus influente de Hotspring</strong>.</p>
+     <p>À la fin de la partie, vous marquez des points grâce à :</p>
+     <ul>
+      <li>vos <strong>objectifs secrets</strong> accomplis ;</li>
+      <li>votre <strong>objectif de trajectoire</strong> ;</li>
+      <li>votre <strong>héritage final</strong>.</li>
+     </ul>
+     <p>Gardez vos objectifs confidentiels.</p>
+    </section>
+    <section>
+     <h4>Un dilemme en 5 étapes</h4>
+     <ol>
+      <li><strong>Le MJ présente la situation.</strong></li>
+      <li><strong>Les familles négocient librement.</strong></li>
+      <li><strong>Chaque famille choisit POUR, CONTRE ou ABSTENTION.</strong></li>
+      <li><strong>Les familles peuvent surenchérir avec de l’Influence.</strong></li>
+      <li><strong>Le camp ayant engagé le plus d’Influence l’emporte.</strong></li>
+     </ol>
+     <p>Les conséquences exactes sont révélées après le vote et modifient durablement Hotspring.</p>
+    </section>
+    <section>
+     <h4>L’Influence</h4>
+     <p>L’Influence représente votre poids politique.</p>
+     <ul>
+      <li>POUR ou CONTRE : engagez au moins <strong>1 Influence</strong>.</li>
+      <li>Votre camp devient définitif pour ce dilemme.</li>
+      <li>Aux tours suivants : <strong>ajoutez de l’Influence ou passez</strong>.</li>
+      <li>Un tour complet sans nouvelle mise termine le vote.</li>
+      <li>L’Influence du camp perdant est rendue.</li>
+      <li>L’Influence du camp gagnant rejoint la réserve commune.</li>
+     </ul>
+    </section>
+   </div>
+   <div>
+    <section>
+     <h4>L’abstention</h4>
+     <p>En vous abstenant, vous quittez définitivement le vote.</p>
+     <p>Vous êtes automatiquement passé lors des tours suivants.</p>
+     <p>Selon votre choix, vous pouvez :</p>
+     <ul>
+      <li>tenter de récupérer de l’Influence ;</li>
+      <li>ou revendiquer le rôle de Shérif.</li>
+     </ul>
+    </section>
+    <section>
+     <h4>Les dollars</h4>
+     <p>Les dollars servent à négocier.</p>
+     <p>Vous pouvez proposer de l’argent à une autre famille, qui peut accepter ou refuser.</p>
+     <p>Une promesse n’est pas automatiquement contraignante.</p>
+    </section>
+    <section>
+     <h4>Le Maire</h4>
+     <p>Le Maire joue en premier.</p>
+     <p>La famille ayant engagé la plus forte mise individuelle peut prendre la fonction de Maire.</p>
+    </section>
+    <section>
+     <h4>Le Shérif</h4>
+     <p>Le Shérif tranche :</p>
+     <ul>
+      <li>une égalité entre POUR et CONTRE ;</li>
+      <li>une égalité pour désigner le nouveau Maire.</li>
+     </ul>
+    </section>
+    <section class="print-reminder-close">
+     <h4>Rappel express</h4>
+     <p><strong>Écoutez. Négociez. Votez. Surenchérissez.</strong></p>
+     <p><strong>Accomplissez vos objectifs. Préservez vos dollars.</strong></p>
+     <p><strong>Construisez Hotspring. Défendez votre famille.</strong></p>
+    </section>
+   </div>
+  </div>
+ </section>
+</template>
+<section id="printSheets" hidden aria-label="Feuilles à imprimer"></section><dialog id="finishDialog" aria-labelledby="finishHeading"><h2 id="finishHeading">Terminer définitivement la partie ?</h2><p id="finishDescription">Cette action clôturera les votes en cours et affichera le résultat final sur tous les écrans.</p><p>Les mises du vote interrompu seront rendues. Seules les décisions déjà résolues compteront pour la ville et les scores.</p><div class="row"><button id="cancelFinish" class="secondary">Annuler</button><button id="confirmFinish" class="danger">Terminer la partie</button></div></dialog></body></html>

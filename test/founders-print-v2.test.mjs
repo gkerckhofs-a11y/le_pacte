@@ -39,7 +39,19 @@ for(const [count,campaign] of [[5,false],[6,false],[5,true]])test(`Fiches ${camp
   const url=new URL(link);assert.equal(url.searchParams.get('session'),created.id);assert.equal(url.searchParams.get('family'),f);
   const token=new URLSearchParams(url.hash.slice(1)).get('token');tokens.push(token);
   const terminal=await fetch(origin+'/api/founders/sessions/'+created.id,{headers:{Authorization:'Bearer '+token}}).then(r=>r.json());
-  if(campaign){assert.equal(terminal.privateCampaign.objectives.length,5);assert.ok(card.textContent.includes(link));}
+  if(campaign){
+   assert.equal(terminal.privateCampaign.objectives.length,5);assert.ok(card.textContent.includes(link));
+   const reminder=card.querySelector('.print-reminder');
+   assert.ok(reminder);assert.ok(card.querySelector('.print-qr').compareDocumentPosition(reminder)&4);
+   assert.equal(reminder.querySelector('ol').children.length,5);
+   assert.deepEqual([...reminder.querySelectorAll('h4')].map(h=>h.textContent),[
+    'Votre but','Un dilemme en 5 étapes','L’Influence','L’abstention','Les dollars','Le Maire','Le Shérif','Rappel express'
+   ]);
+   assert.match(reminder.textContent,/Gardez vos objectifs confidentiels/);
+   assert.doesNotMatch(reminder.textContent,/dollars.*(?:convertis en points|rapportent des points)/i);
+  }else{
+   assert.equal(card.querySelector('.print-reminder'),null);
+  }
   assert.equal(terminal.self.id,f);assert.equal(terminal.code,created.code);assert.ok(card.textContent.includes(terminal.self.name));assert.ok(card.textContent.includes('Gardez cette page ouverte'));
  }
  assert.equal(new Set(tokens).size,count);
