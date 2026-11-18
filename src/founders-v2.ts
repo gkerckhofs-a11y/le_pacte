@@ -1,6 +1,8 @@
 import {openFoundersDilemma,applyFoundersCityEffects,activeFounders} from './founders.ts';
 import {calculateFoundersFinal} from './founders-scoring.ts';
 import {isHybrid,chooseNarrativeNext,narrativeReserve,narrativeEpilogue} from './founders-progression.ts';
+import {isHotspring,hotspringOutcome,campaignNext,campaignCheckpoint,startCharter,campaignEpilogue,campaignResults} from './founders-hotspring.ts';
+import {hotspringScores} from './hotspring-scoring.ts';
 export const CITY_V2={economie:5,ecologie:5,securite:5,demographie:5};
 export const LABELS_V2={economie:'Économie',ecologie:'Écologie',securite:'Sécurité',demographie:'Démographie'};
 export const TIMING_V2={negotiationSeconds:480,voteSeconds:180,resolutionSeconds:20,autoAdvance:true};
@@ -22,30 +24,91 @@ export const GOALS_V2=Object.fromEntries([
 ].map(([id,title,description,indicator,direction,firstTarget,secondTarget])=>[id,{id:'F_'+id,title,description,indicator,direction,firstTarget,secondTarget}]));
 export function setPhaseClock(s,now){
  if(!isV2(s))return;
- const seconds=s.phase==='NEGOTIATION'?s.timing.negotiationSeconds:s.phase==='COUNCIL'?s.timing.voteSeconds:s.phase==='REVEALED'?s.timing.resolutionSeconds:null;
+ const reading=['INTRO','PRESENTATION'].includes(s.phase);
+ const seconds=reading?s.campaign.presentationSeconds:s.phase==='NEGOTIATION'?s.timing.negotiationSeconds:s.phase==='COUNCIL'?s.timing.voteSeconds:s.phase==='REVEALED'?s.timing.resolutionSeconds:null;
  s.clock={phase:s.phase,deadline:seconds===null?null:now+seconds*1000,remainingMs:seconds===null?null:seconds*1000,paused:false};
 }
 export function beginNegotiation(s,now){s.phase='NEGOTIATION';setPhaseClock(s,now);}
 export function beginVote(s,now){s.game=openFoundersDilemma(s.game,s.currentDilemmaId);s.phase='COUNCIL';setPhaseClock(s,now);}
 export function revealResolution(s,now){
  const result=s.game.history.at(-1);check(result?.id===s.currentDilemmaId,'Résultat du vote introuvable');
- const d=s.scenario.dilemmas.find(d=>d.id===s.currentDilemmaId),outcome=d.outcomes[result.winner],cityBefore=structuredClone(s.game.city);
+ const d=s.scenario.dilemmas.find(d=>d.id===s.currentDilemmaId),cityBefore=structuredClone(s.game.city);
+ const campaign=isHotspring(s),outcome=campaign?hotspringOutcome(s,d,result.winner):d.outcomes[result.winner];
  s.game=applyFoundersCityEffects(s.game,outcome.effects.map(e=>({resource:e.indicator,kind:e.operation,...(e.operation==='delta'?{amount:e.value}:{})})));
  for(const o of Object.values(s.offers))if(o.status==='pending')o.status='expired';
  s.lastReveal={id:d.id,title:d.title,winner:result.winner,yes:result.yes,no:result.no,narration:outcome.narration,effects:structuredClone(outcome.effects),cityBefore,cityAfter:structuredClone(s.game.city),nextId:outcome.next_id,...(outcome.chronicle?{chronicle:structuredClone(outcome.chronicle)}:{})};
+ if(campaign)Object.assign(s.lastReveal,{chapter:d.chapter,visual:outcome.visual});
  s.revealedHistory.push({...structuredClone(s.lastReveal),city:structuredClone(s.game.city)});s.phase='REVEALED';setPhaseClock(s,now);
 }
 export function finishV2(s,now){
  // Interrupting a council refunds all its bids; no unfinished decision affects city or score.
  if(s.game.vote){for(const id of activeFounders(s.game))s.game.families[id].power+=s.game.vote.bids[id]??0;s.game.vote=null;}
  for(const o of Object.values(s.offers))if(o.status==='pending')o.status='expired';
+ if(isHotspring(s)){
+  s.campaign.suspension=null;
+  s.phase='EPILOGUE';s.narrativeEnding=campaignEpilogue(s);setPhaseClock(s,now);return;
+ }
  s.phase='FINISHED';s.finalResults=calculateFoundersFinal(s);s.narrativeEnding=epilogueV2(s);setPhaseClock(s,now);
 }
 export function nextV2(s,now,requested){
+ if(isHotspring(s)){continueHotspring(s,now,requested);return;}
  const next=isHybrid(s.scenario)?chooseNarrativeNext(s,requested):s.lastReveal.nextId;
  if(next===null){finishV2(s,now);return;}
  check(s.revealedHistory.length<=s.scenario.dilemmas.length*3,'Nombre maximal de dilemmes atteint');
  s.currentDilemmaId=next;s.lastReveal=null;beginNegotiation(s,now);
+}
+
+export function continueHotspring(s,now,requested){
+ const c=s.campaign;
+ if(s.phase==='INTRO'){s.phase='PRESENTATION';setPhaseClock(s,now);return;}
+ if(s.phase==='PRESENTATION'){beginNegotiation(s,now);return;}
+ if(s.phase==='CHECKPOINT'){
+  c.publicRanking=null;c.interlude=null;
+  if(c.chapter===6)startCharter(s);
+  else {
+   c.chapter++;
+   s.currentDilemmaId=['D01','D04','D09','D15','D21','D29'][c.chapter-1];
+   s.lastReveal=null;s.phase='INTRO';
+  }
+  setPhaseClock(s,now);return;
+ }
+ check(s.phase==='REVEALED','Révélation ou checkpoint requis');
+ const next=campaignNext(s,requested);
+ if(next.end){finishV2(s,now);return;}
+ if(next.checkpoint){
+  campaignCheckpoint(s,now,()=>{
+   s.game=applyFoundersCityEffects(s.game,[{resource:'demographie',kind:'delta',amount:1}]);
+  });
+  s.phase='CHECKPOINT';
+ }else {
+  s.currentDilemmaId=next.id;s.lastReveal=null;s.phase='PRESENTATION';
+ }
+ setPhaseClock(s,now);
+}
+
+export function suspendHotspring(s,now){
+ check(!['READY','FINISHED','EPILOGUE','SUSPENDED'].includes(s.phase),'Fin de séance indisponible');
+ const c=s.campaign;
+ const clock=structuredClone(s.clock);
+ if(clock.deadline!==null)clock.remainingMs=Math.max(0,clock.deadline-now);
+ clock.deadline=null;
+ c.suspension={phase:s.phase,clock};
+ c.publicRanking=hotspringScores(s).rows.map(r=>({family:r.family,name:r.name,total:r.total,maximum:r.maximum}));
+ s.phase='SUSPENDED';setPhaseClock(s,now);
+}
+
+export function resumeHotspring(s,now){
+ const c=s.campaign,{phase,clock}=c.suspension;
+ s.phase=phase;s.clock=clock;
+ if(!clock.paused&&clock.remainingMs!==null)clock.deadline=now+clock.remainingMs;
+ c.suspension=null;c.crisesThisSitting=0;
+ if(phase!=='CHECKPOINT')c.publicRanking=null;
+}
+
+export function revealHotspringResults(s,now){
+ s.finalResults=campaignResults(s);
+ s.campaign.archivedAt=now;
+ s.phase='FINISHED';setPhaseClock(s,now);
 }
 const endText={
  economie:['Les commerces ferment et les échanges se raréfient.','Les affaires peinent à faire vivre la ville.','Les commerces maintiennent une activité régulière.','Les affaires prospèrent et les marchands affluent.','Hot Spring est devenue un carrefour commercial florissant.'],
@@ -65,7 +128,8 @@ export function epilogueV2(s){
 export function advanceNarrativeTime(input,now){
  if(!isV2(input)||input.clock?.paused||!input.timing.autoAdvance||!input.clock?.deadline||now<input.clock.deadline)return input;
  const s=structuredClone(input);
- if(s.phase==='NEGOTIATION')beginVote(s,now);
+ if(isHotspring(s)&&['INTRO','PRESENTATION'].includes(s.phase))continueHotspring(s,now);
+ else if(s.phase==='NEGOTIATION')beginVote(s,now);
  else if(s.phase==='REVEALED'){
   if(narrativeReserve(s)?.blocked)return input;
   nextV2(s,now);

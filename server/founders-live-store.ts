@@ -40,11 +40,11 @@ export class LocalNarrativeSessions{
     scenarioId:s.selection.scenarioId,scenarioVersion:s.selection.scenarioVersion,skinId:s.selection.skinId};
   });
  }
- create({ownerId,preview,code,title,objectives,names,colors,goalCards,scoreRules,timing,gaugeThresholds,now}){
+ create({ownerId,preview,code,title,objectives,names,colors,goalCards,scoreRules,timing,gaugeThresholds,crisisMode,presentationSeconds,now}){
   check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
   return this.transaction(()=>{
    const id=randomBytes(12).toString('hex');
-   const s=createNarrativeSession(preview,{id,ownerId,code,title,objectives,names,colors,goalCards,scoreRules,timing,gaugeThresholds,initiativeOrder:shuffle(activeFounders(preview.game)),now});
+   const s=createNarrativeSession(preview,{id,ownerId,code,title,objectives,names,colors,goalCards,scoreRules,timing,gaugeThresholds,crisisMode,presentationSeconds,initiativeOrder:shuffle(activeFounders(preview.game)),now});
    const access=activeFounders(s.game).map(family=>({family,token:randomBytes(32).toString('base64url')}));
    this.db.prepare('INSERT INTO founders_sessions(id,code,owner_id,state_json,updated) VALUES(?,?,?,?,?)')
     .run(id,code,ownerId,JSON.stringify(s),now);

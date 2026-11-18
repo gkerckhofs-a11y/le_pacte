@@ -146,7 +146,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
      const preview=await foundersPreviewFor(store,actor.id,d);
      const created=await store.narrative.create({
       ownerId:actor.id,preview,code:d.code,title:d.title,
-      objectives:d.objectives,names:d.names,colors:d.colors,goalCards:d.goalCards,scoreRules:d.scoreRules,timing:d.timing,gaugeThresholds:d.gaugeThresholds,now
+      objectives:d.objectives,names:d.names,colors:d.colors,goalCards:d.goalCards,scoreRules:d.scoreRules,timing:d.timing,gaugeThresholds:d.gaugeThresholds,crisisMode:d.crisisMode,presentationSeconds:d.presentationSeconds,now
      });
      json(201,created);return;
     }

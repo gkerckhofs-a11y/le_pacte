@@ -1,4 +1,5 @@
-import {isV2,GOALS_V2,TIMING_V2,validateTiming,validateThresholds,setPhaseClock,beginNegotiation,beginVote,revealResolution,nextV2,finishV2} from './founders-v2.ts';
+import {isV2,GOALS_V2,TIMING_V2,validateTiming,validateThresholds,setPhaseClock,beginNegotiation,beginVote,revealResolution,nextV2,finishV2,continueHotspring,suspendHotspring,resumeHotspring,revealHotspringResults} from './founders-v2.ts';
+import {isHotspring,createHotspringState,campaignDilemma,campaignFamily,campaignOrganizer,campaignPresentation,hotspringSupports,crisisCandidates} from './founders-hotspring.ts';
 import {DEFAULT_TEAM_COLORS,DEFAULT_TEAM_NAMES,teamColor} from '../public/founders-identity.js';
 import {isHybrid,narrativeReserve,chooseNarrativeNext,narrativeEpilogue} from './founders-progression.ts';
 /**
@@ -33,13 +34,20 @@ export const TEST_FAMILY_OBJECTIVES=Object.freeze([
   'Objectif de test : préserver l’autonomie des fondateurs en affaiblissant la Stabilité (voir les paliers de votre ambition).'
 ]);
 
-export function createNarrativeSession(preview,{id,ownerId,code,title,objectives=TEST_FAMILY_OBJECTIVES,names,colors=DEFAULT_TEAM_COLORS,goalCards=DEFAULT_GOAL_CARDS,scoreRules=DEFAULT_SCORE_RULES,initiativeOrder,timing=TIMING_V2,gaugeThresholds=[2,4,6,8],now=Date.now()}) {
+export function createNarrativeSession(preview,{id,ownerId,code,title,objectives=TEST_FAMILY_OBJECTIVES,names,colors=DEFAULT_TEAM_COLORS,goalCards=DEFAULT_GOAL_CARDS,scoreRules=DEFAULT_SCORE_RULES,initiativeOrder,timing=TIMING_V2,gaugeThresholds=[2,4,6,8],crisisMode,presentationSeconds,now=Date.now()}) {
  check(preview?.kind==='founders-session-preview-v2.3'&&preview.previewOnly===true,'Configuration narrative invalide');
  check(typeof id==='string'&&/^[a-f0-9]{24}$/.test(id),'Identifiant de session invalide');
  check(str(ownerId,128),'Organisateur requis');
  check(typeof code==='string'&&/^[A-Z0-9][A-Z0-9_-]{2,11}$/.test(code),'Code de session invalide');
  check(str(title,100),'Titre de partie invalide');
  const ids=activeFounders(preview.game),v2=preview.game.auctionMode==='continuous';
+ const families=preview.scenario.campaign?.families;
+ if(families){
+  check(ids.length===5,'Cinq familles requises pour Hotspring');
+  names??=Object.values(families).map(f=>f.name);
+  objectives=Object.values(families).map(f=>f.briefing);
+  goalCards=GOALS_V2;scoreRules=DEFAULT_SCORE_RULES;
+ }
  if(v2){
   if(goalCards===DEFAULT_GOAL_CARDS)goalCards=GOALS_V2;
   if(objectives===TEST_FAMILY_OBJECTIVES)objectives=ids.map(id=>goalCards[id].description);
@@ -67,6 +75,7 @@ export function createNarrativeSession(preview,{id,ownerId,code,title,objectives
   goals:Object.fromEntries(ids.map((id,i)=>[id,objectives[i]])),
   goalCards:copy(goalCards),scoreRules:copy(scoreRules),initiativeOrder:copy(initiativeOrder),finalResults:null,
   ...(v2?{experienceVersion:2,timing:validateTiming(timing),gaugeThresholds:validateThresholds(gaugeThresholds),clock:{phase:'READY',deadline:null,remainingMs:null,paused:false}}:{}),
+  ...(families?{campaign:createHotspringState(preview.game.city,crisisMode,presentationSeconds)}:{}),
   phase:'READY',currentDilemmaId:preview.scenario.scenario.entry_dilemma,
   lastReveal:null,revealedHistory:[],offers:{},revision:0,createdAt:now,updatedAt:now
  };
@@ -109,7 +118,8 @@ export function applyNarrativeCommand(input,actor,command,now){
  check(Number.isSafeInteger(now)&&now>=0,'Horodatage invalide');
  check(command&&typeof command.kind==='string','Commande invalide');
  const s=copy(input),data=command.data??{},kind=command.kind;
- check(!s.clock?.paused||['pause','resume','configureTiming','adjustTime','correctResource','finish'].includes(kind),'Partie en pause');
+ check(!s.clock?.paused||['pause','resume','configureTiming','adjustTime','correctResource','finish','endSitting'].includes(kind),'Partie en pause');
+ check(s.phase!=='SUSPENDED'||['resumeSitting','finish'].includes(kind),'Séance sauvegardée');
  const org=()=>check(actor.role==='organizer','Régie uniquement');
  const team=()=>check(actor.role==='team','Porte-parole uniquement');
  switch(kind){
@@ -127,7 +137,8 @@ export function applyNarrativeCommand(input,actor,command,now){
 
   case 'start':
    org();check(s.phase==='READY','La partie est déjà lancée');
-   if(isV2(s))beginNegotiation(s,now);else {s.game=openFoundersDilemma(s.game,s.currentDilemmaId);s.phase='COUNCIL';}break;
+   if(isHotspring(s)){s.phase='INTRO';setPhaseClock(s,now);}
+   else if(isV2(s))beginNegotiation(s,now);else {s.game=openFoundersDilemma(s.game,s.currentDilemmaId);s.phase='COUNCIL';}break;
   case 'vote':
    team();check(s.phase==='COUNCIL','Conseil fermé');
    {
@@ -168,6 +179,7 @@ export function applyNarrativeCommand(input,actor,command,now){
   }
   case 'next': {
    org();
+   if(isHotspring(s)){continueHotspring(s,now,data.dilemmaId);break;}
    if(isV2(s)){check(s.phase==='REVEALED','Résolution requise');nextV2(s,now,data.dilemmaId);break;}
   check(s.phase==='REVEALED','Révéler le résultat avant de poursuivre');
    const next=isHybrid(s.scenario)?chooseNarrativeNext(s,data.dilemmaId):s.lastReveal.nextId;
@@ -209,7 +221,12 @@ export function applyNarrativeCommand(input,actor,command,now){
   case 'beginVote':
    org();check(isV2(s)&&s.phase==='NEGOTIATION','Aucune négociation à clore');beginVote(s,now);break;
   case 'configureTiming':
-   org();check(isV2(s)&&s.phase!=='FINISHED','Chronos indisponibles');s.timing=validateTiming(data.timing);s.gaugeThresholds=validateThresholds(data.gaugeThresholds??s.gaugeThresholds);break;
+   org();check(isV2(s)&&s.phase!=='FINISHED','Chronos indisponibles');s.timing=validateTiming(data.timing);s.gaugeThresholds=validateThresholds(data.gaugeThresholds??s.gaugeThresholds);
+   if(isHotspring(s)&&data.presentationSeconds!==undefined){
+    check(Number.isInteger(data.presentationSeconds)&&data.presentationSeconds>=5&&data.presentationSeconds<=7200,'Lecture : de 5 à 7200 secondes');
+    s.campaign.presentationSeconds=data.presentationSeconds;
+   }
+   break;
   case 'pause':
    org();check(isV2(s)&&s.phase!=='FINISHED'&&!s.clock.paused,'Pause indisponible');
    s.clock.remainingMs=s.clock.deadline===null?null:Math.max(0,s.clock.deadline-now);s.clock.deadline=null;s.clock.paused=true;break;
@@ -228,7 +245,27 @@ export function applyNarrativeCommand(input,actor,command,now){
    f[data.resource]=data.value;break;
   }
   case 'finish':
-   org();check(isV2(s)&&s.phase!=='FINISHED'&&data.confirm===true,'Confirmation de fin de partie requise');finishV2(s,now);break;
+   org();check(isV2(s)&&!['FINISHED','EPILOGUE'].includes(s.phase)&&data.confirm===true,'Confirmation de fin de partie requise');
+   if(isHotspring(s)&&s.phase==='CHECKPOINT'&&s.campaign.chapter>=5)continueHotspring(s,now);
+   else finishV2(s,now);
+   break;
+  case 'endSitting':
+   org();check(isHotspring(s),'Campagne Hotspring requise');suspendHotspring(s,now);break;
+  case 'resumeSitting':
+   org();check(isHotspring(s)&&s.phase==='SUSPENDED','Aucune séance à reprendre');resumeHotspring(s,now);break;
+  case 'resumeCrises': {
+   org();check(isHotspring(s)&&s.phase==='CHECKPOINT'&&s.campaign.chapter===5,'Checkpoint des crises requis');
+   const candidates=crisisCandidates(s).filter(c=>c.available).sort((a,b)=>b.risk-a.risk||a.id.localeCompare(b.id));
+   check(candidates.length,'Aucune crise en attente');
+   s.campaign.crisesThisSitting=0;s.campaign.publicRanking=null;s.campaign.interlude=null;
+   s.currentDilemmaId=candidates[0].id;s.lastReveal=null;s.phase='PRESENTATION';setPhaseClock(s,now);break;
+  }
+  case 'supportCharter':
+   team();check(isHotspring(s),'Campagne Hotspring requise');
+   if(hotspringSupports(s,actor.family,data.charter))beginNegotiation(s,now);
+   break;
+  case 'showResults':
+   org();check(isHotspring(s)&&s.phase==='EPILOGUE','Épilogue requis');revealHotspringResults(s,now);break;
   default:throw new Error('Commande narrative inconnue');
  }
  s.revision++;s.updatedAt=now;
@@ -238,9 +275,11 @@ export function applyNarrativeCommand(input,actor,command,now){
 function publicDilemma(s){
  if(s.phase==='READY'||s.phase==='FINISHED')return null;
  const d=dilemma(s);
+ const campaign=isHotspring(s)?campaignDilemma(s,d):null;
+ if(isHotspring(s)&&!campaign)return null;
  return {id:d.id,chapter:d.chapter,title:d.title,public_text:d.public_text,
   ...(isHybrid(s.scenario)?{sequence:s.revealedHistory.length+(s.phase==='REVEALED'?0:1)}:{}),
-  vote_question:d.vote_question,labels:copy(d.labels),image:copy(d.image)};
+  vote_question:d.vote_question,labels:copy(d.labels),image:copy(d.image),...campaign};
 }
 export function narrativePublicView(s){
  check(s?.kind==='founders-live-session-v2.5','Partie inconnue');
@@ -249,6 +288,7 @@ export function narrativePublicView(s){
  return {
   kind:s.kind,id:s.id,code:s.code,title:s.title,phase:s.phase,revision:s.revision,
   ...(isV2(s)?{experienceVersion:2,timing:copy(s.timing),clock:copy(s.clock),gaugeThresholds:copy(s.gaugeThresholds)}:{}),
+  ...(isHotspring(s)?{campaign:campaignPresentation(s)}:{}),
   story:{id:s.scenario.scenario.id,title:s.scenario.scenario.title,location:s.scenario.scenario.location,year:s.scenario.scenario.year},
   skin:{id:s.skin.id,title:s.skin.title,labels:copy(s.skin.labels),theme:copy(s.skin.theme),publicScene:copy(s.skin.publicScene)},
   city:copy(s.game.city),families:activeFounders(s.game).map((id,i)=>({id,name:s.names[id],color:copy(teamColor(s.colors?.[id]??DEFAULT_TEAM_COLORS[i])),members:s.game.families[id].members})),
@@ -258,15 +298,15 @@ export function narrativePublicView(s){
     pendingLeaderChoices:v.pendingLeaderChoices?copy(v.pendingLeaderChoices):[]}:
     {phase:resolved?'revealed':s.phase==='AWAITING_REVEAL'?'closed':'inactive',turn:null,bids:resolved?copy(resolved.bids):{},choices:resolved?copy(resolved.choices):{},pendingLeaderChoices:[]},
   reveal:s.phase==='REVEALED'||s.phase==='FINISHED'?copy(s.lastReveal):null,
-  narrativeEnding:s.phase==='FINISHED'?copy(s.narrativeEnding??null):null,
+  narrativeEnding:['EPILOGUE','FINISHED'].includes(s.phase)?copy(s.narrativeEnding??null):null,
   // Enrich only already revealed chapters. Never send the other outcome.
   // Resolve illustrations from the frozen scenario, including older sessions
   // whose stored history predates the illustrated chronicle.
   history:s.revealedHistory.map(h=>{
    const d=s.scenario.dilemmas.find(d=>d.id===h.id);
    const c=h.chronicle??d?.outcomes?.[h.winner]?.chronicle;
-   return {...copy(h),...(c?{chronicle:copy(c)}:{}),image:c?.image?copy(c.image):d?copy(d.image):null,
-    decisionLabel:d?.labels?.[h.winner]??h.winner};
+   return {...copy(h),...(c?{chronicle:copy(c)}:{}),image:h.visual??(c?.image?copy(c.image):d?copy(d.image):null),
+    decisionLabel:h.id==='D30'&&isHotspring(s)?c.title:d?.labels?.[h.winner]??h.winner};
   }),
   finalTieOrder:copy(s.initiativeOrder??activeFounders(s.game)),
   finalResults:s.phase==='FINISHED'?copy(s.finalResults):null
@@ -284,10 +324,12 @@ export function narrativeFamilyView(s,family){
   mayVote:!s.clock?.paused&&s.phase==='COUNCIL'&&v?.phase==='voting'&&v?.turn===family,
   mayResolve:!s.clock?.paused&&s.phase==='COUNCIL'&&v?.phase==='await_moderator'&&s.game.moderator===family,
   mayChooseLeader:!s.clock?.paused&&s.phase==='COUNCIL'&&v?.phase==='await_leader'&&s.game.moderator===family},
-  goalCard:copy(card),goalProgress:progress,offers,voteCommitment:acceptedVoteCommitment(s,family)};
+  ...(isHotspring(s)?{privateCampaign:campaignFamily(s,family)}:{goalCard:copy(card),goalProgress:progress}),
+  offers,voteCommitment:acceptedVoteCommitment(s,family)};
 }
 export function narrativeOrganizerView(s){
  return {...narrativePublicView(s),familyGoals:copy(s.goals),familyResources:copy(s.game.families),
+  ...(isHotspring(s)?{campaignAdmin:campaignOrganizer(s),privateFamilies:Object.fromEntries(activeFounders(s.game).map(id=>[id,campaignFamily(s,id)]))}:{}),
   progression:s.phase==='REVEALED'?narrativeReserve(s):null,
   source:copy(s.source),selection:copy(s.selection),offers:copy(s.offers),
   goalCards:copy(s.goalCards??DEFAULT_GOAL_CARDS),scoreRules:copy(s.scoreRules??DEFAULT_SCORE_RULES),initiativeOrder:copy(s.initiativeOrder??activeFounders(s.game)),
