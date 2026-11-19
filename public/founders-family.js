@@ -128,7 +128,7 @@ function render(data){
   set('personalScoreBreakdown',score.total+'/'+score.maximum+' · '+campaignScoreText(score));
  }else if(data.finalResults){
   const r=data.finalResults.ranking.find(item=>item.family===self.id);
-  set('personalResultText',r.rank===1?'Votre famille remporte Le Pacte !':'Classement : '+r.rank+' / '+data.families.length+'. Vainqueur : '+teamLabel(data,data.finalResults.ranking[0].family));
+  set('personalResultText',r.rank===1?'Votre famille remporte la partie !':'Classement : '+r.rank+' / '+data.families.length+'. Vainqueur : '+teamLabel(data,data.finalResults.ranking[0].family));
   set('personalScoreBreakdown','Objectif secret '+r.score.secret+' · '+data.skin.labels.currency+' '+r.score.wealth+
       ' · Votes '+r.score.council+' · Influence '+r.score.influence+' = '+r.score.total+' points');
  }

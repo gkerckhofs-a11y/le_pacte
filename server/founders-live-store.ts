@@ -10,7 +10,8 @@ export class LocalNarrativeSessions{
  constructor(db){
   this.db=db;
   db.exec('CREATE TABLE IF NOT EXISTS founders_configurations(id TEXT PRIMARY KEY,owner_id TEXT NOT NULL,data_json TEXT NOT NULL,updated INTEGER NOT NULL)');
-  db.exec('CREATE TABLE IF NOT EXISTS founders_sessions(id TEXT PRIMARY KEY,code TEXT UNIQUE NOT NULL,owner_id TEXT NOT NULL,state_json TEXT NOT NULL,updated INTEGER NOT NULL); CREATE TABLE IF NOT EXISTS founders_access(session_id TEXT NOT NULL,family TEXT NOT NULL,hash TEXT NOT NULL UNIQUE,expires INTEGER NOT NULL,PRIMARY KEY(session_id,family));');
+  db.exec('CREATE TABLE IF NOT EXISTS founders_sessions(id TEXT PRIMARY KEY,code TEXT UNIQUE NOT NULL,owner_id TEXT NOT NULL,state_json TEXT NOT NULL,updated INTEGER NOT NULL,archived_at INTEGER); CREATE TABLE IF NOT EXISTS founders_access(session_id TEXT NOT NULL,family TEXT NOT NULL,hash TEXT NOT NULL UNIQUE,expires INTEGER NOT NULL,PRIMARY KEY(session_id,family));');
+  if(!db.prepare('PRAGMA table_info(founders_sessions)').all().some(column=>column.name==='archived_at'))db.exec('ALTER TABLE founders_sessions ADD COLUMN archived_at INTEGER');
  }
  listConfigurations(ownerId){
   check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
@@ -29,17 +30,22 @@ export class LocalNarrativeSessions{
  }
  get(id){
   check(typeof id==='string'&&/^[a-f0-9]{24}$/.test(id),'Partie introuvable');
-  const row=this.db.prepare('SELECT state_json FROM founders_sessions WHERE id=?').get(id);
-  check(row,'Partie introuvable');return JSON.parse(row.state_json);
+  const row=this.db.prepare('SELECT state_json FROM founders_sessions WHERE id=? AND archived_at IS NULL').get(id);
+  check(row,'Partie introuvable ou archivée');return JSON.parse(row.state_json);
  }
  list(ownerId){
   check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
-  return this.db.prepare('SELECT id,code,state_json FROM founders_sessions WHERE owner_id=? ORDER BY updated DESC LIMIT 100').all(ownerId).map(row=>{
+  return this.db.prepare('SELECT id,code,state_json FROM founders_sessions WHERE owner_id=? AND archived_at IS NULL ORDER BY updated DESC LIMIT 100').all(ownerId).map(row=>{
    const s=JSON.parse(row.state_json);
    return{id:s.id,code:s.code,title:s.title,phase:s.phase,revision:s.revision,
     scenarioId:s.selection.scenarioId,scenarioVersion:s.selection.scenarioVersion,skinId:s.selection.skinId};
   });
  }
+ archiveAll(ownerId,now){
+  check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
+  return this.db.prepare("UPDATE founders_sessions SET archived_at=? WHERE owner_id=? AND archived_at IS NULL AND json_extract(state_json,'$.createdAt')<=?").run(now,ownerId,now).changes;
+ }
+
  create({ownerId,preview,code,title,objectives,names,colors,goalCards,scoreRules,timing,gaugeThresholds,crisisMode,presentationSeconds,now}){
   check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
   return this.transaction(()=>{

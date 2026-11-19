@@ -1,10 +1,10 @@
 <!doctype html><html lang="fr">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Le Pacte des Fondateurs — Régie narrative</title><link rel="stylesheet" href="/founders-live.css"><link rel="stylesheet" href="/hotspring.css">
+<title>Games of Influence · Régie organisateur</title><link rel="stylesheet" href="/founders-live.css"><link rel="stylesheet" href="/hotspring.css">
 <script type="module" src="/founders-regie.js"></script></head>
 <body class="regie-dashboard" data-skin="western">
 <header class="top">
-<div><div class="eyebrow">Ludificateur · Le Pacte</div><h1>Régie narrative</h1></div>
+<div><div class="eyebrow">Le Ludificateur · Games of Influence</div><h1>Régie organisateur</h1></div>
 <div class="row"><button id="chooseSession" type="button" class="secondary" hidden>Mes parties</button><a href="/founders-setup.html">Créer une autre partie</a><span id="phase" class="chip">Connexion en cours…</span></div>
 </header><div id="phaseClock" class="phase-clock" role="timer" hidden></div><main class="page">
 <ol class="regie-steps" aria-label="Étapes de la régie"><li id="step1" aria-current="step"><b>1</b> Connexion organisateur</li><li id="step2"><b>2</b> Préparer et lancer</li><li id="step3"><b>3</b> Animer le Conseil</li></ol>
@@ -16,7 +16,17 @@
  <p id="loginMessage" class="regie-message" role="status" aria-live="polite"></p>
 </div>
 <div id="accountPanel" class="regie-account" hidden><span id="signedInAs"></span><button id="changeAccount" class="secondary" type="button">Changer de compte Google</button></div>
-<section id="sessionPicker" class="panel" hidden><h2>Retrouvez votre partie</h2><p>Ouvrez la régie de la partie que vous voulez animer.</p><div id="sessionsList"></div></section>
+<section id="sessionPicker" class="panel" hidden>
+ <h2>Mes parties</h2>
+ <div id="sessionsList"></div>
+ <button id="archiveSessions" class="secondary" type="button" hidden>Archiver les anciennes parties</button>
+ <p id="archiveMessage" class="small" role="status"></p>
+</section>
+<dialog id="archiveDialog" aria-labelledby="archiveHeading">
+ <h2 id="archiveHeading">Archiver toutes vos parties actuelles ?</h2>
+ <p>Elles disparaîtront de la liste et leurs liens de jeu cesseront de fonctionner. L’historique reste conservé et vos configurations restent disponibles.</p>
+ <div class="row"><button id="cancelArchive" class="secondary" type="button" autofocus>Annuler</button><button id="confirmArchive" class="danger" type="button">Archiver mes parties</button></div>
+</dialog>
 <div id="regieContent" hidden>
  <p id="monitorConnection" class="small" role="status"></p>
  <section class="panel regie-animation" aria-label="Commandes d’animation">

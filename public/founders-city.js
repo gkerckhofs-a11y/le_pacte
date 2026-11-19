@@ -96,7 +96,7 @@ function render(s){
  renderPhaseClock($('phaseClock'),s);
  $('phase').hidden=!$('phaseClock').hidden;
  const totals=voteTotals(s);
- applySkin(document.body,s.skin);document.body.classList.toggle('campaign-hotspring',Boolean(s.campaign));text('universeTitle',s.campaign?s.story.title:'Le Pacte · '+s.skin.title);
+ applySkin(document.body,s.skin);document.body.classList.toggle('campaign-hotspring',Boolean(s.campaign));text('universeTitle',s.campaign?s.story.title:'Games of Influence · '+s.skin.title);
  text('pageTitle',s.story.location+' · '+s.story.year);text('phase',(pretty[s.phase]||s.phase)+(manual&&s.clock?.paused?' · Pause':''));
  text('chapter',s.dilemma?(s.dilemma.sequence?'Conseil '+s.dilemma.sequence:'Chapitre '+s.dilemma.chapter):'Le Conseil des Fondateurs');
  const sceneOnly=s.campaign&&['INTRO','CHECKPOINT','SUSPENDED','CHARTER_SUPPORT','EPILOGUE','FINISHED'].includes(s.phase);

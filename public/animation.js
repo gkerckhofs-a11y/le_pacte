@@ -7,5 +7,5 @@ export function revealReport(reveal,edition,escape){
 }
 export function accessCards(cards,edition,title,code,escape){
  if(!cards.length)return '';
- return `<div class="print-heading"><h2>${escape(title)}</h2><p>${escape(code)} · Six accès privés d’équipe</p></div><div class="access-cards-grid">${cards.map(card=>`<article class="access-card"><p class="eyebrow">LE PACTE · ÉQUIPE ${card.number}</p><h3>${escape(edition.factionLabels[card.team])}</h3><div class="card-qr">${card.svg}</div><p><b>${escape(code)}</b> · ${escape(title)}</p><small>Scannez pour rejoindre votre équipe.<br>Accès privé : ne pas projeter ni partager avec une autre équipe.</small></article>`).join('')}</div>`;
+ return `<div class="print-heading"><h2>${escape(title)}</h2><p>${escape(code)} · Six accès privés d’équipe</p></div><div class="access-cards-grid">${cards.map(card=>`<article class="access-card"><p class="eyebrow">GAMES OF INFLUENCE · ÉQUIPE ${card.number}</p><h3>${escape(edition.factionLabels[card.team])}</h3><div class="card-qr">${card.svg}</div><p><b>${escape(code)}</b> · ${escape(title)}</p><small>Scannez pour rejoindre votre équipe.<br>Accès privé : ne pas projeter ni partager avec une autre équipe.</small></article>`).join('')}</div>`;
 }

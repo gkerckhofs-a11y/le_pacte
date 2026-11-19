@@ -20,6 +20,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
  for(const name of ['pacte-entry','founders-workspace','founders-live-ui','founders-print','founders-council-monitor','founders-vote-progress','founders-role-badges','founders-chronicle','founders-agreements','founders-fullscreen','founders-hotspring','hotspring-panorama','hotspring-rules'])staticFiles['/'+name+'.js']=[name+'.js','text/javascript; charset=utf-8'];
  staticFiles['/hotspring.css']=['hotspring.css','text/css; charset=utf-8'];
  staticFiles['/territorial.html']=['territorial.html','text/html; charset=utf-8'];
+ staticFiles['/regie']=staticFiles['/founders-regie.html'];
  for(let i=1;i<=10;i++){const path='/assets/western/dilemmas/d'+String(i).padStart(2,'0')+'.jpg';staticFiles[path]=[path.slice(1),'image/jpeg'];}
  for(const name of ['reference',...['economie','securite','satisfaction','bien_etre','developpement','stabilite'].flatMap(k=>[k+'-low',k+'-high'])]){
   const path='/assets/western/painted/'+name+'.jpg';staticFiles[path]=[path.slice(1),'image/jpeg'];
@@ -157,6 +158,11 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
      });
      json(201,created);return;
     }
+   }
+   if(path==='/api/founders/sessions/archive'&&req.method==='POST'){
+    const actor=await requireOrg(req);
+    if(!store.narrative)throw new Error('Parties narratives non disponibles');
+    json(200,{archived:await store.narrative.archiveAll(actor.id,now)});return;
    }
    const narrativeMatch=path.match(/^\/api\/founders\/sessions\/([a-f0-9]{24})(?:\/(commands|access|variant)(?:\/([A-F]))?)?$/);
    if(narrativeMatch){

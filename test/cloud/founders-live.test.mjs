@@ -65,3 +65,26 @@ test('Firestore : calibrage personnalisé immuable dans la partie et conservatio
  assert.equal(total,73);
  assert.equal(game.powerSupply,73);
 });
+
+test('Firestore : l’archivage retire les anciennes parties du compte et conserve les données',async()=>{
+ const now=Date.now();
+ const ownerId='archive-'+randomBytes(8).toString('hex');
+ const preview=foundersPreview({scenarioId:'fondateurs-hot-spring-demo',skinId:'western'});
+ const create=(owner,createdAt)=>sessions.create({ownerId:owner,preview,code:'A'+randomBytes(4).toString('hex').toUpperCase(),title:'Archivage',now:createdAt});
+ const old=await create(ownerId,now),other=await create(ownerId+'-other',now);
+ const newSession=await create(ownerId,now+2000);
+ const existingArchive=await create(ownerId,now-100);
+ await sessions.ref(existingArchive.id).update({archivedAt:now-50,clockDue:null});
+ await sessions.ref(old.id).update({clockDue:now+3000});
+ const before=(await sessions.ref(old.id).get()).data().stateJson;
+ assert.equal(await sessions.archiveAll(ownerId,now+1000),1);
+ assert.deepEqual((await sessions.list(ownerId)).map(s=>s.id),[newSession.id]);
+ const stored=(await sessions.ref(old.id).get()).data();
+ assert.equal(stored.stateJson,before);
+ assert.equal(stored.clockDue,null);
+ assert.equal(stored.archivedAt,now+1000);
+ assert.equal((await sessions.ref(existingArchive.id).get()).data().archivedAt,now-50);
+ await assert.rejects(sessions.view(old.id,{role:'public'},now+1000),/archivée/);
+ assert.equal((await sessions.view(other.id,{role:'public'},now+1000)).id,other.id);
+ assert.equal(await sessions.archiveAll(ownerId,now+1000),0);
+});
