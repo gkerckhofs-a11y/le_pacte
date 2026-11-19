@@ -295,8 +295,9 @@ html:fullscreen{overflow-y:auto;background:#15191b}
 .print-card h2{font-size:23pt;margin:4mm 0}.print-card h3{font-size:14pt}.print-card p{margin:3mm 0}
 .print-card .small,.print-kicker{font-size:9pt}.print-kicker{letter-spacing:.06em}.print-qr{background:#fff;width:58mm;height:58mm;margin:5mm auto}
 .print-qr svg{display:block;width:100%;height:100%}.print-reference{text-align:center;font-weight:700}
-.print-hotspring{padding:4mm;color-scheme:light;font-size:12pt;line-height:1.19}
-.print-hotspring h2{font-size:19pt;line-height:1.12;margin:1.5mm 0}
+.print-hotspring{padding:4mm;color-scheme:light;font-size:12.5pt;line-height:1.15}
+.print-hotspring h2{font-size:20pt;line-height:1.12;margin:1.5mm 0}
+.print-hotspring.print-long-name h2{font-size:18pt}
 .print-hotspring p{margin:1.25mm 0;line-height:inherit}
 .print-hotspring-access{display:grid;grid-template-columns:minmax(0,1fr) 40mm;align-items:center;gap:5mm}
 .print-hotspring-access>div:first-child{overflow-wrap:anywhere}
@@ -306,20 +307,46 @@ html:fullscreen{overflow-y:auto;background:#15191b}
 .print-reminder{margin-top:3.5mm;padding-top:2mm;border-top:1px solid #555}
 .print-reminder-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:5mm}
 .print-reminder-columns section+section{margin-top:3mm}
-.print-reminder h4{font-size:13pt;margin:0 0 1mm}
+.print-reminder h4{font-size:14pt;margin:0 0 1mm}
 .print-reminder :is(ol,ul){margin:1mm 0;padding-left:5mm}
 .print-reminder li+li{margin-top:.25mm}
 .print-reminder-close{
  display:grid;grid-template-columns:auto minmax(0,1fr);gap:3mm;align-items:center;
  border-top:1px solid #777;padding-top:1.5mm;margin-top:3mm;
 }
+/* Standard playing cards with an individual cut line. */
+.role-sheet{display:grid;grid-template-columns:repeat(3,63mm);grid-auto-rows:88mm;gap:2mm;justify-content:center;align-content:start}
+.role-card{
+ display:flex;flex-direction:column;gap:1.5mm;min-width:0;padding:3.5mm;
+ border:.3mm solid #72583e;color:#281c12;background:#f7efdf;color-scheme:light;
+ font:10.25pt/1.22 system-ui,sans-serif;break-inside:avoid;print-color-adjust:exact;-webkit-print-color-adjust:exact
+}
+.role-card p{margin:0;line-height:inherit}
+.role-card .role-card-story{
+ font:700 7.5pt/1.2 Georgia,serif;letter-spacing:.055em;text-transform:uppercase;
+ color:#5e442d;overflow-wrap:anywhere
+}
+.role-card h2{margin:0;color:#382317;font:700 17pt/1.05 Georgia,serif}
+.role-card-art{display:block;width:100%;height:26mm;object-fit:cover;border:.25mm solid #987957;flex-shrink:0}
+.role-card-long-name{gap:1mm}
+.role-card-long-name .role-card-art{height:20mm}
+.role-card .role-card-family{
+ margin-top:auto;padding-top:1.5mm;border-top:.3mm solid var(--role-ink);color:var(--role-ink);
+ font-weight:700;font-size:9pt;line-height:1.12;overflow-wrap:anywhere
+}
 @media print{
- @page{size:A4 portrait;margin:8mm}
+ @page{size:A4 portrait;margin:7mm}
+ :root{color-scheme:light;background:#fff}
+ body.printing-roles{background:#fff!important;color:#111!important}
+ body.printing-roles>*:not(#roleSheets){display:none!important}
+ body.printing-roles #roleSheets{display:block!important}
+ body.printing-roles .role-sheet{padding-top:5mm;break-after:page;page-break-after:always}
+ body.printing-roles .role-sheet:last-child{break-after:auto;page-break-after:auto}
  body.printing-kit{background:#fff!important;color:#111!important}
  body.printing-kit>*:not(#printSheets){display:none!important}
  body.printing-kit #printSheets{display:block!important;width:100%;max-width:none;margin:0}
  body.printing-kit .print-card{min-height:265mm;margin:0;break-after:page;page-break-after:always;border-color:#333!important;box-sizing:border-box}
- body.printing-kit .print-hotspring{min-height:280mm;display:flex;flex-direction:column}
+ body.printing-kit .print-hotspring{min-height:282mm;display:flex;flex-direction:column}
  body.printing-kit .print-reminder{display:flex;flex:1;flex-direction:column}
  body.printing-kit .print-reminder-close{margin-top:auto}
  body.printing-kit .print-preview-link{display:none}

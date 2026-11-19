@@ -1,4 +1,4 @@
-import {teamCaption} from './founders-identity.js';
+import {TEAM_INKS,teamCaption} from './founders-identity.js';
 import {createHotspringRules} from './hotspring-rules.js';
 const $=id=>document.getElementById(id);
 const node=(tag,text,className)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;};
@@ -21,35 +21,52 @@ export function mountPrintKit({session,view,request,renew}){
   if(title)c.append(node('h3',title));
   root.append(c);return c;
  }
- function print(){if(!$('printSheets').childElementCount)return;document.body.classList.add('printing-kit');window.print();}
- window.addEventListener('afterprint',()=>document.body.classList.remove('printing-kit'));
- $('printFamilyCards').addEventListener('click',()=>{
-  const s=view();if(!s)return;const root=shell();
-  for(const f of s.families){
-   const c=card(root,f,'Ambition secrète · confidentiel');
-   if(s.privateFamilies?.[f.id]){
-    const family=s.privateFamilies[f.id];
-    c.append(node('p',family.role),node('p',family.briefing),node('p',family.trajectory));
-    const list=node('ol');for(const goal of family.objectives)list.append(node('li',goal));
-    c.append(list,node('p','Jusqu’à 18 points : 10 de chapitre, 2 de trajectoire, 3 d’héritage et 3 pour la fortune finale.'));
-    continue;
-   }
-   const goal=s.goalCards[f.id];
-   c.append(node('h3',goal.title),node('p',s.familyGoals[f.id]));
-   if(goal.description!==s.familyGoals[f.id])c.append(node('p',goal.description));
-   const label=s.skin.labels.resources[goal.indicator]||goal.indicator;
-   const direction=goal.direction==='at_most'?'au plus':'au moins';
-   c.append(node('p',label+' : '+direction+' '+goal.firstTarget+'/10 → '+s.scoreRules.secretFirst+' points ; '+direction+' '+goal.secondTarget+'/10 → '+s.scoreRules.secretSecond+' points. Les deux paliers se cumulent.'));
-  }print();
- });
- $('printRoleCards').addEventListener('click',()=>{
-  const s=view();if(!s)return;const root=shell();
+ function print(root=$('printSheets'),className='printing-kit'){
+  if(!root.childElementCount)return;
+  document.body.classList.remove('printing-kit','printing-roles');
+  document.body.classList.add(className);
+  window.print();
+ }
+ window.addEventListener('afterprint',()=>document.body.classList.remove('printing-kit','printing-roles'));
+ const roles=[
+  {title:'Porte-parole',art:'results/d29_result_against_conseil_des_fondateurs.webp',
+   duties:['Écoutez votre famille et ses diplomates. Consultez vos objectifs secrets.','Utilisez le QR de votre équipe pour saisir ses votes et confirmer ses accords.']},
+  {title:'Diplomate',art:'headers/d06_header_le_saloon_de_main_street.webp',
+   duties:['Négociez avec les autres familles et nouez des alliances.','Rapportez leurs offres à votre équipe. Le porte-parole saisit les accords et les votes.']}
+ ];
+ function roleCard(s,f,role){
+  const c=node('article',undefined,'role-card');
+  if(f.name.length>48)c.classList.add('role-card-long-name');
+  c.style.setProperty('--role-ink',TEAM_INKS[f.color.id]??'#433023');
+  c.append(node('p',s.story.title,'role-card-story'),node('h2',role.title));
+  if(s.campaign){
+   const art=node('img',undefined,'role-card-art');
+   art.src='/assets/hotspring/v1/'+role.art;art.alt='';
+   c.append(art);
+  }
+  for(const duty of role.duties)c.append(node('p',duty,'role-card-duty'));
+  c.append(node('p',teamCaption(f),'role-card-family'));
+  return c;
+ }
+ $('printRoleCards').addEventListener('click',async()=>{
+  const s=view(),button=$('printRoleCards'),status=$('rolePrintStatus');
+  if(!s||preparing||button.disabled)return;
   const count=Number($('diplomatCopies').value);
-  if(!Number.isInteger(count)||count<1||count>30){$('printStatus').textContent='Choisissez de 1 à 30 cartes Diplomate par famille.';return;}
-  for(const f of s.families){
-   card(root,f,'Porte-parole').append(node('p','Vous détenez l’unique accès web de votre famille. Consultez votre ambition secrète, écoutez vos partenaires et saisissez les décisions de votre famille lorsque vient son tour.'));
-   for(let i=0;i<count;i++)card(root,f,'Diplomate').append(node('p','Négociez avec les autres familles. Rapportez leurs propositions à votre famille et préparez vos alliances. Vous jouez sans accès web ; les accords payés sont confirmés par les porte-paroles.'));
-  }print();
+  if(!Number.isInteger(count)||count<1||count>30){status.textContent='Choisissez de 1 à 30 cartes Diplomate par famille.';return;}
+  const root=$('roleSheets');
+  button.disabled=true;status.textContent='Préparation des planches…';root.replaceChildren();
+  try{
+   const cards=s.families.flatMap(f=>[roleCard(s,f,roles[0]),...Array.from({length:count},()=>roleCard(s,f,roles[1]))]);
+   for(let i=0;i<cards.length;i+=9){
+    const page=node('section',undefined,'role-sheet');
+    page.append(...cards.slice(i,i+9));root.append(page);
+   }
+   await Promise.all([...root.querySelectorAll('img')].map(img=>img.decode()));
+   if(!view()||fingerprint(view())!==fingerprint(s))throw new Error('Les équipes ont changé. Préparez les planches à nouveau.');
+   status.textContent=cards.length+' cartes sur '+root.childElementCount+' planche'+(root.childElementCount===1?'':'s')+' A4.';
+   print(root,'printing-roles');
+  }catch(error){root.replaceChildren();status.textContent='Impression des rôles indisponible. '+error.message;}
+  finally{button.disabled=false;}
  });
  function checked(data,f,token,s){
   if(data.session!==session||data.family!==f.id||data.name!==f.name||data.code!==s.code)throw new Error('Identité du terminal incohérente pour '+teamCaption(f));
@@ -59,7 +76,7 @@ export function mountPrintKit({session,view,request,renew}){
  }
  const verify=(s,f,token)=>request('/api/founders/access-qr',{session,family:f.id,token,origin:location.origin}).then(data=>checked(data,f,token,s));
  async function prepareQR(){
-  if(preparing)return;const s=view();if(!s)return;preparing=true;
+  if(preparing||$('printRoleCards').disabled)return;const s=view();if(!s)return;preparing=true;
   const root=shell(),stamp=fingerprint(s),cards=[];$('prepareQR').disabled=true;
   $('printStatus').textContent='Vérification de chaque terminal et préparation des fiches…';
   try{
@@ -83,9 +100,10 @@ export function mountPrintKit({session,view,request,renew}){
     image.append(document.importNode(svg,true));
     if(s.campaign){
      c.classList.add('print-hotspring');
+     if(f.name.length>48)c.classList.add('print-long-name');
      const access=node('header',undefined,'print-hotspring-access'),identity=node('div');
      c.querySelector('.print-kicker').textContent=s.story.title;
-     identity.append(...c.children,node('p','Porte-parole, scannez le QR. Gardez cette page ouverte pendant la partie.','print-scan'),node('p','Ce QR est réservé à votre équipe.','print-scan'));
+     identity.append(...c.children,node('p','Porte-parole, scannez le QR de votre équipe. Gardez cette page ouverte pendant la partie.','print-scan'));
      access.append(identity,image);
      c.append(access,createHotspringRules({print:true,manual:s.campaign.version>=3}));
     }else{
@@ -106,7 +124,7 @@ export function mountPrintKit({session,view,request,renew}){
  }
  $('prepareQR').addEventListener('click',prepareQR);
  async function printVerified(){
-  if(!prepared||preparing)return;preparing=true;$('printReadyQR').disabled=true;
+  if(!prepared||preparing||$('printRoleCards').disabled)return;preparing=true;$('printReadyQR').disabled=true;
   try{
    const kit=prepared,s=view();if(fingerprint(s)!==kit.fingerprint)throw new Error('Les équipes ont changé');
    for(const {f,token} of kit.cards)await verify(s,f,token);

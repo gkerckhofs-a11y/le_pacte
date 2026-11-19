@@ -1,3 +1,4 @@
+import {resolveNarrativeOperator,narrativeStaffView} from './founders-facilitator.ts';
 import {advanceNarrativeTime} from '../src/founders-v2.ts';
 import {activeFounders} from '../src/founders.ts';
 import {randomBytes} from 'node:crypto';
@@ -10,8 +11,10 @@ export class LocalNarrativeSessions{
  constructor(db){
   this.db=db;
   db.exec('CREATE TABLE IF NOT EXISTS founders_configurations(id TEXT PRIMARY KEY,owner_id TEXT NOT NULL,data_json TEXT NOT NULL,updated INTEGER NOT NULL)');
-  db.exec('CREATE TABLE IF NOT EXISTS founders_sessions(id TEXT PRIMARY KEY,code TEXT UNIQUE NOT NULL,owner_id TEXT NOT NULL,state_json TEXT NOT NULL,updated INTEGER NOT NULL,archived_at INTEGER); CREATE TABLE IF NOT EXISTS founders_access(session_id TEXT NOT NULL,family TEXT NOT NULL,hash TEXT NOT NULL UNIQUE,expires INTEGER NOT NULL,PRIMARY KEY(session_id,family));');
-  if(!db.prepare('PRAGMA table_info(founders_sessions)').all().some(column=>column.name==='archived_at'))db.exec('ALTER TABLE founders_sessions ADD COLUMN archived_at INTEGER');
+  db.exec('CREATE TABLE IF NOT EXISTS founders_sessions(id TEXT PRIMARY KEY,code TEXT UNIQUE NOT NULL,owner_id TEXT NOT NULL,state_json TEXT NOT NULL,updated INTEGER NOT NULL,archived_at INTEGER,facilitator_email TEXT); CREATE TABLE IF NOT EXISTS founders_access(session_id TEXT NOT NULL,family TEXT NOT NULL,hash TEXT NOT NULL UNIQUE,expires INTEGER NOT NULL,PRIMARY KEY(session_id,family));');
+  const columns=db.prepare('PRAGMA table_info(founders_sessions)').all().map(column=>column.name);
+  if(!columns.includes('archived_at'))db.exec('ALTER TABLE founders_sessions ADD COLUMN archived_at INTEGER');
+  if(!columns.includes('facilitator_email'))db.exec('ALTER TABLE founders_sessions ADD COLUMN facilitator_email TEXT');
  }
  listConfigurations(ownerId){
   check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
@@ -28,11 +31,12 @@ export class LocalNarrativeSessions{
   try{const result=fn();this.db.exec('COMMIT');return result;}
   catch(e){this.db.exec('ROLLBACK');throw e;}
  }
- get(id){
+ activeRow(id){
   check(typeof id==='string'&&/^[a-f0-9]{24}$/.test(id),'Partie introuvable');
-  const row=this.db.prepare('SELECT state_json FROM founders_sessions WHERE id=? AND archived_at IS NULL').get(id);
-  check(row,'Partie introuvable ou archivée');return JSON.parse(row.state_json);
+  const row=this.db.prepare('SELECT state_json,facilitator_email FROM founders_sessions WHERE id=? AND archived_at IS NULL').get(id);
+  check(row,'Partie introuvable ou archivée');return row;
  }
+ get(id){return JSON.parse(this.activeRow(id).state_json);}
  list(ownerId){
   check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
   return this.db.prepare('SELECT id,code,state_json FROM founders_sessions WHERE owner_id=? AND archived_at IS NULL ORDER BY updated DESC LIMIT 100').all(ownerId).map(row=>{
@@ -75,38 +79,50 @@ export class LocalNarrativeSessions{
   check(r&&r.expires>now,'Accès famille expiré ou révoqué');
   return{role:'team',family:r.family,accessHash:hash};
  }
- verify(s,actor,now){
-  if(actor.role==='organizer'){check(s.ownerId===actor.id,'Accès organisateur refusé');return;}
+ setFacilitator(id,ownerId,email){
+  return this.transaction(()=>{
+   check(this.get(id).ownerId===ownerId,'Accès réservé au propriétaire de la partie');
+   this.db.prepare('UPDATE founders_sessions SET facilitator_email=? WHERE id=?').run(email,id);
+   return email;
+  });
+ }
+ verify(s,actor,now,facilitatorEmail){
+  if(actor.role==='operator')return resolveNarrativeOperator(s.ownerId,actor,facilitatorEmail);
+  if(actor.role==='organizer'){check(s.ownerId===actor.id,'Accès organisateur refusé');return actor;}
   if(actor.role==='team'){
    const r=this.db.prepare('SELECT hash,expires FROM founders_access WHERE session_id=? AND family=?')
     .get(s.id,actor.family);
    check(r&&actor.accessHash===r.hash&&r.expires>now,'Accès famille expiré ou révoqué');
-   return;
+   return actor;
   }
-  check(actor.role==='public','Acteur invalide');
+  check(actor.role==='public','Acteur invalide');return actor;
  }
  view(id,actor,now){
   return this.transaction(()=>{
-   const stored=this.get(id);this.verify(stored,actor,now);
+   const row=this.activeRow(id),stored=JSON.parse(row.state_json);
+   const resolved=this.verify(stored,actor,now,row.facilitator_email);
    const s=advanceNarrativeTime(stored,now);
    if(s!==stored)this.db.prepare('UPDATE founders_sessions SET state_json=?,updated=? WHERE id=?').run(JSON.stringify(s),now,id);
-   return {...narrativeView(s,actor),serverNow:now};
+   return {...narrativeView(s,resolved),...narrativeStaffView(resolved,row.facilitator_email),serverNow:now};
   });
  }
  command(id,actor,command,now){
   return this.transaction(()=>{
-   const s=this.get(id);this.verify(s,actor,now);
-   const next=applyNarrativeCommand(s,actor,command,now);
+   const row=this.activeRow(id),s=JSON.parse(row.state_json);
+   const resolved=this.verify(s,actor,now,row.facilitator_email);
+   const next=applyNarrativeCommand(s,resolved,command,now);
    this.db.prepare('UPDATE founders_sessions SET state_json=?,updated=? WHERE id=?').run(JSON.stringify(next),now,id);
-   return {...narrativeView(next,actor),serverNow:now};
+   return {...narrativeView(next,resolved),...narrativeStaffView(resolved,row.facilitator_email),serverNow:now};
   });
  }
- rotate(id,family,ownerId,now){
+ rotate(id,family,actor,now){
   check(familyIds.includes(family),'Famille invalide');
   return this.transaction(()=>{
-   const s=this.get(id);
+   const row=this.activeRow(id),s=JSON.parse(row.state_json);
+   const staff=typeof actor==='string'?{role:'organizer',id:actor}:actor;
+   const resolved=this.verify(s,staff,now,row.facilitator_email);
+   check(['organizer','facilitator'].includes(resolved.role),'Accès régie refusé');
    check(activeFounders(s.game).includes(family),'Famille inactive');
-   check(s.ownerId===ownerId,'Accès organisateur refusé');
    const token=randomBytes(32).toString('base64url');
    this.db.prepare('UPDATE founders_access SET hash=?,expires=? WHERE session_id=? AND family=?')
     .run(tokenHash(token),now+86400000,id,family);

@@ -1,5 +1,6 @@
 import qrcode from 'qrcode-generator';
 import {checkedConfiguration} from './founders-configurations.ts';
+import {checkedFacilitatorEmail} from './founders-facilitator.ts';
 import {createServer} from 'node:http';
 import {existsSync,readFileSync} from 'node:fs';
 import {timingSafeEqual} from 'node:crypto';
@@ -32,6 +33,13 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
   const t=bearer(req);
   if(options.verifyOperator){const p=t?await options.verifyOperator(t):null;if(!p||!(studio?p.editor:p.organizer))throw new Error('Accès régie ou éditeur requis');return{role:'organizer',id:p.uid,editor:p.editor};}
   if(!isOrg(t))throw new Error('Accès régie requis');return{role:'organizer',id:'local-organizer',editor:true};
+ }
+ async function narrativeOperator(req:any){
+  if(!options.verifyOperator)return requireOrg(req);
+  const token=bearer(req);
+  const person=token?await options.verifyOperator(token):null;
+  if(!person)throw new Error('Accès régie requis');
+  return {role:'operator',id:person.uid,organizer:person.organizer,email:person.email};
  }
  async function actorFor(req:any,id:string):Promise<Actor|{role:'public'}> {
   const t=bearer(req);if(!t)return{role:'public'};
@@ -75,7 +83,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
         return;
       }
       if (path === "/api/founders/access-qr" && req.method === "POST") {
-        const actor = await requireOrg(req), d = await body(req, 1e3);
+        const actor=await narrativeOperator(req), d=await body(req,1e3);
         const sessionView=await store.narrative.view(d.session, actor, now);
         const team3 = await store.narrative.authenticate(d.session, d.token, now);
         const familyView=await store.narrative.view(d.session,team3,now);
@@ -164,7 +172,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
     if(!store.narrative)throw new Error('Parties narratives non disponibles');
     json(200,{archived:await store.narrative.archiveAll(actor.id,now)});return;
    }
-   const narrativeMatch=path.match(/^\/api\/founders\/sessions\/([a-f0-9]{24})(?:\/(commands|access|variant)(?:\/([A-F]))?)?$/);
+   const narrativeMatch=path.match(/^\/api\/founders\/sessions\/([a-f0-9]{24})(?:\/(commands|access|variant|facilitator)(?:\/([A-F]))?)?$/);
    if(narrativeMatch){
     if(!store.narrative)throw new Error('Parties narratives non disponibles');
     const [,sessionId,verb,family]=narrativeMatch;
@@ -172,14 +180,21 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
      const actor=await requireOrg(req);
      json(201,await store.narrative.duplicate(sessionId,actor.id,now));return;
     }
+    if(verb==='facilitator'&&!family&&req.method==='PUT'){
+     const owner=await requireOrg(req);
+     if(!options.verifyOperator)throw new Error('Les invitations nécessitent la connexion Google.');
+     const d=await body(req,1000);
+     const email=checkedFacilitatorEmail(d?.email);
+     json(200,{facilitatorEmail:await store.narrative.setFacilitator(sessionId,owner.id,email)});return;
+    }
     if(verb==='access'&&family&&req.method==='POST'){
-     const actor=await requireOrg(req);
-     json(200,await store.narrative.rotate(sessionId,family,actor.id,now));return;
+     const actor=await narrativeOperator(req);
+     json(200,await store.narrative.rotate(sessionId,family,actor,now));return;
     }
     const token=bearer(req);
     let actor;
     if(!token)actor={role:'public'};
-    else if(options.verifyOperator&&token.includes('.'))actor=await requireOrg(req);
+    else if(options.verifyOperator&&token.includes('.'))actor=await narrativeOperator(req);
     else if(!options.verifyOperator&&isOrg(token))actor={role:'organizer',id:'local-organizer'};
     else actor=await store.narrative.authenticate(sessionId,token,now);
     if(!verb&&req.method==='GET'){json(200,await store.narrative.view(sessionId,actor,now));return;}

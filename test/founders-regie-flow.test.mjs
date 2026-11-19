@@ -41,7 +41,7 @@ test('La consigne suit la phase : lancer, attendre les équipes, révéler, pour
 test('Connexion : lien validé et erreurs Google expliquées',()=>{
  assert.equal(validNarrativeSession(null),false);assert.equal(validNarrativeSession('123456789012123456789012'),true);
  assert.match(organizerError({code:'auth/popup-blocked'}),/fenêtre Google a été bloquée/);
- assert.match(organizerError({message:'Accès régie refusé'}),/compte organisateur qui a créé/);
+ assert.match(organizerError({message:'Accès régie refusé'}),/compte du propriétaire de la partie ou celui de l’animateur invité/);
 });
 test('HTTP : lancer malgré un nom enregistré simultanément ouvre D01 et donne la main au Maire',async t=>{
  const store=new GameStore(':memory:'),key='regie-flow-test-organizer-key-000000000',server=createGameServer(store,key);

@@ -1,3 +1,4 @@
+import {resolveNarrativeOperator,narrativeStaffView} from '../server/founders-facilitator.ts';
 import {advanceNarrativeTime} from '../src/founders-v2.ts';
 import {activeFounders} from '../src/founders.ts';
 import {randomBytes} from 'node:crypto';
@@ -97,15 +98,26 @@ export class FirestoreNarrativeSessions{
    return {role:'team',family,accessHash:hash};
   });
  }
- async verify(tx,s,actor,now){
-  if(actor.role==='organizer'){check(actor.id===s.ownerId,'Accès organisateur refusé');return;}
+ async setFacilitator(id,ownerId,email){
+  const ref=this.ref(id);
+  return this.db.runTransaction(async tx=>{
+   const row=await tx.get(ref);
+   check(row.exists&&!row.data().archivedAt,'Partie introuvable ou archivée');
+   check(row.data().ownerId===ownerId,'Accès réservé au propriétaire de la partie');
+   tx.update(ref,{facilitatorEmail:email});
+   return email;
+  });
+ }
+ async verify(tx,s,actor,now,facilitatorEmail){
+  if(actor.role==='operator')return resolveNarrativeOperator(s.ownerId,actor,facilitatorEmail);
+  if(actor.role==='organizer'){check(actor.id===s.ownerId,'Accès organisateur refusé');return actor;}
   if(actor.role==='team'){
    check(familyIds.includes(actor.family),'Famille inconnue');
    const access=await tx.get(this.accessRef(s.id,actor.family));
    check(access.exists&&actor.accessHash===access.data().hash&&access.data().expires>now,'Accès famille expiré ou révoqué');
-   return;
+   return actor;
   }
-  check(actor.role==='public','Acteur invalide');
+  check(actor.role==='public','Acteur invalide');return actor;
  }
  async view(id,actor,now,skipArchived=false){
   const ref=this.ref(id);
@@ -114,10 +126,10 @@ export class FirestoreNarrativeSessions{
    if(skipArchived&&(!row.exists||row.data().archivedAt))return;
    check(row.exists&&!row.data().archivedAt,'Partie introuvable ou archivée');
    const stored=JSON.parse(row.data().stateJson);
-   await this.verify(tx,stored,actor,now);
+   const resolved=await this.verify(tx,stored,actor,now,row.data().facilitatorEmail);
    const s=advanceNarrativeTime(stored,now);
    if(s!==stored)tx.update(ref,{stateJson:JSON.stringify(s),updated:now,revision:s.revision,clockDue:clockDue(s)});
-   return {...narrativeView(s,actor),serverNow:now};
+   return {...narrativeView(s,resolved),...narrativeStaffView(resolved,row.data().facilitatorEmail),serverNow:now};
   });
  }
  async command(id,actor,command,now){
@@ -125,21 +137,24 @@ export class FirestoreNarrativeSessions{
   return this.db.runTransaction(async tx=>{
    const row=await tx.get(ref);check(row.exists&&!row.data().archivedAt,'Partie introuvable ou archivée');
    const s=JSON.parse(row.data().stateJson);
-   await this.verify(tx,s,actor,now);
-   const next=applyNarrativeCommand(s,actor,command,now);
+   const resolved=await this.verify(tx,s,actor,now,row.data().facilitatorEmail);
+   const next=applyNarrativeCommand(s,resolved,command,now);
    tx.update(ref,{stateJson:JSON.stringify(next),updated:now,revision:next.revision,clockDue:clockDue(next)});
-   return {...narrativeView(next,actor),serverNow:now};
+   return {...narrativeView(next,resolved),...narrativeStaffView(resolved,row.data().facilitatorEmail),serverNow:now};
   });
  }
  async advanceDue(now){
   const p=Pipelines;const due=await this.db.pipeline().collection('pacteNarrativeSessions').where(p.and(p.field('clockDue').greaterThanOrEqual(0),p.field('clockDue').lessThanOrEqual(now))).sort(p.ascending('clockDue')).limit(100).execute();
   for(const d of due.results)await this.view(d.id,{role:'public'},now,true);
  }
- async rotate(id,family,ownerId,now){
+ async rotate(id,family,actor,now){
   check(familyIds.includes(family),'Famille inconnue');
   const token=randomBytes(32).toString('base64url'),hash=tokenHash(token),ref=this.ref(id);
   await this.db.runTransaction(async tx=>{
-   const row=await tx.get(ref);check(row.exists&&!row.data().archivedAt&&row.data().ownerId===ownerId,'Accès organisateur refusé');
+   const row=await tx.get(ref);check(row.exists&&!row.data().archivedAt,'Partie introuvable ou archivée');
+   const staff=typeof actor==='string'?{role:'organizer',id:actor}:actor;
+   const resolved=await this.verify(tx,JSON.parse(row.data().stateJson),staff,now,row.data().facilitatorEmail);
+   check(['organizer','facilitator'].includes(resolved.role),'Accès régie refusé');
    const access=await tx.get(this.accessRef(id,family));check(access.exists,'Famille inconnue');
    const oldHash=access.data().hash;
    tx.delete(ref.collection('keys').doc(oldHash));

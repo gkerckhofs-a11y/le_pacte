@@ -9,8 +9,12 @@ Le catalogue propose la V1.2 par défaut. Les cinq jauges commencent à 5. Sous 
 1. Démarrer le serveur avec `npm start`.
 2. Ouvrir `/founders-setup.html?scenario=les-colons-de-hotspring` sur ce serveur, puis charger le catalogue avec la clé de régie locale.
 3. Prévisualiser la campagne, nommer les équipes et créer la partie. Choisir « Séance standard » pour limiter le chapitre V à deux crises par séance.
-4. Dans la régie, vérifier les cinq fiches QR et leur rappel des règles avant de les imprimer sur une page A4 par famille. Un renouvellement remplace l’accès précédent. Les QR expirent 24 heures après création et peuvent être régénérés à une reprise.
+4. Dans la régie, cliquer sur « Générer les fiches équipes », puis « Imprimer les fiches équipes ». Choisir A4 portrait et une échelle de 100 %. Chaque famille tient sur une page avec son QR et le rappel des règles. Un renouvellement remplace l’accès précédent. Les QR expirent 24 heures après création et peuvent être régénérés à une reprise.
 5. Ouvrir la projection. La régie peut passer de la lecture à la négociation puis au vote. L’épilogue annonce le résultat et les scores. Un bouton dévoile ensuite les ambitions et le détail des points. Les commandes d’animation sont regroupées en haut de la régie.
+
+Les cartes de rôle sont accessibles dans « Les équipes et leurs accès ». Choisir le nombre de diplomates par famille et imprimer en A4 portrait à 100 %. Chaque planche contient jusqu’à neuf cartes de 63 × 88 mm.
+
+Pour déléguer l’animation, ouvrir « Inviter un animateur » depuis la régie de la partie. Enregistrer l’adresse du compte Google, puis transmettre le lien de la régie. L’invité peut animer cette partie, préparer ses fiches et ouvrir la projection. Le propriétaire peut remplacer l’adresse ou retirer l’accès depuis la même rubrique.
 
 « Terminer la séance » sauvegarde aussi un scrutin ouvert, ses mises, ses propositions et son chrono. Le bilan ne compte que les chapitres clôturés et la trajectoire. Au checkpoint du chapitre V, la régie peut reprendre les crises en réserve ou ouvrir le final. La variante d’une archive repart du checkpoint « Gouvernement choisi », avec les ressources et le panorama précédant le duel des chartes.
 
