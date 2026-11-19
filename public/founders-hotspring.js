@@ -197,6 +197,11 @@ export function renderHotspringStage(root,s,support,{showIntroImage=true}={}){
   root.append(list);
  }
  if(s.narrativeEnding){
+  const scores=s.campaign.epilogueResults;
+  if(scores){
+   root.append(node('h2',hotspringWinners(s,scores)));
+   renderCampaignRanking(root,scores.rows);
+  }
   root.append(node('h2',s.narrativeEnding.title));
   for(const paragraph of s.narrativeEnding.paragraphs)root.append(node('p',paragraph));
  }
@@ -233,12 +238,39 @@ export function campaignScoreText(r){
   ...(r.wealth===undefined?[]:['Fortune '+r.wealth+'/3 ('+r.dollars+' $ · rang '+r.wealthRank+')'])].join(' · ');
 }
 
-export function hotspringWinners(s){
- const names=s.finalResults.winners.map(id=>familyName(s,id));
+export function hotspringWinners(s,results=s.finalResults){
+ const names=results.winners.map(id=>familyName(s,id));
  return (names.length===1?'Famille la plus influente — ':'Co-victoire — ')+names.join(', ');
 }
 
-export function renderCampaignAdmin(root,s,command,newVariant){
+export function renderCampaignActions(root,s,command){
+ const previous=root.querySelector('select')?.value;
+ root.replaceChildren();root.hidden=true;
+ const a=s.campaignAdmin;
+ if(!a)return;
+ const action=(label,kind,primary=false)=>{
+  const b=node('button',label,primary?null:'secondary');b.type='button';b.addEventListener('click',()=>command(kind));return b;
+ };
+ if(s.phase==='SUSPENDED')root.append(action('Reprendre la séance','resumeSitting',true));
+ if(a.mayResumeCrises&&!s.clock.paused)root.append(action('Reprendre les crises en réserve','resumeCrises'));
+ if(s.phase==='EPILOGUE'&&!s.clock.paused)root.append(action('Dévoiler les objectifs et le détail des scores','showResults',true));
+ if(!['READY','SUSPENDED','EPILOGUE','FINISHED'].includes(s.phase))root.append(action('Terminer la séance','endSitting'));
+ if(a.crisisMode==='extended'&&s.phase==='REVEALED'&&!s.clock.paused&&/^D2[3-8]/.test(s.reveal?.id??'')){
+  const opts=a.crises.filter(c=>c.available);
+  if(opts.length){
+   const label=node('label','Choisir une crise', 'regie-crisis');
+   const select=node('select');
+   for(const c of opts){const o=node('option',c.id+' · '+c.reason);o.value=c.id;select.append(o);}
+   if(opts.some(c=>c.id===previous))select.value=previous;
+   const button=node('button','Présenter cette crise','secondary');button.type='button';
+   button.addEventListener('click',()=>command('next',{dilemmaId:select.value}));
+   label.append(select);root.append(label,button);
+  }
+ }
+ root.hidden=!root.childElementCount;
+}
+
+export function renderCampaignAdmin(root,s,newVariant){
  root.hidden=!s.campaignAdmin;
  if(root.hidden){root.replaceChildren();return;}
  const open=[...root.querySelectorAll('details')].map(d=>d.open);
@@ -246,15 +278,6 @@ export function renderCampaignAdmin(root,s,command,newVariant){
  root.replaceChildren();
  const a=s.campaignAdmin;
  root.append(node('h2','Campagne · Chapitre '+s.campaign.chapter));
- const action=(label,kind)=>{
-  const b=node('button',label,'secondary');b.type='button';b.addEventListener('click',()=>command(kind));return b;
- };
- const buttons=node('div',null,'row');
- if(!['READY','SUSPENDED','EPILOGUE','FINISHED'].includes(s.phase))buttons.append(action('Terminer la séance','endSitting'));
- if(s.phase==='SUSPENDED')buttons.append(action('Reprendre la séance','resumeSitting'));
- if(a.mayResumeCrises&&!s.clock.paused)buttons.append(action('Reprendre les crises en réserve','resumeCrises'));
- if(s.phase==='EPILOGUE'&&!s.clock.paused)buttons.append(action('Révéler les objectifs et le classement','showResults'));
- root.append(buttons);
  if(s.phase==='FINISHED'){
   const exported=node('button','Exporter le résultat');exported.type='button';
   exported.addEventListener('click',()=>{
@@ -279,15 +302,6 @@ export function renderCampaignAdmin(root,s,command,newVariant){
  }
  for(const checkpoint of a.checkpoints)detail.append(node('p',checkpoint.name));
  detail.append(node('p',a.markers.join(', ')));
- if(a.crisisMode==='extended'&&s.phase==='REVEALED'&&/^D2[3-8]/.test(s.reveal?.id??'')){
-  const opts=a.crises.filter(c=>c.available);
-  if(opts.length){
-   const label=node('label','Choisir une crise');const select=node('select');
-   for(const c of opts){const o=node('option',c.id+' · '+c.reason);o.value=c.id;select.append(o);}
-   const b=node('button','Présenter cette crise','secondary');b.type='button';
-   b.addEventListener('click',()=>command('next',{dilemmaId:select.value}));label.append(select);detail.append(label,b);
-  }
- }
  root.append(detail);
  const privateView=node('details');privateView.open=Boolean(open[1]);
  privateView.append(node('summary','Objectifs confidentiels et scores'));

@@ -286,6 +286,12 @@ test('Hotspring : Terminer l’histoire produit un épilogue anticipé et rembou
  g.command('finish',{confirm:true});
  assert.equal(g.state.game.families.A.power,8);
  assert.equal(g.state.phase,'EPILOGUE');assert.equal(g.state.campaign.charter,null);
+ const summary=narrativePublicView(g.state).campaign.epilogueResults;
+ assert.equal(summary.winners.length,5);
+ assert.ok(summary.rows.every(row=>row.total===3&&row.maximum===5));
+ g.command('pause');
+ assert.throws(()=>g.command('correctResource',{family:'A',resource:'dollars',value:0}),/avant l’épilogue/);
+ g.command('resume');
  g.command('showResults');
  assert.equal(g.state.finalResults.rows[0].maximum,5);
  assert.ok(g.state.finalResults.rows.every(row=>row.wealthRank===1&&row.wealth===3));

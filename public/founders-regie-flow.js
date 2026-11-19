@@ -11,7 +11,7 @@ export function councilGuidance(s){
    SUSPENDED:{step:3,title:'La séance est sauvegardée',hint:s.campaign.version>=3?'La reprise restaure la phase, les mises et les engagements.':'La reprise restaure la phase, les mises et le temps restant.'},
    CHARTER_SUPPORT:{step:3,title:'Les familles qualifient les chartes',hint:'Les porte-paroles soutiennent une charte depuis leur terminal.'},
    REVEALED:{step:3,title:s.reveal?.chronicle?.title??'Le résultat est affiché',hint:s.reveal?.id==='D30'?'Lisez l’épilogue de la ville.':'Laissez le groupe découvrir les effets et le panorama, puis poursuivez.'},
-   EPILOGUE:{step:3,title:'Lisez l’épilogue de la ville',hint:'Révélez les ambitions et le classement après le récit.'},
+   EPILOGUE:{step:3,title:'Annoncez le résultat et lisez l’épilogue',hint:'La projection affiche le classement. Vous pouvez ensuite dévoiler les objectifs et le détail des points.'},
    FINISHED:{step:3,title:'La campagne est archivée',hint:'Vous pouvez consulter le panorama, la chronique et les résultats.'}
   };
   if(s.campaign.version>=3&&s.phase==='NEGOTIATION')return {step:3,title:'Les familles négocient',hint:'Laissez les équipes discuter. Cliquez sur « Ouvrir le vote » quand elles sont prêtes.'};

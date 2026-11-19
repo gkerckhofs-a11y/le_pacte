@@ -84,9 +84,11 @@ function drawPanoramaStability(s,manual){
 }
 function render(s){
  const manual=s.campaign?.version>=3;
+ const epilogueScores=s.campaign?.epilogueResults;
+ const results=s.finalResults??epilogueScores;
  document.body.classList.toggle('game-finished',Boolean(s.finalResults));
  document.body.classList.toggle('projection-manual-hotspring',manual);
- $('dilemmaPanel').hidden=Boolean(s.finalResults);
+ $('dilemmaPanel').hidden=Boolean(results);
  const stageReading=Boolean(s.campaign)&&['CHECKPOINT','SUSPENDED','CHARTER_SUPPORT','EPILOGUE'].includes(s.phase);
  document.body.classList.toggle('projection-stage-reading',stageReading);
  document.body.classList.toggle('projection-qualification',s.phase==='CHARTER_SUPPORT');
@@ -108,7 +110,7 @@ function render(s){
  if($('chronicleDialog').open)renderChronicle($('cityChronicle'),s);
  if(s.campaign){
   renderHotspringPanorama($('city'),s,{showResultStill:false});
-  renderHotspringStage($('hotspringStage'),s,undefined,{showIntroImage:false});
+  if(!results)renderHotspringStage($('hotspringStage'),s,undefined,{showIntroImage:false});
   renderTendencies($('hotspringTendencies'),sceneOnly||s.reveal?null:s.dilemma);
   status('cityEvolution','');
  }else{
@@ -142,24 +144,27 @@ function render(s){
   const amount=document.createElement('span');amount.textContent=s.council.bids[f.id]??0;
   row.append(n,v,amount);ballots.append(row);
  }
- $('finalResults').hidden=!s.finalResults;
+ $('finalResults').hidden=!results;
  $('narrativeEnding').hidden=!s.narrativeEnding;
+ $('narrativeEnding').querySelector('summary').textContent=epilogueScores?'Lire le récit de l’épilogue':'Relire l’épilogue';
  const epilogue=$('endingText');epilogue.replaceChildren();
  if(s.narrativeEnding){
   const title=document.createElement('h3');title.textContent=s.narrativeEnding.title;epilogue.append(title);
   for(const paragraph of s.narrativeEnding.paragraphs){const p=document.createElement('p');p.textContent=paragraph;epilogue.append(p);}
  }
  $('legacyScoreExplanation').hidden=Boolean(s.campaign);
- if(s.campaign&&s.finalResults){
-  text('winnerTitle',hotspringWinners(s));
+ if(s.campaign&&results){
+  text('winnerTitle',hotspringWinners(s,results));
   const root=$('finalRanking');root.replaceChildren();
-  const revealText=document.createElement('p');revealText.textContent=s.finalResults.text;root.append(revealText);
+  if(s.finalResults){
+   const revealText=document.createElement('p');revealText.textContent=s.finalResults.text;root.append(revealText);
+  }
   const archive=s.campaign.archive;
   if(archive?.governance){
    const record=document.createElement('p');record.textContent=archive.governance;
    root.append(record);
   }
-  renderCampaignRanking(root,s.finalResults.rows,true,{compact:true});
+  renderCampaignRanking(root,results.rows,Boolean(s.finalResults),{compact:true});
  }else if(s.finalResults){
   const ranking=s.finalResults.ranking;
   text('winnerTitle','Victoire de '+teamLabel(s,ranking[0].family)+' · '+ranking[0].score.total+' points');

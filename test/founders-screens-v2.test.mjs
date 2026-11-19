@@ -175,6 +175,11 @@ test('Hotspring V1.2 : Stabilité sous le panorama et ouverture manuelle depuis 
  const g=newCampaign({scenarioVersion:'1.2.0',ownerId:owner.id});
  for(const action of ['start','next','next'])g.command(action,{},owner);
  const regie=(await screen('regie',g.state)).document;
+ const controls=regie.querySelector('.regie-animation');
+ assert.equal(controls.nextElementSibling.id,'councilMonitor');
+ assert.ok(controls.contains(regie.getElementById('beginVote')));
+ assert.ok(controls.contains(regie.getElementById('pauseGame')));
+ assert.ok(controls.contains(regie.getElementById('finishGame')));
  assert.equal(regie.getElementById('timingForm').hidden,true);
  assert.equal(regie.getElementById('beginVote').hidden,false);
  assert.equal(regie.getElementById('beginVote').textContent,'Ouvrir le vote');
@@ -193,6 +198,31 @@ test('Hotspring V1.2 : Stabilité sous le panorama et ouverture manuelle depuis 
  assert.match(get('councilPrompt').textContent,/À la parole · Les Doyle/);
  assert.equal(get('influenceAvailable').textContent,'3 Influence');
  assert.equal(get('influencePart').textContent,'3 Influence');
+});
+
+test('Hotspring : l’épilogue annonce le classement avant le détail des objectifs',async()=>{
+ const game=newCampaign({scenarioVersion:'1.2.0',ownerId:owner.id});
+ game.command('start',{},owner);
+ game.command('pause',{},owner);
+ game.command('correctResource',{family:'B',resource:'dollars',value:15},owner);
+ game.command('resume',{},owner);
+ game.command('finish',{confirm:true},owner);
+ const projection=await screen('city',game.state);
+ const get=id=>projection.document.getElementById(id);
+ assert.equal(get('dilemmaPanel').hidden,true);
+ assert.equal(get('finalResults').hidden,false);
+ assert.match(get('winnerTitle').textContent,/Les Doyle/);
+ assert.equal(get('finalRanking').querySelectorAll('ol > li').length,5);
+ assert.equal(get('finalRanking').querySelector('details'),null);
+ assert.match(get('finalRanking').textContent,/Les Doyle · 5 \/ 5/);
+ assert.equal(get('narrativeEnding').hidden,false);
+ assert.ok(get('endingText').textContent.includes('Qu’avez-vous fait de Hotspring'));
+ const regie=(await screen('regie',game.state)).document;
+ assert.match(regie.getElementById('actions').textContent,/Dévoiler les objectifs et le détail des scores/);
+ assert.match(regie.getElementById('hotspringStage').textContent,/Les Doyle · 5 \/ 5/);
+ game.command('showResults',{},owner);
+ await projection.update(game.state);
+ assert.equal(get('finalRanking').querySelectorAll('ol > li > details').length,5);
 });
 
 test('Projection Hotspring : la réserve affiche l’estimation puis le versement',async()=>{

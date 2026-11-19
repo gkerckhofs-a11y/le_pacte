@@ -1,5 +1,5 @@
 import {rememberAccess} from './founders-workspace.js';
-import {CAMPAIGN_PHASES,renderHotspringStage,renderTendencies,renderCampaignAdmin,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
+import {CAMPAIGN_PHASES,renderHotspringStage,renderTendencies,renderCampaignAdmin,renderCampaignActions,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
 import {decorateGauge,formatGaugeNumber,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
 import {mountPrintKit} from './founders-print.js';
 import {renderCouncilMonitor} from './founders-council-monitor.js';
@@ -136,7 +136,8 @@ function render(s){
  applySkin(document.body,s.skin);
  current=s;
  document.body.classList.toggle('campaign-hotspring',Boolean(s.campaign));
- renderCampaignAdmin($('hotspringAdmin'),s,command,newVariant);
+ renderCampaignActions($('campaignActions'),s,command);
+ renderCampaignAdmin($('hotspringAdmin'),s,newVariant);
  if(s.campaign){renderHotspringStage($('hotspringStage'),s);renderTendencies($('hotspringTendencies'),s.phase==='REVEALED'?null:s.dilemma);}
  printKit.sync(s);renderPhaseClock($('phaseClock'),s);renderV2Controls(s);
  renderCouncilMonitor($('councilMonitor'),s);
@@ -157,7 +158,7 @@ function render(s){
   $('next').textContent=({INTRO:'Présenter le dilemme',PRESENTATION:'Ouvrir la négociation',REVEALED:s.reveal?.id==='D30'?'Lire l’épilogue':'Poursuivre',CHECKPOINT:s.campaign.chapter===6?'Qualifier les chartes':'Reprendre — chapitre suivant'})[s.phase]??'Poursuivre';
  }
  $('tiePriority').closest('details').hidden=Boolean(s.campaign);
- $('next').disabled=Boolean(s.progression?.blocked);
+ renderActionAvailability(s);
  $('reservePanel').hidden=!s.progression||s.progression.terminal;
  const choice=$('nextDilemma'),previousChoice=choice.value;choice.replaceChildren();
  const auto=document.createElement('option');auto.value='';auto.textContent='Laisser le moteur choisir';choice.append(auto);
@@ -211,12 +212,18 @@ function render(s){
 }
 async function command(kind,data={}){
  if(!current||busy)return;
- busy=true;set('actionMessage','Enregistrement…');$('actions').querySelectorAll('button').forEach(b=>b.disabled=true);
+ busy=true;set('actionMessage','Enregistrement…');renderActionAvailability(current);
  try{
   const s=await api('/commands','POST',{kind,data,expectedRevision:current.revision});
   render(s);set('actionMessage',kind==='reveal'?'Décision révélée sur la projection.':s.phase==='FINISHED'?'Partie terminée : classement affiché.':s.campaign?(labels[s.phase]??s.phase)+'.':'Le prochain dilemme est ouvert.');
  }catch(e){set('actionMessage',e.message);try{render(await api(''));}catch{}}
- finally{busy=false;$('actions').querySelectorAll('button').forEach(b=>b.disabled=false);$('next').disabled=Boolean(current?.progression?.blocked);}
+ finally{busy=false;renderActionAvailability(current);}
+}
+function renderActionAvailability(s){
+ for(const button of $('actions').querySelectorAll('button')){
+  const advance=['start','next','reveal','beginVote'].includes(button.id);
+  button.disabled=busy||Boolean(advance&&s?.clock?.paused)||Boolean(button.id==='next'&&s?.progression?.blocked);
+ }
 }
 async function newVariant(){
  if(busy)return;
@@ -247,7 +254,7 @@ $('start').addEventListener('click',async()=>{
   const result=await startCouncil(api);render(result.view);
   set('actionMessage',result.started?'Partie lancée. Le premier dilemme est affiché ; le Maire peut voter sur son écran d’équipe.':'La partie a déjà démarré. La régie affiche son état actuel.');
  }catch(error){set('actionMessage',organizerError(error));try{render(await api(''));}catch{}}
- finally{busy=false;$('start').disabled=false;}
+ finally{busy=false;renderActionAvailability(current);}
 });
 $('reveal').addEventListener('click',()=>command('reveal'));
 $('next').addEventListener('click',()=>command('next',current?.progression&&$('nextDilemma').value?{dilemmaId:$('nextDilemma').value}:{}));
@@ -281,13 +288,16 @@ function renderV2Controls(s){
  $('v2Controls').hidden=s.experienceVersion!==2;
  $('beginVote').hidden=s.phase!=='NEGOTIATION';
  set('beginVote',manual?'Ouvrir le vote':'Ouvrir le vote maintenant');
- set('v2ControlsTitle',manual?'Commandes de la régie':'Animation et chronos');
- for(const id of ['timingForm','addTime','removeTime'])$(id).hidden=manual;
- $('pauseGame').hidden=Boolean(s.clock?.paused);$('resumeGame').hidden=!s.clock?.paused;
- $('finishGame').disabled=['EPILOGUE','FINISHED'].includes(s.phase);
+ set('v2ControlsTitle',manual?'Réglages':'Chronos et réglages');
+ $('timingForm').hidden=manual;
+ const ended=['EPILOGUE','FINISHED'].includes(s.phase),suspended=s.phase==='SUSPENDED',v2=s.experienceVersion===2;
+ for(const id of ['addTime','removeTime'])$(id).hidden=!v2||manual||s.clock?.remainingMs==null||ended||suspended;
+ $('pauseGame').hidden=!v2||ended||suspended||Boolean(s.clock?.paused);
+ $('resumeGame').hidden=!v2||suspended||!s.clock?.paused;
+ $('finishGame').hidden=!v2||ended;
  $('finishDescription').textContent=s.campaign&&s.phase==='CHECKPOINT'&&s.campaign.chapter>=5?
   'La régie ouvrira la prochaine étape du final. Les familles décideront du gouvernement et de la charte.':
-  s.campaign?'La régie ouvrira l’épilogue avec les décisions déjà prises. Les objectifs seront révélés ensuite.':
+  s.campaign?'La régie ouvrira l’épilogue et affichera les scores issus des décisions déjà prises.':
   'Cette action clôture la partie et affiche le résultat. Les mises d’un vote en cours sont rendues.';
  $('finishGame').textContent=s.campaign?'Terminer l’histoire':'Terminer la partie';
  $('presentationTiming').hidden=!s.campaign;$('presentationSeconds').disabled=!s.campaign;
@@ -297,6 +307,7 @@ function renderV2Controls(s){
  if(!document.activeElement?.closest('#correctionForm')){
   const selected=$('correctFamily').value;$('correctFamily').replaceChildren();for(const f of s.families){const o=document.createElement('option');o.value=f.id;o.textContent=teamCaption(f);$('correctFamily').append(o);}$('correctFamily').value=selected||s.families[0].id;
  }
+ for(const field of $('correctionForm').querySelectorAll('input,select,button'))field.disabled=ended||suspended||!s.clock?.paused;
  const pending=Object.values(s.offers).filter(o=>o.status==='pending');
  set('pendingOffers',pending.length?'Offres en attente : '+pending.map(o=>teamLabel(s,o.from)+' → '+teamLabel(s,o.to)+' : '+o.amount+' '+s.skin.labels.currency).join(' ; '):'Aucune proposition financière en attente.');
 }

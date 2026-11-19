@@ -255,7 +255,7 @@ export function applyNarrativeCommand(input,actor,command,now){
    if(s.clock.paused)s.clock.remainingMs=Math.max(0,s.clock.remainingMs+data.seconds*1000);
    else {s.clock.deadline=Math.max(now,s.clock.deadline+data.seconds*1000);s.clock.remainingMs=Math.max(0,s.clock.deadline-now);}break;
   case 'correctResource': {
-   org();check(isV2(s)&&s.phase!=='FINISHED'&&s.clock.paused,'Mettre la partie en pause avant correction');
+   org();check(isV2(s)&&!['EPILOGUE','FINISHED'].includes(s.phase)&&s.clock.paused,'Corrigez les ressources pendant une pause, avant l’épilogue');
    check(activeFounders(s.game).includes(data.family)&&['power','dollars'].includes(data.resource)&&Number.isSafeInteger(data.value)&&data.value>=0&&data.value<=100000,'Correction invalide');
    const f=s.game.families[data.family];
    if(manual&&data.resource==='power'&&!Object.hasOwn(s.game.vote?.choices??{},data.family)){

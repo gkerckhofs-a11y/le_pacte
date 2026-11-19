@@ -73,6 +73,8 @@ test('Hotspring HTTP : reprise SQLite en cours de scrutin puis campagne complèt
 
  const ending=await playHotspringTo(client,'EPILOGUE');
  assert.equal(ending.finalResults,null);
+ assert.equal(ending.campaign.epilogueResults.rows.length,5);
+ assert.ok(ending.campaign.epilogueResults.rows.every(row=>Object.keys(row).length===4));
  assert.equal(ending.reveal,null);
  assert.equal(ending.campaign.archive,null);
  assert.ok(ending.campaign.epilogueRecap.length>=2);
@@ -84,6 +86,10 @@ test('Hotspring HTTP : reprise SQLite en cours de scrutin puis campagne complèt
  const final=await client.projection();
  assert.equal(final.phase,'FINISHED');
  assert.equal(final.finalResults.rows.length,5);
+ assert.deepEqual(ending.campaign.epilogueResults,{
+  winners:final.finalResults.winners,
+  rows:final.finalResults.rows.map(({family,name,total,maximum})=>({family,name,total,maximum}))
+ });
  assert.ok(final.finalResults.rows.every(r=>r.maximum===18&&r.wealth>=0&&r.wealth<=3));
  assert.deepEqual((await client.family('B')).privateCampaign.score,final.finalResults.rows.find(r=>r.family==='B'));
  assert.equal(final.campaign.archive.charter,'A');

@@ -13,7 +13,6 @@ export function mountPrintKit({session,view,request,renew}){
  };
  function shell(){invalidate();const root=$('printSheets');root.replaceChildren();root.hidden=false;return root;}
  function sync(s){
-  $('printDuplexNote').hidden=!(s.campaign?.version>=3);
   if(prepared&&fingerprint(s)!==prepared.fingerprint){invalidate();$('printSheets').replaceChildren();$('printStatus').textContent='Les équipes ont changé. Préparez les fiches de nouveau.';}
  }
  function card(root,family,title){
@@ -61,7 +60,6 @@ export function mountPrintKit({session,view,request,renew}){
  const verify=(s,f,token)=>request('/api/founders/access-qr',{session,family:f.id,token,origin:location.origin}).then(data=>checked(data,f,token,s));
  async function prepareQR(){
   if(preparing)return;const s=view();if(!s)return;preparing=true;
-  const duplex=s.campaign?.version>=3;
   const root=shell(),stamp=fingerprint(s),cards=[];$('prepareQR').disabled=true;
   $('printStatus').textContent='Vérification de chaque terminal et préparation des fiches…';
   try{
@@ -84,18 +82,13 @@ export function mountPrintKit({session,view,request,renew}){
     if(svg.localName!=='svg'||svg.querySelector('parsererror'))throw new Error('Image QR invalide');
     image.append(document.importNode(svg,true));
     const reference=node('p','Session '+s.code+' · Équipe '+f.id,'print-reference');
+    const accessNotice=node('p','Confidentiel. Accès valable 24 h après sa création. Régénérer un accès invalide le QR précédent.','small');
     if(s.campaign){
      c.classList.add('print-hotspring');
      const access=node('header',undefined,'print-hotspring-access'),identity=node('div');
-     identity.append(...c.children,reference,node('p','Porte-parole : scannez le QR code, vérifiez la famille et la session. Gardez cette page ouverte.','print-scan'));
+     identity.append(...c.children,reference,node('p','Porte-parole : scannez le QR code, vérifiez la famille et la session. Gardez cette page ouverte.','print-scan'),accessNotice);
      access.append(identity,image);
-     c.append(access);
-     if(duplex){
-      c.classList.add('print-hotspring-front');c.dataset.side='recto';
-      c.append(node('h3','Accès confidentiel de votre famille'),node('p','Consultez votre objectif secret et prenez les décisions de votre famille sur le terminal. Les règles sont au verso.'));
-      const back=card(root,f);back.classList.add('print-hotspring');back.dataset.side='verso';
-      back.append(createHotspringRules({print:true,manual:true}));
-     }else c.append(createHotspringRules({print:true}));
+     c.append(access,createHotspringRules({print:true,manual:s.campaign.version>=3}));
     }else{
      c.append(image,reference);
      const instructions=node('ol');for(const t of ['Scannez le QR code.','Vérifiez le nom de votre famille et le code de session affichés.','Gardez cette page ouverte pendant toute la partie.','Un seul terminal officiel est utilisé pour votre famille.'])instructions.append(node('li',t));c.append(instructions);
@@ -103,9 +96,9 @@ export function mountPrintKit({session,view,request,renew}){
      for(const [title,body] of [['Accueil','« Ma table » : votre situation et vos ressources.'],['Vote','« Votre décision politique » : POUR, CONTRE ou ABSTENTION, puis ajout d’Influence ou passage.'],['Négociation et finances','« Vos négociations » : envoyez une proposition, acceptez ou refusez une somme ; vos fonds sont dans « Vos ressources ».'],['Objectifs','Votre ambition secrète et ses paliers se trouvent sur « Ma table ».']])c.append(node('p',title+' — '+body));
      c.append(node('p','Le porte-parole utilise l’interface officielle. Les autres membres de l’équipe peuvent librement négocier avec les autres familles.'));
     }
-    const link=node('a','Ouvrir le terminal de '+f.name);link.href=data.link;c.append(link);
+    const link=node('a',s.campaign?'Ouvrir le terminal':'Ouvrir le terminal de '+f.name);link.href=data.link;c.append(link);
     if(s.campaign)c.append(node('p',data.link,'small hotspring-text print-url'));
-    c.append(node('p','Confidentiel. Accès valable 24 h après sa création. Régénérer un accès invalide le QR précédent.','small'));
+    else c.append(accessNotice);
    }
    prepared={fingerprint:stamp,cards};$('printReadyQR').disabled=false;
    $('printStatus').textContent=cards.length+'/'+s.families.length+' fiches vérifiées. Les accès absents ou expirés ont été remplacés ; distribuez ces nouvelles fiches.';

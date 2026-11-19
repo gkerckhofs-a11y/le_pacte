@@ -305,6 +305,7 @@ function epilogueRecap(s){
 
 export function campaignPresentation(s){
  const c=s.campaign,content=s.scenario.campaign;
+ const endingScores=s.phase==='EPILOGUE'?hotspringScores(s,{final:true}):null;
  const checkpoint=c.checkpoints.at(-1);
  const q=c.qualification;
  const summary=s.revealedHistory.slice(-4).map(h=>({id:h.id,title:h.chronicle?.title??h.title,summary:h.narration}));
@@ -313,6 +314,10 @@ export function campaignPresentation(s){
  const stopsAtCheckpoint=s.phase==='CHECKPOINT'||c.suspension?.phase==='CHECKPOINT';
  return {
   chapter:c.chapter,version:c.version,
+  ...(endingScores?{epilogueResults:{
+   winners:endingScores.winners,
+   rows:endingScores.rows.map(({family,name,total,maximum})=>({family,name,total,maximum}))
+  }}:{}),
   ...(isManualHotspring(s)?{stabilityLabel:hotspringStabilityLabel(calculateHotspringStability(s.game.city))}:{}),
   familyPitches:s.phase==='READY'?Object.values(content.families).map(f=>({role:f.publicRole,text:f.pitch})):null,relation:c.chapter>=3?relationLabel(c.trust,c.markers):null,
   landscape:hotspringLandscape(s),intro,recap:intro||c.justResumed?summary:[],epilogueRecap:epilogueRecap(s),

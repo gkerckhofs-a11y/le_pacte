@@ -35,13 +35,13 @@ Les cinq jauges fondamentales atteignent chacune 0 et 10 dans l’échantillon. 
 - Tableau public actualisé pendant le vote et la restitution de l’Influence. La part est arrondie à l’entier inférieur et le reliquat reste en réserve. La revendication du rôle de Shérif ne compte pas dans le partage.
 - Ouverture manuelle en régie, aucun passage automatique à l’expiration du temps et reprise d’une négociation avec l’engagement conservé.
 - Accords POUR ou CONTRE validés côté serveur, cumul des engagements compatibles, rejet des engagements contradictoires et des votes non conformes. Les fonds restent disponibles à l’émission et sont vérifiés à nouveau à l’acceptation. L’interface propose une mise minimale de 1 pour les nouvelles offres. Le serveur et le menu de vote prennent aussi en charge un minimum supérieur porté par un accord.
-- Vérification en navigateur de la Projection à 1280 × 720, 1920 × 1080 et 3840 × 2160, des règles sur terminal mobile et de la concordance du texte des règles avec le verso. Cinq terminaux vérifiés et cinq paires recto verso A4.
+- Vérification en navigateur de la Projection à 1280 × 720, 1920 × 1080 et 3840 × 2160, des règles sur terminal mobile et de la concordance du texte des règles avec la fiche imprimée. Cinq terminaux vérifiés et une page A4 par famille, QR et règles sur la même face.
 
 ## À valider au prochain essai humain
 
 - Compréhension du classement avec une égalité au premier rang ou à la deuxième place. Observer l’impact sur les choix de Caldwell et Whitmore.
 - Compréhension du bouton « Accepter et s’engager », surtout lorsqu’une famille reçoit plusieurs propositions ou qu’un donneur dépense ses dollars avant l’acceptation.
 - Rythme d’une négociation menée par le MJ, fenêtre de lecture de la part versée et lisibilité de la Stabilité sur le vidéoprojecteur de la salle.
-- Impression réelle sur le bord long et scan des QR de jeu sur les téléphones utilisés en salle.
+- Impression réelle en A4 et scan des QR de jeu sur les téléphones utilisés en salle.
 
-[Projection](captures/v12-projection.jpg) · [Terminal](captures/v12-terminal.jpg) · [Proposition reçue](captures/v12-terminal-accord.jpg) · [Régie](captures/v12-regie.jpg) · [Fiche recto verso – spécimen](fiche-qr-v1.2-specimen.pdf). Le QR du spécimen pointe vers un domaine fictif. La régie génère les QR valides pour chaque partie.
+[Projection](captures/v12-projection.jpg) · [Terminal](captures/v12-terminal.jpg) · [Proposition reçue](captures/v12-terminal-accord.jpg) · [Régie](captures/v12-regie.jpg) · [Fiche A4 – spécimen](fiche-qr-v1.2-specimen.pdf). Le QR du spécimen pointe vers un domaine fictif. La régie génère les QR valides pour chaque partie.
