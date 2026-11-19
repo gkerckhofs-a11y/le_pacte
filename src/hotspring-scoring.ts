@@ -19,6 +19,10 @@ export function autonomyIndex(markers){
  return autonomyGains.filter(m=>markers.has(m)).length-autonomyLosses.filter(m=>markers.has(m)).length;
 }
 
+export function hotspringTrajectoryTarget(campaign,indicator){
+ return indicator==='autonomy'?2:campaign.initialCity[indicator]+1;
+}
+
 export function chapterObjective(definition,markers){
  return definition.groups.filter(group=>group.some(m=>markers.has(m))).length>=definition.required?2:0;
 }
@@ -36,9 +40,8 @@ export function hotspringScores(s,{final=false}={}){
    const objective=definition.objectives[chapter-1];
    return {chapter,title:objective.title,points:chapterObjective(objective,markers),maximum:2};
   });
-  const trajectory=(definition.trajectory==='autonomy'
-   ?autonomyIndex(markers)>=2
-   :s.game.city[definition.trajectory]>campaign.initialCity[definition.trajectory])?2:0;
+  const value=definition.trajectory==='autonomy'?autonomyIndex(markers):s.game.city[definition.trajectory];
+  const trajectory=value>=hotspringTrajectoryTarget(campaign,definition.trajectory)?2:0;
   const charter=hasLegacy&&legacy[key].charters.some(m=>markers.has(m))?2:0;
   const governance=hasLegacy&&(
    key==='whitmore'?campaign.trust>=3||markers.has('ALLIANCE_VALLEE'):markers.has(legacy[key].government)

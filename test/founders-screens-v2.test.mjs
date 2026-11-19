@@ -14,15 +14,15 @@ const command=(s,actor,kind,data={})=>applyNarrativeCommand(s,actor,{kind,data,e
 state=command(command(state,owner,'start'),owner,'beginVote');
 for(const id of 'ABCDE')state=command(state,{role:'team',family:id},'vote',{kind:id==='A'?'pour':'passe_pouvoir',...(id==='A'?{amount:1}:{})});
 while(state.game.vote)state=command(state,{role:'team',family:state.game.vote.turn},'vote',{kind:'maintien'});
-async function screen(app,s){
+async function screen(app,s,family='A'){
  const {document,window}=parseHTML(readFileSync(new URL('../public/founders-'+app+'.html',import.meta.url),'utf8'));
  Object.defineProperty(window.HTMLSelectElement.prototype,'value',{configurable:true,get(){return [...this.options].find(o=>o.hasAttribute('selected'))?.value??this.options[0]?.value??'';},set(value){for(const o of this.options){if(o.value===value)o.setAttribute('selected','');else o.removeAttribute('selected');}}});
  window.Element.prototype.scrollIntoView=function(){};window.Element.prototype.showModal=function(){this.open=true;this.setAttribute('open','');};window.Element.prototype.close=function(){this.open=false;this.removeAttribute('open');};
- const errors=[],storage=new Map([['pacte-founder-family-'+s.id+'-A','a'.repeat(43)],['pacte-founder-organizer-key','local-key-1234567890123456789012345']]);
- const actor=app==='city'?{role:'public'}:app==='family'?{role:'team',family:'A'}:owner;
+ const errors=[],storage=new Map([['pacte-founder-family-'+s.id+'-'+family,'a'.repeat(43)],['pacte-founder-organizer-key','local-key-1234567890123456789012345']]);
+ const actor=app==='city'?{role:'public'}:app==='family'?{role:'team',family}:owner;
  const data={...narrativeView(s,actor),serverNow:2000};
  const timers=[];const catalog=await foundersCatalogFor({},'host');
- const context=vm.createContext({document,window,DOMParser:window.DOMParser,location:{origin:'http://localhost',pathname:'/founders-'+app+'.html',search:'?session='+s.id+'&family=A',hash:''},history:{replaceState(){}},sessionStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},URL,URLSearchParams,Image:class{constructor(){return document.createElement('img');}},crypto:webcrypto,performance:{now:()=>0},requestAnimationFrame:fn=>fn(),setInterval:fn=>{timers.push(fn);return {unref(){}};},fetch:async(path,options)=>({ok:true,json:async()=>path==='/api/catalog'?{authMode:'local'}:path==='/api/founders/catalog'?catalog:path==='/api/founders/preview'?foundersPreview(JSON.parse(options.body)):path==='/api/founders/configurations'?{configurations:[]}:path==='/api/founders/sessions'?{sessions:[]}:data}),console:{log(){},error:e=>errors.push(e)}});
+ const context=vm.createContext({document,window,DOMParser:window.DOMParser,location:{origin:'http://localhost',pathname:'/founders-'+app+'.html',search:'?session='+s.id+'&family='+family,hash:''},history:{replaceState(){}},sessionStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},URL,URLSearchParams,Image:class{constructor(){return document.createElement('img');}},crypto:webcrypto,performance:{now:()=>0},requestAnimationFrame:fn=>fn(),setInterval:fn=>{timers.push(fn);return {unref(){}};},fetch:async(path,options)=>({ok:true,json:async()=>path==='/api/catalog'?{authMode:'local'}:path==='/api/founders/catalog'?catalog:path==='/api/founders/preview'?foundersPreview(JSON.parse(options.body)):path==='/api/founders/configurations'?{configurations:[]}:path==='/api/founders/sessions'?{sessions:[]}:data}),console:{log(){},error:e=>errors.push(e)}});
  const bundle=await build({entryPoints:['public/founders-'+app+'.js'],bundle:true,write:false,format:'iife',platform:'browser',logLevel:'silent'});
  vm.runInContext(bundle.outputFiles[0].text,context);
  for(let i=0;i<10;i++)await new Promise(r=>setImmediate(r));
@@ -99,6 +99,33 @@ test('Hotspring : six valeurs au Terminal et simulation plafonnée en Régie',as
  assert.match(text,/Bien-être.*Stabilité.*6,0\/10/);
  assert.equal(family.document.querySelectorAll('#gauges .gauge').length,6);
  assert.doesNotMatch(family.document.body.textContent,/après plafonnement/);
+});
+
+test('Hotspring : le Terminal affiche le seuil privé et les règles de la fiche QR',async()=>{
+ const game=newCampaign();
+ game.command('start');
+ const {document}=await screen('family',game.state,'B');
+ const get=id=>document.getElementById(id);
+ assert.match(get('objective').textContent,/Bien-être.*au moins 6\/10.*2 points.*0 point/);
+ assert.equal(get('goalProgress').hidden,true);
+ assert.equal(get('familyStatsBlock').hidden,true);
+ assert.equal(get('councilRoles').querySelectorAll('.council-office').length,2);
+ assert.doesNotMatch(get('boardPanel').textContent,/Des fondations communes|Les points sont affichés au bilan|matériel remplaçable/);
+ get('rulesTab').click();
+ assert.equal(get('rulesPanel').hidden,false);
+ assert.equal(get('rulesV2').hidden,true);
+ assert.equal(get('rulesLegacy').hidden,true);
+ const rules=get('rulesHotspring');
+ assert.equal(rules.hidden,false);
+ assert.deepEqual([...rules.querySelectorAll('h3')].map(h=>h.textContent),[
+  'Votre but','Un dilemme en 5 étapes','L’Influence','L’abstention','Les dollars','Le Maire','Le Shérif','Rappel express'
+ ]);
+ assert.match(rules.textContent,/Maximum : 18 points/);
+ assert.match(rules.textContent,/deux familles terminent deuxièmes/);
+ const legacy=await screen('family',state);
+ assert.equal(legacy.document.getElementById('rulesHotspring').hidden,true);
+ assert.equal(legacy.document.getElementById('rulesV2').hidden,false);
+ assert.equal(legacy.document.getElementById('goalProgress').hidden,false);
 });
 
 test('Projection Hotspring : la réserve affiche l’estimation puis le versement',async()=>{

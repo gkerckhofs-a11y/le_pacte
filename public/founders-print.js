@@ -1,4 +1,5 @@
 import {teamCaption} from './founders-identity.js';
+import {createHotspringRules} from './hotspring-rules.js';
 const $=id=>document.getElementById(id);
 const node=(tag,text,className)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;};
 export function mountPrintKit({session,view,request,renew}){
@@ -84,7 +85,7 @@ export function mountPrintKit({session,view,request,renew}){
      const access=node('header',undefined,'print-hotspring-access'),identity=node('div');
      identity.append(...c.children,reference,node('p','Porte-parole : scannez le QR code, vérifiez la famille et la session. Gardez cette page ouverte.','print-scan'));
      access.append(identity,image);
-     c.append(access,$('hotspringQrReminder').content.cloneNode(true));
+     c.append(access,createHotspringRules({print:true}));
     }else{
      c.append(image,reference);
      const instructions=node('ol');for(const t of ['Scannez le QR code.','Vérifiez le nom de votre famille et le code de session affichés.','Gardez cette page ouverte pendant toute la partie.','Un seul terminal officiel est utilisé pour votre famille.'])instructions.append(node('li',t));c.append(instructions);

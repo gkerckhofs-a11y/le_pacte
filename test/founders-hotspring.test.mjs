@@ -68,8 +68,14 @@ test('Hotspring : le Bien-être évolue par les votes et la Stabilité suit la m
  const first=narrativePublicView(g.state);
  assert.deepEqual(first.city,{economie:5,ecologie:5,securite:5,demographie:5,bien_etre:5,stabilite:5});
  assert.deepEqual(Object.values(g.state.scenario.campaign.families).map(f=>f.trajectory),['economie','bien_etre','securite','demographie','ecologie']);
- assert.match(narrativeFamilyView(g.state,'B').privateCampaign.trajectory,/Bien-être/);
- assert.match(narrativeFamilyView(g.state,'D').privateCampaign.trajectory,/Démographie/);
+ for(const [family,label] of [['A','Économie'],['B','Bien-être'],['C','Sécurité'],['D','Démographie'],['E','Écologie']]){
+  assert.match(narrativeFamilyView(g.state,family).privateCampaign.trajectory,new RegExp(label+' » doit atteindre au moins 6/10.*2 points'));
+ }
+ const old=newCampaign({scenarioVersion:'1.0.0'}).state;
+ old.campaign.initialCity.economie=7;
+ assert.match(narrativeFamilyView(old,'A').privateCampaign.trajectory,/au moins 8\/10/);
+ old.campaign.initialCity.economie=10;
+ assert.match(narrativeFamilyView(old,'A').privateCampaign.trajectory,/hors d’atteinte/);
  g.command('start');g.vote('pour');g.command('next');
  assert.match(narrativePublicView(g.state).dilemma.tendencies.contre.join(' '),/Bien-être ↑/);
  g.vote('contre');

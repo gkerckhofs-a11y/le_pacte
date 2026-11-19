@@ -1,5 +1,5 @@
 import {activeFounders} from './founders.ts';
-import {hotspringScores,autonomyIndex} from './hotspring-scoring.ts';
+import {hotspringScores,autonomyIndex,hotspringTrajectoryTarget} from './hotspring-scoring.ts';
 import {hotspringLandscape} from './hotspring-landscape.ts';
 import art from '../content/hotspring-art-index-v1.json' with {type:'json'};
 
@@ -345,9 +345,15 @@ export function campaignFamily(s,family){
   return o.title+' ('+o.required+' choix) — '+options.join(', ')+'.';
  });
  const score=current?(s.finalResults??hotspringScores(s)).rows.find(r=>r.family===family):null;
+ const target=hotspringTrajectoryTarget(s.campaign,def.trajectory);
+ const indicator=cityLabels[def.trajectory];
+ const trajectory=def.trajectory==='autonomy'
+  ?'Un indice d’autonomie d’au moins '+target+' au bilan vous rapporte 2 points. En dessous, vous marquez 0 point.'
+  :target>10
+   ?'La jauge « '+indicator+' » a commencé à 10/10. Le seuil de progression est hors d’atteinte et rapporte 0 point.'
+   :'La jauge « '+indicator+' » doit atteindre au moins '+target+'/10 au bilan pour vous rapporter 2 points. En dessous, vous marquez 0 point.';
  return {role:def.publicRole,briefing:def.briefing,objectives,
-  trajectory:def.trajectory==='autonomy'?'Atteindre un indice d’autonomie d’au moins 2.':
-   'Améliorer la jauge '+cityLabels[def.trajectory]+' par rapport à sa valeur de départ.',
+  trajectory,
   score,maySupport:!s.clock?.paused&&s.phase==='CHARTER_SUPPORT'&&!Object.hasOwn(s.campaign.qualification.supports,family)};
 }
 

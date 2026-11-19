@@ -6,6 +6,7 @@ import {renderCouncilRoles,appendFamilyRoles} from './founders-role-badges.js';
 import {saveFamilyName} from './founders-name-save.js';
 import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
 import {teamCaption,teamLabel} from './founders-identity.js';
+import {createHotspringRules} from './hotspring-rules.js';
 "use strict";
 const $=id=>document.getElementById(id),params=new URLSearchParams(location.search);
 const sessionId=params.get('session'),expectedFamily=params.get('family'),key='pacte-founder-family-'+sessionId+(expectedFamily?'-'+expectedFamily:'');
@@ -88,13 +89,10 @@ function render(data){
  }
  set('influence',self.power);set('dollars',self.dollars);
  set('influenceLabel',data.skin.labels.influence);set('dollarLabel',data.skin.labels.currency);set('offerAmountLabel',data.skin.labels.currency+' proposés');
- set('objective',self.objective);
- if(data.privateCampaign){
-  const own=data.privateCampaign;
-  set('goalTitle',own.role);
-  set('goalConditions',own.objectives.join(' · ')+' — '+own.trajectory);
-  set('goalStatus',own.score?own.score.total+'/'+own.score.maximum+' · '+campaignScoreText(own.score):'Les points sont affichés au bilan.');
- }else if(data.goalCard&&data.goalProgress){
+ set('objective',data.privateCampaign?.trajectory??self.objective);
+ $('goalProgress').hidden=Boolean(data.campaign);
+ $('chapterObjectivesNote').hidden=!data.campaign;
+ if(!data.campaign&&data.goalCard&&data.goalProgress){
   const card=data.goalCard,progress=data.goalProgress;
   set('goalTitle',card.title);
   const direction=card.direction==='at_least'?'au moins':'au plus';
@@ -119,7 +117,8 @@ function render(data){
   if(!b.dataset.defaultLabel)b.dataset.defaultLabel=b.textContent;
   b.textContent=data.campaign&&data.dilemma?' '+side.toUpperCase()+' · '+data.dilemma.labels[side]:b.dataset.defaultLabel;
  }
- set('familyStats',self.members+' membre(s) · Maire : '+teamLabel(data,data.leader)+' · Shérif : '+teamLabel(data,data.moderator));
+ $('familyStatsBlock').hidden=Boolean(data.campaign);
+ if(!data.campaign)set('familyStats',self.members+' membre(s) · Maire : '+teamLabel(data,data.leader)+' · Shérif : '+teamLabel(data,data.moderator));
  set('committed',self.choice?'Votre position : '+self.choice+' · Mise engagée : '+self.bid:'Aucun vote engagé pour ce dilemme.');
  set('voteHint',self.mayVote?'Votre famille doit décider maintenant.':data.phase==='COUNCIL'?'Vous pouvez négocier en attendant votre tour.':'Le Conseil attend la prochaine phase.');
  $('firstVote').hidden=!(self.mayVote&&self.choice===null);
@@ -145,9 +144,11 @@ function render(data){
  $('offerBindingHelp').hidden=data.experienceVersion===2;
  $('offerReason').required=data.experienceVersion!==2;
  if(data.experienceVersion===2)$('offerCommitment').value='gift';
- $('rulesLegacy').hidden=data.experienceVersion===2;$('rulesV2').hidden=data.experienceVersion!==2;
- $('rulesV2Score').hidden=Boolean(data.campaign);$('rulesHotspringScore').hidden=!data.campaign;
- $('rulesHotspringStability').hidden=data.campaign?.version!==2;
+ const campaignRules=$('rulesHotspring');
+ campaignRules.hidden=!data.campaign;
+ if(data.campaign&&!campaignRules.firstElementChild)campaignRules.append(createHotspringRules());
+ $('rulesIntroduction').hidden=Boolean(data.campaign);
+ $('rulesLegacy').hidden=data.experienceVersion===2;$('rulesV2').hidden=data.experienceVersion!==2||Boolean(data.campaign);
  const target=$('targetFamily'),prev=target.value;target.replaceChildren();
  for(const f of data.families.filter(f=>f.id!==self.id)){
   const option=document.createElement('option');option.value=f.id;option.textContent=teamCaption(f);target.append(option);
