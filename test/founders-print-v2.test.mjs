@@ -43,21 +43,25 @@ for(const [count,version] of [[5,'2.0.0'],[6,'2.0.0'],[5,'1.1.0'],[5,'1.2.0']])t
   const token=new URLSearchParams(url.hash.slice(1)).get('token');tokens.push(token);
   const terminal=await fetch(origin+'/api/founders/sessions/'+created.id,{headers:{Authorization:'Bearer '+token}}).then(r=>r.json());
   if(campaign){
-   assert.equal(terminal.privateCampaign.objectives.length,5);assert.ok(card.textContent.includes(link));
+   assert.equal(terminal.privateCampaign.objectives.length,5);
+   assert.match(card.textContent,/Les Colons de Hotspring/i);
+   assert.doesNotMatch(card.textContent,/https?:|#token=|Accès valable 24 h|V1\.2/i);
+   assert.ok(!card.textContent.includes(created.code));
+   assert.ok(!card.textContent.includes('Équipes & vérification'));
    const reminder=card.querySelector('.print-reminder');
    assert.ok(reminder);
    assert.equal(card.querySelector('.print-qr').closest('.print-hotspring-access').nextElementSibling,reminder);
    if(manual){
-    assert.match(reminder.textContent,/En acceptant un accord de vote/);
-    assert.match(reminder.textContent,/deux jauges les plus élevées/);
+    assert.match(reminder.textContent,/doit voter dans le camp convenu et miser au moins 1 Influence/);
+    assert.match(reminder.textContent,/sa jauge secrète figure parmi les deux plus élevées/);
    }
    assert.equal(reminder.querySelector('ol').children.length,5);
    assert.deepEqual([...reminder.querySelectorAll('h4')].map(h=>h.textContent),[
     'Votre but','Un dilemme en 5 étapes','L’Influence','L’abstention','Les dollars','Le Maire','Le Shérif','Rappel express'
    ]);
-   assert.match(reminder.textContent,/Vos objectifs sont secrets\. Gardez-les confidentiels/);
-   assert.match(reminder.textContent,/Maximum : 18 points/);
-   assert.match(reminder.textContent,/deux familles terminent deuxièmes\. Elles gagnent chacune 2 points, et la famille suivante est classée quatrième\./);
+   assert.match(reminder.textContent,/Gardez vos objectifs secrets/);
+   assert.match(reminder.textContent,/maximum est de 18 points/);
+   assert.match(reminder.textContent,/deux familles finissent deuxièmes, elles gagnent chacune 2 points et la suivante se classe quatrième\./);
    assert.match(reminder.textContent,/Préservez votre fortune/);
   }else{
    assert.equal(card.querySelector('.print-reminder'),null);
