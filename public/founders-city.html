@@ -37,6 +37,10 @@
 <section class="projection-city">
  <div class="projection-visual">
   <div class="projection-viewport"><div id="city" aria-label="Illustration évolutive de Hot Spring"></div></div>
+  <section id="panoramaStability" class="panorama-stability" aria-labelledby="stabilityTitle" hidden>
+   <div class="gauge-head"><strong id="stabilityTitle"></strong><span id="stabilityState"></span></div>
+   <div id="stabilityTrack" class="track" role="progressbar" aria-label="Stabilité" aria-valuemin="0" aria-valuemax="10"><div id="stabilityBar" class="bar"></div></div>
+  </section>
   <p id="cityEvolution" class="small city-evolution" role="status" hidden></p>
  </div>
  <div class="projection-results">
@@ -49,7 +53,7 @@
   <div class="panel">
    <h2>La ville après vos décisions</h2><div id="gauges"></div>
    <dl id="influenceReserve" class="projection-reserve" aria-label="Partage de la réserve d’influence" aria-live="polite" hidden>
-    <div><dt>Influence en réserve</dt><dd id="influenceAvailable"></dd></div>
+    <div><dt id="influenceAvailableLabel">Influence en réserve</dt><dd id="influenceAvailable"></dd></div>
     <div><dt>Familles en récupération</dt><dd id="influenceParticipants"></dd></div>
     <div><dt id="influencePartLabel">Part estimée par famille</dt><dd id="influencePart"></dd></div>
    </dl>

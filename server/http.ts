@@ -101,7 +101,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
       scenarioId:d.scenarioId,scenarioVersion:d.scenarioVersion,skinId:d.skinId,members:d.members,
       calibration:d.calibration
     });
-    if(p.scenario.campaign)throw new Error('La campagne Hotspring utilise son propre barème sur 15 points.');
+    if(p.scenario.campaign)throw new Error('La campagne Hotspring utilise son propre barème sur 18 points.');
     json(200,analyzeFoundersGoalReachability(p.scenario,d.goalCards??DEFAULT_GOAL_CARDS,
       {initialCity:p.game.city}));return;
    }
@@ -112,7 +112,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
       scenarioId:d.scenarioId,scenarioVersion:d.scenarioVersion,skinId:d.skinId,members:d.members,
       calibration:d.calibration
     });
-    if(p.scenario.campaign)throw new Error('La campagne Hotspring utilise son propre barème sur 15 points.');
+    if(p.scenario.campaign)throw new Error('La campagne Hotspring utilise son propre barème sur 18 points.');
     json(200,simulateFoundersPolicies(p.scenario,{
       cards:d.goalCards,rule:d.scoreRules,calibration:p.settings.calibration,members:p.settings.members,
       runs:d.runs,mode:d.mode,seed:d.seed

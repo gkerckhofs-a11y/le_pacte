@@ -2,14 +2,14 @@
 
 Campagne versionnée à cinq familles, de l’arrivée des chariots en 1872 au choix d’une charte en 1893. La sélection « Les Colons de Hotspring » crée une session propre au parcours.
 
-Le catalogue propose la V1.1 par défaut. Économie, Écologie, Sécurité, Bien-être et Démographie commencent à 5. La Stabilité affiche leur moyenne, soit 5,0 au départ. Les sauvegardes antérieures réutilisent les règles de leur version. La [matrice des résultats](matrice-indicateurs-v1.1.md) détaille les choix, les variantes et les chartes. Le [rapport de simulation](rapport-simulation-v1.1.md) contient les captures et les points à revoir en salle.
+Le catalogue propose la V1.2 par défaut. Les cinq jauges commencent à 5. Sous le panorama, la Stabilité affiche leur moyenne, soit 5,0 au départ. Les sauvegardes antérieures réutilisent leurs règles d’origine. En V1.2, l’animateur ouvre le vote et décide quand poursuivre. La [matrice des résultats](matrice-indicateurs-v1.2.md) détaille les décisions et chartes. Le [rapport de simulation](rapport-simulation-v1.2.md) contient les captures et les points à revoir en salle.
 
 ## Essai local
 
 1. Démarrer le serveur avec `npm start`.
 2. Ouvrir `/founders-setup.html?scenario=les-colons-de-hotspring` sur ce serveur, puis charger le catalogue avec la clé de régie locale.
 3. Prévisualiser la campagne, nommer les équipes et créer la partie. Choisir « Séance standard » pour limiter le chapitre V à deux crises par séance.
-4. Dans la régie, vérifier les cinq fiches QR avant de les imprimer. Un renouvellement remplace l’accès précédent. Les QR expirent 24 heures après création et peuvent être régénérés à une reprise.
+4. Dans la régie, vérifier les cinq fiches QR avant de les imprimer en A4 recto verso au bord long. Un renouvellement remplace l’accès précédent. Les QR expirent 24 heures après création et peuvent être régénérés à une reprise.
 5. Ouvrir la projection. La régie peut passer de la lecture à la négociation puis au vote. L’épilogue précède le bouton de révélation des ambitions et du classement.
 
 « Terminer la séance » sauvegarde aussi un scrutin ouvert, ses mises, ses propositions et son chrono. Le bilan ne compte que les chapitres clôturés et la trajectoire. Au checkpoint du chapitre V, la régie peut reprendre les crises en réserve ou ouvrir le final. La variante d’une archive repart du checkpoint « Gouvernement choisi », avec les ressources et le panorama précédant le duel des chartes.

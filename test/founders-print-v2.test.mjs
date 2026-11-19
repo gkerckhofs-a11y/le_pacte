@@ -12,7 +12,7 @@ const decode=svg=>{
  const png=PNG.sync.read(new Resvg(svg,{fitTo:{mode:'width',value:660}}).render().asPng());
  const result=jsQR(new Uint8ClampedArray(png.data),png.width,png.height);assert.ok(result,'QR lisible par le décodeur indépendant');return result.data;
 };
-for(const [count,campaign] of [[5,false],[6,false],[5,true]])test(`Fiches ${campaign?'Hotspring ':''}${count} : décodage du SVG imprimé, session, famille, révocation, rechargement et blocage complet`,async t=>{
+for(const [count,version] of [[5,'2.0.0'],[6,'2.0.0'],[5,'1.1.0'],[5,'1.2.0']])test(`Fiches ${count} · ${version} : décodage du SVG imprimé, session, famille, révocation, rechargement et blocage complet`,async t=>{
  let now=1000;const store=new GameStore(':memory:'),key='organizer-qr-verification-1234567890',server=createGameServer(store,key,()=>now);
  await new Promise(r=>server.listen(0,'127.0.0.1',r));
  t.after(async()=>{server.closeAllConnections();await new Promise(r=>server.close(r));store.close();});
@@ -21,8 +21,9 @@ for(const [count,campaign] of [[5,false],[6,false],[5,true]])test(`Fiches ${camp
   const r=await fetch(origin+path,{method:data?'POST':'GET',headers:{Authorization:'Bearer '+key,...(data?{'Content-Type':'application/json'}:{})},body:data?JSON.stringify(data):undefined});
   const result=await r.json();if(!r.ok){const e=new Error(result.error);e.accessInvalid=r.status===403&&/expiré|révoqué/.test(e.message);throw e;}return result;
  };
+ const campaign=version!=='2.0.0',duplex=version==='1.2.0';
  const scenarioId=campaign?'les-colons-de-hotspring':'hot-spring-reserve-hybride';
- const created=await request('/api/founders/sessions',{scenarioId,scenarioVersion:campaign?'1.1.0':'2.0.0',skinId:'western',code:'QRTEST'+count,title:'Équipes & vérification',members:Array(count).fill(1),names:['Caldwell','Doyle','Mercer','L’eau & les terres','Les Établis','Sixième'].slice(0,count)});
+ const created=await request('/api/founders/sessions',{scenarioId,scenarioVersion:version,skinId:'western',code:'QRTEST'+count,title:'Équipes & vérification',members:Array(count).fill(1),names:['Caldwell','Doyle','Mercer','L’eau & les terres','Les Établis','Sixième'].slice(0,count)});
  let view=await request('/api/founders/sessions/'+created.id);
  const storage=new Map();let prints=0,offline=false,wrong=false;
  const mount=()=>{
@@ -32,18 +33,28 @@ for(const [count,campaign] of [[5,false],[6,false],[5,true]])test(`Fiches ${camp
   return {document,kit};
  };
  let {document,kit}=mount();
+ kit.sync(view);assert.equal(document.getElementById('printDuplexNote').hidden,!duplex);
  await kit.prepare();assert.equal(document.querySelectorAll('.print-qr svg').length,count);assert.equal(document.getElementById('printReadyQR').disabled,false);
+ assert.equal(document.querySelectorAll('.print-card').length,duplex?count*2:count);
  const tokens=[];
- for(const card of document.querySelectorAll('.print-card')){
+ for(const card of document.querySelectorAll('.print-card[data-family]')){
   const f=card.dataset.family,svg=card.querySelector('svg').outerHTML,link=decode(svg);assert.equal(card.querySelector('a').href,link);
   const url=new URL(link);assert.equal(url.searchParams.get('session'),created.id);assert.equal(url.searchParams.get('family'),f);
   const token=new URLSearchParams(url.hash.slice(1)).get('token');tokens.push(token);
   const terminal=await fetch(origin+'/api/founders/sessions/'+created.id,{headers:{Authorization:'Bearer '+token}}).then(r=>r.json());
   if(campaign){
    assert.equal(terminal.privateCampaign.objectives.length,5);assert.ok(card.textContent.includes(link));
-   const reminder=card.querySelector('.print-reminder');
+   const back=card.nextElementSibling;
+   const reminder=(duplex?back:card).querySelector('.print-reminder');
    assert.ok(reminder);
-   assert.equal(card.querySelector('.print-qr').closest('.print-hotspring-access').nextElementSibling,reminder);
+   if(duplex){
+    assert.equal(card.dataset.side,'recto');
+    assert.equal(back.dataset.side,'verso');
+    assert.equal(back.querySelector('h2').textContent,card.querySelector('h2').textContent);
+    assert.equal(back.querySelector('svg'),null);
+    assert.match(reminder.textContent,/En acceptant un accord de vote/);
+    assert.match(reminder.textContent,/deux jauges les plus élevées/);
+   }else assert.equal(card.querySelector('.print-qr').closest('.print-hotspring-access').nextElementSibling,reminder);
    assert.equal(reminder.querySelector('ol').children.length,5);
    assert.deepEqual([...reminder.querySelectorAll('h4')].map(h=>h.textContent),[
     'Votre but','Un dilemme en 5 étapes','L’Influence','L’abstention','Les dollars','Le Maire','Le Shérif','Rappel express'

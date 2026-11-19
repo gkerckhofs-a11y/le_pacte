@@ -29,7 +29,7 @@ const requireValid=(errors,label)=>{if(errors.length)throw new Error(label+': '+
 export function validateFoundersStory(payload) {
  const errors=[];
  if(!keys(payload,['schema_version','scenario','dilemmas','campaign']))return ['Objet de scénario invalide'];
- error(payload.schema_version==='1.0.0'||payload.schema_version==='1.1.0'&&payload.scenario?.id===HOTSPRING_ID&&payload.campaign?.version===2,'schema_version incompatible',errors);
+ error(payload.schema_version==='1.0.0'||['1.1.0','1.2.0'].includes(payload.schema_version)&&payload.scenario?.id===HOTSPRING_ID&&payload.campaign,'schema_version incompatible',errors);
  const s=payload.scenario;
  if(!keys(s,['id','title','universe','location','year','entry_dilemma','status','progression']))errors.push('scenario : structure');
  else {
@@ -194,7 +194,7 @@ export function prepareFoundersSession(input,{scenarioId,scenarioVersion,skinId,
  members??=hotspring?[5,5,5,5,5]:[5,5,5,5,5,5];
  if(hotspring&&(!Array.isArray(members)||members.length!==5))throw new Error('Les Colons de Hotspring se jouent avec cinq familles.');
  const v2=hotspring||selectedVersion==='2.0.0'&&scenarioId==='hot-spring-reserve-hybride';
- const expandedHotspring=hotspring&&release.payload.campaign.version===2;
+ const expandedHotspring=hotspring&&release.payload.campaign.version>=2;
  if(expandedHotspring&&calibration===FOUNDERS_DEFAULT_CALIBRATION)
   calibration={...calibration,city:{...CITY_V2,bien_etre:5}};
  else if(v2&&!expandedHotspring&&!Object.hasOwn(calibration.city??{},'ecologie'))

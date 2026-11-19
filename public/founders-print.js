@@ -12,7 +12,10 @@ export function mountPrintKit({session,view,request,renew}){
   try{sessionStorage.setItem('pacte-narrative-access-'+session,JSON.stringify({access:[...credentials].map(([family,token])=>({family,token}))}));}catch{}
  };
  function shell(){invalidate();const root=$('printSheets');root.replaceChildren();root.hidden=false;return root;}
- function sync(s){if(prepared&&fingerprint(s)!==prepared.fingerprint){invalidate();$('printSheets').replaceChildren();$('printStatus').textContent='Les équipes ont changé. Préparez les fiches de nouveau.';}}
+ function sync(s){
+  $('printDuplexNote').hidden=!(s.campaign?.version>=3);
+  if(prepared&&fingerprint(s)!==prepared.fingerprint){invalidate();$('printSheets').replaceChildren();$('printStatus').textContent='Les équipes ont changé. Préparez les fiches de nouveau.';}
+ }
  function card(root,family,title){
   const c=node('article',undefined,'print-card');c.style.borderColor=family.color.hex;
   c.append(node('p',view().title+' · '+view().code,'print-kicker'),node('h2',teamCaption(family)));
@@ -58,6 +61,7 @@ export function mountPrintKit({session,view,request,renew}){
  const verify=(s,f,token)=>request('/api/founders/access-qr',{session,family:f.id,token,origin:location.origin}).then(data=>checked(data,f,token,s));
  async function prepareQR(){
   if(preparing)return;const s=view();if(!s)return;preparing=true;
+  const duplex=s.campaign?.version>=3;
   const root=shell(),stamp=fingerprint(s),cards=[];$('prepareQR').disabled=true;
   $('printStatus').textContent='Vérification de chaque terminal et préparation des fiches…';
   try{
@@ -85,7 +89,13 @@ export function mountPrintKit({session,view,request,renew}){
      const access=node('header',undefined,'print-hotspring-access'),identity=node('div');
      identity.append(...c.children,reference,node('p','Porte-parole : scannez le QR code, vérifiez la famille et la session. Gardez cette page ouverte.','print-scan'));
      access.append(identity,image);
-     c.append(access,createHotspringRules({print:true}));
+     c.append(access);
+     if(duplex){
+      c.classList.add('print-hotspring-front');c.dataset.side='recto';
+      c.append(node('h3','Accès confidentiel de votre famille'),node('p','Consultez votre objectif secret et prenez les décisions de votre famille sur le terminal. Les règles sont au verso.'));
+      const back=card(root,f);back.classList.add('print-hotspring');back.dataset.side='verso';
+      back.append(createHotspringRules({print:true,manual:true}));
+     }else c.append(createHotspringRules({print:true}));
     }else{
      c.append(image,reference);
      const instructions=node('ol');for(const t of ['Scannez le QR code.','Vérifiez le nom de votre famille et le code de session affichés.','Gardez cette page ouverte pendant toute la partie.','Un seul terminal officiel est utilisé pour votre famille.'])instructions.append(node('li',t));c.append(instructions);

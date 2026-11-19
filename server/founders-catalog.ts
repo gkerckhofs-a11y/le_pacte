@@ -49,8 +49,11 @@ library=publishFoundersScenario(library,{payload:hybridIllustrated,version:'1.3.
 library=publishFoundersScenario(library,{payload:hybridV2,version:'2.0.0',source:{type:'bundled_fixture',label:'Corrections du premier test — quatre jauges et surenchère continue'}});
 library=publishFoundersScenario(library,{payload:hotspring,version:'1.0.0',
  source:{type:'bundled_fixture',label:'Les Colons de Hotspring — campagne d’origine'}});
-library=publishFoundersScenario(library,{payload:hotspringWithWellBeing(hotspring),version:'1.1.0',
+const hotspringV11=hotspringWithWellBeing(hotspring);
+library=publishFoundersScenario(library,{payload:hotspringV11,version:'1.1.0',
  source:{type:'bundled_fixture',label:'Les Colons de Hotspring — Bien-être, Stabilité et objectifs des cinq familles'}});
+library=publishFoundersScenario(library,{payload:{...hotspringV11,schema_version:'1.2.0',campaign:{...hotspringV11.campaign,version:3}},version:'1.2.0',
+ source:{type:'bundled_fixture',label:'Les Colons de Hotspring — trajectoires relatives et négociations contraignantes'}});
 export const foundersLibrary=library;
 export const foundersCatalog=()=>listFoundersLibrary(foundersLibrary);
 export const foundersPreview=selection=>prepareFoundersSession(foundersLibrary,selection);

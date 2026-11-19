@@ -343,7 +343,7 @@ const workspace=mountWorkspace({api,getCatalog:()=>catalog,
 $('gameCode').value='P'+crypto.randomUUID().replaceAll('-','').slice(0,7).toUpperCase();
 
 const campaignSetup=()=>$('scenario').value==='les-colons-de-hotspring';
-const expandedCampaignSetup=()=>campaignSetup()&&$('scenarioVersion').value==='1.1.0';
+const expandedCampaignSetup=()=>campaignSetup()&&['1.1.0','1.2.0'].includes($('scenarioVersion').value);
 const legacyNote=$('familySetupNote').textContent;
 let usedCampaignNames=false;
 function isV2Setup(){return campaignSetup()|| $('scenario').value==='hot-spring-reserve-hybride'&&$('scenarioVersion').value==='2.0.0';}

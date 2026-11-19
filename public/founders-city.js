@@ -18,13 +18,15 @@ function status(id,value){
  text(id,value);
  $(id).hidden=!value;
 }
-function drawInfluenceReserve(reserve){
+function drawInfluenceReserve(reserve,manual){
  $('influenceReserve').hidden=!reserve;
  if(!reserve)return;
- text('influenceAvailable',reserve.available);
+ const units=manual?' Influence':'';
+ text('influenceAvailableLabel',manual?'Réserve commune':'Influence en réserve');
+ text('influenceAvailable',reserve.available+units);
  text('influenceParticipants',reserve.participants);
  text('influencePartLabel',reserve.settled?'Part versée par famille':'Part estimée par famille');
- text('influencePart',reserve.participants?reserve.perFamily:'—');
+ text('influencePart',reserve.participants?reserve.perFamily+units:'—');
 }
 function drawIllustration(s,sceneOnly){
  const image=$('decisionImage');
@@ -43,6 +45,7 @@ function drawGauges(s){
  const compact=Boolean(s.campaign)&&Object.hasOwn(s.city,'bien_etre');
  root.classList.toggle('projection-gauges-grid',compact);
  for(const key of Object.keys(s.city)){
+  if(key==='stabilite'&&s.campaign?.version>=3)continue;
   const g=document.createElement('div');g.className='gauge';
   const row=document.createElement('div');row.className='gauge-head';
   const label=document.createElement('span');label.textContent=s.skin.labels.resources[key]||key;
@@ -67,18 +70,32 @@ function drawGauges(s){
  }
 
 }
+function drawPanoramaStability(s,manual){
+ $('panoramaStability').hidden=!manual;
+ if(!manual)return;
+ const value=s.city.stabilite,track=$('stabilityTrack'),bar=$('stabilityBar'),state=$('stabilityState');
+ text('stabilityTitle','Stabilité — '+formatGaugeNumber(value,true)+' / 10');
+ appendGaugeDelta($('stabilityTitle'),s,'stabilite');
+ text('stabilityState',s.campaign.stabilityLabel);
+ track.setAttribute('aria-valuenow',String(value));
+ track.setAttribute('aria-valuetext',formatGaugeNumber(value,true)+' sur 10. '+s.campaign.stabilityLabel);
+ bar.style.width=value*10+'%';
+ decorateGauge(bar,state,value,s,{compact:true});
+}
 function render(s){
+ const manual=s.campaign?.version>=3;
  document.body.classList.toggle('game-finished',Boolean(s.finalResults));
+ document.body.classList.toggle('projection-manual-hotspring',manual);
  $('dilemmaPanel').hidden=Boolean(s.finalResults);
  const stageReading=Boolean(s.campaign)&&['CHECKPOINT','SUSPENDED','CHARTER_SUPPORT','EPILOGUE'].includes(s.phase);
  document.body.classList.toggle('projection-stage-reading',stageReading);
  document.body.classList.toggle('projection-qualification',s.phase==='CHARTER_SUPPORT');
- document.body.classList.toggle('projection-hotspring-epilogue',s.campaign?.version===2&&s.phase==='EPILOGUE');
+ document.body.classList.toggle('projection-hotspring-epilogue',s.campaign?.version>=2&&s.phase==='EPILOGUE');
  renderPhaseClock($('phaseClock'),s);
  $('phase').hidden=!$('phaseClock').hidden;
  const totals=voteTotals(s);
  applySkin(document.body,s.skin);document.body.classList.toggle('campaign-hotspring',Boolean(s.campaign));text('universeTitle',s.campaign?s.story.title:'Le Pacte · '+s.skin.title);
- text('pageTitle',s.story.location+' · '+s.story.year);text('phase',pretty[s.phase]||s.phase);
+ text('pageTitle',s.story.location+' · '+s.story.year);text('phase',(pretty[s.phase]||s.phase)+(manual&&s.clock?.paused?' · Pause':''));
  text('chapter',s.dilemma?(s.dilemma.sequence?'Conseil '+s.dilemma.sequence:'Chapitre '+s.dilemma.chapter):'Le Conseil des Fondateurs');
  const sceneOnly=s.campaign&&['INTRO','CHECKPOINT','SUSPENDED','CHARTER_SUPPORT','EPILOGUE','FINISHED'].includes(s.phase);
  $('dilemmaTitle').hidden=Boolean(sceneOnly);$('dilemmaText').hidden=Boolean(sceneOnly||s.reveal);
@@ -86,6 +103,7 @@ function render(s){
  text('dilemmaText',s.dilemma?.public_text||(s.phase==='FINISHED'?'Les délibérations sont terminées.':'Le Conseil attend le signal de la régie.'));
  text('question',sceneOnly?'':s.dilemma?.vote_question||'');
  drawGauges(s);
+ drawPanoramaStability(s,manual);
  $('chronicleOpen').hidden=!(s.history?.length);
  if($('chronicleDialog').open)renderChronicle($('cityChronicle'),s);
  if(s.campaign){
@@ -101,14 +119,17 @@ function render(s){
  previousCityStates=cityStates;
  }
  drawIllustration(s,sceneOnly);
- drawInfluenceReserve(s.influenceReserve);
+ drawInfluenceReserve(s.influenceReserve,manual);
  const out=$('outcome');out.hidden=!s.reveal;
  if(s.reveal){text('outcomeTitle',s.campaign?s.reveal.chronicle.title:s.reveal.winner==='pour'?'PROPOSITION ADOPTÉE':'PROPOSITION REJETÉE');text('outcomeText',s.reveal.narration);}
- text('voteForTotal',totals.yes);text('voteAgainstTotal',totals.no);text('voteAbstentions',totals.abstentions);
- text('voteSummary',s.phase==='AWAITING_REVEAL'?'Résultat sous scellés · révélation par la régie':'Influence engagée');
+ text('voteForTotal',totals.yes+(manual?' Influence':''));
+ text('voteAgainstTotal',totals.no+(manual?' Influence':''));
+ text('voteAbstentions',totals.abstentions);
+ status('voteSummary',s.phase==='AWAITING_REVEAL'?'Résultat sous scellés · révélation par la régie':manual?'':'Influence engagée');
  const arbitrating=s.phase==='COUNCIL'&&['await_moderator','await_leader'].includes(s.council.phase);
  const activeFamily=s.phase==='COUNCIL'?(arbitrating?s.moderator:s.council.turn):null;
- status('councilPrompt',arbitrating?voteProgress(s)?.title:'');
+ const speaker=s.families.find(f=>f.id===activeFamily);
+ status('councilPrompt',arbitrating?voteProgress(s)?.title:manual&&speaker?'À la parole · '+speaker.name:'');
  const ballots=$('ballots');ballots.replaceChildren();
  for(const f of s.families){
   const row=document.createElement('div');row.className='ballot';

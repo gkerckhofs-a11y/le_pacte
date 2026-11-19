@@ -1,5 +1,5 @@
 import {isV2,GOALS_V2,TIMING_V2,validateTiming,validateThresholds,setPhaseClock,beginNegotiation,beginVote,revealResolution,nextV2,finishV2,continueHotspring,suspendHotspring,resumeHotspring,revealHotspringResults} from './founders-v2.ts';
-import {isHotspring,createHotspringState,campaignDilemma,campaignFamily,campaignOrganizer,campaignPresentation,hotspringSupports,crisisCandidates,hotspringCityIndicators,hotspringOutcome,HOTSPRING_INDICATORS} from './founders-hotspring.ts';
+import {isHotspring,isManualHotspring,createHotspringState,campaignDilemma,campaignFamily,campaignOrganizer,campaignPresentation,hotspringSupports,crisisCandidates,hotspringCityIndicators,hotspringOutcome,HOTSPRING_INDICATORS} from './founders-hotspring.ts';
 import {DEFAULT_TEAM_COLORS,DEFAULT_TEAM_NAMES,teamColor} from '../public/founders-identity.js';
 import {isHybrid,narrativeReserve,chooseNarrativeNext,narrativeEpilogue} from './founders-progression.ts';
 /**
@@ -74,7 +74,8 @@ export function createNarrativeSession(preview,{id,ownerId,code,title,objectives
   colors:Object.fromEntries(ids.map((id,i)=>[id,colors[i]])),
   goals:Object.fromEntries(ids.map((id,i)=>[id,objectives[i]])),
   goalCards:copy(goalCards),scoreRules:copy(scoreRules),initiativeOrder:copy(initiativeOrder),finalResults:null,
-  ...(v2?{experienceVersion:2,timing:validateTiming(timing),gaugeThresholds:validateThresholds(gaugeThresholds),clock:{phase:'READY',deadline:null,remainingMs:null,paused:false}}:{}),
+  ...(v2?{experienceVersion:2,timing:validateTiming(preview.scenario.campaign?.version===3?{...timing,autoAdvance:false}:timing),
+   gaugeThresholds:validateThresholds(gaugeThresholds),clock:{phase:'READY',deadline:null,remainingMs:null,paused:false}}:{}),
   ...(families?{campaign:createHotspringState(preview.game.city,crisisMode,presentationSeconds,preview.scenario.campaign.version)}:{}),
   phase:'READY',currentDilemmaId:preview.scenario.scenario.entry_dilemma,
   lastReveal:null,revealedHistory:[],offers:{},revision:0,createdAt:now,updatedAt:now
@@ -116,11 +117,13 @@ function validateOfferCommitment(s,to,commitment){
  if(commitment.choice==='gift'){
   check(Object.keys(commitment).every(k=>k==='choice'),'Transfert sans contrepartie invalide');return;
  }
- check(['pour','contre','passe_pouvoir'].includes(commitment.choice),'Engagement de vote invalide');
+ const manual=isManualHotspring(s);
+ check((manual?['pour','contre']:['pour','contre','passe_pouvoir']).includes(commitment.choice),'Engagement de vote invalide');
  check(Object.keys(commitment).every(k=>['choice','minInfluence'].includes(k)),'Champ d’engagement invalide');
  const minimum=commitment.minInfluence;
  check(Number.isSafeInteger(minimum)&&(commitment.choice==='passe_pouvoir'?minimum===0:minimum>=1&&minimum<=s.game.families[to].power),'Influence insuffisante pour cet engagement');
- check(s.game.vote?.phase==='voting'&&s.game.vote.choices[to]===undefined,'Cette famille a déjà voté ou le vote est clos');
+ check((manual&&s.phase==='NEGOTIATION')||
+  (s.game.vote?.phase==='voting'&&!Object.hasOwn(s.game.vote.choices,to)),'Cette famille a déjà voté ou le vote est clos');
  const prior=acceptedVoteCommitment(s,to);
  check(!prior||prior.choice===commitment.choice,'Cette famille a déjà accepté un engagement incompatible');
 }
@@ -132,6 +135,7 @@ export function applyNarrativeCommand(input,actor,command,now){
  check(Number.isSafeInteger(now)&&now>=0,'Horodatage invalide');
  check(command&&typeof command.kind==='string','Commande invalide');
  const s=copy(input),data=command.data??{},kind=command.kind;
+ const manual=isManualHotspring(s);
  check(!s.clock?.paused||['pause','resume','configureTiming','adjustTime','correctResource','correctCity','finish','endSitting'].includes(kind),'Partie en pause');
  check(s.phase!=='SUSPENDED'||['resumeSitting','finish'].includes(kind),'Séance sauvegardée');
  const org=()=>check(actor.role==='organizer','Régie uniquement');
@@ -208,7 +212,7 @@ export function applyNarrativeCommand(input,actor,command,now){
    check(activeOffers(s)<maxOffers,'Trop d’offres en attente');
    check(activeFounders(s.game).includes(data.to)&&data.to!==actor.family,'Destinataire invalide');
    check(Number.isSafeInteger(data.amount)&&data.amount>=1&&data.amount<=s.game.families[actor.family].dollars,'Dollars insuffisants');
-   if(isV2(s)){check(data.reason===undefined||typeof data.reason==='string'&&data.reason.length<=300,'Message : 300 caractères maximum');data.reason=data.reason?.trim()||'Proposition financière';data.commitment={choice:'gift'};}
+   if(isV2(s)){check(data.reason===undefined||typeof data.reason==='string'&&data.reason.length<=300,'Message : 300 caractères maximum');data.reason=data.reason?.trim()||'Proposition financière';if(!manual)data.commitment={choice:'gift'};}
    check(str(data.reason,300),'Motif de proposition requis');
    validateOfferCommitment(s,data.to,data.commitment);
    check(typeof data.id==='string'&&/^[A-Za-z0-9_-]{8,80}$/.test(data.id)&&!has(s.offers,data.id),'Identifiant d’offre déjà utilisé');
@@ -235,7 +239,7 @@ export function applyNarrativeCommand(input,actor,command,now){
   case 'beginVote':
    org();check(isV2(s)&&s.phase==='NEGOTIATION','Aucune négociation à clore');beginVote(s,now);break;
   case 'configureTiming':
-   org();check(isV2(s)&&s.phase!=='FINISHED','Chronos indisponibles');s.timing=validateTiming(data.timing);s.gaugeThresholds=validateThresholds(data.gaugeThresholds??s.gaugeThresholds);
+   org();check(isV2(s)&&!manual&&s.phase!=='FINISHED','Chronos indisponibles');s.timing=validateTiming(data.timing);s.gaugeThresholds=validateThresholds(data.gaugeThresholds??s.gaugeThresholds);
    if(isHotspring(s)&&data.presentationSeconds!==undefined){
     check(Number.isInteger(data.presentationSeconds)&&data.presentationSeconds>=5&&data.presentationSeconds<=7200,'Lecture : de 5 à 7200 secondes');
     s.campaign.presentationSeconds=data.presentationSeconds;
@@ -247,20 +251,24 @@ export function applyNarrativeCommand(input,actor,command,now){
   case 'resume':
    org();check(isV2(s)&&s.clock.paused,'La partie n’est pas en pause');s.clock.paused=false;s.clock.deadline=s.clock.remainingMs===null?null:now+s.clock.remainingMs;break;
   case 'adjustTime':
-   org();check(isV2(s)&&Number.isInteger(data.seconds)&&Math.abs(data.seconds)<=3600&&s.clock.remainingMs!==null,'Ajustement de chrono invalide');
+   org();check(isV2(s)&&!manual&&Number.isInteger(data.seconds)&&Math.abs(data.seconds)<=3600&&s.clock.remainingMs!==null,'Ajustement de chrono invalide');
    if(s.clock.paused)s.clock.remainingMs=Math.max(0,s.clock.remainingMs+data.seconds*1000);
    else {s.clock.deadline=Math.max(now,s.clock.deadline+data.seconds*1000);s.clock.remainingMs=Math.max(0,s.clock.deadline-now);}break;
   case 'correctResource': {
    org();check(isV2(s)&&s.phase!=='FINISHED'&&s.clock.paused,'Mettre la partie en pause avant correction');
    check(activeFounders(s.game).includes(data.family)&&['power','dollars'].includes(data.resource)&&Number.isSafeInteger(data.value)&&data.value>=0&&data.value<=100000,'Correction invalide');
    const f=s.game.families[data.family];
+   if(manual&&data.resource==='power'&&!Object.hasOwn(s.game.vote?.choices??{},data.family)){
+    const commitment=acceptedVoteCommitment(s,data.family);
+    check(!commitment||data.value>=commitment.minInfluence,'Cette correction empêcherait le vote promis');
+   }
    if(data.resource==='power')s.game.powerSupply+=data.value-f.power;
    (s.corrections??=[]).push({family:data.family,resource:data.resource,before:f[data.resource],after:data.value,at:now});
    f[data.resource]=data.value;break;
   }
   case 'correctCity': {
    org();
-   check(isHotspring(s)&&s.campaign.version===2&&!['FINISHED','EPILOGUE'].includes(s.phase)&&s.clock.paused,'Mettre la campagne en pause avant de corriger une jauge');
+   check(isHotspring(s)&&s.campaign.version>=2&&!['FINISHED','EPILOGUE'].includes(s.phase)&&s.clock.paused,'Mettre la campagne en pause avant de corriger une jauge');
    const {indicator,value}=data;
    check(HOTSPRING_INDICATORS.includes(indicator)&&Number.isInteger(value)&&value>=0&&value<=10,'Choisir une jauge fondamentale et un entier entre 0 et 10');
    (s.corrections??=[]).push({kind:'city',indicator,before:s.game.city[indicator],after:value,at:now});
@@ -320,7 +328,7 @@ export function narrativePublicView(s){
  const v=s.game.vote,resolved=(s.phase==='REVEALED'||s.phase==='FINISHED')?s.game.history.at(-1):null;
  const snapshot=record=>{
   const view=copy(record);
-  if(isHotspring(s)&&s.campaign.version===2&&view){
+  if(isHotspring(s)&&s.campaign.version>=2&&view){
    for(const key of ['city','cityBefore','cityAfter'])if(view[key])view[key]=hotspringCityIndicators(view[key]);
   }
   return view;
@@ -378,7 +386,7 @@ export function narrativeOrganizerView(s){
   game:copy(s.game),scenario:copy(s.scenario)};
 }
 function hotspringEffectsPreview(s){
- if(!isHotspring(s)||s.campaign.version!==2||!['PRESENTATION','NEGOTIATION','COUNCIL'].includes(s.phase))return null;
+ if(!isHotspring(s)||s.campaign.version<2||!['PRESENTATION','NEGOTIATION','COUNCIL'].includes(s.phase))return null;
  const dilemma=s.scenario.dilemmas.find(d=>d.id===s.currentDilemmaId);
  const cityBefore=hotspringCityIndicators(s.game.city);
  return ['pour','contre'].map(side=>{

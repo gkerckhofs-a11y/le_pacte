@@ -7,7 +7,7 @@ import {webcrypto} from 'node:crypto';
 import {parseHTML} from 'linkedom';
 import {foundersPreview,foundersCatalogFor} from '../server/founders-catalog.ts';
 import {createNarrativeSession,applyNarrativeCommand,narrativeView} from '../src/founders-live.ts';
-import {newCampaign} from './helpers/hotspring.mjs';
+import {newCampaign,team} from './helpers/hotspring.mjs';
 const owner={role:'organizer',id:'host'};
 let state=createNarrativeSession(foundersPreview({scenarioId:'hot-spring-reserve-hybride',scenarioVersion:'2.0.0',skinId:'western',members:[1,1,1,1,1]}),{ownerId:'host',id:'1'.repeat(24),code:'SCREENV2',title:'Test écrans',now:1000});
 const command=(s,actor,kind,data={})=>applyNarrativeCommand(s,actor,{kind,data,expectedRevision:s.revision},2000);
@@ -20,13 +20,14 @@ async function screen(app,s,family='A'){
  window.Element.prototype.scrollIntoView=function(){};window.Element.prototype.showModal=function(){this.open=true;this.setAttribute('open','');};window.Element.prototype.close=function(){this.open=false;this.removeAttribute('open');};
  const errors=[],storage=new Map([['pacte-founder-family-'+s.id+'-'+family,'a'.repeat(43)],['pacte-founder-organizer-key','local-key-1234567890123456789012345']]);
  const actor=app==='city'?{role:'public'}:app==='family'?{role:'team',family}:owner;
- const data={...narrativeView(s,actor),serverNow:2000};
+ const toView=state=>({...narrativeView(state,actor),serverNow:2000});
+ let data=toView(s);
  const timers=[];const catalog=await foundersCatalogFor({},'host');
  const context=vm.createContext({document,window,DOMParser:window.DOMParser,location:{origin:'http://localhost',pathname:'/founders-'+app+'.html',search:'?session='+s.id+'&family='+family,hash:''},history:{replaceState(){}},sessionStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},URL,URLSearchParams,Image:class{constructor(){return document.createElement('img');}},crypto:webcrypto,performance:{now:()=>0},requestAnimationFrame:fn=>fn(),setInterval:fn=>{timers.push(fn);return {unref(){}};},fetch:async(path,options)=>({ok:true,json:async()=>path==='/api/catalog'?{authMode:'local'}:path==='/api/founders/catalog'?catalog:path==='/api/founders/preview'?foundersPreview(JSON.parse(options.body)):path==='/api/founders/configurations'?{configurations:[]}:path==='/api/founders/sessions'?{sessions:[]}:data}),console:{log(){},error:e=>errors.push(e)}});
  const bundle=await build({entryPoints:['public/founders-'+app+'.js'],bundle:true,write:false,format:'iife',platform:'browser',logLevel:'silent'});
  vm.runInContext(bundle.outputFiles[0].text,context);
  for(let i=0;i<10;i++)await new Promise(r=>setImmediate(r));
- return {document,context,errors};
+ return {document,context,errors,update:async next=>{data=toView(next);await timers.at(-1)();}};
 }
 for(const app of ['city','family','regie'])test(`Écran ${app} : quatre jauges, delta visible et épilogue au premier plan`,async()=>{
  const live=await screen(app,state);assert.equal(live.document.querySelectorAll('#gauges .gauge').length,4,live.document.getElementById('notice')?.textContent??'');
@@ -126,6 +127,72 @@ test('Hotspring : le Terminal affiche le seuil privé et les règles de la fiche
  assert.equal(legacy.document.getElementById('rulesHotspring').hidden,true);
  assert.equal(legacy.document.getElementById('rulesV2').hidden,false);
  assert.equal(legacy.document.getElementById('goalProgress').hidden,false);
+});
+
+test('Hotspring V1.2 : négociation, menus bornés et mise à jour du terminal',async()=>{
+ const g=newCampaign({scenarioVersion:'1.2.0'});
+ for(const action of ['start','next','next','pause'])g.command(action);
+ g.command('correctResource',{family:'B',resource:'power',value:4});
+ g.command('correctResource',{family:'B',resource:'dollars',value:6});
+ g.command('resume');
+ const {document,update}=await screen('family',g.state,'B');
+ const get=id=>document.getElementById(id),options=id=>[...get(id).options].map(o=>o.textContent);
+ assert.match(get('objective').textContent,/Bien-être.*2 points.*deux plus élevées/);
+ assert.equal(get('phaseClock').hidden,true);
+ assert.equal(get('offerCommitmentFields').hidden,false);
+ assert.equal(get('voteAmount').localName,'select');
+ assert.deepEqual(options('voteAmount'),['1','2','3','4']);
+ assert.deepEqual(options('offerAmount'),['1 $','2 $','3 $','4 $','5 $','6 $']);
+ g.command('offer',{id:'affaire01',to:'A',amount:6,commitment:{choice:'gift'}},team('B'));
+ await update(g.state);assert.equal(options('offerAmount').length,6);
+ g.command('acceptOffer',{id:'affaire01'},team('A'));
+ await update(g.state);
+ assert.deepEqual(options('offerAmount'),[]);
+ assert.equal(get('sendOffer').disabled,true);
+ assert.equal(get('offerBalanceHint').hidden,false);
+ g.command('offer',{id:'affaire02',to:'B',amount:4,commitment:{choice:'pour',minInfluence:3}},team('A'));
+ await update(g.state);
+ assert.match(get('receivedOffer').textContent,/Mercer » vous propose 4 \$ en échange d’un vote POUR/);
+ assert.equal(get('offerAccept').textContent,'Accepter et s’engager');
+ g.command('acceptOffer',{id:'affaire02'},team('B'));
+ g.command('beginVote');g.command('vote',{kind:'pour',amount:2},team('A'));
+ await update(g.state);
+ assert.deepEqual(options('offerAmount'),['1 $','2 $','3 $','4 $']);
+ assert.deepEqual(options('voteAmount'),['3','4']);
+ assert.equal(get('firstVote').querySelector('[data-vote="contre"]').disabled,true);
+ assert.equal(get('firstVote').querySelector('[data-vote="passe_pouvoir"]').disabled,true);
+ assert.match(get('voteProgress').textContent,/vous engage à voter POUR avec au moins 3 Influence/);
+ g.command('vote',{kind:'pour',amount:3},team('B'));
+ for(const id of ['C','D','E'])g.command('vote',{kind:'passe_pouvoir'},team(id));
+ g.command('vote',{kind:'maintien'},team('A'));
+ await update(g.state);
+ assert.equal(get('raiseVote').hidden,false);
+ assert.deepEqual(options('raiseAmount'),['+1']);
+ assert.equal(get('raiseVote').querySelector('[data-vote="maintien"]').disabled,false);
+});
+
+test('Hotspring V1.2 : Stabilité sous le panorama et ouverture manuelle depuis la régie',async()=>{
+ const g=newCampaign({scenarioVersion:'1.2.0',ownerId:owner.id});
+ for(const action of ['start','next','next'])g.command(action,{},owner);
+ const regie=(await screen('regie',g.state)).document;
+ assert.equal(regie.getElementById('timingForm').hidden,true);
+ assert.equal(regie.getElementById('beginVote').hidden,false);
+ assert.equal(regie.getElementById('beginVote').textContent,'Ouvrir le vote');
+ assert.doesNotMatch(regie.getElementById('stageHint').textContent,/chrono/);
+ assert.match(regie.querySelector('#councilMonitor .council-prompt').textContent,/Ouvrez le vote/);
+ g.command('beginVote',{},owner);g.command('vote',{kind:'passe_pouvoir'},team('A'));
+ const {document}=await screen('city',g.state);
+ const get=id=>document.getElementById(id);
+ assert.equal(get('phaseClock').hidden,true);
+ assert.equal(get('panoramaStability').previousElementSibling.firstElementChild.id,'city');
+ assert.equal(get('panoramaStability').hidden,false);
+ assert.equal(get('stabilityTitle').textContent,'Stabilité — 5,0 / 10');
+ assert.equal(get('stabilityState').textContent,'Ville stable');
+ assert.equal(document.querySelectorAll('#gauges .gauge').length,5);
+ assert.doesNotMatch(get('gauges').textContent,/Stabilité|Moyenne générale/);
+ assert.match(get('councilPrompt').textContent,/À la parole · Les Doyle/);
+ assert.equal(get('influenceAvailable').textContent,'3 Influence');
+ assert.equal(get('influencePart').textContent,'3 Influence');
 });
 
 test('Projection Hotspring : la réserve affiche l’estimation puis le versement',async()=>{

@@ -3,7 +3,8 @@ import {teamLabel,teamCaption,colorize} from './founders-identity.js';
 const choices={pour:'POUR',contre:'CONTRE',passe_pouvoir:'Passe · récupération',passe_moderateur:'Passe · Shérif'};
 export function councilMonitor(s){
  const active=s.game.vote;
- const closed=s.phase!=='READY'&&s.phase!=='COUNCIL'?s.game.history.at(-1):null;
+ const manual=s.campaign?.version>=3,preVote=['INTRO','PRESENTATION','NEGOTIATION'].includes(s.phase);
+ const closed=s.phase!=='READY'&&s.phase!=='COUNCIL'&&!(manual&&preVote)?s.game.history.at(-1):null;
  const vote=active??closed;
  const bids=vote?.bids??{},positions=vote?.choices??{};
  const total=side=>s.families.reduce((n,f)=>n+(positions[f.id]===side?(bids[f.id]??0):0),0);
@@ -14,6 +15,8 @@ export function councilMonitor(s){
  const action=turn?(positions[turn]?'Maintenir ou surenchérir dans le même camp ; une abstention reste définitive.':'Choisir POUR, CONTRE ou passer sur son écran d’équipe.'):
  active?.phase==='await_moderator'?'Le Shérif doit départager POUR et CONTRE.':
  active?.phase==='await_leader'?'Le Shérif doit désigner le Maire parmi : '+active.pendingLeaderChoices.map(id=>teamLabel(s,id)).join(', '):
+ manual&&s.phase==='NEGOTIATION'?'Ouvrez le vote lorsque les familles ont terminé de négocier.':
+ manual&&preVote?'Présentez le dilemme avant la négociation.':
  s.phase==='READY'?'La régie peut lancer le premier Conseil.':s.phase==='AWAITING_REVEAL'?'Vote clos : la régie doit révéler les conséquences.':s.phase==='FINISHED'?'Partie terminée.':'Résolution affichée : poursuivre vers le prochain chapitre.';
  return {yes,no,actor,action,closed:Boolean(closed),pool:s.game.pool,
  balance:closed?'Résultat : '+closed.winner.toUpperCase():!vote?'Vote non ouvert':yes===no?'Égalité provisoire':(yes>no?'POUR':'CONTRE')+' en tête de '+Math.abs(yes-no)+' Influence',

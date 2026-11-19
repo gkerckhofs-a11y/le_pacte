@@ -12,8 +12,9 @@ export function decorateGauge(bar,label,value,s,{compact=false}={}){
 }
 const clocks=new Map();
 export function renderPhaseClock(root,s){
- if(!root){return;}root.hidden=s.experienceVersion!==2;
- if(s.experienceVersion!==2)return;
+ if(!root)return;
+ root.hidden=s.experienceVersion!==2||s.campaign?.version>=3;
+ if(root.hidden){clocks.delete(root);return;}
  clocks.set(root,{s,started:performance.now()});drawClock(root,clocks.get(root));
 }
 function drawClock(root,{s,started}){
@@ -34,8 +35,8 @@ export function gaugeDelta(s,key){
  const before=s.reveal?.cityBefore?.[key],after=s.reveal?.cityAfter?.[key];
  if(!Number.isFinite(before)||!Number.isFinite(after))return null;
  const value=Math.round((after-before)*10)/10;
- const format=number=>formatGaugeNumber(number,key==='stabilite'&&s.campaign?.version===2);
- const description=key==='stabilite'&&s.campaign?.version===2?'Moyenne calculée, ':'Effet du dilemme : ';
+ const format=number=>formatGaugeNumber(number,key==='stabilite'&&s.campaign?.version>=2);
+ const description=key==='stabilite'&&s.campaign?.version>=2?'Moyenne calculée, ':'Effet du dilemme : ';
  return {value,text:value>0?'+'+format(value):value<0?'−'+format(Math.abs(value)):format(0),kind:value>0?'positive':value<0?'negative':'neutral',description:description+format(before)+' → '+format(after)+'/10'};
 }
 export function appendGaugeDelta(root,s,key){

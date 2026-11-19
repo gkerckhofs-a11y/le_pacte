@@ -6,7 +6,7 @@ const organizer={role:'organizer',id:'organizer'};
 export const hotspringSelection={scenarioId:'les-colons-de-hotspring',skinId:'western'};
 export const team=family=>({role:'team',family});
 export function newCampaign(options={}){
- const {scenarioVersion,...sessionOptions}=options;
+ const {scenarioVersion='1.1.0',...sessionOptions}=options;
  const preview=foundersPreview({...hotspringSelection,scenarioVersion});
  let current=createNarrativeSession(preview,{id,ownerId:organizer.id,code:'HOT01',title:'Hotspring',now:1000,...sessionOptions});
  const command=(kind,data={},actor=organizer,now=current.updatedAt+100)=>{

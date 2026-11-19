@@ -20,7 +20,7 @@ test('Hotspring HTTP : reprise SQLite en cours de scrutin puis campagne complèt
  const original=await server.request('/api/founders/sessions',{token:hotspringTestKey,status:201,body:{
   scenarioId:'fondateurs-hot-spring-demo',skinId:'western',code:'ORIGINAL',title:'Parcours original',members:[1,1,1,1,1,1]}});
  const initialOriginal=await hotspringClient(server,original).projection();
- const session=await createHotspringTestGame(server);
+ const session=await createHotspringTestGame(server,{scenarioVersion:'1.1.0'});
  assert.equal(session.access.length,5);
  let client=hotspringClient(server,session);
  const ready=await client.projection();
@@ -92,4 +92,30 @@ test('Hotspring HTTP : reprise SQLite en cours de scrutin puis campagne complèt
  assert.equal(savedOriginal.phase,initialOriginal.phase);
  assert.equal(savedOriginal.revision,initialOriginal.revision);
  assert.equal(savedOriginal.families.length,6);
+});
+
+test('Hotspring HTTP V1.2 : accord préservé à la reprise et requêtes incompatibles rejetées',async t=>{
+ const server=await serveHotspringTest();
+ t.after(()=>server.close());
+ const created=await createHotspringTestGame(server,{code:'HOT12'});
+ const client=hotspringClient(server,created);
+ const send=async(kind,data={},family)=>client.command(await client.projection(),kind,data,family);
+ assert.equal((await client.projection()).story.schemaVersion,'1.2.0');
+ assert.equal((await client.projection()).city.stabilite,5);
+ await send('start');await send('next');await send('next');
+ await send('offer',{id:'accord03',to:'B',amount:4,commitment:{choice:'pour',minInfluence:3}},'A');
+ await send('acceptOffer',{id:'accord03'},'B');
+ assert.deepEqual((await client.family('B')).voteCommitment,{choice:'pour',minInfluence:3});
+ assert.equal((await client.family('B')).self.dollars,14);
+ assert.equal((await client.projection()).offers,undefined);
+ await send('endSitting');await send('resumeSitting');
+ assert.equal((await client.projection()).clock.deadline,null);
+ await send('beginVote');await send('vote',{kind:'pour',amount:1},'A');
+ const before=await client.family('B');
+ await assert.rejects(send('vote',{kind:'contre',amount:3},'B'),/position de vote/);
+ await assert.rejects(send('vote',{kind:'passe_pouvoir'},'B'),/position de vote/);
+ await assert.rejects(send('vote',{kind:'pour',amount:2},'B'),/mise minimale de 3/);
+ assert.equal((await client.family('B')).revision,before.revision);
+ await send('vote',{kind:'pour',amount:3},'B');
+ assert.equal((await client.family('B')).self.power,before.self.power-3);
 });

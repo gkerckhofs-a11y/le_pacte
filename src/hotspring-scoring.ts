@@ -1,5 +1,7 @@
 import {activeFounders} from './founders.ts';
 
+export const HOTSPRING_INDICATORS=Object.freeze(['economie','ecologie','securite','bien_etre','demographie']);
+
 const autonomyGains = [
  'EAU_PRIVEE','CENTRE_PRIVE','AUTONOMIE_LOCALE','CREDIT_LIMITE','POSSE',
  'FINANCEMENT_PONCTUEL','CONSEIL_FONDATEURS','CHARTE_FRONTIERE_LIBRE'
@@ -23,6 +25,11 @@ export function hotspringTrajectoryTarget(campaign,indicator){
  return indicator==='autonomy'?2:campaign.initialCity[indicator]+1;
 }
 
+export function hotspringLeadingThreshold(city){
+ // The second position sets the threshold. Any gauge tied at that level qualifies.
+ return HOTSPRING_INDICATORS.map(indicator=>city[indicator]).sort((left,right)=>right-left)[1];
+}
+
 export function chapterObjective(definition,markers){
  return definition.groups.filter(group=>group.some(m=>markers.has(m))).length>=definition.required?2:0;
 }
@@ -32,6 +39,7 @@ export function hotspringScores(s,{final=false}={}){
  const definitions=s.scenario.campaign.families;
  const markers=new Set(campaign.markers);
  const chapters=campaign.completedChapters;
+ const leadingThreshold=campaign.version===3?hotspringLeadingThreshold(s.game.city):null;
  const hasLegacy=final&&Boolean(campaign.charter);
  const families=activeFounders(s.game);
  const rows=families.map((family,i)=>{
@@ -41,7 +49,7 @@ export function hotspringScores(s,{final=false}={}){
    return {chapter,title:objective.title,points:chapterObjective(objective,markers),maximum:2};
   });
   const value=definition.trajectory==='autonomy'?autonomyIndex(markers):s.game.city[definition.trajectory];
-  const trajectory=value>=hotspringTrajectoryTarget(campaign,definition.trajectory)?2:0;
+  const trajectory=value>=(leadingThreshold??hotspringTrajectoryTarget(campaign,definition.trajectory))?2:0;
   const charter=hasLegacy&&legacy[key].charters.some(m=>markers.has(m))?2:0;
   const governance=hasLegacy&&(
    key==='whitmore'?campaign.trust>=3||markers.has('ALLIANCE_VALLEE'):markers.has(legacy[key].government)

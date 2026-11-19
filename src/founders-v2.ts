@@ -1,7 +1,7 @@
 import {openFoundersDilemma,applyFoundersCityEffects,activeFounders} from './founders.ts';
 import {calculateFoundersFinal} from './founders-scoring.ts';
 import {isHybrid,chooseNarrativeNext,narrativeReserve,narrativeEpilogue} from './founders-progression.ts';
-import {isHotspring,hotspringOutcome,campaignNext,campaignCheckpoint,startCharter,campaignEpilogue,campaignResults,hotspringCityIndicators} from './founders-hotspring.ts';
+import {isHotspring,isManualHotspring,hotspringOutcome,campaignNext,campaignCheckpoint,startCharter,campaignEpilogue,campaignResults,hotspringCityIndicators} from './founders-hotspring.ts';
 import {hotspringScores} from './hotspring-scoring.ts';
 export const CITY_V2={economie:5,ecologie:5,securite:5,demographie:5};
 export const LABELS_V2={economie:'Économie',ecologie:'Écologie',securite:'Sécurité',demographie:'Démographie'};
@@ -26,7 +26,7 @@ export function setPhaseClock(s,now){
  if(!isV2(s))return;
  if(isHotspring(s))s.campaign.justResumed=false;
  const reading=['INTRO','PRESENTATION'].includes(s.phase);
- const seconds=reading?s.campaign.presentationSeconds:s.phase==='NEGOTIATION'?s.timing.negotiationSeconds:s.phase==='COUNCIL'?s.timing.voteSeconds:s.phase==='REVEALED'?s.timing.resolutionSeconds:null;
+ const seconds=isManualHotspring(s)?null:reading?s.campaign.presentationSeconds:s.phase==='NEGOTIATION'?s.timing.negotiationSeconds:s.phase==='COUNCIL'?s.timing.voteSeconds:s.phase==='REVEALED'?s.timing.resolutionSeconds:null;
  s.clock={phase:s.phase,deadline:seconds===null?null:now+seconds*1000,remainingMs:seconds===null?null:seconds*1000,paused:false};
 }
 export function beginNegotiation(s,now){s.phase='NEGOTIATION';setPhaseClock(s,now);}
@@ -79,7 +79,7 @@ export function continueHotspring(s,now,requested){
  if(next.end){finishV2(s,now);return;}
  if(next.checkpoint){
   campaignCheckpoint(s,now,()=>{
-   s.game=applyFoundersCityEffects(s.game,[{resource:c.version===2?'bien_etre':'demographie',kind:'delta',amount:1}]);
+   s.game=applyFoundersCityEffects(s.game,[{resource:c.version>=2?'bien_etre':'demographie',kind:'delta',amount:1}]);
   });
   s.phase='CHECKPOINT';
  }else {
@@ -128,7 +128,7 @@ export function epilogueV2(s){
 }
 /** Called transactionally on reads, including projection polling; the server clock owns transitions. */
 export function advanceNarrativeTime(input,now){
- if(!isV2(input)||input.clock?.paused||!input.timing.autoAdvance||!input.clock?.deadline||now<input.clock.deadline)return input;
+ if(!isV2(input)||isManualHotspring(input)||input.clock?.paused||!input.timing.autoAdvance||!input.clock?.deadline||now<input.clock.deadline)return input;
  const s=structuredClone(input);
  if(isHotspring(s)&&['INTRO','PRESENTATION'].includes(s.phase))continueHotspring(s,now);
  else if(s.phase==='NEGOTIATION')beginVote(s,now);

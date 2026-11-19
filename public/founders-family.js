@@ -34,18 +34,37 @@ function gauge(data){
   const item=document.createElement('div');item.className='gauge';
   const top=document.createElement('div');top.className='gauge-head';
   const name=document.createElement('span');name.textContent=data.skin.labels.resources[indicator]||indicator;
-  const n=document.createElement('strong');n.textContent=formatGaugeNumber(data.city[indicator],indicator==='stabilite'&&data.campaign?.version===2)+'/10';appendGaugeDelta(n,data,indicator);top.append(name,n);
+  const n=document.createElement('strong');n.textContent=formatGaugeNumber(data.city[indicator],indicator==='stabilite'&&data.campaign?.version>=2)+'/10';appendGaugeDelta(n,data,indicator);top.append(name,n);
   const bar=document.createElement('div');bar.className='track';
   const inside=document.createElement('div');inside.className='bar';inside.style.width=data.city[indicator]*10+'%';
   decorateGauge(inside,name,data.city[indicator],data);bar.append(inside);item.append(top,bar);root.append(item);
  }
 }
+function renderAmountMenu(id,min,max,{prefix='',suffix=''}={}){
+ let select=$(id);
+ if(select.localName!=='select'){
+  const input=select;select=document.createElement('select');select.id=id;select.required=true;
+  input.replaceWith(select);
+ }
+ const bounds=min+':'+max;
+ if(select.dataset.bounds===bounds)return;
+ const previous=Number(select.value);
+ const options=document.createDocumentFragment();
+ for(let value=min;value<=max;value++){
+  const option=document.createElement('option');option.value=String(value);option.textContent=prefix+value+suffix;options.append(option);
+ }
+ select.replaceChildren(options);
+ select.disabled=max<min;
+ if(!select.disabled)select.value=String(previous>=min&&previous<=max?previous:min);
+ select.dataset.bounds=bounds;
+}
+const isPoliticalOffer=offer=>Boolean(offer.commitment&&offer.commitment.choice!=='gift');
 function offers(data){
  const root=$('offers');root.replaceChildren();
  for(const o of data.offers.slice(-30).reverse()){
   const el=document.createElement('div');el.className='card';
   const content=document.createElement('p');
-  content.textContent=(o.from===data.self.id?'Vous proposez ':'Proposition reçue : ')+o.amount+' '+data.skin.labels.currency+' de '+teamLabel(data,o.from)+' à '+teamLabel(data,o.to)+' · '+o.reason+' · '+o.status+' · '+commitmentLabel(o.commitment);
+  content.textContent=(o.from===data.self.id?'Vous proposez ':'Proposition reçue : ')+o.amount+' '+data.skin.labels.currency+' de '+teamLabel(data,o.from)+' à '+teamLabel(data,o.to)+' · '+o.reason+' · '+o.status+' · '+(data.campaign?.version>=3&&!isPoliticalOffer(o)?'Transfert sans engagement politique':commitmentLabel(o.commitment));
   el.append(content);
   if(o.status==='pending'&&o.to===data.self.id){
    for(const [name,kind] of [['Accepter','acceptOffer'],['Refuser','rejectOffer']]){
@@ -60,6 +79,7 @@ function offers(data){
  }
 }
 function render(data){
+ const manual=data.campaign?.version>=3;
  const finishing=data.phase==='FINISHED'&&!document.body.classList.contains('game-finished');document.body.classList.toggle('game-finished',data.phase==='FINISHED');
  renderVoteProgress($('voteProgress'),data);
  renderPhaseClock($('phaseClock'),data);
@@ -72,7 +92,7 @@ function render(data){
  set('teamIdentity',self.color.symbol+' Équipe '+self.color.label+' · Porte-parole');
  $('identityPanel').hidden=data.phase!=='READY';
  if(!identityDirty&&document.activeElement!==$('chosenName'))$('chosenName').value=self.name==='Nom à choisir'?'':self.name;
- set('terminalSession','Session '+data.code+' · Équipe '+self.id);set('familyName',self.name);appendFamilyRoles($('familyName'),data,self.id);set('phase',nice[data.phase]||data.phase);
+ set('terminalSession','Session '+data.code+' · Équipe '+self.id);set('familyName',self.name);appendFamilyRoles($('familyName'),data,self.id);set('phase',(nice[data.phase]||data.phase)+(manual&&data.clock?.paused?' · Pause':''));
  set('turn',data.phase==='COUNCIL'?(c.turn===self.id?'C’est à vous.':c.turn?'En attente — '+teamLabel(data,c.turn)+' joue actuellement.':c.phase==='await_moderator'?'Arbitrage':'Choix du Maire'):'—');
  set('dilemmaLabel',data.dilemma?'Chapitre '+data.dilemma.chapter:'Conseil des Fondateurs');
  set('dilemmaTitle',data.dilemma?.title||(data.phase==='FINISHED'?'Fin de la campagne':'Conseil en préparation'));
@@ -123,15 +143,24 @@ function render(data){
  set('voteHint',self.mayVote?'Votre famille doit décider maintenant.':data.phase==='COUNCIL'?'Vous pouvez négocier en attendant votre tour.':'Le Conseil attend la prochaine phase.');
  $('firstVote').hidden=!(self.mayVote&&self.choice===null);
  $('raiseVote').hidden=!(self.mayVote&&self.choice!==null);
- $('voteAmount').max=self.power;$('raiseAmount').max=self.power;
  $('raiseAmount').closest('.field').hidden=!['pour','contre'].includes(self.choice);
  $('raiseVote').querySelector('[data-vote="augmenter"]').hidden=!['pour','contre'].includes(self.choice);
  const lock=data.voteCommitment;
- $('voteCommitment').hidden=!lock||data.phase!=='COUNCIL';
+ $('voteCommitment').hidden=!lock||!(data.phase==='COUNCIL'||manual&&data.phase==='NEGOTIATION');
  set('voteCommitment',lock?'Accord accepté : '+commitmentLabel(lock)+'. Ce choix est obligatoire pour ce Conseil.':'');
- for(const button of $('firstVote').querySelectorAll('[data-vote]'))button.disabled=Boolean(lock&&button.dataset.vote!==lock.choice);
- $('voteAmount').min=lock?.minInfluence||1;
- if(lock?.minInfluence&&Number($('voteAmount').value)<lock.minInfluence)$('voteAmount').value=lock.minInfluence;
+ if(manual){
+  renderAmountMenu('voteAmount',lock?.minInfluence||1,self.power);
+  renderAmountMenu('raiseAmount',1,self.power,{prefix:'+'});
+ }else{
+  $('voteAmount').max=self.power;$('raiseAmount').max=self.power;
+  $('voteAmount').min=lock?.minInfluence||1;
+  if(lock?.minInfluence&&Number($('voteAmount').value)<lock.minInfluence)$('voteAmount').value=lock.minInfluence;
+ }
+ for(const button of $('firstVote').querySelectorAll('[data-vote]')){
+  const choice=button.dataset.vote;
+  button.disabled=Boolean(lock&&choice!==lock.choice)||Boolean(manual&&$('voteAmount').disabled&&['pour','contre'].includes(choice));
+ }
+ $('raiseVote').querySelector('[data-vote="augmenter"]').disabled=Boolean(manual&&$('raiseAmount').disabled);
 
  $('moderatorTie').hidden=!self.mayResolve;
  $('moderatorLeader').hidden=!self.mayChooseLeader;
@@ -140,13 +169,24 @@ function render(data){
   const b=document.createElement('button');b.textContent='Désigner '+teamLabel(data,id);b.addEventListener('click',()=>command('chooseLeader',{family:id}));candidate.append(b);
  }
  $('offerForm').hidden=!['NEGOTIATION','COUNCIL'].includes(data.phase);
- $('offerCommitmentFields').hidden=data.experienceVersion===2;
- $('offerBindingHelp').hidden=data.experienceVersion===2;
+ const freeOnly=data.experienceVersion===2&&!manual;
+ $('offerCommitmentFields').hidden=freeOnly;
+ $('offerBindingHelp').hidden=freeOnly;
  $('offerReason').required=data.experienceVersion!==2;
- if(data.experienceVersion===2)$('offerCommitment').value='gift';
+ const offerChoice=$('offerCommitment'),passChoice=offerChoice.querySelector('[value="passe_pouvoir"]');
+ passChoice.hidden=passChoice.disabled=manual;
+ if(freeOnly)offerChoice.value='gift';
+ if(manual){
+  offerChoice.querySelector('[value="gift"]').textContent='Don / transfert libre';
+  $('offerBindingHelp').textContent='Un accord de vote accepté transfère les dollars et oblige la famille à voter dans le camp convenu avec au moins 1 Influence. Un don est sans engagement politique.';
+  $('offerMinimumField').hidden=true;
+  renderAmountMenu('offerAmount',1,self.dollars,{suffix:' $'});
+ }
+ $('sendOffer').disabled=Boolean(manual&&self.dollars===0);
+ $('offerBalanceHint').hidden=!manual||self.dollars>0;
  const campaignRules=$('rulesHotspring');
  campaignRules.hidden=!data.campaign;
- if(data.campaign&&!campaignRules.firstElementChild)campaignRules.append(createHotspringRules());
+ if(data.campaign&&!campaignRules.firstElementChild)campaignRules.append(createHotspringRules({manual}));
  $('rulesIntroduction').hidden=Boolean(data.campaign);
  $('rulesLegacy').hidden=data.experienceVersion===2;$('rulesV2').hidden=data.experienceVersion!==2||Boolean(data.campaign);
  const target=$('targetFamily'),prev=target.value;target.replaceChildren();
@@ -166,8 +206,14 @@ function renderOfferDialog(data){
  if(!offer||data.clock?.paused){if(dialog.open)dialog.close();return;}
  if(dialog.dataset.offer===offer.id&&dialog.open)return;
  dialog.dataset.offer=offer.id;
- set('receivedOffer',teamLabel(data,offer.from)+' vous propose '+offer.amount+' '+data.skin.labels.currency+'.');
- set('receivedMessage',offer.reason);set('receivedCommitment',data.experienceVersion===2?'L’acceptation ne vous engage pas à voter.':commitmentLabel(offer.commitment));
+ const manual=data.campaign?.version>=3,binding=isPoliticalOffer(offer);
+ const side=binding?offer.commitment.choice.toUpperCase():'';
+ const sender=data.families.find(f=>f.id===offer.from)?.name??offer.from;
+ set('receivedOffer',manual?'La famille « '+sender+' » vous propose '+offer.amount+' $'+(binding?' en échange d’un vote '+side:'')+'.':teamLabel(data,offer.from)+' vous propose '+offer.amount+' '+data.skin.labels.currency+'.');
+ set('receivedMessage',offer.reason);
+ set('receivedCommitment',manual?(binding?'En acceptant, vous devrez voter '+side+' et engager au moins '+offer.commitment.minInfluence+' Influence.':'Transfert sans engagement politique.'):
+  data.experienceVersion===2?'L’acceptation ne vous engage pas à voter.':commitmentLabel(offer.commitment));
+ set('offerAccept',manual&&binding?'Accepter et s’engager':'Accepter');
  if(!dialog.open)dialog.showModal();
 }
 $('offerAccept').addEventListener('click',()=>command('acceptOffer',{id:$('offerDialog').dataset.offer}));
@@ -197,7 +243,9 @@ document.querySelectorAll('[data-tie]').forEach(button=>button.addEventListener(
 $('offerForm').addEventListener('submit',e=>{
  e.preventDefault();
  const id=crypto.randomUUID();
- command('offer',{id,to:$('targetFamily').value,amount:Number($('offerAmount').value),reason:$('offerReason').value.trim(),commitment:{choice:$('offerCommitment').value,...($('offerCommitment').value==='gift'?{}:{minInfluence:['pour','contre'].includes($('offerCommitment').value)?Number($('offerMinimum').value):0})}});
+ const choice=$('offerCommitment').value;
+ const minInfluence=current?.campaign?.version>=3?1:Number($('offerMinimum').value);
+ command('offer',{id,to:$('targetFamily').value,amount:Number($('offerAmount').value),reason:$('offerReason').value.trim(),commitment:{choice,...(choice==='gift'?{}:{minInfluence:['pour','contre'].includes(choice)?minInfluence:0})}});
 });
 $('chosenName').addEventListener('input',()=>{identityDirty=true;set('identityNotice','');});
 $('identityForm').addEventListener('submit',async event=>{
@@ -223,4 +271,4 @@ tabs.forEach((tab,i)=>{
 });
 refresh();setInterval(refresh,2500);
 
-$('offerCommitment').addEventListener('change',()=>{$('offerMinimumField').hidden=!['pour','contre'].includes($('offerCommitment').value);});
+$('offerCommitment').addEventListener('change',()=>{$('offerMinimumField').hidden=current?.campaign?.version>=3||!['pour','contre'].includes($('offerCommitment').value);});

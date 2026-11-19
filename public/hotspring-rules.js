@@ -1,5 +1,5 @@
 // The terminal and printed QR sheet use the same rule text.
-export function createHotspringRules({print=false}={}){
+export function createHotspringRules({print=false,manual=false}={}){
  const title=print?'h3':'h2',heading=print?'h4':'h3';
  const template=document.createElement('template');
  template.innerHTML=`
@@ -22,6 +22,7 @@ export function createHotspringRules({print=false}={}){
      <p><strong>Maximum : 18 points</strong></p>
      <p>La famille qui totalise le plus de points remporte la partie.</p>
      <p>Vos objectifs sont secrets. Gardez-les confidentiels, mais utilisez-les pour orienter vos alliances, vos négociations et vos votes.</p>
+     ${manual?'<p>Au bilan, votre famille gagne 2 points si sa jauge secrète figure parmi les deux jauges les plus élevées. Une égalité à la limite du classement compte pour toutes les jauges concernées.</p><p>La Stabilité est la moyenne des cinq jauges.</p>':''}
     </section>
     <section>
      <${heading}>Un dilemme en 5 étapes</${heading}>
@@ -33,6 +34,7 @@ export function createHotspringRules({print=false}={}){
       <li>Le camp ayant engagé le plus d’Influence l’emporte.</li>
      </ol>
      <p>Les conséquences exactes sont révélées après le vote et transforment durablement Hotspring.</p>
+     ${manual?'<p>Le MJ gère le temps. Il ouvre le vote et lance le dilemme suivant quand le groupe est prêt.</p>':''}
     </section>
     <section>
      <${heading}>L’Influence</${heading}>
@@ -57,11 +59,14 @@ export function createHotspringRules({print=false}={}){
       <li>tenter de récupérer de l’Influence ;</li>
       <li>ou revendiquer le rôle de <strong>Shérif</strong>.</li>
      </ul>
+     ${manual?'<p>Seules les familles qui choisissent la récupération se partagent la réserve commune. La projection indique la part estimée puis la part versée.</p>':''}
     </section>
     <section>
      <${heading}>Les dollars</${heading}>
      <p>Les dollars servent à négocier.</p>
-     <p>Vous pouvez proposer de l’argent à une autre famille, qui peut accepter ou refuser. Une promesse n’est jamais automatiquement contraignante.</p>
+     ${manual?
+      '<p>Proposez un don, ou des dollars en échange d’un vote POUR ou CONTRE. En acceptant un accord de vote, la famille reçoit les dollars et s’engage à voter dans le camp convenu en misant au moins 1 Influence. Elle ne peut pas s’abstenir.</p><p>Un don est sans engagement politique. Le solde de l’émetteur est vérifié au moment de l’acceptation.</p>':
+      '<p>Vous pouvez proposer de l’argent à une autre famille, qui peut accepter ou refuser. Une promesse n’est jamais automatiquement contraignante.</p>'}
      <p>Les dollars conservés rapportent également des points en fin de partie :</p>
      <ul>
       <li>famille la plus riche : <strong>3 points</strong> ;</li>

@@ -96,14 +96,14 @@ function gauge(s){
   const el=document.createElement('div');el.className='gauge';
   const row=document.createElement('div');row.className='gauge-head';
   const label=document.createElement('span');label.textContent=s.skin.labels.resources[k]||k;
-  const n=document.createElement('strong');n.textContent=formatGaugeNumber(s.city[k],k==='stabilite'&&s.campaign?.version===2)+'/10';appendGaugeDelta(n,s,k);row.append(label,n);
+  const n=document.createElement('strong');n.textContent=formatGaugeNumber(s.city[k],k==='stabilite'&&s.campaign?.version>=2)+'/10';appendGaugeDelta(n,s,k);row.append(label,n);
   const track=document.createElement('div');track.className='track';
   const bar=document.createElement('div');bar.className='bar';bar.style.width=s.city[k]*10+'%';decorateGauge(bar,label,s.city[k],s);track.append(bar);el.append(row,track);root.append(el);
  }
  renderCityAudit(s);
 }
 function renderCityAudit(s){
- const expanded=s.campaign?.version===2,formula=$('stabilityFormula'),correction=$('cityCorrection'),audit=$('cityEffectAudit');
+ const expanded=s.campaign?.version>=2,formula=$('stabilityFormula'),correction=$('cityCorrection'),audit=$('cityEffectAudit');
  formula.hidden=correction.hidden=!expanded;
  audit.replaceChildren();audit.hidden=true;
  if(!expanded)return;
@@ -277,8 +277,12 @@ const printKit=mountPrintKit({session:sid,view:()=>current,request:async(path,bo
 }});
 
 function renderV2Controls(s){
+ const manual=s.campaign?.version>=3;
  $('v2Controls').hidden=s.experienceVersion!==2;
  $('beginVote').hidden=s.phase!=='NEGOTIATION';
+ set('beginVote',manual?'Ouvrir le vote':'Ouvrir le vote maintenant');
+ set('v2ControlsTitle',manual?'Commandes de la régie':'Animation et chronos');
+ for(const id of ['timingForm','addTime','removeTime'])$(id).hidden=manual;
  $('pauseGame').hidden=Boolean(s.clock?.paused);$('resumeGame').hidden=!s.clock?.paused;
  $('finishGame').disabled=['EPILOGUE','FINISHED'].includes(s.phase);
  $('finishDescription').textContent=s.campaign&&s.phase==='CHECKPOINT'&&s.campaign.chapter>=5?
