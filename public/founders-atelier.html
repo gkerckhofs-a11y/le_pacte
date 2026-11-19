@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="fr">
+<head>
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+ <title>Les Colons de Hotspring · Atelier de dilemmes</title>
+ <link rel="stylesheet" href="/univers.css">
+ <script type="module" src="/founders-atelier.js"></script>
+</head>
+<body>
+<header class="mast"><a href="/" class="brand">Games of Influence</a><span>Le Ludificateur</span></header>
+<main>
+ <nav class="breadcrumb" aria-label="Navigation"><a href="/">Univers</a><span aria-hidden="true">›</span><a href="/hotspring">Régie Hotspring</a></nav>
+ <h1>Atelier de dilemmes</h1>
+ <p class="context">Les Colons de Hotspring</p>
+ <p>Écris une situation, une question de vote et les conséquences des deux issues. Les brouillons restent dans ton espace de préparation.</p>
+ <div id="loginPanel" class="form-panel">
+  <div id="localLogin" hidden><label for="localKey">Clé de répétition locale</label><input id="localKey" type="password" autocomplete="off"></div>
+  <div class="actions"><button id="connect" type="button" disabled>Connexion…</button></div>
+ </div>
+ <div class="form-grid" id="workshop" hidden>
+  <form class="form-panel" id="draftForm">
+   <h2 id="draftHeading">Nouveau dilemme</h2>
+   <label for="title">Titre</label><input id="title" maxlength="120" required>
+   <label for="situation">Situation à présenter aux familles</label><textarea id="situation" maxlength="6000"></textarea>
+   <label for="question">Question soumise au vote</label><input id="question" maxlength="500">
+   <label for="pour">Conséquences du POUR</label><textarea id="pour" maxlength="2500"></textarea>
+   <label for="contre">Conséquences du CONTRE</label><textarea id="contre" maxlength="2500"></textarea>
+   <div class="actions"><button id="saveDraft">Enregistrer le brouillon</button></div>
+  </form>
+  <aside class="form-panel">
+   <h2>Mes brouillons</h2>
+   <label for="drafts">Charger un brouillon</label><select id="drafts"></select>
+   <div class="actions"><button id="newDraft" type="button" class="secondary">Nouveau dilemme</button></div>
+  </aside>
+ </div>
+ <p id="status" role="status" aria-live="polite"></p>
+</main>
+</body>
+</html>

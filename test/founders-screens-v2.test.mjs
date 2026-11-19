@@ -245,16 +245,16 @@ test('Projection Hotspring : la réserve affiche l’estimation puis le versemen
  assert.equal(get(reveal,'influencePart').textContent,'3');
 });
 
-test('Configuration : la version V2 est proposée, quatre jauges et ambitions cohérentes à cinq familles',async()=>{
- const {document}=await screen('setup',state);document.getElementById('token').value='local-v2-key-123456789012345678901234';document.getElementById('load').click();
+test('Préparation : cinq familles Hotspring et aucun catalogue de prototypes',async()=>{
+ const {document}=await screen('setup',state);
+ const get=id=>document.getElementById(id);
+ get('localKey').value='local-v2-key-123456789012345678901234';get('connect').click();
  for(let i=0;i<12;i++)await new Promise(r=>setImmediate(r));
- assert.equal(document.getElementById('scenarioVersion').value,'2.0.0');assert.equal(document.getElementById('city_ecologie').parentElement.hidden,false);assert.equal(document.getElementById('city_satisfaction').parentElement.hidden,true);
- assert.equal(document.getElementById('goalIndicator-D').value,'ecologie');
- document.getElementById('familyCount').value='5';document.getElementById('familyCount').dispatchEvent(new document.defaultView.Event('change'));
- document.getElementById('config').dispatchEvent(new document.defaultView.Event('submit',{cancelable:true}));
- for(let i=0;i<12;i++)await new Promise(r=>setImmediate(r));
- assert.equal(document.getElementById('status').dataset.type,'success',document.getElementById('status').textContent);
- assert.equal(document.getElementById('memberCount-F').disabled,true);
+ assert.equal(get('gameForm').hidden,false,get('status').textContent);
+ assert.equal(document.querySelectorAll('#familySettings .family-row').length,5);
+ assert.equal(get('family-name-0').value,'Les Mercer');
+ assert.equal(get('scenarioVersion'),null);
+ assert.equal(get('familyCount'),null);
 });
 test('Famille : une proposition reçue ouvre immédiatement une fenêtre avec acceptation et refus',async()=>{
  let s=command(state,owner,'next');s=command(s,{role:'team',family:'B'},'offer',{id:'popup_001',to:'A',amount:3,reason:'Votez avec nous'});

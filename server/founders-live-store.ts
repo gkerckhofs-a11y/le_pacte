@@ -12,6 +12,7 @@ export class LocalNarrativeSessions{
   this.db=db;
   db.exec('CREATE TABLE IF NOT EXISTS founders_configurations(id TEXT PRIMARY KEY,owner_id TEXT NOT NULL,data_json TEXT NOT NULL,updated INTEGER NOT NULL)');
   db.exec('CREATE TABLE IF NOT EXISTS founders_sessions(id TEXT PRIMARY KEY,code TEXT UNIQUE NOT NULL,owner_id TEXT NOT NULL,state_json TEXT NOT NULL,updated INTEGER NOT NULL,archived_at INTEGER,facilitator_email TEXT); CREATE TABLE IF NOT EXISTS founders_access(session_id TEXT NOT NULL,family TEXT NOT NULL,hash TEXT NOT NULL UNIQUE,expires INTEGER NOT NULL,PRIMARY KEY(session_id,family));');
+  db.exec('CREATE TABLE IF NOT EXISTS hotspring_dilemma_drafts(id TEXT PRIMARY KEY,owner_id TEXT NOT NULL,data_json TEXT NOT NULL,updated INTEGER NOT NULL)');
   const columns=db.prepare('PRAGMA table_info(founders_sessions)').all().map(column=>column.name);
   if(!columns.includes('archived_at'))db.exec('ALTER TABLE founders_sessions ADD COLUMN archived_at INTEGER');
   if(!columns.includes('facilitator_email'))db.exec('ALTER TABLE founders_sessions ADD COLUMN facilitator_email TEXT');
@@ -25,6 +26,20 @@ export class LocalNarrativeSessions{
   const id=randomBytes(12).toString('hex');
   this.db.prepare('INSERT INTO founders_configurations(id,owner_id,data_json,updated) VALUES(?,?,?,?)').run(id,ownerId,JSON.stringify(data),now);
   return {id,...data};
+ }
+ listDilemmaDrafts(ownerId){
+  return this.db.prepare('SELECT id,data_json,updated FROM hotspring_dilemma_drafts WHERE owner_id=? ORDER BY updated DESC LIMIT 100')
+   .all(ownerId).map(row=>({id:row.id,...JSON.parse(row.data_json),updated:row.updated}));
+ }
+ saveDilemmaDraft(ownerId,id,draft,now){
+  if(id){
+   const result=this.db.prepare('UPDATE hotspring_dilemma_drafts SET data_json=?,updated=? WHERE id=? AND owner_id=?').run(JSON.stringify(draft),now,id,ownerId);
+   check(result.changes,'Dilemme introuvable');
+  }else{
+   id=randomBytes(12).toString('hex');
+   this.db.prepare('INSERT INTO hotspring_dilemma_drafts(id,owner_id,data_json,updated) VALUES(?,?,?,?)').run(id,ownerId,JSON.stringify(draft),now);
+  }
+  return {id,...draft,updated:now};
  }
  transaction(fn){
   this.db.exec('BEGIN IMMEDIATE');

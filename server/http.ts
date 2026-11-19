@@ -1,4 +1,5 @@
 import qrcode from 'qrcode-generator';
+import {checkedDilemmaDraft} from './hotspring-dilemma-drafts.ts';
 import {checkedConfiguration} from './founders-configurations.ts';
 import {checkedFacilitatorEmail} from './founders-facilitator.ts';
 import {createServer} from 'node:http';
@@ -13,15 +14,21 @@ import {foundersCatalogFor,foundersPreviewFor,foundersStoryCheck,prepareFounders
 import {DEFAULT_GOAL_CARDS,analyzeFoundersGoalReachability} from '../src/founders-scoring.ts';
 import {simulateFoundersPolicies} from '../src/founders-policy-lab.ts';
 import type {Actor} from '../src/session.ts';
-export function createGameServer(store:StorePort,organizerToken:string,clock=()=>Date.now(),options:{clientAuth?:any;authEmulatorUrl?:string;apiOnly?:boolean;publicOrigin?:string;verifyOperator?:(token:string)=>Promise<Operator|null>}={}){
+export function createGameServer(store:StorePort,organizerToken:string,clock=()=>Date.now(),options:{clientAuth?:any;authEmulatorUrl?:string;apiOnly?:boolean;publicOrigin?:string;publicOrigins?:string[];verifyOperator?:(token:string)=>Promise<Operator|null>}={}){
  const publicOrigin=options.publicOrigin?normalizeOrigin(options.publicOrigin):null;
+ const publicOrigins=new Set([publicOrigin,...(options.publicOrigins??[]).map(normalizeOrigin)]);
+ const requestOrigin=(req:any)=>req.headers.origin??('https://'+req.headers.host);
+ const publishedOrigin=(req:any)=>publicOrigins.has(requestOrigin(req))?requestOrigin(req):publicOrigin;
  if(!/^[A-Za-z0-9_-]{32,128}$/.test(organizerToken))throw new Error('Clé régie : au moins 32 caractères');
  const tokenDigest=Buffer.from(tokenHash(organizerToken),'hex');
  const staticFiles:Record<string,[string,string]>={ '/founders-regie-flow.js':['founders-regie-flow.js','text/javascript; charset=utf-8'], '/founders-name-save.js':['founders-name-save.js','text/javascript; charset=utf-8'], '/founders-painted-western.js':['founders-painted-western.js','text/javascript; charset=utf-8'], '/founders-skins.json':['../content/founders-skins-v1.json','application/json; charset=utf-8'], '/founders-skins.html':['founders-skins.html','text/html; charset=utf-8'], '/founders-skins.js':['founders-skins.js','text/javascript; charset=utf-8'], '/founders-skin-theme.js':['founders-skin-theme.js','text/javascript; charset=utf-8'], '/founders-skin-scenes.js':['founders-skin-scenes.js','text/javascript; charset=utf-8'], '/founders-identity.js':['founders-identity.js','text/javascript; charset=utf-8'], '/founders-city-scene.js':['founders-city-scene.js','text/javascript; charset=utf-8'], '/founders-live.css':['founders-live.css','text/css; charset=utf-8'], '/founders-city.html':['founders-city.html','text/html; charset=utf-8'], '/founders-city.js':['founders-city.js','text/javascript; charset=utf-8'], '/founders-family.html':['founders-family.html','text/html; charset=utf-8'], '/founders-family.js':['founders-family.js','text/javascript; charset=utf-8'], '/founders-regie.html':['founders-regie.html','text/html; charset=utf-8'], '/founders-regie.js':['founders-regie.js','text/javascript; charset=utf-8'], '/founders-import.html':['founders-import.html','text/html; charset=utf-8'], '/founders-import.js':['founders-import.js','text/javascript; charset=utf-8'], '/founders-setup.html':['founders-setup.html','text/html; charset=utf-8'], '/founders-setup.js':['founders-setup.js','text/javascript; charset=utf-8'], '/western-board.js':['western-board.js','text/javascript; charset=utf-8'],'/western-territories.js':['western-territories.js','text/javascript; charset=utf-8'],'/far-west.html':['far-west.html','text/html; charset=utf-8'],'/western-preview.js':['western-preview.js','text/javascript; charset=utf-8'],'/assets/western/frontier-terrain-v1.webp':['assets/western/frontier-terrain-v1.webp','image/webp'], '/':['index.html','text/html; charset=utf-8'],'/app.js':['app.js','text/javascript; charset=utf-8'],'/studio.js':['studio.js','text/javascript; charset=utf-8'],'/animation.js':['animation.js','text/javascript; charset=utf-8'],'/style.css':['style.css','text/css; charset=utf-8']};
- for(const name of ['pacte-entry','founders-workspace','founders-live-ui','founders-print','founders-council-monitor','founders-vote-progress','founders-role-badges','founders-chronicle','founders-agreements','founders-fullscreen','founders-hotspring','hotspring-panorama','hotspring-rules'])staticFiles['/'+name+'.js']=[name+'.js','text/javascript; charset=utf-8'];
+ for(const name of ['pacte-entry','founders-workspace','founders-live-ui','founders-print','founders-council-monitor','founders-vote-progress','founders-role-badges','founders-chronicle','founders-agreements','founders-fullscreen','founders-hotspring','hotspring-panorama','hotspring-rules','founders-univers','founders-atelier'])staticFiles['/'+name+'.js']=[name+'.js','text/javascript; charset=utf-8'];
  staticFiles['/hotspring.css']=['hotspring.css','text/css; charset=utf-8'];
  staticFiles['/territorial.html']=['territorial.html','text/html; charset=utf-8'];
- staticFiles['/regie']=staticFiles['/founders-regie.html'];
+ staticFiles['/regie']=staticFiles['/hotspring']=staticFiles['/founders-regie.html'];
+ staticFiles['/hotspring/nouvelle-partie']=staticFiles['/founders-setup.html'];
+ staticFiles['/hotspring/atelier']=['founders-atelier.html','text/html; charset=utf-8'];
+ staticFiles['/univers.css']=['univers.css','text/css; charset=utf-8'];
  for(let i=1;i<=10;i++){const path='/assets/western/dilemmas/d'+String(i).padStart(2,'0')+'.jpg';staticFiles[path]=[path.slice(1),'image/jpeg'];}
  for(const name of ['reference',...['economie','securite','satisfaction','bien_etre','developpement','stabilite'].flatMap(k=>[k+'-low',k+'-high'])]){
   const path='/assets/western/painted/'+name+'.jpg';staticFiles[path]=[path.slice(1),'image/jpeg'];
@@ -61,7 +68,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
    }
    if(!path.startsWith('/api/')){json(404,{error:'Page introuvable'});return;}
    // No cookie authentication. Cross-origin requests and DNS-rebinding writes are refused.
-   if(req.headers.origin&&new URL(req.headers.origin).host!==req.headers.host&&new URL(req.headers.origin).origin!==publicOrigin){json(403,{error:'Origine refusée'});return;}
+   if(req.headers.origin&&new URL(req.headers.origin).host!==req.headers.host&&!publicOrigins.has(new URL(req.headers.origin).origin)){json(403,{error:'Origine refusée'});return;}
    const bucketKey=req.socket.remoteAddress??'unknown',now=clock();let bucket=limiter.get(bucketKey);
    if(!bucket||bucket.until<now){bucket={until:now+60000,count:0};limiter.set(bucketKey,bucket);}
    if(++bucket.count>1200){json(429,{error:'Trop de requêtes, réessayez dans une minute'});return;}
@@ -89,7 +96,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
         const familyView=await store.narrative.view(d.session,team3,now);
         if(d.family!==undefined&&d.family!==team3.family)throw new Error('Famille du QR incohérente');
         if(familyView.self.id!==team3.family)throw new Error('Terminal du QR incohérent');
-        const origin = publicOrigin ?? normalizeOrigin(d.origin);
+        const origin=publicOrigin?(publicOrigins.has(d.origin)?d.origin:publishedOrigin(req)):normalizeOrigin(d.origin);
         const link2 = origin + "/founders-family.html?session=" + d.session + "&family=" + team3.family + "#token=" + encodeURIComponent(d.token);
         const qr2 = qrcode(0, "M");
         qr2.addData(link2, "Byte");
@@ -151,6 +158,16 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
     json(201,{...published,warnings:parsed.warnings});return;
    }
 
+   const draftMatch=path.match(/^\/api\/founders\/hotspring\/drafts(?:\/([a-f0-9]{24}))?$/);
+   if(draftMatch){
+    const actor=await requireOrg(req),draftId=draftMatch[1];
+    if(!draftId&&req.method==='GET'){json(200,{drafts:await store.narrative.listDilemmaDrafts(actor.id)});return;}
+    if(draftId?req.method==='PUT':req.method==='POST'){
+     const draft=checkedDilemmaDraft(await body(req,48000));
+     json(draftId?200:201,await store.narrative.saveDilemmaDraft(actor.id,draftId,draft,now));return;
+    }
+    json(405,{error:'Méthode refusée'});return;
+   }
    // Narrative sessions use separate Firestore / SQLite collections from
    // legacy territorial sessions. Never treat team access as organizer access.
    if(path==='/api/founders/sessions'){
@@ -229,7 +246,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
    const match=path.match(/^\/api\/sessions\/([a-f0-9]{24})(?:\/(commands|check|export|access)(?:\/([a-z]+))?(?:\/(qr))?)?$/);
    if(!match){json(404,{error:'Route introuvable'});return;}
    const [,id,action,team,qr]=match;
-   const accessOrigin=publicOrigin??normalizeOrigin('http://'+req.headers.host);
+   const accessOrigin=publishedOrigin(req)??normalizeOrigin('http://'+req.headers.host);
    if(qr&&action!=='access'){json(404,{error:'Route introuvable'});return;}
    if(qr&&req.method==='POST'){const operator=await requireOrg(req);if(store.assertOwner)await store.assertOwner(id,(operator as {id:string}).id);const d=await body(req);if(typeof d.teamToken!=='string')throw new Error('Clé équipe requise');const actor=await store.authenticateTeam(id,d.teamToken,clock(),false);if(actor.role!=='team'||actor.team!==team)throw new Error('Accès QR invalide');json(200,accessQr(accessOrigin,id,d.teamToken));return;}
    if(action==='access'&&req.method==='POST'){const operator=await requireOrg(req);json(200,{team,token:await store.rotate(id,team as any,now,(operator as {id:string}).id)});return;}
