@@ -85,6 +85,7 @@
     <label for="diplomatCopies">Cartes Diplomate par famille, en plus de la carte Porte-parole</label>
     <input id="diplomatCopies" type="number" min="1" max="30" value="4">
     <button id="printRoleCards" class="secondary" type="button">Imprimer les cartes de rôle</button>
+    <p class="small">Neuf cartes à découper par feuille A4. Imprimez à 100 %.</p>
     <p id="rolePrintStatus" class="small" role="status"></p>
    </details>
    <p class="small muted">Un seul lien privé par équipe, à remettre à son porte-parole. Si un lien fonctionne déjà, conservez-le. Renouveler un lien désactive son ancien accès.</p>
@@ -130,4 +131,4 @@
  </div>
 </div><div id="notice" role="status" style="margin-top:18px"></div>
 </main>
-<section id="printSheets" hidden aria-label="Feuilles à imprimer"></section><dialog id="finishDialog" aria-labelledby="finishHeading"><h2 id="finishHeading">Terminer définitivement la partie ?</h2><p id="finishDescription">Cette action clôturera les votes en cours et affichera le résultat final sur tous les écrans.</p><p>Les mises du vote interrompu seront rendues. Seules les décisions déjà résolues compteront pour la ville et les scores.</p><div class="row"><button id="cancelFinish" class="secondary">Annuler</button><button id="confirmFinish" class="danger">Terminer la partie</button></div></dialog></body></html>
+<section id="printSheets" hidden aria-label="Fiches équipes à imprimer"></section><section id="roleSheets" hidden aria-label="Cartes de rôle à imprimer"></section><dialog id="finishDialog" aria-labelledby="finishHeading"><h2 id="finishHeading">Terminer définitivement la partie ?</h2><p id="finishDescription">Cette action clôturera les votes en cours et affichera le résultat final sur tous les écrans.</p><p>Les mises du vote interrompu seront rendues. Seules les décisions déjà résolues compteront pour la ville et les scores.</p><div class="row"><button id="cancelFinish" class="secondary">Annuler</button><button id="confirmFinish" class="danger">Terminer la partie</button></div></dialog></body></html>
