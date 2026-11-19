@@ -1,0 +1,97 @@
+.campaign-hotspring .western-edition{display:none}
+.campaign-hotspring .dilemma-panel{padding:clamp(16px,2vw,32px)}
+.campaign-hotspring .dilemma-panel h2{font-family:Georgia,serif;letter-spacing:-.02em}
+.campaign-hotspring .dilemma-panel [hidden]{display:none}
+.hotspring-panorama{position:relative;overflow:hidden;aspect-ratio:16/9;background:#2f2b24;isolation:isolate}
+.hotspring-panorama .hotspring-map{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.hotspring-panorama .hotspring-before{z-index:1;animation:hotspring-before 7.5s ease-in-out both}
+.hotspring-panorama .hotspring-after{animation:hotspring-pan 7.5s ease-out both;transform-origin:50% 62%}
+.hotspring-panorama .scene-diagonal-low{transform-origin:38% 64%}
+.hotspring-panorama .scene-diagonal-high{transform-origin:75% 42%}
+.hotspring-panorama .hotspring-result-still{position:absolute;z-index:3;inset:0;width:100%;height:100%;object-fit:cover;animation:hotspring-still 7.5s ease-in-out both}
+.hotspring-effect{position:absolute;inset:0;z-index:2;pointer-events:none;animation:hotspring-weather 7.5s ease both;mix-blend-mode:screen}
+.hotspring-effect.scene-smoke,.hotspring-effect.scene-steam,.hotspring-effect.scene-fire{
+ background:radial-gradient(ellipse at 52% 65%,#d4bc97aa,transparent 45%);animation-name:hotspring-weather,hotspring-drift
+}
+.hotspring-effect.scene-fire{background:radial-gradient(ellipse at 44% 65%,#82502dcc,transparent 50%)}
+.hotspring-effect.scene-rain,.hotspring-effect.scene-water,.hotspring-effect.scene-river{
+ background:linear-gradient(157deg,transparent 43%,#a9b9bd71,transparent 72%)
+}
+.hotspring-effect.scene-snow{background:radial-gradient(ellipse at 50% 72%,#d2d4c6a0,transparent 70%)}
+.hotspring-effect.scene-lamps,.hotspring-effect.scene-build{background:radial-gradient(ellipse at 58% 56%,#c0985088,transparent 53%)}
+.hotspring-effect.scene-dust,.hotspring-effect.scene-trail{background:radial-gradient(ellipse at 48% 83%,#baa27aa6,transparent 60%);animation-name:hotspring-weather,hotspring-drift}
+.hotspring-tendencies,.hotspring-charters{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr));gap:8px;margin-block:12px}
+.hotspring-tendencies[hidden],.hotspring-stage[hidden]{display:none}
+.hotspring-tendency{border:1px solid var(--line,#846f58);border-radius:8px;padding:10px;min-width:0}
+.hotspring-tendency h3{font-size:1rem;margin:0 0 .38rem}
+.hotspring-tendency p{font-size:.92rem;line-height:1.32;margin:0 0 .35rem}
+.hotspring-stage img{display:block;width:100%;max-height:38vh;object-fit:cover;border-radius:8px}
+.hotspring-stage img[hidden]{display:none}
+.hotspring-stage p{margin-block:.45rem;line-height:1.48}
+.hotspring-text{white-space:pre-line}
+.hotspring-ranking{padding-left:1.4rem}
+.hotspring-ranking li{margin-block:.55rem}
+.hotspring-result-asset{font-size:.82rem}
+.hotspring-gallery .hotspring-panorama{min-width:0}
+.hotspring-gallery .hotspring-gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr));gap:12px}
+.hotspring-gallery img{display:block;max-width:100%;aspect-ratio:16/9;object-fit:cover}
+.hotspring-gallery .card h3{margin-top:.6rem}
+@keyframes hotspring-before{0%,8%{opacity:1}55%,100%{opacity:0}}
+@keyframes hotspring-pan{0%{transform:scale(1.055)}100%{transform:scale(1)}}
+@keyframes hotspring-still{0%,6%{opacity:0}20%,58%{opacity:1}100%{opacity:0;visibility:hidden}}
+@keyframes hotspring-weather{0%,100%{opacity:0}35%{opacity:.65}}
+@keyframes hotspring-drift{0%{transform:translate(-3%,2%)}100%{transform:translate(6%,-3%)}}
+@media (prefers-reduced-motion:reduce){
+ .hotspring-panorama .hotspring-before,.hotspring-effect{display:none;animation:none}
+ .hotspring-panorama .hotspring-after{animation:none}
+ .hotspring-panorama .hotspring-result-still{animation:none;inset:auto 2% 4% auto;width:32%;height:auto;border:1px solid #c1b193;border-radius:4px}
+}
+.print-url{overflow-wrap:anywhere;word-break:break-word}
+.hotspring-construction{position:absolute;inset:0;z-index:2;pointer-events:none;animation:hotspring-construction 7.5s ease-in-out both}
+@keyframes hotspring-construction{0%,13%{opacity:0}28%,50%{opacity:1}74%,100%{opacity:0;visibility:hidden}}
+@media (prefers-reduced-motion:reduce){.hotspring-construction{display:none;animation:none}}
+.hotspring-prologue [data-layer="camp"]>g>g{animation:hotspring-arrival .9s ease-out both}
+.hotspring-prologue [data-layer="camp"]>g>g:nth-child(2){animation-delay:.7s}
+.hotspring-prologue [data-layer="camp"]>g>g:nth-child(3){animation-delay:1.4s}
+.hotspring-prologue [data-layer="camp"]>g>g:nth-child(4){animation-delay:2.1s}
+.hotspring-prologue [data-layer="camp"]>g>g:nth-child(5){animation-delay:2.8s}
+.hotspring-prologue [data-layer="camp"]>g>g:nth-child(n+6){animation-delay:3.5s}
+@keyframes hotspring-arrival{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.hotspring-prologue [data-layer="camp"]>g>g{animation:none}}
+
+.hotspring-epilogue {animation:hotspring-epilogue 10s ease-in-out both}
+.hotspring-camp-memory {animation:hotspring-memory 2.6s ease-in-out both}
+.hotspring-local-smoke {animation:hotspring-smoke 4.8s ease-in-out 2 alternate both;transform-box:fill-box;transform-origin:50% 95%}
+.hotspring-epilogue-scene {
+ position:absolute;
+ z-index:2;
+ right:4%;
+ bottom:6%;
+ width:min(42%,38rem);
+ margin:0;
+ background:#292018;
+ border:1px solid #ba9972;
+ border-radius:5px;
+ overflow:hidden;
+ animation:hotspring-vignette 1.65s ease-in-out var(--scene-delay) both;
+}
+.hotspring-epilogue-scene img {display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.hotspring-epilogue-scene figcaption {padding:.45rem .7rem;color:#f3eadc;font-size:clamp(.75rem,1.2vw,1.3rem)}
+@keyframes hotspring-epilogue {
+ 0% {transform:scale(1.17)}
+ 22% {transform:scale(1.11)}
+ 100% {transform:scale(1)}
+}
+@keyframes hotspring-memory {
+ 0%,30% {opacity:.82}
+ 99%,100% {opacity:0;visibility:hidden}
+}
+@keyframes hotspring-vignette {
+ 0%,100% {opacity:0;visibility:hidden}
+ 15%,82% {opacity:1;visibility:visible}
+}
+@keyframes hotspring-smoke {from {transform:scale(.92);opacity:.62} to {transform:scale(1.08);opacity:.78}}
+@media (prefers-reduced-motion:reduce) {
+ .hotspring-epilogue,.hotspring-local-smoke {animation:none}
+ .hotspring-camp-memory,.hotspring-epilogue-scene {display:none;animation:none}
+}

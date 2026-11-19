@@ -18,25 +18,26 @@ export const FOUNDERS_DEFAULT_CALIBRATION=Object.freeze({
  initialPower:8,initialDollars:10,initialPool:3,
  city:{economie:5,securite:5,satisfaction:5,bien_etre:5,developpement:5,stabilite:5}
 });
-export function validateFoundersCalibration(settings){
+export function validateFoundersCalibration(settings,{expandedHotspring=false}={}){
  const errors=[],allowed=['initialPower','initialDollars','initialPool','city'];
  if(!settings||typeof settings!=='object'||Array.isArray(settings))return ['Calibrage invalide'];
  if(Object.keys(settings).some(k=>!allowed.includes(k)))errors.push('Champ de calibrage non autorisé');
  if(!integer(settings.initialPower,1,30))errors.push('Influence initiale : 1 à 30');
  if(!integer(settings.initialDollars,0,100))errors.push('Dollars initiaux : 0 à 100');
  if(!integer(settings.initialPool,0,100))errors.push('Réserve commune : 0 à 100');
- const names=Object.hasOwn(settings.city??{},'ecologie')?['economie','ecologie','securite','demographie']:['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
+ const names=expandedHotspring||Object.hasOwn(settings.city??{},'ecologie')?['economie','ecologie','securite','demographie']:['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
+ if(expandedHotspring)names.push('bien_etre');
  if(!settings.city||typeof settings.city!=='object'||Array.isArray(settings.city)||
     Object.keys(settings.city).some(k=>!names.includes(k)))errors.push('Jauges initiales invalides');
  else for(const name of names)if(!integer(settings.city[name],0,10))errors.push('Jauge '+name+' : 0 à 10');
  return errors;
 }
-export function createFoundersGame({members=[5,5,5,5,5,5],leader='A',moderator,calibration=FOUNDERS_DEFAULT_CALIBRATION}={}) {
+export function createFoundersGame({members=[5,5,5,5,5,5],leader='A',moderator,calibration=FOUNDERS_DEFAULT_CALIBRATION,expandedHotspring=false}={}) {
  requireThat(Array.isArray(members)&&[5,6].includes(members.length)&&members.every(n=>integer(n,1,300)), 'Cinq ou six effectifs positifs obligatoires');
  const ids=FOUNDERS.slice(0,members.length);
  moderator??=ids.at(-1);
  requireThat(ids.includes(leader)&&ids.includes(moderator),'Maire ou shérif inconnu');
- const errors=validateFoundersCalibration(calibration);
+ const errors=validateFoundersCalibration(calibration,{expandedHotspring});
  requireThat(!errors.length,errors.join(' ; '));
  const powerSupply=ids.length*calibration.initialPower+calibration.initialPool;
  return {
@@ -64,11 +65,14 @@ export function transferFoundersDollars(input,from,to,amount,reason) {
  const s=clone(input);s.families[from].dollars-=amount;s.families[to].dollars+=amount;
  s.transactions.push({from,to,amount,reason,voteId:s.vote?.id??null});return s;
 }
+export function foundersReserveAllocation(s,{pool=s.pool,choices=s.vote?.choices??{}}={}){
+ const families=activeFounders(s).filter(id=>choices[id]==='passe_pouvoir');
+ return {families,perFamily:families.length?Math.floor(pool/families.length):0};
+}
 function complete(s,winner,leaderChoice=null) {
  const v=s.vote;
  requireThat(v.phase==='await_moderator'||v.phase==='voting'||v.phase==='await_leader','Vote non résoluble');
  requireThat(['pour','contre'].includes(winner),'Décision invalide');
- const passes=activeFounders(s).filter(id=>v.choices[id]==='passe_pouvoir');
  const candidates=activeFounders(s).filter(id=>v.choices[id]===winner);
  let newLeader=s.leader;
  if(candidates.length===0) newLeader=s.moderator; // all passed: moderator bears responsibility
@@ -79,7 +83,8 @@ function complete(s,winner,leaderChoice=null) {
   requireThat(tied.includes(leaderChoice)||tied.length===1,'Maire final invalide');
   newLeader=tied.length===1?tied[0]:leaderChoice;
  }
- const oldPool=s.pool;const each=passes.length?Math.floor(oldPool/passes.length):0;
+ const oldPool=s.pool;
+ const {families:passes,perFamily:each}=foundersReserveAllocation(s);
  s.pool-=each*passes.length;
  for(const id of passes)s.families[id].power+=each;
  for(const id of activeFounders(s)){

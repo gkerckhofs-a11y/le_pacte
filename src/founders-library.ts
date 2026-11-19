@@ -8,6 +8,7 @@ import {validateHybridStory,isHybrid} from './founders-progression.ts';
  * Catalogue records are immutable by convention: APIs always return clones.
  */
 import {createFoundersGame,FOUNDERS_DEFAULT_CALIBRATION,validateFoundersCalibration} from './founders.ts';
+import {HOTSPRING_ID,validateHotspring} from './founders-hotspring.ts';
 
 export const FOUNDERS_RESOURCE_IDS = Object.freeze([
   'ecologie','demographie','economie','securite','satisfaction','bien_etre','developpement','stabilite'
@@ -27,8 +28,8 @@ const requireValid=(errors,label)=>{if(errors.length)throw new Error(label+': '+
 
 export function validateFoundersStory(payload) {
  const errors=[];
- if(!keys(payload,['schema_version','scenario','dilemmas']))return ['Objet de scénario invalide'];
- error(payload.schema_version==='1.0.0','schema_version incompatible',errors);
+ if(!keys(payload,['schema_version','scenario','dilemmas','campaign']))return ['Objet de scénario invalide'];
+ error(payload.schema_version==='1.0.0'||['1.1.0','1.2.0'].includes(payload.schema_version)&&payload.scenario?.id===HOTSPRING_ID&&payload.campaign,'schema_version incompatible',errors);
  const s=payload.scenario;
  if(!keys(s,['id','title','universe','location','year','entry_dilemma','status','progression']))errors.push('scenario : structure');
  else {
@@ -95,7 +96,7 @@ export function validateFoundersStory(payload) {
  }
  if(s&&DILEMMA_RE.test(s.entry_dilemma))error(ids.has(s.entry_dilemma),'scenario.entry_dilemma absent',errors);
  for(const [path,id] of nexts)error(ids.has(id),path+' référence manquante '+id,errors);
- errors.push(...validateHybridStory(payload));
+ errors.push(...validateHybridStory(payload),...validateHotspring(payload));
  const graph=new Map(ds.filter(d=>isObj(d)&&DILEMMA_RE.test(d.id)&&isObj(d.outcomes)).map(d=>[d.id,OUTCOMES.flatMap(x=>[d.outcomes[x]?.next_id,...(Array.isArray(d.outcomes[x]?.unlocks)?d.outcomes[x].unlocks:[])])]));
  const visited=new Set(),todo=[s?.entry_dilemma,...(Array.isArray(s?.progression?.initial_dilemmas)?s.progression.initial_dilemmas:[]),...(isHybrid(payload)?[s.progression.finale_id]:[])];
  while(todo.length){
@@ -152,6 +153,7 @@ export function publishFoundersScenario(input,{payload,source,version}){
     typeof source.spreadsheetId==='string'&&/^[A-Za-z0-9_-]{15,160}$/.test(source.spreadsheetId);
  const demoSource=keys(source,['type','label'])&&source.type==='bundled_fixture';
  if(!(sheetSource||demoSource)||!txt(source.label,1,160))throw new Error('Source de scénario invalide');
+ if(payload.campaign&&!demoSource)throw new Error('La campagne versionnée doit être intégrée au catalogue.');
  const library=clone(input),id=payload.scenario.id;
  const record=Object.hasOwn(library.scenarios,id)?library.scenarios[id]:{id,releases:{}};
  if(Object.hasOwn(record.releases,version))throw new Error('Version de scénario déjà publiée : '+id+'@'+version);
@@ -167,7 +169,8 @@ export function listFoundersLibrary(input){
    const latest=s.releases[versions.at(-1)];
    return {id:s.id,title:latest.payload.scenario.title,universe:latest.payload.scenario.universe,
      status:latest.payload.scenario.status,version:latest.version,
-     releases:versions,sourceType:latest.source.type,dilemmas:latest.payload.dilemmas.length};
+     releases:versions,sourceType:latest.source.type,dilemmas:latest.payload.dilemmas.length,
+     ...(latest.payload.campaign?{familyCount:5,familyNames:Object.values(latest.payload.campaign.families).map(f=>f.name)}:{})};
   }).sort((a,b)=>a.title.localeCompare(b.title,'fr')),
   skins:Object.values(input.skins).map(s=>({
    id:s.id,title:s.title,universe:s.universe,status:s.status,version:s.version,
@@ -175,7 +178,7 @@ export function listFoundersLibrary(input){
   })).sort((a,b)=>a.title.localeCompare(b.title,'fr'))
  };
 }
-export function prepareFoundersSession(input,{scenarioId,scenarioVersion,skinId,members=[5,5,5,5,5,5],calibration=FOUNDERS_DEFAULT_CALIBRATION}){
+export function prepareFoundersSession(input,{scenarioId,scenarioVersion,skinId,members,calibration=FOUNDERS_DEFAULT_CALIBRATION}){
  if(input.kind!=='founders-library-v2.3')throw new Error('Catalogue invalide');
  const record=Object.hasOwn(input.scenarios,scenarioId)?input.scenarios[scenarioId]:undefined;
  if(!record)throw new Error('Scénario inconnu');
@@ -187,18 +190,27 @@ export function prepareFoundersSession(input,{scenarioId,scenarioVersion,skinId,
  const skin=Object.hasOwn(input.skins,skinId)?input.skins[skinId]:undefined;
  if(!skin||skin.status==='archived')throw new Error('Skin inconnue ou archivée');
  // This is only a preview. The running session persistence layer is not wired.
- const v2=selectedVersion==='2.0.0'&&scenarioId==='hot-spring-reserve-hybride';
- if(v2&&!Object.hasOwn(calibration.city??{},'ecologie'))calibration={...calibration,city:{...CITY_V2,economie:calibration.city.economie,securite:calibration.city.securite}};
- const calibrationErrors=validateFoundersCalibration(calibration);
+ const hotspring=scenarioId===HOTSPRING_ID&&Boolean(release.payload.campaign);
+ members??=hotspring?[5,5,5,5,5]:[5,5,5,5,5,5];
+ if(hotspring&&(!Array.isArray(members)||members.length!==5))throw new Error('Les Colons de Hotspring se jouent avec cinq familles.');
+ const v2=hotspring||selectedVersion==='2.0.0'&&scenarioId==='hot-spring-reserve-hybride';
+ const expandedHotspring=hotspring&&release.payload.campaign.version>=2;
+ if(expandedHotspring&&calibration===FOUNDERS_DEFAULT_CALIBRATION)
+  calibration={...calibration,city:{...CITY_V2,bien_etre:5}};
+ else if(v2&&!expandedHotspring&&!Object.hasOwn(calibration.city??{},'ecologie'))
+  calibration={...calibration,city:{...CITY_V2,economie:calibration.city.economie,securite:calibration.city.securite}};
+ const calibrationErrors=validateFoundersCalibration(calibration,{expandedHotspring});
  if(calibrationErrors.length)throw new Error(calibrationErrors.join(' ; '));
- const game=createFoundersGame({members,calibration});
+ if(expandedHotspring&&Object.values(calibration.city).some(value=>value!==5))throw new Error('Les cinq jauges de Hotspring démarrent à 5');
+ const game=createFoundersGame({members,calibration,expandedHotspring});
  if(v2)game.auctionMode='continuous';
  const selectedSkin=clone(skin);if(v2)selectedSkin.labels.resources=clone(LABELS_V2);
+ if(expandedHotspring)Object.assign(selectedSkin.labels.resources,{bien_etre:'Bien-être',stabilite:'Stabilité'});
  const warnings=[];
  if(skin.universe!==release.payload.scenario.universe)warnings.push('Univers différent : le visuel ne traduit pas automatiquement le texte narratif.');
  if(skin.status==='prototype')warnings.push('Skin en cours de conception, affichage non final.');
  if(!skin.publicScene.baseImageUrl&&!nativeSkinScene(skin.id))warnings.push('Décor public à créer : aucune image de ville disponible.');
- if(release.payload.scenario.status==='prototype')warnings.push('Scénario de test non validé.');
+ if(release.payload.scenario.status==='prototype')warnings.push(hotspring?'Campagne en brouillon. Certains visuels sont temporaires.':'Scénario de test non validé.');
  if(isHybrid(release.payload))warnings.push('Parcours hybride expérimental : ordre variable, objectifs et durée à recalibrer en test humain.');
  return {
   kind:'founders-session-preview-v2.3',

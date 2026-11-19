@@ -1,7 +1,7 @@
 import qrcode from 'qrcode-generator';
 import {checkedConfiguration} from './founders-configurations.ts';
 import {createServer} from 'node:http';
-import {readFileSync} from 'node:fs';
+import {existsSync,readFileSync} from 'node:fs';
 import {timingSafeEqual} from 'node:crypto';
 import {catalog,map} from './catalog.ts';
 import {tokenHash} from './security.ts';
@@ -17,7 +17,8 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
  if(!/^[A-Za-z0-9_-]{32,128}$/.test(organizerToken))throw new Error('Clé régie : au moins 32 caractères');
  const tokenDigest=Buffer.from(tokenHash(organizerToken),'hex');
  const staticFiles:Record<string,[string,string]>={ '/founders-regie-flow.js':['founders-regie-flow.js','text/javascript; charset=utf-8'], '/founders-name-save.js':['founders-name-save.js','text/javascript; charset=utf-8'], '/founders-painted-western.js':['founders-painted-western.js','text/javascript; charset=utf-8'], '/founders-skins.json':['../content/founders-skins-v1.json','application/json; charset=utf-8'], '/founders-skins.html':['founders-skins.html','text/html; charset=utf-8'], '/founders-skins.js':['founders-skins.js','text/javascript; charset=utf-8'], '/founders-skin-theme.js':['founders-skin-theme.js','text/javascript; charset=utf-8'], '/founders-skin-scenes.js':['founders-skin-scenes.js','text/javascript; charset=utf-8'], '/founders-identity.js':['founders-identity.js','text/javascript; charset=utf-8'], '/founders-city-scene.js':['founders-city-scene.js','text/javascript; charset=utf-8'], '/founders-live.css':['founders-live.css','text/css; charset=utf-8'], '/founders-city.html':['founders-city.html','text/html; charset=utf-8'], '/founders-city.js':['founders-city.js','text/javascript; charset=utf-8'], '/founders-family.html':['founders-family.html','text/html; charset=utf-8'], '/founders-family.js':['founders-family.js','text/javascript; charset=utf-8'], '/founders-regie.html':['founders-regie.html','text/html; charset=utf-8'], '/founders-regie.js':['founders-regie.js','text/javascript; charset=utf-8'], '/founders-import.html':['founders-import.html','text/html; charset=utf-8'], '/founders-import.js':['founders-import.js','text/javascript; charset=utf-8'], '/founders-setup.html':['founders-setup.html','text/html; charset=utf-8'], '/founders-setup.js':['founders-setup.js','text/javascript; charset=utf-8'], '/western-board.js':['western-board.js','text/javascript; charset=utf-8'],'/western-territories.js':['western-territories.js','text/javascript; charset=utf-8'],'/far-west.html':['far-west.html','text/html; charset=utf-8'],'/western-preview.js':['western-preview.js','text/javascript; charset=utf-8'],'/assets/western/frontier-terrain-v1.webp':['assets/western/frontier-terrain-v1.webp','image/webp'], '/':['index.html','text/html; charset=utf-8'],'/app.js':['app.js','text/javascript; charset=utf-8'],'/studio.js':['studio.js','text/javascript; charset=utf-8'],'/animation.js':['animation.js','text/javascript; charset=utf-8'],'/style.css':['style.css','text/css; charset=utf-8']};
- for(const name of ['pacte-entry','founders-workspace','founders-live-ui','founders-print','founders-council-monitor','founders-vote-progress','founders-role-badges','founders-chronicle','founders-agreements','founders-fullscreen'])staticFiles['/'+name+'.js']=[name+'.js','text/javascript; charset=utf-8'];
+ for(const name of ['pacte-entry','founders-workspace','founders-live-ui','founders-print','founders-council-monitor','founders-vote-progress','founders-role-badges','founders-chronicle','founders-agreements','founders-fullscreen','founders-hotspring','hotspring-panorama','hotspring-rules'])staticFiles['/'+name+'.js']=[name+'.js','text/javascript; charset=utf-8'];
+ staticFiles['/hotspring.css']=['hotspring.css','text/css; charset=utf-8'];
  staticFiles['/territorial.html']=['territorial.html','text/html; charset=utf-8'];
  for(let i=1;i<=10;i++){const path='/assets/western/dilemmas/d'+String(i).padStart(2,'0')+'.jpg';staticFiles[path]=[path.slice(1),'image/jpeg'];}
  for(const name of ['reference',...['economie','securite','satisfaction','bien_etre','developpement','stabilite'].flatMap(k=>[k+'-low',k+'-high'])]){
@@ -45,6 +46,10 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
   try {
    const url=new URL(req.url??'/','http://localhost');const path=url.pathname;
    if(!options.apiOnly&&req.method==='GET'&&staticFiles[path]){const [file,type]=staticFiles[path];res.writeHead(200,{'Content-Type':type});res.end(readFileSync(new URL(`../public/${file}`,import.meta.url)));return;}
+   if(!options.apiOnly&&req.method==='GET'&&/^\/assets\/hotspring\/v1\/\w+\/[\w-]+\.webp$/.test(path)){
+    const file=new URL('../public'+path,import.meta.url);
+    if(existsSync(file)){res.writeHead(200,{'Content-Type':'image/webp','Cache-Control':'public, max-age=86400'});res.end(readFileSync(file));return;}
+   }
    if(!path.startsWith('/api/')){json(404,{error:'Page introuvable'});return;}
    // No cookie authentication. Cross-origin requests and DNS-rebinding writes are refused.
    if(req.headers.origin&&new URL(req.headers.origin).host!==req.headers.host&&new URL(req.headers.origin).origin!==publicOrigin){json(403,{error:'Origine refusée'});return;}
@@ -96,6 +101,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
       scenarioId:d.scenarioId,scenarioVersion:d.scenarioVersion,skinId:d.skinId,members:d.members,
       calibration:d.calibration
     });
+    if(p.scenario.campaign)throw new Error('La campagne Hotspring utilise son propre barème sur 18 points.');
     json(200,analyzeFoundersGoalReachability(p.scenario,d.goalCards??DEFAULT_GOAL_CARDS,
       {initialCity:p.game.city}));return;
    }
@@ -106,6 +112,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
       scenarioId:d.scenarioId,scenarioVersion:d.scenarioVersion,skinId:d.skinId,members:d.members,
       calibration:d.calibration
     });
+    if(p.scenario.campaign)throw new Error('La campagne Hotspring utilise son propre barème sur 18 points.');
     json(200,simulateFoundersPolicies(p.scenario,{
       cards:d.goalCards,rule:d.scoreRules,calibration:p.settings.calibration,members:p.settings.members,
       runs:d.runs,mode:d.mode,seed:d.seed
@@ -146,15 +153,19 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
      const preview=await foundersPreviewFor(store,actor.id,d);
      const created=await store.narrative.create({
       ownerId:actor.id,preview,code:d.code,title:d.title,
-      objectives:d.objectives,names:d.names,colors:d.colors,goalCards:d.goalCards,scoreRules:d.scoreRules,timing:d.timing,gaugeThresholds:d.gaugeThresholds,now
+      objectives:d.objectives,names:d.names,colors:d.colors,goalCards:d.goalCards,scoreRules:d.scoreRules,timing:d.timing,gaugeThresholds:d.gaugeThresholds,crisisMode:d.crisisMode,presentationSeconds:d.presentationSeconds,now
      });
      json(201,created);return;
     }
    }
-   const narrativeMatch=path.match(/^\/api\/founders\/sessions\/([a-f0-9]{24})(?:\/(commands|access)(?:\/([A-F]))?)?$/);
+   const narrativeMatch=path.match(/^\/api\/founders\/sessions\/([a-f0-9]{24})(?:\/(commands|access|variant)(?:\/([A-F]))?)?$/);
    if(narrativeMatch){
     if(!store.narrative)throw new Error('Parties narratives non disponibles');
     const [,sessionId,verb,family]=narrativeMatch;
+    if(verb==='variant'&&!family&&req.method==='POST'){
+     const actor=await requireOrg(req);
+     json(201,await store.narrative.duplicate(sessionId,actor.id,now));return;
+    }
     if(verb==='access'&&family&&req.method==='POST'){
      const actor=await requireOrg(req);
      json(200,await store.narrative.rotate(sessionId,family,actor.id,now));return;

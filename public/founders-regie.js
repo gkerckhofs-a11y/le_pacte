@@ -1,4 +1,6 @@
-import {decorateGauge,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
+import {rememberAccess} from './founders-workspace.js';
+import {CAMPAIGN_PHASES,renderHotspringStage,renderTendencies,renderCampaignAdmin,renderCampaignActions,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
+import {decorateGauge,formatGaugeNumber,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
 import {mountPrintKit} from './founders-print.js';
 import {renderCouncilMonitor} from './founders-council-monitor.js';
 import {councilGuidance,startCouncil,organizerError,validNarrativeSession} from './founders-regie-flow.js';
@@ -7,7 +9,7 @@ import {teamCaption,teamLabel,colorize} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id),p=new URLSearchParams(location.search);
 const sid=p.get('session');let authSDK=null,cloud=false,token='',current=null,busy=false,initialized=false,authenticating=false,waitingForLogin=false;
-const labels={NEGOTIATION:'Négociations',READY:'Prêt',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'En attente de la révélation',REVEALED:'Résultat annoncé',FINISHED:'Partie terminée'};
+const labels={...CAMPAIGN_PHASES,NEGOTIATION:'Négociations',READY:'Prêt',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'En attente de la révélation',REVEALED:'Résultat annoncé',FINISHED:'Partie terminée'};
 const gaugeIds=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
 const set=(id,v)=>$(id).textContent=String(v??'');
 const secure=()=>validNarrativeSession(sid);
@@ -94,14 +96,49 @@ function gauge(s){
   const el=document.createElement('div');el.className='gauge';
   const row=document.createElement('div');row.className='gauge-head';
   const label=document.createElement('span');label.textContent=s.skin.labels.resources[k]||k;
-  const n=document.createElement('strong');n.textContent=s.city[k]+'/10';appendGaugeDelta(n,s,k);row.append(label,n);
+  const n=document.createElement('strong');n.textContent=formatGaugeNumber(s.city[k],k==='stabilite'&&s.campaign?.version>=2)+'/10';appendGaugeDelta(n,s,k);row.append(label,n);
   const track=document.createElement('div');track.className='track';
   const bar=document.createElement('div');bar.className='bar';bar.style.width=s.city[k]*10+'%';decorateGauge(bar,label,s.city[k],s);track.append(bar);el.append(row,track);root.append(el);
+ }
+ renderCityAudit(s);
+}
+function renderCityAudit(s){
+ const expanded=s.campaign?.version>=2,formula=$('stabilityFormula'),correction=$('cityCorrection'),audit=$('cityEffectAudit');
+ formula.hidden=correction.hidden=!expanded;
+ audit.replaceChildren();audit.hidden=true;
+ if(!expanded)return;
+ const indicators=Object.keys(s.city).filter(key=>key!=='stabilite');
+ formula.textContent='Stabilité en lecture seule · ('+indicators.map(key=>s.city[key]).join(' + ')+') ÷ 5 = '+formatGaugeNumber(s.city.stabilite,true);
+ const select=$('correctIndicator');
+ if(!select.options.length)for(const key of indicators){
+  const option=document.createElement('option');option.value=key;option.textContent=s.skin.labels.resources[key];select.append(option);
+ }
+ for(const field of $('cityCorrectionForm').querySelectorAll('select,input,button'))field.disabled=!s.clock.paused||['FINISHED','EPILOGUE','SUSPENDED'].includes(s.phase);
+ const records=s.reveal?[{...s.reveal,side:s.reveal.winner}]:s.effectsPreview;
+ if(!records?.length)return;
+ audit.hidden=false;
+ const heading=document.createElement('h3');heading.textContent=s.reveal?'Effets appliqués':'Effets prévus avant le vote';audit.append(heading);
+ const sign=n=>n>0?'+'+n:n<0?'−'+Math.abs(n):'0';
+ for(const record of records){
+  const title=document.createElement('strong');title.textContent=record.side==='pour'?'POUR':'CONTRE';audit.append(title);
+  const list=document.createElement('ul');
+  for(const effect of record.effects){
+   const key=effect.indicator,before=record.cityBefore[key],after=record.cityAfter[key],row=document.createElement('li');
+   row.textContent=s.skin.labels.resources[key]+' '+sign(effect.value)+' prévu · '+before+' → '+after+' ('+sign(after-before)+(s.reveal?' appliqué':' après plafonnement')+')';
+   list.append(row);
+  }
+  const stability=document.createElement('li');
+  stability.textContent='Stabilité calculée · '+formatGaugeNumber(record.cityBefore.stabilite,true)+' → '+formatGaugeNumber(record.cityAfter.stabilite,true);
+  list.append(stability);audit.append(list);
  }
 }
 function render(s){
  applySkin(document.body,s.skin);
  current=s;
+ document.body.classList.toggle('campaign-hotspring',Boolean(s.campaign));
+ renderCampaignActions($('campaignActions'),s,command);
+ renderCampaignAdmin($('hotspringAdmin'),s,newVariant);
+ if(s.campaign){renderHotspringStage($('hotspringStage'),s);renderTendencies($('hotspringTendencies'),s.phase==='REVEALED'?null:s.dilemma);}
  printKit.sync(s);renderPhaseClock($('phaseClock'),s);renderV2Controls(s);
  renderCouncilMonitor($('councilMonitor'),s);
  const guidance=councilGuidance(s);step(guidance.step);set('stageTitle',guidance.title);set('stageHint',guidance.hint);
@@ -116,7 +153,12 @@ function render(s){
  $('reveal').hidden=s.phase!=='AWAITING_REVEAL';
  $('next').hidden=s.phase!=='REVEALED';
  $('next').textContent=(s.progression?s.progression.terminal:s.reveal?.nextId===null)?'Terminer la partie':'Dilemme suivant';
- $('next').disabled=Boolean(s.progression?.blocked);
+ if(s.campaign){
+  $('next').hidden=!['INTRO','PRESENTATION','REVEALED','CHECKPOINT'].includes(s.phase);
+  $('next').textContent=({INTRO:'Présenter le dilemme',PRESENTATION:'Ouvrir la négociation',REVEALED:s.reveal?.id==='D30'?'Lire l’épilogue':'Poursuivre',CHECKPOINT:s.campaign.chapter===6?'Qualifier les chartes':'Reprendre — chapitre suivant'})[s.phase]??'Poursuivre';
+ }
+ $('tiePriority').closest('details').hidden=Boolean(s.campaign);
+ renderActionAvailability(s);
  $('reservePanel').hidden=!s.progression||s.progression.terminal;
  const choice=$('nextDilemma'),previousChoice=choice.value;choice.replaceChildren();
  const auto=document.createElement('option');auto.value='';auto.textContent='Laisser le moteur choisir';choice.append(auto);
@@ -142,7 +184,13 @@ function render(s){
   el.append(details);families.append(el);
  }
  const final=$('finalPanel');final.hidden=!s.finalResults;
- if(s.finalResults){
+ if(s.campaign&&s.finalResults){
+  set('finalWinner',hotspringWinners(s));
+  set('finalScoreRule',s.finalResults.rows[0].maximum+' points possibles par famille.');
+  const root=$('ranking');root.replaceChildren();
+  renderCampaignRanking(root,s.finalResults.rows,true);
+ }else if(s.finalResults){
+  set('finalScoreRule','Barème de test V2.6 · une seule famille déclarée vainqueure.');
   set('finalWinner',teamLabel(s,s.finalResults.ranking[0].family)+' remporte la partie ('+s.finalResults.ranking[0].score.total+' pts)');
   const root=$('ranking');root.replaceChildren();
   for(const r of s.finalResults.ranking){
@@ -164,18 +212,34 @@ function render(s){
 }
 async function command(kind,data={}){
  if(!current||busy)return;
- busy=true;set('actionMessage','Enregistrement…');$('actions').querySelectorAll('button').forEach(b=>b.disabled=true);
+ busy=true;set('actionMessage','Enregistrement…');renderActionAvailability(current);
  try{
   const s=await api('/commands','POST',{kind,data,expectedRevision:current.revision});
-  render(s);set('actionMessage',kind==='reveal'?'Décision révélée sur la projection.':s.phase==='FINISHED'?'Partie terminée : classement affiché.':'Le prochain dilemme est ouvert.');
+  render(s);set('actionMessage',kind==='reveal'?'Décision révélée sur la projection.':s.phase==='FINISHED'?'Partie terminée : classement affiché.':s.campaign?(labels[s.phase]??s.phase)+'.':'Le prochain dilemme est ouvert.');
  }catch(e){set('actionMessage',e.message);try{render(await api(''));}catch{}}
- finally{busy=false;$('actions').querySelectorAll('button').forEach(b=>b.disabled=false);$('next').disabled=Boolean(current?.progression?.blocked);}
+ finally{busy=false;renderActionAvailability(current);}
+}
+function renderActionAvailability(s){
+ for(const button of $('actions').querySelectorAll('button')){
+  const advance=['start','next','reveal','beginVote'].includes(button.id);
+  button.disabled=busy||Boolean(advance&&s?.clock?.paused)||Boolean(button.id==='next'&&s?.progression?.blocked);
+ }
+}
+async function newVariant(){
+ if(busy)return;
+ busy=true;
+ try{
+  const result=await api('/variant','POST',{});
+  rememberAccess(result);
+  location.assign('/founders-regie.html?session='+encodeURIComponent(result.id));
+ }catch(e){set('actionMessage',e.message);}
+ finally{busy=false;}
 }
 async function rotate(family){
  if(busy)return;busy=true;set('notice','Renouvellement du jeton…');
  try{
   const result=await api('/access/'+family,'POST',{});
-  const url=new URL('/founders-family.html?session='+sid,location.origin);
+  const url=new URL('/founders-family.html?session='+sid+'&family='+family,location.origin);
   url.hash='token='+encodeURIComponent(result.token);
   printKit.remember(family,result.token);
   $('newAccessLink').value=url.href;$('accessOutput').hidden=false;
@@ -190,7 +254,7 @@ $('start').addEventListener('click',async()=>{
   const result=await startCouncil(api);render(result.view);
   set('actionMessage',result.started?'Partie lancée. Le premier dilemme est affiché ; le Maire peut voter sur son écran d’équipe.':'La partie a déjà démarré. La régie affiche son état actuel.');
  }catch(error){set('actionMessage',organizerError(error));try{render(await api(''));}catch{}}
- finally{busy=false;$('start').disabled=false;}
+ finally{busy=false;renderActionAvailability(current);}
 });
 $('reveal').addEventListener('click',()=>command('reveal'));
 $('next').addEventListener('click',()=>command('next',current?.progression&&$('nextDilemma').value?{dilemmaId:$('nextDilemma').value}:{}));
@@ -220,15 +284,30 @@ const printKit=mountPrintKit({session:sid,view:()=>current,request:async(path,bo
 }});
 
 function renderV2Controls(s){
+ const manual=s.campaign?.version>=3;
  $('v2Controls').hidden=s.experienceVersion!==2;
  $('beginVote').hidden=s.phase!=='NEGOTIATION';
- $('pauseGame').hidden=Boolean(s.clock?.paused);$('resumeGame').hidden=!s.clock?.paused;
- $('finishGame').disabled=s.phase==='FINISHED';
+ set('beginVote',manual?'Ouvrir le vote':'Ouvrir le vote maintenant');
+ set('v2ControlsTitle',manual?'Réglages':'Chronos et réglages');
+ $('timingForm').hidden=manual;
+ const ended=['EPILOGUE','FINISHED'].includes(s.phase),suspended=s.phase==='SUSPENDED',v2=s.experienceVersion===2;
+ for(const id of ['addTime','removeTime'])$(id).hidden=!v2||manual||s.clock?.remainingMs==null||ended||suspended;
+ $('pauseGame').hidden=!v2||ended||suspended||Boolean(s.clock?.paused);
+ $('resumeGame').hidden=!v2||suspended||!s.clock?.paused;
+ $('finishGame').hidden=!v2||ended;
+ $('finishDescription').textContent=s.campaign&&s.phase==='CHECKPOINT'&&s.campaign.chapter>=5?
+  'La régie ouvrira la prochaine étape du final. Les familles décideront du gouvernement et de la charte.':
+  s.campaign?'La régie ouvrira l’épilogue et affichera les scores issus des décisions déjà prises.':
+  'Cette action clôture la partie et affiche le résultat. Les mises d’un vote en cours sont rendues.';
+ $('finishGame').textContent=s.campaign?'Terminer l’histoire':'Terminer la partie';
+ $('presentationTiming').hidden=!s.campaign;$('presentationSeconds').disabled=!s.campaign;
+ if(!document.activeElement?.closest('#timingForm'))$('presentationSeconds').value=s.campaignAdmin?.presentationSeconds??'';
  const fields={negotiationSeconds:s.timing?.negotiationSeconds,voteSeconds:s.timing?.voteSeconds,resolutionSeconds:s.timing?.resolutionSeconds};
  if(!document.activeElement?.closest('#timingForm')){for(const [id,value] of Object.entries(fields))$(id).value=value??'';$('autoAdvance').checked=s.timing?.autoAdvance??false;$('gaugeThresholds').value=(s.gaugeThresholds??[2,4,6,8]).join(',');}
  if(!document.activeElement?.closest('#correctionForm')){
   const selected=$('correctFamily').value;$('correctFamily').replaceChildren();for(const f of s.families){const o=document.createElement('option');o.value=f.id;o.textContent=teamCaption(f);$('correctFamily').append(o);}$('correctFamily').value=selected||s.families[0].id;
  }
+ for(const field of $('correctionForm').querySelectorAll('input,select,button'))field.disabled=ended||suspended||!s.clock?.paused;
  const pending=Object.values(s.offers).filter(o=>o.status==='pending');
  set('pendingOffers',pending.length?'Offres en attente : '+pending.map(o=>teamLabel(s,o.from)+' → '+teamLabel(s,o.to)+' : '+o.amount+' '+s.skin.labels.currency).join(' ; '):'Aucune proposition financière en attente.');
 }
@@ -237,8 +316,9 @@ $('pauseGame').addEventListener('click',()=>command('pause'));
 $('resumeGame').addEventListener('click',()=>command('resume'));
 $('addTime').addEventListener('click',()=>command('adjustTime',{seconds:60}));
 $('removeTime').addEventListener('click',()=>command('adjustTime',{seconds:-60}));
-$('timingForm').addEventListener('submit',event=>{event.preventDefault();command('configureTiming',{timing:{negotiationSeconds:Number($('negotiationSeconds').value),voteSeconds:Number($('voteSeconds').value),resolutionSeconds:Number($('resolutionSeconds').value),autoAdvance:$('autoAdvance').checked},gaugeThresholds:$('gaugeThresholds').value.split(',').map(Number)});});
+$('timingForm').addEventListener('submit',event=>{event.preventDefault();command('configureTiming',{timing:{negotiationSeconds:Number($('negotiationSeconds').value),voteSeconds:Number($('voteSeconds').value),resolutionSeconds:Number($('resolutionSeconds').value),autoAdvance:$('autoAdvance').checked},gaugeThresholds:$('gaugeThresholds').value.split(',').map(Number),...(current?.campaign?{presentationSeconds:Number($('presentationSeconds').value)}:{})});});
 $('correctionForm').addEventListener('submit',event=>{event.preventDefault();command('correctResource',{family:$('correctFamily').value,resource:$('correctResource').value,value:Number($('correctValue').value)});});
+$('cityCorrectionForm').addEventListener('submit',event=>{event.preventDefault();command('correctCity',{indicator:$('correctIndicator').value,value:Number($('correctIndicatorValue').value)});});
 $('finishGame').addEventListener('click',()=>$('finishDialog').showModal());
 $('cancelFinish').addEventListener('click',()=>$('finishDialog').close());
-$('confirmFinish').addEventListener('click',async()=>{await command('finish',{confirm:true});if(current?.phase==='FINISHED')$('finishDialog').close();});
+$('confirmFinish').addEventListener('click',async()=>{await command('finish',{confirm:true});if(current&&['EPILOGUE','FINISHED','INTRO','CHARTER_SUPPORT'].includes(current.phase))$('finishDialog').close();});

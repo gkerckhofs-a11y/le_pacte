@@ -97,11 +97,11 @@ small{color:#656a6e}a{color:inherit}ol{padding-left:20px;line-height:1.6}
     </div>
     <div id="warnings"></div>
     <hr><h2>3 · Familles et création</h2>
-    <p class="note">Les six familles ont chacune une ambition secrète. Gardez les réglages proposés ou personnalisez leurs cartes. Le barème reste à confirmer en test humain.</p>
+    <p class="note" id="familySetupNote">Les familles ont chacune une ambition secrète. Gardez les réglages proposés ou personnalisez leurs cartes. Le barème reste à confirmer en test humain.</p>
     <label for="gameTitle">Nom de la partie</label><input id="gameTitle" value="Le Pacte des Fondateurs — Répétition" maxlength="100">
     <label for="gameCode">Code de partie (unique)</label><input id="gameCode" placeholder="Ex. PACTE01" pattern="[A-Z0-9][A-Z0-9_-]{2,11}" maxlength="12">
     <div id="familySettings"></div>
-    <details class="advanced"><summary>Réglages avancés · barème et laboratoire</summary><h2>Barème final de test</h2>
+    <label id="crisisModeField" hidden>Rythme des crises<select id="crisisMode"><option value="standard">Séance standard (deux crises au maximum)</option><option value="extended">Campagne longue (crises éligibles)</option></select></label><details class="advanced" id="legacyScoring"><summary>Réglages avancés · barème et laboratoire</summary><h2>Barème final de test</h2>
     <p class="note">Les cartes de familles donnent deux paliers d'objectif secret. Ces valeurs restent expérimentales et seront ajustées après les tests humains.</p>
     <div class="grid2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
       <label for="secretFirst">Points objectif palier 1<input id="secretFirst" type="number" min="0" max="12" value="3"></label>

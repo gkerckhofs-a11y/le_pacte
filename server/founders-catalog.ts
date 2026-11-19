@@ -1,4 +1,6 @@
 import hybridV2 from '../content/founders-hybrid-v2.json' with {type:'json'};
+import hotspring from '../content/founders-hotspring-v1.json' with {type:'json'};
+import {hotspringWithWellBeing} from '../content/founders-hotspring-wellbeing.ts';
 import {GOALS_V2,CITY_V2} from '../src/founders-v2.ts';
 import {createHash} from 'node:crypto';
 import {DEFAULT_GOAL_CARDS,DEFAULT_SCORE_RULES} from '../src/founders-scoring.ts';
@@ -45,6 +47,13 @@ library=publishFoundersScenario(library,{payload:hybridExpanded,version:'1.1.0',
 library=publishFoundersScenario(library,{payload:hybridBalanced,version:'1.2.0',source:{type:'bundled_fixture',label:'Hot Spring hybride — calibration des vingt dilemmes'}});
 library=publishFoundersScenario(library,{payload:hybridIllustrated,version:'1.3.0',source:{type:'bundled_fixture',label:'Hot Spring hybride — vingt scènes et quarante résolutions illustrées'}});
 library=publishFoundersScenario(library,{payload:hybridV2,version:'2.0.0',source:{type:'bundled_fixture',label:'Corrections du premier test — quatre jauges et surenchère continue'}});
+library=publishFoundersScenario(library,{payload:hotspring,version:'1.0.0',
+ source:{type:'bundled_fixture',label:'Les Colons de Hotspring — campagne d’origine'}});
+const hotspringV11=hotspringWithWellBeing(hotspring);
+library=publishFoundersScenario(library,{payload:hotspringV11,version:'1.1.0',
+ source:{type:'bundled_fixture',label:'Les Colons de Hotspring — Bien-être, Stabilité et objectifs des cinq familles'}});
+library=publishFoundersScenario(library,{payload:{...hotspringV11,schema_version:'1.2.0',campaign:{...hotspringV11.campaign,version:3}},version:'1.2.0',
+ source:{type:'bundled_fixture',label:'Les Colons de Hotspring — trajectoires relatives et négociations contraignantes'}});
 export const foundersLibrary=library;
 export const foundersCatalog=()=>listFoundersLibrary(foundersLibrary);
 export const foundersPreview=selection=>prepareFoundersSession(foundersLibrary,selection);

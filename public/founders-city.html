@@ -1,41 +1,70 @@
 <!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hot Spring · Le Pacte des Fondateurs</title><link rel="stylesheet" href="/founders-live.css">
+<title>Hot Spring · Le Pacte des Fondateurs</title><link rel="stylesheet" href="/founders-live.css"><link rel="stylesheet" href="/hotspring.css">
 <script type="module" src="/founders-city.js"></script></head><body class="projection-dashboard">
-<header class="top"><div><span class="eyebrow" id="universeTitle">Le Pacte</span><h1 id="pageTitle">Hot Spring · 1876</h1></div><div class="row"><span class="chip" id="phase">En attente</span><span class="chip" id="connection">Connexion…</span><button id="projectionFullscreen" type="button" class="secondary" aria-pressed="false">Plein écran</button></div></header><div id="councilRoles" class="council-offices" aria-label="Maire et shérif du Conseil"></div>
-<section id="voteProgress" class="vote-progress" aria-label="Passage et clôture du vote" role="status" hidden></section>
-<div id="phaseClock" class="phase-clock" role="timer" hidden></div><main class="page">
+<header class="top">
+ <div><span class="eyebrow" id="universeTitle">Le Pacte</span><h1 id="pageTitle">Hot Spring · 1876</h1></div>
+ <div class="row projection-controls">
+  <span class="chip" id="phase">En attente</span><span id="phaseClock" class="chip projection-clock" role="timer" hidden></span>
+  <span class="chip" id="connection" role="status">Connexion…</span>
+  <button id="chronicleOpen" type="button" class="secondary" aria-haspopup="dialog" hidden>Chronique</button>
+  <button id="projectionFullscreen" type="button" class="secondary" aria-pressed="false">Plein écran</button>
+ </div>
+</header>
+<main class="page">
 <div class="projection-grid">
-<section class="panel dilemma-panel">
- <div class="row between"><span class="eyeline" id="chapter">Conseil des fondateurs</span><span class="chip" id="turn">—</span></div>
- <h2 id="dilemmaTitle">Bienvenue au Conseil</h2>
- <img id="decisionImage" alt="" hidden>
- <p id="dilemmaText">Le Conseil attend le signal de la régie.</p>
- <p id="question" class="big"></p>
- <div id="outcome" class="card" hidden><div class="eyeline">Décision du Conseil</div><h3 id="outcomeTitle"></h3><p id="outcomeText"></p></div>
+<section id="dilemmaPanel" class="panel dilemma-panel">
+ <div class="projection-copy">
+  <div class="eyeline" id="chapter">Conseil des fondateurs</div>
+  <h2 id="dilemmaTitle">Bienvenue au Conseil</h2>
+  <p id="dilemmaText">Le Conseil attend le signal de la régie.</p>
+  <p id="question" class="big hotspring-text"></p>
+  <div id="hotspringTendencies" class="hotspring-tendencies" hidden></div>
+  <div id="hotspringStage" class="hotspring-stage" hidden></div>
+  <div id="outcome" class="card" hidden><div class="eyeline">Décision du Conseil</div><h3 id="outcomeTitle"></h3><p id="outcomeText"></p></div>
+ </div>
+ <figure id="dilemmaArtwork" class="projection-artwork" hidden><img id="decisionImage" alt="" hidden></figure>
+</section>
+<section id="finalResults" class="panel" hidden>
+ <div class="eyeline">Épilogue · Conseil des Fondateurs</div>
+ <h2 id="winnerTitle">La famille gagnante</h2>
+ <p id="legacyScoreExplanation" class="small muted">Classement final après les objectifs secrets, les ressources financières, les votes remportés et l’Influence restante.</p>
+ <div id="finalRanking"></div>
+ <details id="narrativeEnding" class="card" hidden>
+  <summary>Relire l’épilogue</summary><div id="endingText"></div>
+ </details>
 </section>
 <section class="projection-city">
- <div id="city" aria-label="Illustration évolutive de Hot Spring"></div>
- <p id="cityEvolution" class="small city-evolution" role="status" aria-live="polite"></p>
+ <div class="projection-visual">
+  <div class="projection-viewport"><div id="city" aria-label="Illustration évolutive de Hot Spring"></div></div>
+  <section id="panoramaStability" class="panorama-stability" aria-labelledby="stabilityTitle" hidden>
+   <div class="gauge-head"><strong id="stabilityTitle"></strong><span id="stabilityState"></span></div>
+   <div id="stabilityTrack" class="track" role="progressbar" aria-label="Stabilité" aria-valuemin="0" aria-valuemax="10"><div id="stabilityBar" class="bar"></div></div>
+  </section>
+  <p id="cityEvolution" class="small city-evolution" role="status" hidden></p>
+ </div>
  <div class="projection-results">
-  <div class="panel"><h2>Résultat du vote</h2>
+  <div class="panel"><h2>Vote du Conseil</h2>
    <div class="vote-totals"><div><span>ABSTENTIONS</span><strong id="voteAbstentions">0</strong></div><div><span>POUR</span><strong id="voteForTotal">—</strong></div><div><span>CONTRE</span><strong id="voteAgainstTotal">—</strong></div></div>
-   <p id="voteSummary" class="small muted">Sommes de l’influence engagée</p>
+   <p id="voteSummary" class="small muted">Influence engagée</p>
+   <p id="councilPrompt" role="status" hidden></p>
    <div id="ballots"></div>
   </div>
-  <div class="panel"><h2>La ville après vos décisions</h2><div id="gauges"></div></div>
+  <div class="panel">
+   <h2>La ville après vos décisions</h2><div id="gauges"></div>
+   <dl id="influenceReserve" class="projection-reserve" aria-label="Partage de la réserve d’influence" aria-live="polite" hidden>
+    <div><dt id="influenceAvailableLabel">Influence en réserve</dt><dd id="influenceAvailable"></dd></div>
+    <div><dt>Familles en récupération</dt><dd id="influenceParticipants"></dd></div>
+    <div><dt id="influencePartLabel">Part estimée par famille</dt><dd id="influencePart"></dd></div>
+   </dl>
+  </div>
  </div>
 </section>
 </div>
-<div class="projection-foot"><p class="small muted" id="councilStatus"></p>
-<details class="city-legend"><summary>Repères du Conseil et lecture du paysage</summary><p class="small muted" id="tiePriority"></p><div id="cityDetails" class="city-details"></div></details></div>
-<section id="finalResults" class="panel" style="margin-top:18px" hidden>
- <div class="eyeline">Épilogue · Conseil des Fondateurs</div>
- <h2 id="winnerTitle" style="font-size:clamp(22px,3vw,34px);margin-top:9px">La famille gagnante</h2>
- <p class="small muted">Classement final après les objectifs secrets, les ressources financières, les votes remportés et l’Influence restante.</p>
- <div id="finalRanking"></div>
- <div id="narrativeEnding" class="card" hidden></div>
-</section>
-<section id="cityChronicle" class="panel city-chronicle" aria-label="Dernier chapitre révélé de la ville" hidden></section>
-<div id="notice" role="status" style="margin-top:15px"></div>
-</main></body></html>
+<div id="notice" role="status"></div>
+</main>
+<dialog id="chronicleDialog" aria-label="Chronique de la ville">
+ <form method="dialog"><button type="submit" class="secondary">Fermer la chronique</button></form>
+ <section id="cityChronicle" class="city-chronicle" hidden></section>
+</dialog>
+</body></html>

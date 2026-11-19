@@ -15,7 +15,7 @@ export function checkedConfiguration(preview, input, ownerId, now) {
     colors: activeFounders(s.game).map((id) => s.colors[id]),
     objectives: activeFounders(s.game).map((id) => s.goals[id]),
     goalCards: s.goalCards,
-    scoreRules: s.scoreRules,...(s.experienceVersion===2?{timing:s.timing,gaugeThresholds:s.gaugeThresholds}:{})
+    scoreRules: s.scoreRules,...(s.experienceVersion===2?{timing:s.timing,gaugeThresholds:s.gaugeThresholds}:{}),...(s.campaign?{crisisMode:s.campaign.crisisMode,presentationSeconds:s.campaign.presentationSeconds}:{})
   } };
 }
 
