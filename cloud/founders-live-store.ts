@@ -27,16 +27,32 @@ export class FirestoreNarrativeSessions{
   check(familyIds.includes(family),'Famille inconnue');
   return this.ref(id).collection('access').doc(family);
  }
- async list(ownerId){
+ activeSessions(ownerId){
   check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
-  const q=await this.db.pipeline().collection('pacteNarrativeSessions')
+  return this.db.pipeline().collection('pacteNarrativeSessions')
    .where(Pipelines.field('ownerId').equal(ownerId))
-   .sort(Pipelines.descending('updated')).limit(100).execute();
-  return q.results.filter(d=>!d.data().archivedAt).map(d=>{
+   .where(Pipelines.field('archivedAt').ifAbsent(0).ifNull(0).equal(0));
+ }
+ async list(ownerId){
+  const q=await this.activeSessions(ownerId).sort(Pipelines.descending('updated')).limit(100).execute();
+  return q.results.map(d=>{
    const s=JSON.parse(d.data().stateJson);
    return{id:s.id,code:s.code,title:s.title,phase:s.phase,revision:s.revision,
     scenarioId:s.selection.scenarioId,scenarioVersion:s.selection.scenarioVersion,skinId:s.selection.skinId};
   });
+ }
+ async archiveAll(ownerId,now){
+  let count=0;
+  for(;;){
+   const q=await this.activeSessions(ownerId).where(Pipelines.field('created').lessThanOrEqual(now)).limit(100).execute();
+   if(!q.results.length)return count;
+   count+=await this.db.runTransaction(async tx=>{
+    const rows=await tx.getAll(...q.results.map(d=>this.ref(d.id)));
+    const active=rows.filter(row=>row.exists&&row.data().ownerId===ownerId&&!row.data().archivedAt);
+    for(const row of active)tx.update(row.ref,{archivedAt:now,clockDue:null});
+    return active.length;
+   });
+  }
  }
  async create({ownerId,preview,code,title,objectives,names,colors,goalCards,scoreRules,timing,gaugeThresholds,crisisMode,presentationSeconds,now}){
   check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
@@ -46,7 +62,7 @@ export class FirestoreNarrativeSessions{
  }
  async duplicate(id,ownerId,now){
   const result=await this.ref(id).get();
-  check(result.exists,'Partie introuvable');
+  check(result.exists&&!result.data().archivedAt,'Partie introuvable ou archivée');
   const s=duplicateHotspringFinal(JSON.parse(result.data().stateJson),{id:randomBytes(12).toString('hex'),
    code:'V'+randomBytes(4).toString('hex').toUpperCase(),ownerId,now});
   return this.insert(s);
@@ -91,10 +107,12 @@ export class FirestoreNarrativeSessions{
   }
   check(actor.role==='public','Acteur invalide');
  }
- async view(id,actor,now){
+ async view(id,actor,now,skipArchived=false){
   const ref=this.ref(id);
   return this.db.runTransaction(async tx=>{
-   const row=await tx.get(ref);check(row.exists&&!row.data().archivedAt,'Partie introuvable ou archivée');
+   const row=await tx.get(ref);
+   if(skipArchived&&(!row.exists||row.data().archivedAt))return;
+   check(row.exists&&!row.data().archivedAt,'Partie introuvable ou archivée');
    const stored=JSON.parse(row.data().stateJson);
    await this.verify(tx,stored,actor,now);
    const s=advanceNarrativeTime(stored,now);
@@ -115,7 +133,7 @@ export class FirestoreNarrativeSessions{
  }
  async advanceDue(now){
   const p=Pipelines;const due=await this.db.pipeline().collection('pacteNarrativeSessions').where(p.and(p.field('clockDue').greaterThanOrEqual(0),p.field('clockDue').lessThanOrEqual(now))).sort(p.ascending('clockDue')).limit(100).execute();
-  for(const d of due.results)await this.view(d.id,{role:'public'},now);
+  for(const d of due.results)await this.view(d.id,{role:'public'},now,true);
  }
  async rotate(id,family,ownerId,now){
   check(familyIds.includes(family),'Famille inconnue');

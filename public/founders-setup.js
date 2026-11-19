@@ -250,10 +250,10 @@ $('createNarrative').addEventListener('click',async()=>{
   const append=(label,path)=>{
    const url=new URL(path,location.origin);
    const el=document.createElement('div');el.className='card';el.style.padding='9px';
-   const a=document.createElement('a');a.href=url.href;a.textContent=label;a.target=path.startsWith('/founders-regie.html')?'_self':'_blank';a.rel='noopener';
+   const a=document.createElement('a');a.href=url.href;a.textContent=label;a.target=path.startsWith('/regie')?'_self':'_blank';a.rel='noopener';
    el.append(a);links.append(el);
   };
-  append('Ouvrir la régie de la partie','/founders-regie.html?session='+result.id);
+  append('Ouvrir la régie de la partie','/regie?session='+result.id);
   append('Ouvrir la projection publique','/founders-city.html?session='+result.id);
   for(const a of result.access){
    const path='/founders-family.html?session='+result.id+'&family='+a.family+'#token='+encodeURIComponent(a.token);

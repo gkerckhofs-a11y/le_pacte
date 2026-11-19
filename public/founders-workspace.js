@@ -18,7 +18,7 @@ export function mountWorkspace({api,getCatalog,collect,apply}){
    const root=$('recentGamesList');root.replaceChildren();$('recentGames').hidden=false;
    const phases={READY:'Prête',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'À révéler',REVEALED:'Résultat affiché',FINISHED:'Terminée'};
    for(const s of results[1].value.sessions.slice(0,6)){
-    const a=document.createElement('a');a.href='/founders-regie.html?session='+encodeURIComponent(s.id);
+    const a=document.createElement('a');a.href='/regie?session='+encodeURIComponent(s.id);
     a.textContent=s.title+' · '+s.code+' · '+(phases[s.phase]??s.phase)+' →';root.append(a);
    }
    if(!root.children.length)root.textContent='Votre première partie apparaîtra ici.';

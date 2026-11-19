@@ -58,9 +58,10 @@ async function listSessions(){
   if(!validNarrativeSession(session.id))continue;
   const row=document.createElement('div');row.className='card row between';
   const title=document.createElement('strong');title.textContent=session.code+' · '+session.title+' · '+(labels[session.phase]||session.phase);
-  const link=document.createElement('a');link.textContent='Ouvrir la régie →';link.href='/founders-regie.html?session='+session.id;row.append(title,link);root.append(row);
+  const link=document.createElement('a');link.textContent='Ouvrir la régie →';link.href='/regie?session='+session.id;row.append(title,link);root.append(row);
  }
- if(!data.sessions.length)root.textContent='Aucune partie trouvée pour ce compte. Changez de compte Google ou créez une partie.';
+ $('archiveSessions').hidden=!root.children.length;
+ if(!root.children.length)root.textContent='Aucune partie en cours ou à reprendre. Créez une partie pour commencer.';
 }
 function connected(){
  $('loginPanel').hidden=true;$('accountPanel').hidden=false;$('chooseSession').hidden=false;$('changeAccount').hidden=!cloud;
@@ -231,7 +232,7 @@ async function newVariant(){
  try{
   const result=await api('/variant','POST',{});
   rememberAccess(result);
-  location.assign('/founders-regie.html?session='+encodeURIComponent(result.id));
+  location.assign('/regie?session='+encodeURIComponent(result.id));
  }catch(e){set('actionMessage',e.message);}
  finally{busy=false;}
 }
@@ -275,7 +276,26 @@ async function login(){
 $('login').addEventListener('click',login);
 $('changeAccount').addEventListener('click',login);
 $('retryInit').addEventListener('click',init);
-$('chooseSession').addEventListener('click',async()=>{try{await listSessions();}catch(error){set('notice',organizerError(error));}});
+$('chooseSession').addEventListener('click',()=>location.assign('/regie'));
+$('archiveSessions').addEventListener('click',()=>$('archiveDialog').showModal());
+$('cancelArchive').addEventListener('click',()=>$('archiveDialog').close());
+$('confirmArchive').addEventListener('click',async()=>{
+ const button=$('confirmArchive');
+ button.disabled=true;
+ $('archiveDialog').close();
+ $('archiveSessions').disabled=true;
+ set('archiveMessage','Archivage des parties en cours…');
+ try{
+  const bearer=await organizerToken();
+  const r=await fetch('/api/founders/sessions/archive',{method:'POST',headers:{Authorization:'Bearer '+bearer}});
+  const data=await r.json();
+  if(!r.ok)throw new Error(data.error||'Archivage indisponible.');
+  await listSessions();
+  const n=data.archived;
+  set('archiveMessage',n===0?'Aucune partie à archiver.':n===1?'Une partie archivée.':n+' parties archivées.');
+ }catch(error){set('archiveMessage',organizerError(error));}
+ finally{button.disabled=false;$('archiveSessions').disabled=false;}
+});
 init();setInterval(refresh,2500);
 
 const printKit=mountPrintKit({session:sid,view:()=>current,request:async(path,body)=>{

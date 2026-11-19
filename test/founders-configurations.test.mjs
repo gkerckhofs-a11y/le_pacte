@@ -40,3 +40,31 @@ test('Modèles : secrets et champs inconnus ne sont pas sauvegardés',()=>{
  assert.equal(JSON.stringify(checked).includes('CREDENTIAL_SENTINEL_9182'),false);
  assert.equal(checked.config.names.length,5);
 });
+
+test('La régie Games of Influence archive seulement les parties narratives du compte connecté',async t=>{
+ const store=new GameStore(':memory:'),key='archive-games-of-influence-organizer-key',preview=foundersPreview(make(5));
+ let now=1000;
+ const server=createGameServer(store,key,()=>now);
+ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+ t.after(async()=>{server.closeAllConnections();await new Promise(resolve=>server.close(resolve));store.close();});
+ const origin='http://127.0.0.1:'+server.address().port;
+ const request=(path,token,method='GET')=>fetch(origin+path,{method,headers:token?{Authorization:'Bearer '+token}:{}});
+ const base='/api/founders/sessions';
+ const create=(ownerId,code)=>store.narrative.create({ownerId,preview,code,title:'Test '+code,now});
+ const old=create('local-organizer','ARCHIVE1'),other=create('autre-organisateur','ARCHIVE2');
+ const config=store.narrative.saveConfiguration('local-organizer',{name:'Configuration conservée'},now);
+ const regie=await request('/regie');
+ assert.equal(regie.status,200);
+ assert.match(await regie.text(),/<title>Games of Influence · Régie organisateur<\/title>/);
+ assert.equal((await request(base+'/archive',old.access[0].token,'POST')).status,403);
+ assert.deepEqual(await (await request(base+'/archive',key,'POST')).json(),{archived:1});
+ assert.deepEqual(await (await request(base,key)).json(),{sessions:[]});
+ assert.equal((await request(base+'/'+old.id)).status,404);
+ assert.equal((await request(base+'/'+old.id,old.access[0].token)).status,404);
+ assert.equal((await request(base+'/'+other.id)).status,200);
+ assert.equal(store.narrative.listConfigurations('local-organizer')[0].id,config.id);
+ assert.deepEqual(await (await request(base+'/archive',key,'POST')).json(),{archived:0});
+ now++;
+ const fresh=create('local-organizer','ARCHIVE3');
+ assert.equal((await (await request(base,key)).json()).sessions[0].id,fresh.id);
+});
