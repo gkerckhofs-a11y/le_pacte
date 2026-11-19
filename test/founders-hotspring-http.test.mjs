@@ -12,6 +12,11 @@ test('Hotspring HTTP : reprise SQLite en cours de scrutin puis campagne complèt
  let server=await serveHotspringTest({file,clock:()=>now});
  t.after(async()=>{await server.close();rmSync(dir,{recursive:true,force:true});});
 
+ const rules=await fetch(server.origin+'/hotspring-rules.js');
+ assert.equal(rules.status,200);
+ assert.match(rules.headers.get('content-type'),/^text\/javascript/);
+ assert.match(await rules.text(),/Un dilemme en 5 étapes/);
+
  const original=await server.request('/api/founders/sessions',{token:hotspringTestKey,status:201,body:{
   scenarioId:'fondateurs-hot-spring-demo',skinId:'western',code:'ORIGINAL',title:'Parcours original',members:[1,1,1,1,1,1]}});
  const initialOriginal=await hotspringClient(server,original).projection();
