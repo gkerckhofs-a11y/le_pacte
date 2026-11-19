@@ -14,6 +14,8 @@ Le catalogue propose la V1.2 par défaut. Les cinq jauges commencent à 5. Sous 
 
 Les cartes de rôle sont accessibles dans « Les équipes et leurs accès ». Choisir le nombre de diplomates par famille et imprimer en A4 portrait à 100 %. Chaque planche contient jusqu’à neuf cartes de 63 × 88 mm.
 
+L’accueil « Games of Influence » donne accès aux univers. La régie de Hotspring regroupe les parties de la version courante, la création de parties et l’atelier de dilemmes. L’atelier enregistre la situation, la question et les deux issues comme brouillon privé. Les brouillons pourront être intégrés à une version de campagne après validation des règles et de l’équilibrage.
+
 Pour déléguer l’animation, ouvrir « Inviter un animateur » depuis la régie de la partie. Enregistrer l’adresse du compte Google, puis transmettre le lien de la régie. L’invité peut animer cette partie, préparer ses fiches et ouvrir la projection. Le propriétaire peut remplacer l’adresse ou retirer l’accès depuis la même rubrique.
 
 « Terminer la séance » sauvegarde aussi un scrutin ouvert, ses mises, ses propositions et son chrono. Le bilan ne compte que les chapitres clôturés et la trajectoire. Au checkpoint du chapitre V, la régie peut reprendre les crises en réserve ou ouvrir le final. La variante d’une archive repart du checkpoint « Gouvernement choisi », avec les ressources et le panorama précédant le duel des chartes.

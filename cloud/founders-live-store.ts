@@ -20,6 +20,24 @@ export class FirestoreNarrativeSessions{
     await this.db.doc("pacteNarrativeConfigurations/" + id).create({ id, ownerId, updated: now, dataJson: JSON.stringify(data2) });
     return { id, ...data2 };
   }
+ async listDilemmaDrafts(ownerId){
+  const q=await this.db.pipeline().collection('pacteHotspringDilemmaDrafts')
+   .where(Pipelines.field('ownerId').equal(ownerId)).sort(Pipelines.descending('updated')).limit(100).execute();
+  return q.results.map(d=>({id:d.id,...JSON.parse(d.data().dataJson),updated:d.data().updated}));
+ }
+ async saveDilemmaDraft(ownerId,id,draft,now){
+  const collection=this.db.collection('pacteHotspringDilemmaDrafts');
+  const ref=id?collection.doc(id):collection.doc(randomBytes(12).toString('hex'));
+  const dataJson=JSON.stringify(draft);
+  if(id){
+   await this.db.runTransaction(async tx=>{
+    const existing=await tx.get(ref);
+    check(existing.exists&&existing.data().ownerId===ownerId,'Dilemme introuvable');
+    tx.update(ref,{dataJson,updated:now});
+   });
+  }else await ref.create({ownerId,dataJson,updated:now});
+  return {id:ref.id,...draft,updated:now};
+ }
  ref(id){
   check(typeof id==='string'&&/^[a-f0-9]{24}$/.test(id),'Partie introuvable');
   return this.db.doc('pacteNarrativeSessions/'+id);

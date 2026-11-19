@@ -68,3 +68,21 @@ test('La régie Games of Influence archive seulement les parties narratives du c
  const fresh=create('local-organizer','ARCHIVE3');
  assert.equal((await (await request(base,key)).json()).sessions[0].id,fresh.id);
 });
+
+test('Le QR utilise chacun des deux domaines publiés et refuse une origine tierce',async t=>{
+ const store=new GameStore(':memory:'),key='organizer-test-two-public-origins';
+ const primary='https://le-pacte-ludificateur.web.app',secondary='https://games-of-influence.web.app';
+ const server=createGameServer(store,key,()=>Date.now(),{publicOrigin:primary,publicOrigins:[secondary]});
+ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+ t.after(async()=>{server.closeAllConnections();await new Promise(resolve=>server.close(resolve));store.close();});
+ const session=store.narrative.create({ownerId:'local-organizer',preview:foundersPreview(make(5)),code:'SITESQR',title:'Deux adresses',now:Date.now()});
+ const endpoint='http://127.0.0.1:'+server.address().port+'/api/founders/access-qr';
+ const request=(origin,selected=origin)=>fetch(endpoint,{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Origin:origin},body:JSON.stringify({session:session.id,token:session.access[0].token,origin:selected})});
+ for(const origin of [primary,secondary]){
+  const r=await request(origin);assert.equal(r.status,200);
+  assert.equal(new URL((await r.json()).link).origin,origin);
+ }
+ assert.equal((await request('https://example.invalid')).status,403);
+ const fallback=await request(secondary,'https://example.invalid');
+ assert.equal(new URL((await fallback.json()).link).origin,secondary);
+});

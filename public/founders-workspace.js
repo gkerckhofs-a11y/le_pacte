@@ -1,43 +1,51 @@
+import {organizerError} from './founders-regie-flow.js';
+
 const $=id=>document.getElementById(id);
+const key='pacte-founder-organizer-key';
 export function rememberAccess(result){
  // Raw credentials stay in this tab session, never in saved configurations.
  try{sessionStorage.setItem('pacte-narrative-access-'+result.id,JSON.stringify({created:Date.now(),access:result.access}));}catch{}
 }
-export function mountWorkspace({api,getCatalog,collect,apply}){
- let configs=[];
- async function refresh(){
-  const results=await Promise.allSettled([api('/api/founders/configurations'),api('/api/founders/sessions')]);
-  if(results[0].status==='fulfilled'){
-   configs=results[0].value.configurations;
-   const select=$('savedConfig');select.replaceChildren();
-   for(const c of configs){const o=document.createElement('option');o.value=c.id;o.textContent=c.name+' · '+c.config.scenarioVersion;select.append(o);}
-   $('savedConfigurations').hidden=false;$('useConfiguration').disabled=!configs.length;
-   if(!configs.length){const o=document.createElement('option');o.textContent='Aucune configuration enregistrée';select.append(o);}
-  }else $('configurationMessage').textContent=results[0].reason.message;
-  if(results[1].status==='fulfilled'){
-   const root=$('recentGamesList');root.replaceChildren();$('recentGames').hidden=false;
-   const phases={READY:'Prête',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'À révéler',REVEALED:'Résultat affiché',FINISHED:'Terminée'};
-   for(const s of results[1].value.sessions.slice(0,6)){
-    const a=document.createElement('a');a.href='/regie?session='+encodeURIComponent(s.id);
-    a.textContent=s.title+' · '+s.code+' · '+(phases[s.phase]??s.phase)+' →';root.append(a);
-   }
-   if(!root.children.length)root.textContent='Votre première partie apparaîtra ici.';
-  }
+
+export function organizerWorkspace({onOpen,status,localAction}){
+ let authSDK=null;
+ async function request(path,method='GET',body){
+  const token=authSDK?await authSDK.currentToken():$('localKey').value.trim();
+  if(!token)throw new Error('Connectez-vous à la régie.');
+  const response=await fetch(path,{method,headers:{Authorization:'Bearer '+token,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});
+  const data=await response.json();
+  if(!response.ok){const e=new Error(data.error);e.status=response.status;throw e;}
+  return data;
  }
- $('useConfiguration').addEventListener('click',()=>{
-  const c=configs.find(c=>c.id===$('savedConfig').value);if(!c)return;
-  const story=getCatalog().scenarios.find(s=>s.id===c.config.scenarioId);
-  if(!story?.releases.includes(c.config.scenarioVersion)){$('configurationMessage').textContent='Cette version du scénario n’est plus disponible. Choisissez une version publiée.';return;}
-  apply(c.config);$('gameTitle').value=c.name;$('configurationName').value=c.name;
- });
- $('saveConfiguration').addEventListener('click',async()=>{
-  const button=$('saveConfiguration');button.disabled=true;
+ async function connect(){
+  const button=$('connect');button.disabled=true;
   try{
-   const saved=await api('/api/founders/configurations','POST',{name:$('configurationName').value,config:collect()});
-   await refresh();$('savedConfig').value=saved.id;
-   $('configurationMessage').textContent='Configuration enregistrée dans votre compte. Retrouvez-la dans « Mes configurations » pour créer une nouvelle partie.';
-  }catch(e){$('configurationMessage').textContent=e.message;}
+   if(authSDK)await authSDK.login();
+   await onOpen();
+   if(!authSDK)sessionStorage.setItem(key,$('localKey').value.trim());
+   status('');
+  }catch(e){status(organizerError(e),true);}
   finally{button.disabled=false;}
- });
- return {refresh};
+ }
+ $('connect').addEventListener('click',connect);
+ async function init(){
+  try{
+   const response=await fetch('/api/catalog',{cache:'no-store'});
+   if(!response.ok)throw new Error('Connexion indisponible.');
+   const settings=await response.json();
+   if(settings.authMode==='firebase'){
+    authSDK=await import('/firebase-auth.js');
+    await authSDK.configure(settings.firebaseConfig,settings.authEmulatorUrl);
+    $('connect').textContent='Se connecter avec Google';
+    if(await authSDK.currentToken())await onOpen();
+   }else{
+    $('connect').textContent=localAction;$('localLogin').hidden=false;
+    $('localKey').value=sessionStorage.getItem(key)??'';
+    if($('localKey').value)await onOpen();
+   }
+  }catch(e){status(organizerError(e),true);}
+  finally{$('connect').disabled=false;}
+ }
+ init();
+ return request;
 }

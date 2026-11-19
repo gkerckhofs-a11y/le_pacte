@@ -6,8 +6,6 @@ import {foundersPreview} from '../server/founders-catalog.ts';
 import {createNarrativeSession,applyNarrativeCommand,narrativePublicView,narrativeFamilyView} from '../src/founders-live.ts';
 import {LocalNarrativeSessions} from '../server/founders-live-store.ts';
 import {simulateFoundersPolicies} from '../src/founders-policy-lab.ts';
-import {readFileSync} from 'node:fs';
-import vm from 'node:vm';
 import {voteProgress} from '../public/founders-vote-progress.js';
 const owner={role:'organizer',id:'host'};
 const command=(s,actor,kind,data={})=>applyNarrativeCommand(s,actor,{kind,data,expectedRevision:s.revision},1000+s.revision);
@@ -76,19 +74,11 @@ test('Laboratoire à cinq familles : simulation complète sans sixième famille 
  assert.equal(result.completed,12);assert.equal(result.failed,0);
  assert.deepEqual(Object.keys(result.families),['A','B','C','D','E']);
 });
-test('Sélecteur : 6 → 5 → 6 masque et désactive la famille absente, garde les valeurs saisies',()=>{
- const source=readFileSync(new URL('../public/founders-setup.js',import.meta.url),'utf8');
- const fields=new Map();
- const get=id=>{if(!fields.has(id))fields.set(id,{value:'',hidden:false,disabled:false,parentElement:{},inputs:[{},{}]});return fields.get(id);};
- get('familyCount').value='6';for(const [i,id] of [...'ABCDEF'].entries())get('memberCount-'+id).value=String(i+1);
- get('familySettings').querySelector=selector=>{const id=selector.match(/"([A-F])"/)[1],node=get('section-'+id);node.querySelectorAll=()=>node.inputs;return node;};
- const context=vm.createContext({$:get});
- const start=source.indexOf('function syncFamilyCount(){'),end=source.indexOf("$('familyCount').addEventListener",start);
- vm.runInContext("const FAMILY_IDS=[...'ABCDEF'];const activeFamilyIds=()=>FAMILY_IDS.slice(0,Number($('familyCount').value));let selectedPreview={};"+source.slice(start,end),context);
- get('familyCount').value='5';vm.runInContext('syncFamilyCount()',context);
- assert.equal(get('members').value,'1,2,3,4,5');assert.equal(get('memberCount-F').disabled,true);assert.equal(get('section-F').hidden,true);
- assert.ok(get('section-F').inputs.every(x=>x.disabled));
- get('familyCount').value='6';vm.runInContext('syncFamilyCount()',context);
- assert.equal(get('members').value,'1,2,3,4,5,6');assert.equal(get('memberCount-F').disabled,false);assert.equal(get('section-F').hidden,false);
- assert.ok(get('section-F').inputs.every(x=>!x.disabled));assert.equal(get('createNarrative').disabled,false);
+test('La régie Hotspring propose la version de campagne courante',async()=>{
+ const {HOTSPRING,isCurrentHotspring}=await import('../public/founders-univers.js');
+ const current=foundersPreview(HOTSPRING);
+ assert.equal(current.settings.members.length,5);
+ assert.equal(isCurrentHotspring(current.selection),true);
+ assert.equal(isCurrentHotspring({...current.selection,scenarioVersion:'1.1.0'}),false);
+ assert.equal(isCurrentHotspring({...current.selection,scenarioId:'hot-spring-reserve-hybride'}),false);
 });

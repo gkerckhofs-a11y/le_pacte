@@ -1,3 +1,4 @@
+import {isHotspring,isCurrentHotspring,narrativeRegie} from './founders-univers.js';
 import {rememberAccess} from './founders-workspace.js';
 import {CAMPAIGN_PHASES,renderHotspringStage,renderTendencies,renderCampaignAdmin,renderCampaignActions,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
 import {decorateGauge,formatGaugeNumber,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
@@ -8,11 +9,17 @@ import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
 import {teamCaption,teamLabel,colorize} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id),p=new URLSearchParams(location.search);
+const hotspringHome=location.pathname==='/hotspring'||(location.pathname==='/regie'&&!p.has('session'));
 const sid=p.get('session');let authSDK=null,cloud=false,token='',current=null,busy=false,initialized=false,authenticating=false,waitingForLogin=false;
 const labels={...CAMPAIGN_PHASES,NEGOTIATION:'Négociations',READY:'Prêt',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'En attente de la révélation',REVEALED:'Résultat annoncé',FINISHED:'Partie terminée'};
 const gaugeIds=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
 const set=(id,v)=>$(id).textContent=String(v??'');
 const secure=()=>validNarrativeSession(sid);
+function labelWorld(){
+ document.title='Les Colons de Hotspring · Régie';
+ set('regieTitle','Régie · Les Colons de Hotspring');
+}
+if(hotspringHome)labelWorld();
 function step(number){for(let i=1;i<=3;i++)if(i===number)$('step'+i).setAttribute('aria-current','step');else $('step'+i).removeAttribute('aria-current');}
 function account(){const user=authSDK?.currentAccount?.();return user?.email||user?.displayName||'Compte organisateur connecté';}
 async function init(){
@@ -54,13 +61,16 @@ async function listSessions(){
  const bearer=await organizerToken(),r=await fetch('/api/founders/sessions',{headers:{Authorization:'Bearer '+bearer},cache:'no-store'});
  const data=await r.json();if(!r.ok){const error=new Error(data.error||'Impossible de retrouver vos parties.');error.status=r.status;throw error;}
  const root=$('sessionsList');root.replaceChildren();$('sessionPicker').hidden=false;
- for(const session of data.sessions){
+ const sessions=hotspringHome?data.sessions.filter(isCurrentHotspring):data.sessions;
+ $('worldLinks').hidden=!hotspringHome;
+ set('sessionListTitle',hotspringHome?'Mes parties Hotspring':'Mes parties');
+ for(const session of sessions){
   if(!validNarrativeSession(session.id))continue;
   const row=document.createElement('div');row.className='card row between';
   const title=document.createElement('strong');title.textContent=session.code+' · '+session.title+' · '+(labels[session.phase]||session.phase);
-  const link=document.createElement('a');link.textContent='Ouvrir la régie →';link.href='/regie?session='+session.id;row.append(title,link);root.append(row);
+  const link=document.createElement('a');link.textContent='Ouvrir la régie →';link.href=narrativeRegie(session.id,isHotspring(session));row.append(title,link);root.append(row);
  }
- $('archiveSessions').hidden=!root.children.length;
+ $('archiveSessions').hidden=hotspringHome||!root.children.length;
  if(!root.children.length)root.textContent='Aucune partie en cours ou à reprendre. Créez une partie pour commencer.';
 }
 function connected(){
@@ -142,10 +152,11 @@ function renderFacilitator(s){
  if(!canInvite)return;
  if(!current||current.facilitatorEmail!==s.facilitatorEmail)$('facilitatorEmail').value=s.facilitatorEmail??'';
  $('revokeFacilitator').hidden=$('facilitatorShare').hidden=!s.facilitatorEmail;
- $('facilitatorLink').value=s.facilitatorEmail?new URL('/regie?session='+encodeURIComponent(s.id),location.origin).href:'';
+ $('facilitatorLink').value=s.facilitatorEmail?new URL(narrativeRegie(s.id,Boolean(s.campaign)),location.origin).href:'';
 }
 function render(s){
  applySkin(document.body,s.skin);
+ if(s.campaign)labelWorld();
  renderFacilitator(s);
  current=s;
  document.body.classList.toggle('campaign-hotspring',Boolean(s.campaign));
@@ -244,7 +255,7 @@ async function newVariant(){
  try{
   const result=await api('/variant','POST',{});
   rememberAccess(result);
-  location.assign('/regie?session='+encodeURIComponent(result.id));
+  location.assign(narrativeRegie(result.id,true));
  }catch(e){set('actionMessage',e.message);}
  finally{busy=false;}
 }
@@ -307,7 +318,7 @@ async function login(){
 $('login').addEventListener('click',login);
 $('changeAccount').addEventListener('click',login);
 $('retryInit').addEventListener('click',init);
-$('chooseSession').addEventListener('click',()=>location.assign('/regie'));
+$('chooseSession').addEventListener('click',()=>location.assign(current?.campaign||hotspringHome?'/hotspring':'/founders-regie.html'));
 $('archiveSessions').addEventListener('click',()=>$('archiveDialog').showModal());
 $('cancelArchive').addEventListener('click',()=>$('archiveDialog').close());
 $('confirmArchive').addEventListener('click',async()=>{
