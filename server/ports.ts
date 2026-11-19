@@ -14,4 +14,4 @@ export interface StorePort {
  validate(id:string,actor:Actor,orders:any,now:number):any;
  command(id:string,actor:Actor,command:Command,now:number):any;
 }
-export type Operator={uid:string;organizer:boolean;editor:boolean};
+export type Operator={uid:string;organizer:boolean;editor:boolean;email?:string};

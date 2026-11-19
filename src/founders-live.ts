@@ -102,9 +102,9 @@ const dilemma=s=>{
  check(d,'Dilemme absent du scénario figé');return d;
 };
 const validateActor=(s,actor)=>{
- check(actor&&['organizer','team'].includes(actor.role),'Identité requise');
+ check(actor&&['organizer','facilitator','team'].includes(actor.role),'Identité requise');
  if(actor.role==='organizer')check(actor.id===s.ownerId,'Accès régie refusé');
- else check(activeFounders(s.game).includes(actor.family),'Famille inconnue');
+ else if(actor.role==='team')check(activeFounders(s.game).includes(actor.family),'Famille inconnue');
 };
 const activeOffers=s=>Object.values(s.offers).filter(o=>o.status==='pending').length;
 export function acceptedVoteCommitment(s,family){
@@ -138,7 +138,7 @@ export function applyNarrativeCommand(input,actor,command,now){
  const manual=isManualHotspring(s);
  check(!s.clock?.paused||['pause','resume','configureTiming','adjustTime','correctResource','correctCity','finish','endSitting'].includes(kind),'Partie en pause');
  check(s.phase!=='SUSPENDED'||['resumeSitting','finish'].includes(kind),'Séance sauvegardée');
- const org=()=>check(actor.role==='organizer','Régie uniquement');
+ const org=()=>check(actor.role==='organizer'||actor.role==='facilitator','Régie uniquement');
  const team=()=>check(actor.role==='team','Porte-parole uniquement');
  switch(kind){
   case 'setIdentity': {
@@ -398,5 +398,5 @@ function hotspringEffectsPreview(s){
 export function narrativeView(s,actor){
  if(actor.role==='public')return narrativePublicView(s);
  validateActor(s,actor);
- return actor.role==='organizer'?narrativeOrganizerView(s):narrativeFamilyView(s,actor.family);
+ return actor.role==='team'?narrativeFamilyView(s,actor.family):narrativeOrganizerView(s);
 }

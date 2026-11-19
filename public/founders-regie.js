@@ -26,7 +26,7 @@ async function init(){
   if(cloud){
    authSDK=await import('/firebase-auth.js');
    await authSDK.configure(c.firebaseConfig,c.authEmulatorUrl);
-   set('loginHelp','Utilisez le compte Google organisateur qui a créé la partie. Les liens des équipes ne permettent pas de lancer le jeu.');
+   set('loginHelp','Connectez-vous avec le compte Google qui a préparé la partie ou celui que l’organisateur a invité.');
    set('login','Se connecter avec Google');
   }else{
    token=sessionStorage.getItem('pacte-founder-organizer-key')||'';$('localKey').value=token;
@@ -64,15 +64,18 @@ async function listSessions(){
  if(!root.children.length)root.textContent='Aucune partie en cours ou à reprendre. Créez une partie pour commencer.';
 }
 function connected(){
- $('loginPanel').hidden=true;$('accountPanel').hidden=false;$('chooseSession').hidden=false;$('changeAccount').hidden=!cloud;
- set('signedInAs',cloud?'Connecté : '+account():'Régie locale connectée');
+ const invited=current?.sessionRole==='facilitator';
+ $('loginPanel').hidden=true;$('accountPanel').hidden=false;$('chooseSession').hidden=invited;$('changeAccount').hidden=!cloud;
+ $('createAnotherSession').hidden=invited;
+ set('signedInAs',cloud?(invited?'Animateur invité · ':'Connecté · ')+account():'Régie locale connectée');
 }
 function connectionFailure(error){
  set('monitorConnection','○ Actualisation interrompue : les informations affichées peuvent être anciennes.');
  set('loginMessage',organizerError(error));$('loginPanel').hidden=false;
  if(!current)set('phase','Connexion requise');
  if(error.status===403||/organisateur Google|Clé régie requise/.test(error.message)){
-  waitingForLogin=true;
+  waitingForLogin=true;current=null;
+  set('phase','Connexion requise');$('phaseClock').hidden=true;
   $('regieContent').hidden=true;$('accountPanel').hidden=true;step(1);
   const user=authSDK?.currentAccount?.();
   if(user){set('login','Changer de compte Google');set('loginMessage','Compte connecté : '+account()+'. '+organizerError(error));}
@@ -87,7 +90,7 @@ async function refresh(){
   }
   const s=await api('');
   if(busy||authenticating||waitingForLogin||s.revision<(current?.revision??-1))return;
-  if(current?.revision!==s.revision)render(s);else renderPhaseClock($('phaseClock'),s);
+  if(current?.revision!==s.revision||current?.facilitatorEmail!==s.facilitatorEmail||current?.sessionRole!==s.sessionRole)render(s);else renderPhaseClock($('phaseClock'),s);
   connected();$('regieContent').hidden=false;set('monitorConnection','● Synchronisé · actualisation automatique');
  }catch(error){connectionFailure(error);}
 }
@@ -133,12 +136,21 @@ function renderCityAudit(s){
   list.append(stability);audit.append(list);
  }
 }
+function renderFacilitator(s){
+ const canInvite=cloud&&s.sessionRole==='organizer';
+ $('facilitatorPanel').hidden=!canInvite;
+ if(!canInvite)return;
+ if(!current||current.facilitatorEmail!==s.facilitatorEmail)$('facilitatorEmail').value=s.facilitatorEmail??'';
+ $('revokeFacilitator').hidden=$('facilitatorShare').hidden=!s.facilitatorEmail;
+ $('facilitatorLink').value=s.facilitatorEmail?new URL('/regie?session='+encodeURIComponent(s.id),location.origin).href:'';
+}
 function render(s){
  applySkin(document.body,s.skin);
+ renderFacilitator(s);
  current=s;
  document.body.classList.toggle('campaign-hotspring',Boolean(s.campaign));
  renderCampaignActions($('campaignActions'),s,command);
- renderCampaignAdmin($('hotspringAdmin'),s,newVariant);
+ renderCampaignAdmin($('hotspringAdmin'),s,s.sessionRole==='facilitator'?null:newVariant);
  if(s.campaign){renderHotspringStage($('hotspringStage'),s);renderTendencies($('hotspringTendencies'),s.phase==='REVEALED'?null:s.dilemma);}
  printKit.sync(s);renderPhaseClock($('phaseClock'),s);renderV2Controls(s);
  renderCouncilMonitor($('councilMonitor'),s);
@@ -263,9 +275,28 @@ $('copyAccess').addEventListener('click',async()=>{
  try{await navigator.clipboard.writeText($('newAccessLink').value);set('notice','Lien copié.');}
  catch{set('notice','Sélectionnez et copiez le lien dans le champ.');}
 });
+async function saveFacilitator(email){
+ if(busy||current?.sessionRole!=='organizer')return;
+ busy=true;$('saveFacilitator').disabled=$('revokeFacilitator').disabled=true;
+ try{
+  const {facilitatorEmail}=await api('/facilitator','PUT',{email});
+  render(await api(''));
+  set('facilitatorMessage',facilitatorEmail?'Accès accordé à '+facilitatorEmail+'. Tu peux lui transmettre le lien.':'L’accès de l’animateur a été retiré.');
+ }catch(error){set('facilitatorMessage',organizerError(error));}
+ finally{busy=false;$('saveFacilitator').disabled=$('revokeFacilitator').disabled=false;}
+}
+$('facilitatorForm').addEventListener('submit',event=>{
+ event.preventDefault();saveFacilitator($('facilitatorEmail').value);
+});
+$('revokeFacilitator').addEventListener('click',()=>saveFacilitator(null));
+$('copyFacilitatorLink').addEventListener('click',async()=>{
+ const input=$('facilitatorLink');
+ try{await navigator.clipboard.writeText(input.value);set('facilitatorMessage','Lien de la régie copié.');}
+ catch{input.focus();input.select();set('facilitatorMessage','Copiez le lien sélectionné.');}
+});
 async function login(){
  if(!initialized||authenticating)return;
- authenticating=true;waitingForLogin=false;current=null;$('regieContent').hidden=true;$('sessionPicker').hidden=true;$('accountPanel').hidden=true;$('login').disabled=true;$('changeAccount').disabled=true;set('loginMessage','Ouverture de la connexion…');
+ authenticating=true;waitingForLogin=false;current=null;set('facilitatorMessage','');$('regieContent').hidden=true;$('sessionPicker').hidden=true;$('accountPanel').hidden=true;$('login').disabled=true;$('changeAccount').disabled=true;set('loginMessage','Ouverture de la connexion…');
  try{
   if(cloud)await authSDK.login();
   else sessionStorage.setItem('pacte-founder-organizer-key',$('localKey').value.trim());

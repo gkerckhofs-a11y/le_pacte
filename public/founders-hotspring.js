@@ -287,7 +287,7 @@ export function renderCampaignAdmin(root,s,newVariant){
    link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   });
   root.append(exported);
-  if(a.mayCreateVariant){
+  if(a.mayCreateVariant&&newVariant){
    const clone=node('button','Créer une variante au dernier conseil','secondary');
    clone.type='button';clone.addEventListener('click',newVariant);root.append(clone);
   }

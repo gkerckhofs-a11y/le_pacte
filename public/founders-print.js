@@ -23,29 +23,12 @@ export function mountPrintKit({session,view,request,renew}){
  }
  function print(){if(!$('printSheets').childElementCount)return;document.body.classList.add('printing-kit');window.print();}
  window.addEventListener('afterprint',()=>document.body.classList.remove('printing-kit'));
- $('printFamilyCards').addEventListener('click',()=>{
-  const s=view();if(!s)return;const root=shell();
-  for(const f of s.families){
-   const c=card(root,f,'Ambition secrète · confidentiel');
-   if(s.privateFamilies?.[f.id]){
-    const family=s.privateFamilies[f.id];
-    c.append(node('p',family.role),node('p',family.briefing),node('p',family.trajectory));
-    const list=node('ol');for(const goal of family.objectives)list.append(node('li',goal));
-    c.append(list,node('p','Jusqu’à 18 points : 10 de chapitre, 2 de trajectoire, 3 d’héritage et 3 pour la fortune finale.'));
-    continue;
-   }
-   const goal=s.goalCards[f.id];
-   c.append(node('h3',goal.title),node('p',s.familyGoals[f.id]));
-   if(goal.description!==s.familyGoals[f.id])c.append(node('p',goal.description));
-   const label=s.skin.labels.resources[goal.indicator]||goal.indicator;
-   const direction=goal.direction==='at_most'?'au plus':'au moins';
-   c.append(node('p',label+' : '+direction+' '+goal.firstTarget+'/10 → '+s.scoreRules.secretFirst+' points ; '+direction+' '+goal.secondTarget+'/10 → '+s.scoreRules.secretSecond+' points. Les deux paliers se cumulent.'));
-  }print();
- });
  $('printRoleCards').addEventListener('click',()=>{
-  const s=view();if(!s)return;const root=shell();
+  const s=view();if(!s||preparing)return;
   const count=Number($('diplomatCopies').value);
-  if(!Number.isInteger(count)||count<1||count>30){$('printStatus').textContent='Choisissez de 1 à 30 cartes Diplomate par famille.';return;}
+  if(!Number.isInteger(count)||count<1||count>30){$('rolePrintStatus').textContent='Choisissez de 1 à 30 cartes Diplomate par famille.';return;}
+  $('rolePrintStatus').textContent='';
+  const root=shell();
   for(const f of s.families){
    card(root,f,'Porte-parole').append(node('p','Vous détenez l’unique accès web de votre famille. Consultez votre ambition secrète, écoutez vos partenaires et saisissez les décisions de votre famille lorsque vient son tour.'));
    for(let i=0;i<count;i++)card(root,f,'Diplomate').append(node('p','Négociez avec les autres familles. Rapportez leurs propositions à votre famille et préparez vos alliances. Vous jouez sans accès web ; les accords payés sont confirmés par les porte-paroles.'));
@@ -83,9 +66,10 @@ export function mountPrintKit({session,view,request,renew}){
     image.append(document.importNode(svg,true));
     if(s.campaign){
      c.classList.add('print-hotspring');
+     if(f.name.length>48)c.classList.add('print-long-name');
      const access=node('header',undefined,'print-hotspring-access'),identity=node('div');
      c.querySelector('.print-kicker').textContent=s.story.title;
-     identity.append(...c.children,node('p','Porte-parole, scannez le QR. Gardez cette page ouverte pendant la partie.','print-scan'),node('p','Ce QR est réservé à votre équipe.','print-scan'));
+     identity.append(...c.children,node('p','Porte-parole, scannez le QR de votre équipe. Gardez cette page ouverte pendant la partie.','print-scan'));
      access.append(identity,image);
      c.append(access,createHotspringRules({print:true,manual:s.campaign.version>=3}));
     }else{

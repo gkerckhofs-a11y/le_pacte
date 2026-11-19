@@ -5,11 +5,11 @@
 <body class="regie-dashboard" data-skin="western">
 <header class="top">
 <div><div class="eyebrow">Le Ludificateur · Games of Influence</div><h1>Régie organisateur</h1></div>
-<div class="row"><button id="chooseSession" type="button" class="secondary" hidden>Mes parties</button><a href="/founders-setup.html">Créer une autre partie</a><span id="phase" class="chip">Connexion en cours…</span></div>
+<div class="row"><button id="chooseSession" type="button" class="secondary" hidden>Mes parties</button><a id="createAnotherSession" href="/founders-setup.html">Créer une autre partie</a><span id="phase" class="chip">Connexion en cours…</span></div>
 </header><div id="phaseClock" class="phase-clock" role="timer" hidden></div><main class="page">
-<ol class="regie-steps" aria-label="Étapes de la régie"><li id="step1" aria-current="step"><b>1</b> Connexion organisateur</li><li id="step2"><b>2</b> Préparer et lancer</li><li id="step3"><b>3</b> Animer le Conseil</li></ol>
+<ol class="regie-steps" aria-label="Étapes de la régie"><li id="step1" aria-current="step"><b>1</b> Connexion à la régie</li><li id="step2"><b>2</b> Préparer et lancer</li><li id="step3"><b>3</b> Animer le Conseil</li></ol>
 <div class="panel regie-login" id="loginPanel">
- <div class="eyeline">Étape 1 · Accès organisateur</div><h2>Connectez la régie pour lancer votre partie</h2>
+ <div class="eyeline">Étape 1 · Accès à la régie</div><h2>Connectez la régie pour lancer votre partie</h2>
  <p id="loginHelp">Vérification de la connexion…</p>
  <div id="localLogin" hidden><label for="localKey">Clé organisateur de la répétition locale</label><input id="localKey" type="password" autocomplete="off"></div>
  <div class="row"><button id="login" type="button" disabled>Connexion en cours…</button><button id="retryInit" type="button" class="secondary" hidden>Réessayer la connexion</button></div>
@@ -66,7 +66,13 @@
   <section class="panel" id="v2Controls" hidden><h2 id="v2ControlsTitle">Réglages</h2>
 <form id="timingForm"><div class="grid2"><label id="presentationTiming" hidden>Lecture (secondes)<input id="presentationSeconds" type="number" min="5" max="7200" disabled></label><label>Négociation (secondes)<input id="negotiationSeconds" type="number" min="5" max="7200" required></label><label>Vote (secondes)<input id="voteSeconds" type="number" min="5" max="7200" required></label><label>Résolution (secondes)<input id="resolutionSeconds" type="number" min="5" max="7200" required></label><label>Seuils des jauges<input id="gaugeThresholds" required value="2,4,6,8"></label></div><label><input id="autoAdvance" type="checkbox"> Passer automatiquement de la négociation au vote et du résultat au chapitre suivant</label><p class="small">Le chrono du vote signale le temps écoulé ; les familles et le Shérif terminent leurs décisions. Les durées enregistrées s’appliquent aux prochaines phases. Les boutons ± 1 minute ajustent le chrono actuel.</p><button type="submit">Enregistrer les réglages</button></form>
 <p id="pendingOffers"></p><details><summary>Correction exceptionnelle d’une ressource</summary><p class="small">Mettez la partie en pause. Les corrections sont conservées dans l’historique technique de la partie.</p><form id="correctionForm"><label>Famille<select id="correctFamily"></select></label><label>Ressource<select id="correctResource"><option value="power">Influence</option><option value="dollars">Argent</option></select></label><label>Nouvelle valeur<input id="correctValue" type="number" min="0" max="100000" required></label><button type="submit">Corriger la ressource</button></form></details></section>
-<section class="panel" id="printKit" style="margin-top:16px"><h2>Supports à imprimer</h2><p class="small muted">Cartes adaptées à cette partie. Les ambitions et les QR d’accès sont confidentiels : distribuez-les séparément à chaque famille.</p><div class="row"><button id="printFamilyCards" class="secondary" type="button">Imprimer les cartes des familles</button><button id="printRoleCards" class="secondary" type="button">Imprimer les rôles</button></div><label for="diplomatCopies">Cartes Diplomate par famille (en plus du porte-parole)</label><input id="diplomatCopies" type="number" min="1" max="30" value="4"><p class="small muted">Rôles distribués librement. Augmentez le nombre de Diplomates selon votre groupe.</p><div class="row"><button id="prepareQR" type="button">Générer les fiches équipes</button><button id="printReadyQR" type="button" class="secondary" disabled>Imprimer les fiches équipes</button></div><p class="small">Imprimez en A4, une page par équipe. Le QR et les règles figurent sur cette page.</p><p id="printStatus" class="small" role="status">Chaque terminal sera vérifié. Les accès absents ou expirés seront remplacés, ce qui invalidera leurs anciennes fiches. L’impression exige une fiche valide par équipe.</p></section>
+<section class="panel" id="printKit" style="margin-top:16px">
+ <h2>Fiches équipes à imprimer</h2>
+ <p class="small">Une page A4 par équipe avec son QR et les règles. Remettez chaque fiche au porte-parole concerné.</p>
+ <div class="row"><button id="prepareQR" type="button">Générer les fiches équipes</button><button id="printReadyQR" class="secondary" type="button" disabled>Imprimer les fiches équipes</button></div>
+ <p class="small muted">Pour conserver la taille de la fiche, imprimez en A4 portrait à 100 %, sans en-têtes ni pieds de page du navigateur.</p>
+ <p id="printStatus" class="small" role="status"></p>
+</section>
   <div class="panel" id="finalPanel" style="margin-top:16px" hidden>
    <div class="eyeline">Résultat de la campagne</div><h2 id="finalWinner">Famille gagnante</h2>
    <p id="finalScoreRule" class="small muted">Barème de test V2.6 ; une seule famille déclarée vainqueure.</p>
@@ -74,6 +80,13 @@
   </div>
   <div class="panel" style="margin-top:16px">
    <h2>Les équipes et leurs accès</h2>
+   <details>
+    <summary>Cartes de rôle facultatives</summary>
+    <label for="diplomatCopies">Cartes Diplomate par famille, en plus de la carte Porte-parole</label>
+    <input id="diplomatCopies" type="number" min="1" max="30" value="4">
+    <button id="printRoleCards" class="secondary" type="button">Imprimer les cartes de rôle</button>
+    <p id="rolePrintStatus" class="small" role="status"></p>
+   </details>
    <p class="small muted">Un seul lien privé par équipe, à remettre à son porte-parole. Si un lien fonctionne déjà, conservez-le. Renouveler un lien désactive son ancien accès.</p>
    <div id="families"></div>
    <div id="accessOutput" class="card" hidden>
@@ -84,6 +97,21 @@
   </div>
  </section>
  <aside>
+  <section id="facilitatorPanel" class="panel" hidden>
+   <h2>Inviter un animateur</h2>
+   <p class="small">L’animateur peut piloter cette partie et préparer les QR des familles. Il se connecte avec le compte Google indiqué.</p>
+   <form id="facilitatorForm">
+    <label for="facilitatorEmail">Adresse du compte Google</label>
+    <input id="facilitatorEmail" type="email" required maxlength="254" autocomplete="off">
+    <div class="row"><button id="saveFacilitator" type="submit">Autoriser l’animateur</button><button id="revokeFacilitator" class="secondary" type="button" hidden>Retirer l’accès</button></div>
+   </form>
+   <div id="facilitatorShare" hidden>
+    <label for="facilitatorLink">Lien à transmettre à l’animateur</label>
+    <input id="facilitatorLink" readonly>
+    <button id="copyFacilitatorLink" class="secondary" type="button">Copier le lien</button>
+   </div>
+   <p id="facilitatorMessage" class="small" role="status"></p>
+  </section>
   <div class="panel"><h2>Indicateurs de la ville</h2><div id="gauges"></div>
    <p id="stabilityFormula" class="small" hidden></p>
    <details id="cityCorrection" hidden>

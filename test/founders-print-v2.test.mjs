@@ -33,6 +33,8 @@ for(const [count,version] of [[5,'2.0.0'],[6,'2.0.0'],[5,'1.1.0'],[5,'1.2.0']])t
   return {document,kit};
  };
  let {document,kit}=mount();
+ assert.deepEqual([...document.querySelectorAll('#printKit button')].map(b=>b.id),['prepareQR','printReadyQR']);
+ assert.equal(document.getElementById('printFamilyCards'),null);
  kit.sync(view);
  await kit.prepare();assert.equal(document.querySelectorAll('.print-qr svg').length,count);assert.equal(document.getElementById('printReadyQR').disabled,false);
  assert.equal(document.querySelectorAll('.print-card').length,count);

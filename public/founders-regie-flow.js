@@ -47,6 +47,6 @@ export function organizerError(error){
  if(code==='auth/popup-closed-by-user'||code==='auth/cancelled-popup-request')return 'La connexion Google n’a pas été terminée. Cliquez sur « Se connecter avec Google » pour réessayer.';
  if(code==='auth/unauthorized-domain')return 'Cette adresse n’est pas autorisée pour la connexion Google. Ouvrez la régie depuis le lien officiel de la partie.';
  if(/organisateur Google|Clé régie requise/.test(message))return 'Connectez-vous pour afficher les commandes de la partie.';
- if(error.status===403||/refusé|réservé|Accès régie|organisateur.*requis|organisateur.*autorisé/i.test(message))return 'Ce compte n’a pas accès à cette régie. Utilisez le compte organisateur qui a créé la partie, via « Changer de compte Google ».';
+ if(error.status===403||/refusé|réservé|Accès régie|organisateur.*requis|organisateur.*autorisé/i.test(message))return 'Ce compte n’a pas accès à cette régie. Utilisez le compte du propriétaire de la partie ou celui de l’animateur invité, via « Changer de compte Google ».';
  return message;
 }
