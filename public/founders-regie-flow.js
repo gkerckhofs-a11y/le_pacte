@@ -8,7 +8,7 @@ export function councilGuidance(s){
    READY:{step:2,title:'Préparez les cinq familles',hint:'Distribuez les QR vérifiés, ouvrez la projection puis lancez le prologue.'},
    INTRO:{step:3,title:'Lisez l’ouverture',hint:'Présentez ensuite le premier dilemme du chapitre.'},
    PRESENTATION:{step:3,title:'Lisez le dilemme et la question',hint:'Les équipes voient les tendances. Ouvrez les négociations quand le groupe est prêt.'},
-   CHECKPOINT:{step:3,title:'Le chapitre est sauvegardé',hint:'Lisez le bilan, terminez la séance ou reprenez la campagne.'},
+   CHECKPOINT:{step:3,title:'Le chapitre est sauvegardé',hint:'Lisez le bilan, puis poursuivez la campagne ou sauvegardez la séance pour la reprendre plus tard.'},
    SUSPENDED:{step:3,title:'La séance est sauvegardée',hint:s.campaign.version>=3?'La reprise restaure la phase, les mises et les engagements.':'La reprise restaure la phase, les mises et le temps restant.'},
    CHARTER_SUPPORT:{step:3,title:'Les familles qualifient les chartes',hint:'Les porte-paroles soutiennent une charte depuis leur terminal.'},
    REVEALED:{step:3,title:s.reveal?.chronicle?.title??'Le résultat est affiché',hint:s.reveal?.id==='D30'?'Lisez l’épilogue de la ville.':'Laissez le groupe découvrir les effets et le panorama, puis poursuivez.'},

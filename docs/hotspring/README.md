@@ -18,7 +18,7 @@ L’accueil « Games of Influence » donne accès aux univers. La régie de Hots
 
 Pour déléguer l’animation, ouvrir « Inviter un animateur » depuis la régie de la partie. Enregistrer l’adresse du compte Google, puis transmettre le lien de la régie. L’invité peut animer cette partie, préparer ses fiches et ouvrir la projection. Le propriétaire peut remplacer l’adresse ou retirer l’accès depuis la même rubrique.
 
-« Terminer la séance » sauvegarde aussi un scrutin ouvert, ses mises, ses propositions et son chrono. Le bilan ne compte que les chapitres clôturés et la trajectoire. Au checkpoint du chapitre V, la régie peut reprendre les crises en réserve ou ouvrir le final. La variante d’une archive repart du checkpoint « Gouvernement choisi », avec les ressources et le panorama précédant le duel des chartes.
+Dans le cadre « Pause et fin de partie », « Sauvegarder et suspendre la séance » conserve aussi un scrutin ouvert, ses mises, ses propositions et son chrono. Le bilan ne compte que les chapitres clôturés et la trajectoire. Au checkpoint du chapitre V, la régie peut reprendre les crises en réserve ou ouvrir le final. La variante d’une archive repart du checkpoint « Gouvernement choisi », avec les ressources et le panorama précédant le duel des chartes.
 
 ## Calibrage consigné pour le test
 
