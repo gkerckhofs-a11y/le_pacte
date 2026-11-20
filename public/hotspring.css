@@ -95,3 +95,15 @@
  .hotspring-epilogue,.hotspring-local-smoke {animation:none}
  .hotspring-camp-memory,.hotspring-epilogue-scene {display:none;animation:none}
 }
+
+.hotspring-panorama .hotspring-reframe{animation:none}
+.hotspring-panorama .hotspring-leaving-frame{animation:hotspring-site-chosen .45s ease-out both}
+@keyframes hotspring-site-chosen{to{opacity:0}}
+#panoramaOverview[aria-pressed=true]{background:var(--gold);color:var(--panel)}
+@media (prefers-reduced-motion:no-preference){
+ .hotspring-hearth{transform-box:fill-box;transform-origin:0 100%;animation:hotspring-hearth-drift 5.2s ease-in-out infinite alternate}
+ .hotspring-hearth.hearth-1{animation-delay:-2.3s;animation-duration:6.7s}
+ .hotspring-stroll{animation:hotspring-stroll 15s ease-in-out infinite alternate}
+ @keyframes hotspring-hearth-drift{from{transform:skewX(-7deg) scaleY(.88)}to{transform:skewX(8deg) scaleY(1.08)}}
+ @keyframes hotspring-stroll{0%,24%{transform:translate(0,0)}78%,100%{transform:translate(6px,1px)}}
+}

@@ -4,7 +4,7 @@ import {join} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {Resvg} from '@resvg/resvg-js';
 import {PNG} from 'pngjs';
-import {simulateCampaign,trajectories} from '../test/helpers/hotspring.mjs';
+import {newCampaign,simulateCampaign,trajectories} from '../test/helpers/hotspring.mjs';
 import {visualComposition} from '../test/helpers/hotspring-visual-compositions.mjs';
 import {hotspringLandscape} from '../src/hotspring-landscape.ts';
 import {renderPanoramaSvg,VALLEY_PLATE} from '../public/hotspring-panorama.js';
@@ -28,7 +28,7 @@ function capture(landscape,width,point=[50,50],zoom=1){
  const w=Math.round(1000/zoom),h=w*9/16;
  const left=Math.max(0,Math.min(1000-w,point[0]*10-w/2));
  const top=Math.max(0,Math.min(562.5-h,point[1]*5.625-h*.66));
- const svg=renderPanoramaSvg(landscape,{background,sprites});
+ const svg=renderPanoramaSvg(landscape,{background,sprites,overview:zoom!==1});
  const height=width*9/16;
  const raster=new Resvg(svg,{fitTo:{mode:'width',value:Math.ceil(width*1000/w)}}).render();
  if(zoom===1){
@@ -51,8 +51,14 @@ function capture(landscape,width,point=[50,50],zoom=1){
 function captureCampaign(){
  const {snapshots}=simulateCampaign(trajectories.institutions);
  const low=simulateCampaign(trajectories.commerce).snapshots;
+ const firstVote=vote=>{
+  const game=newCampaign();game.command('start');
+  return game.vote(vote);
+ };
  const captures=[
   ['00-prologue',snapshots[0],1920,'Prologue de 1872'],
+  ['01-installation-terrasse',firstVote('contre'),1920,'Premiers foyers sur la terrasse, dès le choix du site'],
+  ['01-installation-terres-basses',firstVote('pour'),1920,'Premiers foyers sur les terres basses, dès le choix du site'],
   ['01-fondation',snapshots[1],1920,'Fondation de Hotspring'],
   ['02-premiers-batiments',snapshots[2],1920,'Premières institutions'],
   ['03-corridor-et-comptoir',snapshots[3],1920,'Corridor et comptoir de la vallée'],
@@ -66,7 +72,31 @@ function captureCampaign(){
   writeFileSync(join(folder,name+'.webp'),webp);
   console.log(name,w+'×'+w*9/16,(webp.length/1024).toFixed(1)+' Kio',s.game.city);
  }
- return captures.map(([name,,,alt])=>({file:'captures/'+name+'.webp',alt}));
+ const sequence=newCampaign();
+ sequence.command('start');
+ const montage=mkdtempSync(join(tmpdir(),'hotspring-fondation-'));
+ const stages=[
+  ['contre','Installation · trois tentes'],
+  ['contre','Puits communal · deux tentes'],
+  ['contre','Lots publics · une tente'],
+  ['pour','Scierie · maisons de bois']
+ ];
+ const images=[];
+ try{
+  for(const [i,[vote,label]] of stages.entries()){
+   if(i)sequence.command('next');
+   if(sequence.state.phase==='CHECKPOINT')sequence.command('next');
+   const map=hotspringLandscape(sequence.vote(vote));
+   const file=join(montage,i+'.png');
+   magick(['png:-','-background','#28231e','-gravity','south','-splice','0x42','-fill','#f5e8cd',
+    '-font','DejaVu-Sans','-pointsize','19','-annotate','+0+10',label,file],{input:capture(map,768)});
+   images.push(file);
+  }
+  magick(['montage',...images,'-tile','2x2','-geometry','+2+2','-background','#28231e',
+   '-strip','-quality','80',join(folder,'installation-du-camp-au-village.webp')]);
+ }finally{rmSync(montage,{recursive:true,force:true});}
+ return [{file:'captures/installation-du-camp-au-village.webp',alt:'Sur le plateau, les trois tentes cèdent leur place aux maisons au fil des quatre premiers votes.'},
+  ...captures.map(([name,,,alt])=>({file:'captures/'+name+'.webp',alt}))];
 }
 
 const writeJSON=(path,value)=>writeFileSync(path,JSON.stringify(value,null,2)+'\n');

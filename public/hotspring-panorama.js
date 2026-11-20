@@ -25,7 +25,7 @@ const pole=path('M-15 0l3 -21m18 0 4 21m-20 -9 18 7m-1 -7 -18 7','none','#5d4a37
 const tower=pole+path('M-13 -23v-15l23 1v14z',timber)+path('M-16 -37l14 -8 15 8z',roof);
 const posts=path('M-30 0v-8m12 6v-8m15 6v-8m16 6v-8m14 6v-8m-57 4l57 -8','none','#746047',1.8);
 const spriteSize={
- tent:[26,20],cottages:[95,63],inn:[54,38],shacks:[82,56],planned:[84,54],stockyard:[69,40],
+ plankCottage:[37,26],porchHouse:[39,30],homestead:[48,32],tent:[26,20],cottages:[95,63],inn:[54,38],shacks:[82,56],planned:[84,54],stockyard:[69,40],
  office:[44,32],jail:[39,30],drains:[83,32],hall:[60,43],trade:[45,30],people:[19,13],
  shops:[77,49],relief_cart:[26,20],grove:[59,40],scaffolding:[50,34],debris:[49,22],
  fire:[51,34],flood:[55,19],drought:[48,24],quarantine:[42,30],mine_accident:[44,26],bankruptcy:[36,25],
@@ -38,6 +38,7 @@ function camp(wagonGraphic,tentGraphic=tent){
  return row([[-30,2,.7],[-10,-12,.65],[12,-14,.65],[27,0,.68],[4,17,.7]],wagonGraphic)+row([[-16,12,.65],[16,8,.7]],tentGraphic);
 }
 const building={
+ tent,wagon,plankCottage:cabin(32,16),porchHouse:cabin(34,20),homestead:cabin(36,18),
  cottages:row([[-21,-7,.67],[7,-14,.68],[28,-5,.56],[-2,10,.82]],cabin(27,14)),
  well:path('M-9 0l6 -6 14 1 -4 5z',timber)+path('M0 -5v-13l7 -2m-7 4 6 3','none','#635b50',2.5),
  tower,
@@ -141,6 +142,15 @@ function renderTerrain(layer,high){
   stroke('#826b53',.9,.29,`transform="translate(0 ${-width*.21})"${ruts}`);
 }
 
+// The two roof coordinates are measured on the transparent paintings, in sprite units.
+const hearths={plankCottage:[[1,-24.4,.74]],porchHouse:[[4.3,-29,.72]],homestead:[[-7,-31,1]],cottages:[[9,-40,.76],[-27,-41,.57]]};
+function chimneySmoke(kind,paint){
+ return (hearths[kind]??[]).map(([x,y,size],i)=>at(x,y,
+  `<g class="hotspring-hearth hearth-${i}" fill="url(#${paint}-smoke)" filter="url(#${paint}-smoke-soft)">
+   <path d="M-.7 0C-2-5 4-8 3-12S0-19 6-24S11-29 9-35C16-29 12-24 9-20S8-14 6-11S1-5 .7 0Z"/>
+  </g>`,size)).join('');
+}
+
 function renderLayer(layer,textureFor,high,paint){
  const route=renderTerrain(layer,high);
  const attrs=`data-layer="${escapeXML(layer.id)}" data-kind="${escapeXML(layer.kind)}" data-state="${escapeXML(layer.state)}"`;
@@ -148,6 +158,7 @@ function renderLayer(layer,textureFor,high,paint){
  if(route)return `<g ${attrs}>${title}${route}</g>`;
  const painted=textureFor(layer.kind);
  const graphic=layer.kind==='camp'?groundedCamp(textureFor,paint):
+  layer.kind==='wagons'?row([[-12,-5,.82],[17,5,.88]],groundContact(32,paint)+(textureFor('wagon')??wagon)):
   painted??building[layer.kind]??'';
  const terrain=terrainStages[layer.kind]?.[layer.state];
  const inProgress=layer.state==='building',damaged=layer.state==='damaged';
@@ -160,7 +171,8 @@ function renderLayer(layer,textureFor,high,paint){
   stateScreen[layer.state]??'';
  const footprint=layer.kind==='drains'?0:spriteSize[layer.kind]?.[0];
  const contact=footprint?groundContact(footprint,paint):'';
- const body=terrain??`${contact}<g opacity="${opacity}">${remainder}</g>${embellishment}`;
+ const smoke=layer.state==='complete'?chimneySmoke(layer.kind,paint):'';
+ const body=terrain??`${contact}${smoke}<g opacity="${opacity}"${painted?` filter="url(#${paint}-timber)"`:''}>${remainder}</g>${embellishment}`;
  return `<g ${attrs} transform="translate(${layer.x*10} ${layer.y*5.625}) scale(${layer.scale})">${title}${body}</g>`;
 }
 
@@ -179,7 +191,49 @@ function renderWater(scene){
  return `<g data-river="${escapeXML(scene.river)}">${tinted}${bank}</g>`;
 }
 
-export function renderPanoramaSvg(scene,{background=VALLEY_PLATE,sprites=scene.sprites??{},campMemory=false}={}){
+// Coordinates stay in the original valley for every layer, including the river and off-site works.
+export function panoramaViewBox(scene,overview=false){
+ if(overview||!scene.location||scene.epilogue)return '0 0 1000 562.5';
+ const high=scene.location==='terrasse';
+ const established=scene.layers.some(layer=>['housing','rail','mine'].includes(layer.id));
+ const width=high?(established?570:420):(established?660:510);
+ const height=width*9/16;
+ const centerX=high?748:445,centerY=high?180:342;
+ const left=Math.max(0,Math.min(1000-width,centerX-width/2));
+ return [left,centerY-height/2,width,height].join(' ');
+}
+
+function villageLife(scene,textureFor,paint){
+ if(!scene.location)return [];
+ const high=scene.location==='terrasse';
+ const people=textureFor('people')??row([[-3,0,.8],[3,.7,.94]],person);
+ const groups=[];
+ function gather(id,dx,dy,size,walking=false){
+  const site=scene.layers.find(layer=>layer.id===id);
+  if(!site||site.state!=='complete')return;
+  const activity=`<g data-residents="${id}"${walking?' class="hotspring-stroll"':''}>${groundContact(14,paint)}${people}</g>`;
+  groups.push({y:site.y+dy/5.625,markup:at(site.x*10+dx,site.y*5.625+dy,activity,size)});
+ }
+ // Even a quiet settlement has a household at home. The street reflects public activity.
+ gather('homes',13,3,.85);
+ if(scene.street!=='vide'){
+  gather('camp',-16,9,.78,true);
+  gather('surveyed',high?-22:18,8,.82,scene.street!=='barricadée');
+  if(scene.density!=='faible'){
+   gather('well',12,3,.77);
+   gather('housing',-17,4,.85);
+   gather('depot',19,2,.75);
+  }
+  if(scene.density==='forte'){
+   gather('school',-15,4,.77);
+   gather('saloon',16,5,.82);
+   gather('shops',12,4,.84);
+  }
+ }
+ return groups;
+}
+
+export function renderPanoramaSvg(scene,{background=VALLEY_PLATE,sprites=scene.sprites??{},campMemory=false,overview=false}={}){
  const paint='hotspring-paint-'+(++panoramaId);
  const high=scene.location==='terrasse';
  const hasScars=scene.scars.length>0;
@@ -194,15 +248,11 @@ export function renderPanoramaSvg(scene,{background=VALLEY_PLATE,sprites=scene.s
  const layers=scene.layers.filter(layer=>layer.state!=='absent');
  const isRoute=layer=>(layer.kind==='roadwide'||layer.kind in terrainRoutes);
  const trails=layers.filter(isRoute).map(layer=>renderLayer(layer,textureFor,high,paint)).join('');
- const buildings=layers.filter(layer=>!isRoute(layer)).map(layer=>renderLayer(layer,textureFor,high,paint)).join('');
- const count=scene.location&&scene.street!=='vide'?({faible:2,moyenne:6,forte:12}[scene.density]??0):0;
- const peopleTexture=textureFor('people');
- const group=peopleTexture?groundContact(17,paint)+peopleTexture:null;
- const people=group
-  ?Array.from({length:Math.ceil(count/3)},(_,i)=>at(scene.townX*10-43+i*23,scene.townY*5.625+22+(i%3)*7,group)).join('')
-  :Array.from({length:count},(_,i)=>at(scene.townX*10-57+i*11,scene.townY*5.625+20+(i%3)*6,person,.64+(i%3)*.13)).join('');
- const nearby=scene.location&&scene.density==='faible'?
-  at(scene.townX*10-19,scene.townY*5.625+12,group??person,.68):'';
+ const settlement=layers.filter(layer=>!isRoute(layer)).map(layer=>({
+  y:layer.y,markup:renderLayer(layer,textureFor,high,paint)
+ }));
+ settlement.push(...villageLife(scene,textureFor,paint));
+ const buildings=settlement.sort((a,b)=>a.y-b.y).map(item=>item.markup).join('');
  const scars=placedScars(scene,textureFor);
  const frontage=scene.street==='barricadée'?posts:
   scene.mood==='dangereuse'?path('M-22 1h44m-31 0v-9m9 9v-8m10 8v-9','none','#50453d',2):
@@ -210,7 +260,7 @@ export function renderPanoramaSvg(scene,{background=VALLEY_PLATE,sprites=scene.s
  const street=at(scene.townX*10,scene.townY*5.625+20,frontage,1.5);
  const shutters=scene.prosperity==='abandon'?
   at(scene.townX*10+16,scene.townY*5.625+24,posts,.8):
-  scene.prosperity==='précarité'?at(scene.townX*10+26,scene.townY*5.625+21,tent,.45):'';
+  scene.prosperity==='précarité'?at(scene.townX*10+26,scene.townY*5.625+21,posts,.45):'';
  const showsCharter={
   commerce:at(scene.townX*10+34,scene.townY*5.625+8,boardsForCharter(),1.45),
   services:at(scene.townX*10-10,scene.townY*5.625+17,row([[0,0],[6,1],[14,0]],person),1),
@@ -220,19 +270,34 @@ export function renderPanoramaSvg(scene,{background=VALLEY_PLATE,sprites=scene.s
   réserves:at(228,325,posts,.8)
  };
  const tone=scene.prosperity==='abandon'?'#7e786d':scene.prosperity==='prospérité'?'#d1a564':null;
- const filters=tone?`<ellipse cx="${scene.townX*10}" cy="${scene.townY*5.625}" rx="125" ry="75" fill="${tone}" opacity=".13"/>`:'';
+ const filters=tone?`<ellipse cx="${scene.townX*10}" cy="${scene.townY*5.625}" rx="125" ry="75" fill="${tone}" opacity=".065"/>`:'';
  const ending=scene.epilogue?'<rect width="1000" height="563" fill="#cc8853" opacity=".10"/>':'';
  const memory=campMemory&&scene.epilogue?`<g class="hotspring-camp-memory" aria-hidden="true">
   ${at(scene.epilogue.origin[0]*10,scene.epilogue.origin[1]*5.625,groundedCamp(textureFor,paint))}
  </g>`:'';
  const labels=(scene.details??[]).map(detail=>detail.label);
+ const inhabited=layers.some(layer=>layer.id==='homestead'&&layer.state==='complete');
+ const tents=layers.filter(layer=>layer.kind==='tent').length;
  const description='Vallée de Hotspring'+(scene.location?' — ville sur '+scene.location:'')+
+  (inhabited?'. Un premier foyer habité, une cheminée qui fume.':'')+
+  (tents?'. '+tents+(tents===1?' tente familiale':' tentes familiales'):'')+
   (hasScars?'. Cicatrices : '+scene.scars.join(', '):'')+(labels.length?'. '+labels.join('. '):'');
- return `<svg class="hotspring-map" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 562.5" role="img" aria-label="${escapeXML(description)}">
+ return `<svg class="hotspring-map" xmlns="http://www.w3.org/2000/svg" width="1000" height="562.5" viewBox="${panoramaViewBox(scene,overview)}" role="img" aria-label="${escapeXML(description)}">
  <defs>
+  <linearGradient id="${paint}-smoke" x1="0" y1="1" x2=".15" y2="0">
+   <stop stop-color="#65594d" stop-opacity=".85"/><stop offset=".37" stop-color="#d8caba" stop-opacity=".85"/>
+   <stop offset="1" stop-color="#e6daca" stop-opacity="0"/>
+  </linearGradient>
+  <filter id="${paint}-smoke-soft" x="-60%" y="-15%" width="220%" height="130%"><feGaussianBlur stdDeviation=".75"/></filter>
+  <filter id="${paint}-timber" color-interpolation-filters="sRGB">
+   <feColorMatrix type="saturate" values="1.08"/>
+   <feComponentTransfer>
+    <feFuncR type="linear" slope="1.13" intercept="-.065"/><feFuncG type="linear" slope="1.13" intercept="-.065"/><feFuncB type="linear" slope="1.13" intercept="-.065"/>
+   </feComponentTransfer>
+  </filter>
   <radialGradient id="${paint}-contact">
    <stop offset="0" stop-color="#332a1f" stop-opacity=".64"/>
-   <stop offset=".6" stop-color="#332a1f" stop-opacity=".25"/>
+   <stop offset=".6" stop-color="#332a1f" stop-opacity=".39"/>
    <stop offset="1" stop-color="#332a1f" stop-opacity="0"/>
   </radialGradient>
  </defs>
@@ -241,7 +306,7 @@ export function renderPanoramaSvg(scene,{background=VALLEY_PLATE,sprites=scene.s
  <g data-vegetation="${escapeXML(scene.vegetation)}">${groves}${wood}</g>${buildings}
  <g class="street-detail" data-street="${escapeXML(scene.street)}" data-density="${escapeXML(scene.density)}"
   data-mood="${escapeXML(scene.mood)}" data-prosperity="${escapeXML(scene.prosperity)}">
-  ${scars}${street}${shutters}${nearby}${people}${showsCharter[scene.charter]??''}
+  ${scars}${street}${shutters}${showsCharter[scene.charter]??''}
  </g>
  ${(scene.details??[]).map(detail=>renderDetail(detail,textureFor)).join('')}${ending}${memory}</svg>`;
 }

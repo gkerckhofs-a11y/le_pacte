@@ -152,7 +152,10 @@
         "sprite_relief_cart",
         "sprite_grove",
         "sprite_scaffolding",
-        "sprite_debris"
+        "sprite_debris",
+        "sprite_homestead",
+        "sprite_plankCottage",
+        "sprite_porchHouse"
       ]
     },
     {
