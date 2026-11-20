@@ -5,6 +5,14 @@ const route = '/api/founders/cosa-nostra/preparation';
 const chapterTitles = ['L’Héritage', 'Le Partage', 'La Guerre des ombres', 'Les Trahisons', 'La Commission'];
 const $ = id => document.getElementById(id);
 if(new URLSearchParams(location.search).get('mode')==='test')$('sessionMode').value='test';
+function showMode(){
+ const test=$('sessionMode').value==='test';
+ $('creationHeading').textContent=test?'Nouvelle régie de test':'Nouvelle partie';
+ $('createSession').textContent=test?'Créer et ouvrir la régie de test':'Créer et ouvrir la régie';
+}
+showMode();
+$('sessionMode').addEventListener('change',showMode);
+if(location.hash==='#planForm')$('planForm').querySelector('details').open=true;
 let preparation = null, writing = false, legacyRevision = 0;
 
 function element(tag, text) {
@@ -32,6 +40,7 @@ const request = organizerWorkspace({
 
   $('loginPanel').hidden = true;
   $('workspace').hidden = false;
+  if(['#sessionForm','#planForm'].includes(location.hash))document.querySelector(location.hash).scrollIntoView();
  },
  status,
  localAction: 'Ouvrir la régie'
@@ -95,6 +104,7 @@ function updateSelection() {
 function render(saved) {
  preparation = saved;
  $('campaignPanel').hidden = !saved;
+ $('importSettings').open = !saved;
  if (!saved) return;
  const {metadata, dilemmas} = saved.campaign;
  $('members').replaceChildren(...metadata.family_objectives.map(({family}) => {

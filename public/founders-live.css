@@ -394,3 +394,8 @@ button.danger{background:#a83333!important;color:#fff!important;border-color:#a8
 .rehearsal-panel h4{margin:.75rem 0;font-size:1.15rem}
 .rehearsal-panel input{max-width:7rem}
 .rehearsal-panel .secondary{margin-top:.75rem}
+#regieSceneImage{display:block;width:100%;max-height:260px;object-fit:cover;border-radius:8px;margin:12px 0}
+#regieSceneOptions{list-style:none;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#regieSceneOptions li{border:1px solid currentColor;border-radius:8px;padding:12px}
+#regieSceneOptions p{font-size:.92em;margin:.45em 0}
+@media(max-width:550px){#regieSceneOptions{grid-template-columns:1fr}}

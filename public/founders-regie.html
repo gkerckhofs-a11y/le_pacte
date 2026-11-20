@@ -18,7 +18,7 @@
 <div id="accountPanel" class="regie-account" hidden><span id="signedInAs"></span><button id="changeAccount" class="secondary" type="button">Changer de compte Google</button></div>
 <section id="sessionPicker" class="panel" hidden>
  <h2 id="sessionListTitle">Mes parties</h2>
- <p id="worldLinks" hidden><a href="/hotspring/nouvelle-partie?mode=test">Créer une partie de test</a> · <a href="/hotspring/atelier">Atelier de dilemmes →</a></p>
+ <p id="worldLinks" hidden><a id="worldTest" href="/hotspring/nouvelle-partie?mode=test">Créer une partie de test</a> · <a id="worldWorkshop" href="/hotspring/atelier">Atelier de dilemmes →</a></p>
  <div id="sessionsList"></div>
  <button id="archiveSessions" class="secondary" type="button" hidden>Archiver les anciennes parties</button>
  <p id="archiveMessage" class="small" role="status"></p>
@@ -63,6 +63,7 @@
     <a id="preparePublicLink" class="regie-projection-link" href="#" target="_blank" rel="noopener">Ouvrir l’écran à projeter ↗</a>
     <p class="small muted">Le lancement fige les noms des familles et ouvre le premier dilemme.</p>
    </div>
+   <div id="chicagoBrief" hidden><img id="regieSceneImage" alt=""><h3 id="regieSceneTitle"></h3><p id="regieSceneText"></p><ul id="regieSceneOptions"></ul></div>
    <p id="dilemmaInfo" class="muted"></p><div id="hotspringStage" class="hotspring-stage" hidden></div><div id="hotspringTendencies" class="hotspring-tendencies" hidden></div>
    <details><summary class="small muted">Priorité en cas d’égalité finale</summary><p id="tiePriority" class="small muted"></p></details>
    <div id="lastReveal" class="card" hidden><h3 id="outcomeHeading"></h3><p id="outcomeDetail"></p></div>

@@ -1,9 +1,9 @@
 import {renderRehearsal} from './founders-rehearsal.js';
-import {renderSuccession,showChicagoRanking,chicagoPhase} from './chicago-succession.js';
-import {isHotspring,isCurrentHotspring,narrativeRegie} from './founders-univers.js';
+import {renderSuccession,showChicagoRanking,chicagoPhase,chicagoImage} from './chicago-succession.js';
+import {isHotspring,isCurrentChicago,isCurrentHotspring,narrativeRegie} from './founders-univers.js';
 import {rememberAccess} from './founders-workspace.js';
 import {CAMPAIGN_PHASES,renderHotspringStage,renderTendencies,renderCampaignAdmin,renderCampaignActions,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
-import {decorateGauge,formatGaugeNumber,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
+import {decorateGauge,formatGaugeNumber,renderPhaseClock,renderChicagoChoices,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
 import {mountPrintKit} from './founders-print.js';
 import {renderCouncilMonitor} from './founders-council-monitor.js';
 import {councilGuidance,startCouncil,organizerError,validNarrativeSession} from './founders-regie-flow.js';
@@ -11,7 +11,9 @@ import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
 import {teamCaption,teamLabel,colorize} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id),p=new URLSearchParams(location.search);
-const hotspringHome=location.pathname==='/hotspring'||(location.pathname==='/regie'&&!p.has('session'));
+const chicagoLobby='/regie?univers=chicago';
+const chicagoHome=location.pathname==='/regie'&&!p.has('session')&&p.get('univers')==='chicago';
+const hotspringHome=!chicagoHome&&(location.pathname==='/hotspring'||(location.pathname==='/regie'&&!p.has('session')));
 const sid=p.get('session');let authSDK=null,cloud=false,token='',current=null,busy=false,initialized=false,authenticating=false,waitingForLogin=false;
 const labels={...CAMPAIGN_PHASES,NEGOTIATION:'Négociations',READY:'Prêt',COUNCIL:'Conseil en cours',AWAITING_REVEAL:'En attente de la révélation',REVEALED:'Résultat annoncé',FINISHED:'Partie terminée'};
 const gaugeIds=['economie','securite','satisfaction','bien_etre','developpement','stabilite'];
@@ -22,6 +24,14 @@ function labelWorld(){
  set('regieTitle','Régie · Les Colons de Hotspring');
 }
 if(hotspringHome)labelWorld();
+if(chicagoHome){
+ document.title='Cosa Nostra · Régie';
+ set('regieTitle','Régie · Cosa Nostra');
+ $('createAnotherSession').href='/cosa-nostra';
+ $('worldTest').href='/cosa-nostra?mode=test#sessionForm';
+ $('worldWorkshop').href='/cosa-nostra#planForm';
+ set('worldWorkshop','Parcours des Conseils →');
+}
 function step(number){for(let i=1;i<=3;i++)if(i===number)$('step'+i).setAttribute('aria-current','step');else $('step'+i).removeAttribute('aria-current');}
 function account(){const user=authSDK?.currentAccount?.();return user?.email||user?.displayName||'Compte organisateur connecté';}
 async function init(){
@@ -63,16 +73,16 @@ async function listSessions(){
  const bearer=await organizerToken(),r=await fetch('/api/founders/sessions',{headers:{Authorization:'Bearer '+bearer},cache:'no-store'});
  const data=await r.json();if(!r.ok){const error=new Error(data.error||'Impossible de retrouver vos parties.');error.status=r.status;throw error;}
  const root=$('sessionsList');root.replaceChildren();$('sessionPicker').hidden=false;
- const sessions=hotspringHome?data.sessions.filter(isCurrentHotspring):data.sessions;
- $('worldLinks').hidden=!hotspringHome;
- set('sessionListTitle',hotspringHome?'Mes parties Hotspring':'Mes parties');
+ const sessions=chicagoHome?data.sessions.filter(isCurrentChicago):hotspringHome?data.sessions.filter(isCurrentHotspring):data.sessions;
+ $('worldLinks').hidden=!(hotspringHome||chicagoHome);
+ set('sessionListTitle',chicagoHome?'Mes parties Chicago':hotspringHome?'Mes parties Hotspring':'Mes parties');
  for(const session of sessions){
   if(!validNarrativeSession(session.id))continue;
   const row=document.createElement('div');row.className='card row between';
   const title=document.createElement('strong');title.textContent=(session.rehearsal?'Test · ':'')+session.code+' · '+session.title+' · '+(labels[session.phase]||session.phase);
   const link=document.createElement('a');link.textContent='Ouvrir la régie →';link.href=narrativeRegie(session.id,isHotspring(session));row.append(title,link);root.append(row);
  }
- $('archiveSessions').hidden=hotspringHome||!root.children.length;
+ $('archiveSessions').hidden=chicagoHome||hotspringHome||!root.children.length;
  if(!root.children.length)root.textContent='Aucune partie en cours ou à reprendre. Créez une partie pour commencer.';
 }
 function connected(){
@@ -192,6 +202,15 @@ function render(s){
  $('preparePublicLink').href='/founders-city.html?session='+s.id;
  set('phase',chicagoPhase(s)||labels[s.phase]||s.phase);set('sessionCode',s.code+' · '+s.selection.scenarioVersion+' · skin '+s.selection.skinId);
  set('sessionTitle',s.title);set('revision','Révision '+s.revision);
+ const brief=$('chicagoBrief');
+ brief.hidden=!s.succession||!(s.dilemma||s.reveal)||!['PRESENTATION','NEGOTIATION','COUNCIL','AWAITING_REVEAL','REVEALED'].includes(s.phase);
+ $('dilemmaInfo').hidden=!brief.hidden;
+ if(!brief.hidden){
+  chicagoImage($('regieSceneImage'),s.reveal?.visual??s.dilemma?.image);
+  set('regieSceneTitle',s.reveal?.chronicle?.title??s.dilemma?.title);
+  set('regieSceneText',s.reveal?.narration??[s.dilemma?.public_text,s.dilemma?.vote_question].filter(Boolean).join(' '));
+  renderChicagoChoices($('regieSceneOptions'),s);
+ }
  set('dilemmaInfo',s.dilemma?'Délibération : '+s.dilemma.title+(s.dilemma.vote_question?' — '+s.dilemma.vote_question:''):'');
  set('tiePriority','Tirage de départage final : '+s.finalTieOrder.map(id=>teamLabel(s,id)).join(' → '));
  $('start').hidden=s.phase!=='READY';
@@ -306,7 +325,7 @@ $('start').addEventListener('click',async()=>{
  busy=true;$('start').disabled=true;set('actionMessage','Ouverture du premier dilemme…');
  try{
   const result=await startCouncil(api);render(result.view);
-  set('actionMessage',result.started?(result.view.rehearsal?'Test lancé. Présentez le dilemme, puis ouvrez le vote pour saisir les choix des familles ici.':result.view.chicago?'Répétition lancée. Le premier Conseil est ouvert aux négociations.':'Partie lancée. Le premier dilemme est affiché ; le Maire peut voter sur son écran d’équipe.'):'La partie a déjà démarré. La régie affiche son état actuel.');
+  set('actionMessage',result.started?(result.view.rehearsal?'Test lancé. Présentez le dilemme, puis ouvrez le vote pour saisir les choix des familles ici.':result.view.chicago?'Partie lancée. Présentez le premier dilemme aux familles.':'Partie lancée. Le premier dilemme est affiché ; le Maire peut voter sur son écran d’équipe.'):'La partie a déjà démarré. La régie affiche son état actuel.');
  }catch(error){set('actionMessage',organizerError(error));try{render(await api(''));}catch{}}
  finally{busy=false;renderActionAvailability(current);}
 });
@@ -348,7 +367,7 @@ async function login(){
 $('login').addEventListener('click',login);
 $('changeAccount').addEventListener('click',login);
 $('retryInit').addEventListener('click',init);
-$('chooseSession').addEventListener('click',()=>location.assign(current?.chicago?'/cosa-nostra':current?.campaign||hotspringHome?'/hotspring':'/founders-regie.html'));
+$('chooseSession').addEventListener('click',()=>location.assign((current?.chicago||chicagoHome)?chicagoLobby:current?.campaign||hotspringHome?'/hotspring':'/founders-regie.html'));
 $('archiveSessions').addEventListener('click',()=>$('archiveDialog').showModal());
 $('cancelArchive').addEventListener('click',()=>$('archiveDialog').close());
 $('confirmArchive').addEventListener('click',async()=>{
