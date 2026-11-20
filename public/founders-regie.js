@@ -206,7 +206,7 @@ function render(s){
  brief.hidden=!s.succession||!(s.dilemma||s.reveal)||!['PRESENTATION','NEGOTIATION','COUNCIL','AWAITING_REVEAL','REVEALED'].includes(s.phase);
  $('dilemmaInfo').hidden=!brief.hidden;
  if(!brief.hidden){
-  chicagoImage($('regieSceneImage'),s.reveal?.visual??s.dilemma?.image);
+  chicagoImage($('regieSceneImage'),s.reveal?s.reveal.visual:s.dilemma?.image);
   set('regieSceneTitle',s.reveal?.chronicle?.title??s.dilemma?.title);
   set('regieSceneText',s.reveal?.narration??[s.dilemma?.public_text,s.dilemma?.vote_question].filter(Boolean).join(' '));
   renderChicagoChoices($('regieSceneOptions'),s);

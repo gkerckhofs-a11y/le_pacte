@@ -388,6 +388,7 @@ export function narrativePublicView(s){
   ...(isHotspring(s)||chicago?{influenceReserve:publicInfluenceReserve(s,resolved)}:{}),
   story:{id:s.scenario.scenario.id,title:s.scenario.scenario.title,location:s.scenario.scenario.location,year:s.scenario.scenario.year,schemaVersion:s.scenario.schema_version},
   skin:{id:s.skin.id,title:s.skin.title,labels:copy(s.skin.labels),theme:copy(s.skin.theme),publicScene:copy(s.skin.publicScene)},
+  ...(chicago?{stabilityScore:city.stabilite}:{}),
   ...(qualitative?{cityLevels:Object.fromEntries(Object.entries(s.game.city).map(([k,value])=>[k,level(value)])),stabilityLevel:level(city.stabilite)}:{}),
   city:qualitative?{}:city,families:activeFounders(s.game).map((id,i)=>({id,name:s.names[id],color:copy(teamColor(s.colors?.[id]??DEFAULT_TEAM_COLORS[i])),members:s.game.families[id].members})),
   leader:s.game.leader,moderator:s.game.moderator,

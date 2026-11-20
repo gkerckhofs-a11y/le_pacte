@@ -399,3 +399,39 @@ button.danger{background:#a83333!important;color:#fff!important;border-color:#a8
 #regieSceneOptions li{border:1px solid currentColor;border-radius:8px;padding:12px}
 #regieSceneOptions p{font-size:.92em;margin:.45em 0}
 @media(max-width:550px){#regieSceneOptions{grid-template-columns:1fr}}
+
+/* Chicago is a single film frame above the Commission's three desks. */
+.projection-dashboard.chicago-v3{display:flex;flex-direction:column;height:auto;min-height:100dvh;background:#101313}
+#cineHero{display:flex;align-items:center;justify-content:center;position:relative;background:radial-gradient(ellipse at center,#38342c,#0d1010 75%);border-bottom:1px solid #64523c}
+#cineHero figure{position:relative;background:#141819;width:min(100%,88.89dvh);aspect-ratio:16/9;margin:0;display:grid;place-items:center}
+#cineImage{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+#cineMissing{color:#cec0ac;font:italic 1.1em Georgia,serif}
+.cine-brand,#cineChapter{position:absolute;z-index:1;max-width:22vw;color:#e3c28c}
+.cine-brand{left:3vw;display:grid;gap:.45em}
+.cine-brand strong{color:#f3e8d6;font:clamp(22px,3vw,100px)/1 Georgia,serif}
+.cine-brand span,#cineChapter{font:650 clamp(11px,.82vw,25px)/1.4 system-ui;text-transform:uppercase;letter-spacing:.13em}
+#cineChapter{right:3vw;text-align:right}
+.chicago-v3.projection-dashboard .top{justify-content:flex-end;padding:4px 1vw}.chicago-v3.projection-dashboard .top>div:first-child{display:none}
+.chicago-v3.projection-dashboard .projection-grid{height:auto;grid-template-columns:minmax(0,.92fr) minmax(0,2.1fr) minmax(0,1.18fr);grid-template-rows:auto;align-items:start}
+.chicago-v3.projection-dashboard .projection-city{display:none}
+.chicago-v3 #cineState{grid-column:1}.chicago-v3 :is(#dilemmaPanel,#finalResults,#chicagoSuccession){grid-column:2;grid-row:1}
+.chicago-v3 #cineVote{grid-column:3;grid-row:1}
+.chicago-v3 #cineVote h2,.chicago-v3 #cineState h2{font-size:clamp(16px,1.35vw,46px);margin:0 0 .45em}
+.chicago-v3.projection-dashboard #dilemmaPanel{overflow:visible;font-size:clamp(13px,min(1.05vw,1.85dvh),38px)}
+.chicago-v3.projection-dashboard #dilemmaTitle{font-size:1.55em}
+.chicago-v3.projection-dashboard #question{font-size:1.05em}
+.chicago-v3 #chicagoChoices li:first-child{background:#1b342c;border-color:#487b67}
+.chicago-v3 #chicagoChoices li:last-child{background:#392427;border-color:#825552}
+.chicago-v3 #cineState .gauge-head,.chicago-v3 #cineVote .ballot{font-size:clamp(12px,.95vw,34px)}
+.chicago-v3 #panoramaStability{margin-top:1em}.chicago-v3 #stabilityTitle{font-size:1.3em}
+.chicago-v3 #cineVote .ballot{padding:3px 4px;grid-template-columns:minmax(0,1fr) auto 2ch}
+.chicago-v3 #cineVote #councilPrompt{color:var(--gold);font-weight:bold;margin:.45em 0}
+.chicago-v3 #cineChanges{color:var(--gold)}
+.regie-dashboard.chicago-v3 #regieSceneImage{width:min(100%,320px);aspect-ratio:16/9}
+@media(max-aspect-ratio:4/3){.cine-brand,#cineChapter{background:#101313d9;padding:5px 8px;top:8px}.cine-brand span,.cine-brand small{display:none}.cine-brand{max-width:none}}
+@media(max-width:800px){.chicago-v3.projection-dashboard .projection-grid{display:flex;flex-direction:column}.chicago-v3 .projection-grid>.panel{width:100%}.chicago-v3 #cineState{order:2}.chicago-v3 #cineVote{order:1}}
+.chicago-v3 #cineState #gauges{display:grid;gap:4px}
+.chicago-v3 #cineState #gauges .gauge{margin:0;padding:2px 0}
+.chicago-v3 #cineState #gauges .gauge-head{margin:0}
+.chicago-v3 #cineState .track{height:5px}
+.chicago-v3 #cineState #panoramaStability{margin-top:8px}
