@@ -9,7 +9,7 @@
 <body class="cosa-nostra-page">
 <header class="mast"><a href="/" class="brand">Games of Influence</a><span>Le Ludificateur</span></header>
 <main>
- <nav class="breadcrumb" aria-label="Navigation"><a href="/">Univers</a></nav>
+ <nav class="breadcrumb" aria-label="Navigation"><a href="/">Univers</a><span aria-hidden="true">›</span><a href="/regie?univers=chicago">Régie Cosa Nostra</a></nav>
  <h1>Cosa Nostra — Le Trône de Chicago</h1>
  <p class="context">Régie de préparation · Chicago, 1931</p>
  <p>Préparez le parcours des Conseils pour votre groupe ou pour un test en solo. Chaque dilemme propose un vote POUR/CONTRE avec les deux propositions de la campagne V3.</p>
@@ -19,29 +19,11 @@
   <div class="actions"><button id="connect" type="button" disabled>Connexion…</button></div>
  </section>
  <div id="workspace" hidden>
-  <section class="form-panel" aria-labelledby="sessionsHeading">
-   <h2 id="sessionsHeading">Mes parties Chicago</h2>
-   <ul id="sessions"></ul>
-  </section>
-  <form class="form-panel" id="importForm">
-   <h2>Campagne narrative V3</h2>
-   <p id="sourceVersion">Importez le fichier Cosa_Nostra_Campagne_30_Dilemmes_V3_Binaire.json pour ouvrir la campagne dans votre régie.</p>
-   <label for="campaignFile">Fichier de campagne JSON</label>
-   <input id="campaignFile" type="file" accept=".json,application/json" required>
-   <div class="actions"><button id="importCampaign">Importer la campagne</button></div>
-  </form>
   <div id="campaignPanel" class="form-grid" hidden>
-   <form class="form-panel" id="planForm">
-    <h2>Parcours des Conseils</h2>
-    <p class="help">Les quinze pivots sont inclus. Choisissez jusqu’à deux crises par chapitre et relisez les deux issues soumises au vote. Les issues liées aux ambitions restent jouables.</p>
-    <p id="planSummary" aria-live="polite"></p>
-    <div id="chapters"></div>
-    <div class="actions"><button id="savePlan">Enregistrer le parcours</button></div>
-   </form>
    <div>
     <form class="form-panel" id="sessionForm">
-     <h2>Nouvelle partie</h2>
-     <p class="help">Les cinq jauges démarrent à 50/100 pour la recette. La régie peut convoquer la succession à tout moment.</p>
+     <h2 id="creationHeading">Nouvelle partie</h2>
+     <p class="help">Indiquez les effectifs des cinq familles. Vous pourrez convoquer la succession du Parrain depuis la régie.</p>
      <label for="sessionMode">Mode de jeu</label>
      <select id="sessionMode"><option value="live">Partie avec joueurs</option><option value="test">Régie de test · je vote pour les familles</option></select>
      <label for="sessionTitle">Nom de la partie</label>
@@ -54,7 +36,25 @@
      <div id="families"></div>
     </aside>
    </div>
+   <form class="form-panel" id="planForm"><details><summary>Configurer le parcours des Conseils</summary>
+
+    <p class="help">Les quinze pivots sont inclus. Choisissez jusqu’à deux crises par chapitre et relisez les deux issues soumises au vote. Les issues liées aux ambitions restent jouables.</p>
+    <p id="planSummary" aria-live="polite"></p>
+    <div id="chapters"></div>
+    <div class="actions"><button id="savePlan">Enregistrer le parcours</button></div></details>
+   </form>
   </div>
+  <section class="form-panel" aria-labelledby="sessionsHeading">
+   <h2 id="sessionsHeading">Mes parties Chicago</h2>
+   <ul id="sessions"></ul>
+  </section>
+  <form class="form-panel" id="importForm">
+   <details id="importSettings" open><summary>Campagne narrative V3</summary>
+   <p id="sourceVersion">Importez le fichier Cosa_Nostra_Campagne_30_Dilemmes_V3_Binaire.json pour ouvrir la campagne dans votre régie.</p>
+   <label for="campaignFile">Fichier de campagne JSON</label>
+   <input id="campaignFile" type="file" accept=".json,application/json" required>
+   <div class="actions"><button id="importCampaign">Importer la campagne</button></div></details>
+  </form>
  </div>
 </main>
 </body>

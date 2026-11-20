@@ -49,3 +49,11 @@ button.secondary{color:var(--text);background:transparent;border-color:var(--lin
 .cosa-nostra-page .scene details{padding:0 0 0 1.5rem;border:0}
 .cosa-nostra-page .scene li{margin-bottom:.85rem}
 .cosa-nostra-page h3{font-size:1rem}
+.univers-home .univers-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(16px,3vw,32px)}
+.univers-home .universe{display:flex;flex-direction:column;align-items:stretch;background:var(--surface);min-height:0}
+.universe-art{display:block;width:100%;aspect-ratio:2/1;object-fit:cover}
+.univers-home .universe-content{display:flex;flex:1;flex-direction:column;padding:clamp(20px,3vw,34px)}
+.univers-home .context{margin-top:0}
+.univers-home .actions{margin-top:auto;padding-top:12px}
+.univers-home h1{margin-bottom:.65em}
+@media(max-width:720px){.univers-home .univers-grid{grid-template-columns:1fr}}
