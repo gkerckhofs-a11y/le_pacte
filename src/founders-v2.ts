@@ -1,3 +1,4 @@
+import {isChicago} from './founders-chicago.ts';
 import {openFoundersDilemma,applyFoundersCityEffects,activeFounders} from './founders.ts';
 import {calculateFoundersFinal} from './founders-scoring.ts';
 import {isHybrid,chooseNarrativeNext,narrativeReserve,narrativeEpilogue} from './founders-progression.ts';
@@ -49,6 +50,11 @@ export function finishV2(s,now){
  if(isHotspring(s)){
   s.campaign.suspension=null;
   s.phase='EPILOGUE';s.narrativeEnding=campaignEpilogue(s);setPhaseClock(s,now);return;
+ }
+ if(isChicago(s)){
+  s.phase='FINISHED';s.lastReveal=null;
+  s.narrativeEnding={title:'Conseils de Chicago terminés',paragraphs:['Le parcours de répétition est terminé. Le scrutin de succession fera l’objet d’une recette séparée.']};
+  setPhaseClock(s,now);return;
  }
  s.phase='FINISHED';s.finalResults=calculateFoundersFinal(s);s.narrativeEnding=epilogueV2(s);setPhaseClock(s,now);
 }

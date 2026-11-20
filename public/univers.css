@@ -41,3 +41,11 @@ button.secondary{color:var(--text);background:transparent;border-color:var(--lin
 #status[data-error=true]{color:#ffb8a4}
 .form-panel+.form-panel{margin-top:16px}
 @media(max-width:720px){.univers-grid,.form-grid{grid-template-columns:1fr}.chicago{min-height:200px}}
+.cosa-nostra-page{--page:#15191b;--surface:#202a2e;--line:#56646a;--text:#eee3d0;--muted:#d1c5b4;--gold:#c7a777}
+.cosa-nostra-page .form-panel input{background:#15191b;border-color:var(--line)}
+.cosa-nostra-page .form-panel input[type=checkbox]{width:auto;margin-right:.55em;accent-color:var(--gold)}
+.cosa-nostra-page .form-panel fieldset{margin:.8rem 0}
+.cosa-nostra-page .scene{margin:0 0 .8rem;padding:0 0 .8rem;border-bottom:1px solid var(--line)}
+.cosa-nostra-page .scene details{padding:0 0 0 1.5rem;border:0}
+.cosa-nostra-page .scene li{margin-bottom:.85rem}
+.cosa-nostra-page h3{font-size:1rem}

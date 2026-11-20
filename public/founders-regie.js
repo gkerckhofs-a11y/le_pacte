@@ -110,9 +110,9 @@ function gauge(s){
   const el=document.createElement('div');el.className='gauge';
   const row=document.createElement('div');row.className='gauge-head';
   const label=document.createElement('span');label.textContent=s.skin.labels.resources[k]||k;
-  const n=document.createElement('strong');n.textContent=formatGaugeNumber(s.city[k],k==='stabilite'&&s.campaign?.version>=2)+'/10';appendGaugeDelta(n,s,k);row.append(label,n);
+  const n=document.createElement('strong');n.textContent=formatGaugeNumber(s.city[k],k==='stabilite'&&s.campaign?.version>=2)+'/'+(s.gaugeMaximum??10);appendGaugeDelta(n,s,k);row.append(label,n);
   const track=document.createElement('div');track.className='track';
-  const bar=document.createElement('div');bar.className='bar';bar.style.width=s.city[k]*10+'%';decorateGauge(bar,label,s.city[k],s);track.append(bar);el.append(row,track);root.append(el);
+  const bar=document.createElement('div');bar.className='bar';bar.style.width=s.city[k]*100/(s.gaugeMaximum??10)+'%';decorateGauge(bar,label,s.city[k],s);track.append(bar);el.append(row,track);root.append(el);
  }
  renderCityAudit(s);
 }
@@ -157,6 +157,11 @@ function renderFacilitator(s){
 function render(s){
  applySkin(document.body,s.skin);
  if(s.campaign)labelWorld();
+ if(s.chicago){
+  document.title='Cosa Nostra · Régie';
+  set('regieTitle','Régie · Cosa Nostra');
+  $('createAnotherSession').href='/cosa-nostra';
+ }
  renderFacilitator(s);
  current=s;
  document.body.classList.toggle('campaign-hotspring',Boolean(s.campaign));
@@ -177,11 +182,12 @@ function render(s){
  $('reveal').hidden=s.phase!=='AWAITING_REVEAL';
  $('next').hidden=s.phase!=='REVEALED';
  $('next').textContent=(s.progression?s.progression.terminal:s.reveal?.nextId===null)?'Terminer la partie':'Dilemme suivant';
+ if(s.chicago&&s.reveal?.nextId===null)$('next').textContent='Clôturer la répétition';
  if(s.campaign){
   $('next').hidden=!['INTRO','PRESENTATION','REVEALED','CHECKPOINT'].includes(s.phase);
   $('next').textContent=({INTRO:'Présenter le dilemme',PRESENTATION:'Ouvrir la négociation',REVEALED:s.reveal?.id==='D30'?'Lire l’épilogue':'Poursuivre',CHECKPOINT:s.campaign.chapter===6?'Qualifier les chartes':'Reprendre — chapitre suivant'})[s.phase]??'Poursuivre';
  }
- $('tiePriority').closest('details').hidden=Boolean(s.campaign);
+ $('tiePriority').closest('details').hidden=Boolean(s.campaign||s.chicago);
  renderActionAvailability(s);
  $('reservePanel').hidden=!s.progression||s.progression.terminal;
  const choice=$('nextDilemma'),previousChoice=choice.value;choice.replaceChildren();
@@ -229,7 +235,7 @@ function render(s){
  const history=$('history');history.replaceChildren();
  for(const item of [...s.history].reverse()){
   const el=document.createElement('div');el.className='card';
-  const title=document.createElement('strong');title.textContent=item.title+' · '+(item.winner==='pour'?'Adopté':'Refusé');
+  const title=document.createElement('strong');title.textContent=item.title+' · '+(s.chicago?item.decisionLabel:item.winner==='pour'?'Adopté':'Refusé');
   const desc=document.createElement('p');desc.className='small';desc.textContent=item.narration;
   el.append(title,desc);history.append(el);
  }
@@ -239,7 +245,7 @@ async function command(kind,data={}){
  busy=true;set('actionMessage','Enregistrement…');renderActionAvailability(current);
  try{
   const s=await api('/commands','POST',{kind,data,expectedRevision:current.revision});
-  render(s);set('actionMessage',kind==='reveal'?'Décision révélée sur la projection.':s.phase==='FINISHED'?'Partie terminée : classement affiché.':s.campaign?(labels[s.phase]??s.phase)+'.':'Le prochain dilemme est ouvert.');
+  render(s);set('actionMessage',kind==='reveal'?'Décision révélée sur la projection.':s.phase==='FINISHED'?(s.chicago?'Répétition terminée.':'Partie terminée : classement affiché.'):s.campaign?(labels[s.phase]??s.phase)+'.':'Le prochain dilemme est ouvert.');
  }catch(e){set('actionMessage',e.message);try{render(await api(''));}catch{}}
  finally{busy=false;renderActionAvailability(current);}
 }
@@ -276,7 +282,7 @@ $('start').addEventListener('click',async()=>{
  busy=true;$('start').disabled=true;set('actionMessage','Ouverture du premier dilemme…');
  try{
   const result=await startCouncil(api);render(result.view);
-  set('actionMessage',result.started?'Partie lancée. Le premier dilemme est affiché ; le Maire peut voter sur son écran d’équipe.':'La partie a déjà démarré. La régie affiche son état actuel.');
+  set('actionMessage',result.started?(result.view.chicago?'Répétition lancée. Le premier Conseil est ouvert aux négociations.':'Partie lancée. Le premier dilemme est affiché ; le Maire peut voter sur son écran d’équipe.'):'La partie a déjà démarré. La régie affiche son état actuel.');
  }catch(error){set('actionMessage',organizerError(error));try{render(await api(''));}catch{}}
  finally{busy=false;renderActionAvailability(current);}
 });
@@ -318,7 +324,7 @@ async function login(){
 $('login').addEventListener('click',login);
 $('changeAccount').addEventListener('click',login);
 $('retryInit').addEventListener('click',init);
-$('chooseSession').addEventListener('click',()=>location.assign(current?.campaign||hotspringHome?'/hotspring':'/founders-regie.html'));
+$('chooseSession').addEventListener('click',()=>location.assign(current?.chicago?'/cosa-nostra':current?.campaign||hotspringHome?'/hotspring':'/founders-regie.html'));
 $('archiveSessions').addEventListener('click',()=>$('archiveDialog').showModal());
 $('cancelArchive').addEventListener('click',()=>$('archiveDialog').close());
 $('confirmArchive').addEventListener('click',async()=>{
@@ -351,12 +357,12 @@ function renderV2Controls(s){
  $('beginVote').hidden=s.phase!=='NEGOTIATION';
  set('beginVote',manual?'Ouvrir le vote':'Ouvrir le vote maintenant');
  set('v2ControlsTitle',manual?'Réglages':'Chronos et réglages');
- $('timingForm').hidden=manual;
+ $('timingForm').hidden=manual||Boolean(s.chicago);
  const ended=['EPILOGUE','FINISHED'].includes(s.phase),suspended=s.phase==='SUSPENDED',v2=s.experienceVersion===2;
  for(const id of ['addTime','removeTime'])$(id).hidden=!v2||manual||s.clock?.remainingMs==null||ended||suspended;
  $('pauseGame').hidden=!v2||ended||suspended||Boolean(s.clock?.paused);
  $('resumeGame').hidden=!v2||suspended||!s.clock?.paused;
- $('finishGame').hidden=!v2||ended;
+ $('finishGame').hidden=!v2||ended||s.chicago;
  $('finishDescription').textContent=s.campaign&&s.phase==='CHECKPOINT'&&s.campaign.chapter>=5?
   'La régie ouvrira la prochaine étape du final. Les familles décideront du gouvernement et de la charte.':
   s.campaign?'La régie ouvrira l’épilogue et affichera les scores issus des décisions déjà prises.':

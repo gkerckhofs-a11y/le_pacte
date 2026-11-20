@@ -1,3 +1,4 @@
+import {isChicago,chicagoAmbition} from './founders-chicago.ts';
 import {isV2,GOALS_V2,TIMING_V2,validateTiming,validateThresholds,setPhaseClock,beginNegotiation,beginVote,revealResolution,nextV2,finishV2,continueHotspring,suspendHotspring,resumeHotspring,revealHotspringResults} from './founders-v2.ts';
 import {isHotspring,isManualHotspring,createHotspringState,campaignDilemma,campaignFamily,campaignOrganizer,campaignPresentation,hotspringSupports,crisisCandidates,hotspringCityIndicators,hotspringOutcome,HOTSPRING_INDICATORS} from './founders-hotspring.ts';
 import {DEFAULT_TEAM_COLORS,DEFAULT_TEAM_NAMES,teamColor} from '../public/founders-identity.js';
@@ -51,7 +52,7 @@ export function createNarrativeSession(preview,{id,ownerId,code,title,objectives
  if(v2){
   if(goalCards===DEFAULT_GOAL_CARDS)goalCards=GOALS_V2;
   if(objectives===TEST_FAMILY_OBJECTIVES)objectives=ids.map(id=>goalCards[id].description);
-  check(ids.every(id=>Object.hasOwn(preview.game.city,goalCards[id]?.indicator)),'Les ambitions doivent utiliser les quatre jauges de la V2');
+  check(isChicago(preview)||ids.every(id=>Object.hasOwn(preview.game.city,goalCards[id]?.indicator)),'Les ambitions doivent utiliser les quatre jauges de la V2');
  }
  objectives=objectives===TEST_FAMILY_OBJECTIVES?objectives.slice(0,ids.length):objectives;
  colors=colors===DEFAULT_TEAM_COLORS?colors.slice(0,ids.length):colors;
@@ -106,6 +107,7 @@ const validateActor=(s,actor)=>{
  if(actor.role==='organizer')check(actor.id===s.ownerId,'Accès régie refusé');
  else if(actor.role==='team')check(activeFounders(s.game).includes(actor.family),'Famille inconnue');
 };
+const usesBindingOffers=s=>isManualHotspring(s)||isChicago(s);
 const activeOffers=s=>Object.values(s.offers).filter(o=>o.status==='pending').length;
 export function acceptedVoteCommitment(s,family){
  const offers=Object.values(s.offers).filter(o=>o.status==='accepted'&&o.to===family&&o.councilNumber===s.game.history.length&&o.commitment?.choice&&o.commitment.choice!=='gift');
@@ -117,7 +119,7 @@ function validateOfferCommitment(s,to,commitment){
  if(commitment.choice==='gift'){
   check(Object.keys(commitment).every(k=>k==='choice'),'Transfert sans contrepartie invalide');return;
  }
- const manual=isManualHotspring(s);
+ const manual=usesBindingOffers(s);
  check((manual?['pour','contre']:['pour','contre','passe_pouvoir']).includes(commitment.choice),'Engagement de vote invalide');
  check(Object.keys(commitment).every(k=>['choice','minInfluence'].includes(k)),'Champ d’engagement invalide');
  const minimum=commitment.minInfluence;
@@ -212,7 +214,7 @@ export function applyNarrativeCommand(input,actor,command,now){
    check(activeOffers(s)<maxOffers,'Trop d’offres en attente');
    check(activeFounders(s.game).includes(data.to)&&data.to!==actor.family,'Destinataire invalide');
    check(Number.isSafeInteger(data.amount)&&data.amount>=1&&data.amount<=s.game.families[actor.family].dollars,'Dollars insuffisants');
-   if(isV2(s)){check(data.reason===undefined||typeof data.reason==='string'&&data.reason.length<=300,'Message : 300 caractères maximum');data.reason=data.reason?.trim()||'Proposition financière';if(!manual)data.commitment={choice:'gift'};}
+   if(isV2(s)){check(data.reason===undefined||typeof data.reason==='string'&&data.reason.length<=300,'Message : 300 caractères maximum');data.reason=data.reason?.trim()||'Proposition financière';if(!usesBindingOffers(s))data.commitment={choice:'gift'};}
    check(str(data.reason,300),'Motif de proposition requis');
    validateOfferCommitment(s,data.to,data.commitment);
    check(typeof data.id==='string'&&/^[A-Za-z0-9_-]{8,80}$/.test(data.id)&&!has(s.offers,data.id),'Identifiant d’offre déjà utilisé');
@@ -258,7 +260,7 @@ export function applyNarrativeCommand(input,actor,command,now){
    org();check(isV2(s)&&!['EPILOGUE','FINISHED'].includes(s.phase)&&s.clock.paused,'Corrigez les ressources pendant une pause, avant l’épilogue');
    check(activeFounders(s.game).includes(data.family)&&['power','dollars'].includes(data.resource)&&Number.isSafeInteger(data.value)&&data.value>=0&&data.value<=100000,'Correction invalide');
    const f=s.game.families[data.family];
-   if(manual&&data.resource==='power'&&!Object.hasOwn(s.game.vote?.choices??{},data.family)){
+   if(usesBindingOffers(s)&&data.resource==='power'&&!Object.hasOwn(s.game.vote?.choices??{},data.family)){
     const commitment=acceptedVoteCommitment(s,data.family);
     check(!commitment||data.value>=commitment.minInfluence,'Cette correction empêcherait le vote promis');
    }
@@ -276,7 +278,7 @@ export function applyNarrativeCommand(input,actor,command,now){
    break;
   }
   case 'finish':
-   org();check(isV2(s)&&!['FINISHED','EPILOGUE'].includes(s.phase)&&data.confirm===true,'Confirmation de fin de partie requise');
+   org();check(!isChicago(s)&&isV2(s)&&!['FINISHED','EPILOGUE'].includes(s.phase)&&data.confirm===true,'Confirmation de fin de partie requise');
    if(isHotspring(s)&&s.phase==='CHECKPOINT'&&s.campaign.chapter>=5)continueHotspring(s,now);
    else finishV2(s,now);
    break;
@@ -337,6 +339,7 @@ export function narrativePublicView(s){
  return {
   kind:s.kind,id:s.id,code:s.code,title:s.title,phase:s.phase,revision:s.revision,
   ...(isV2(s)?{experienceVersion:2,timing:copy(s.timing),clock:copy(s.clock),gaugeThresholds:copy(s.gaugeThresholds)}:{}),
+  ...(isChicago(s)?{chicago:true,gaugeMaximum:s.game.cityMaximum}:{}),
   ...(isHotspring(s)?{campaign:campaignPresentation(s),influenceReserve:publicInfluenceReserve(s,resolved)}:{}),
   story:{id:s.scenario.scenario.id,title:s.scenario.scenario.title,location:s.scenario.scenario.location,year:s.scenario.scenario.year,schemaVersion:s.scenario.schema_version},
   skin:{id:s.skin.id,title:s.skin.title,labels:copy(s.skin.labels),theme:copy(s.skin.theme),publicScene:copy(s.skin.publicScene)},
@@ -365,7 +368,7 @@ export function narrativeFamilyView(s,family){
  check(activeFounders(s.game).includes(family),'Famille inconnue');
  const view=narrativePublicView(s),v=s.game.vote;
  const card=s.goalCards?.[family]??DEFAULT_GOAL_CARDS[family];
- const progress=evaluateGoal(card,s.game.city,s.scoreRules??DEFAULT_SCORE_RULES);
+ const progress=isChicago(s)?null:evaluateGoal(card,s.game.city,s.scoreRules??DEFAULT_SCORE_RULES);
  const offers=Object.values(s.offers).filter(o=>o.from===family||o.to===family).map(copy);
  return {...view,self:{id:family,name:s.names[family],color:copy(view.families.find(f=>f.id===family).color),objective:s.goals[family],
   members:s.game.families[family].members,power:s.game.families[family].power,dollars:s.game.families[family].dollars,
@@ -373,11 +376,11 @@ export function narrativeFamilyView(s,family){
   mayVote:!s.clock?.paused&&s.phase==='COUNCIL'&&v?.phase==='voting'&&v?.turn===family,
   mayResolve:!s.clock?.paused&&s.phase==='COUNCIL'&&v?.phase==='await_moderator'&&s.game.moderator===family,
   mayChooseLeader:!s.clock?.paused&&s.phase==='COUNCIL'&&v?.phase==='await_leader'&&s.game.moderator===family},
-  ...(isHotspring(s)?{privateCampaign:campaignFamily(s,family)}:{goalCard:copy(card),goalProgress:progress}),
+  ...(isChicago(s)?{chicagoAmbition:chicagoAmbition(s,family)}:isHotspring(s)?{privateCampaign:campaignFamily(s,family)}:{goalCard:copy(card),goalProgress:progress}),
   offers,voteCommitment:acceptedVoteCommitment(s,family)};
 }
 export function narrativeOrganizerView(s){
- return {...narrativePublicView(s),familyGoals:copy(s.goals),familyResources:copy(s.game.families),
+ return {...narrativePublicView(s),familyGoals:isChicago(s)?Object.fromEntries(activeFounders(s.game).map(id=>[id,chicagoAmbition(s,id).specialty])):copy(s.goals),familyResources:copy(s.game.families),
   ...(isHotspring(s)?{campaignAdmin:campaignOrganizer(s),privateFamilies:Object.fromEntries(activeFounders(s.game).map(id=>[id,campaignFamily(s,id)]))}:{}),
   effectsPreview:hotspringEffectsPreview(s),
   progression:s.phase==='REVEALED'?narrativeReserve(s):null,

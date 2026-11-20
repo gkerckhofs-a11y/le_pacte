@@ -1,8 +1,8 @@
 import {CAMPAIGN_PHASES,setHotspringImage,renderTendencies,renderHotspringStage,campaignScoreText,hotspringWinners} from './founders-hotspring.js';
-import {decorateGauge,formatGaugeNumber,renderPhaseClock,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
+import {decorateGauge,formatGaugeNumber,renderPhaseClock,voteTotals,appendGaugeDelta,renderChicagoChoices} from './founders-live-ui.js';
 import {renderVoteProgress} from './founders-vote-progress.js';
 import {commitmentLabel} from './founders-agreements.js';
-import {renderCouncilRoles,appendFamilyRoles} from './founders-role-badges.js';
+import {renderCouncilRoles,appendFamilyRoles,roleLabel} from './founders-role-badges.js';
 import {saveFamilyName} from './founders-name-save.js';
 import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
 import {teamCaption,teamLabel} from './founders-identity.js';
@@ -34,9 +34,9 @@ function gauge(data){
   const item=document.createElement('div');item.className='gauge';
   const top=document.createElement('div');top.className='gauge-head';
   const name=document.createElement('span');name.textContent=data.skin.labels.resources[indicator]||indicator;
-  const n=document.createElement('strong');n.textContent=formatGaugeNumber(data.city[indicator],indicator==='stabilite'&&data.campaign?.version>=2)+'/10';appendGaugeDelta(n,data,indicator);top.append(name,n);
+  const n=document.createElement('strong');n.textContent=formatGaugeNumber(data.city[indicator],indicator==='stabilite'&&data.campaign?.version>=2)+'/'+(data.gaugeMaximum??10);appendGaugeDelta(n,data,indicator);top.append(name,n);
   const bar=document.createElement('div');bar.className='track';
-  const inside=document.createElement('div');inside.className='bar';inside.style.width=data.city[indicator]*10+'%';
+  const inside=document.createElement('div');inside.className='bar';inside.style.width=data.city[indicator]*100/(data.gaugeMaximum??10)+'%';
   decorateGauge(inside,name,data.city[indicator],data);bar.append(inside);item.append(top,bar);root.append(item);
  }
 }
@@ -79,7 +79,7 @@ function offers(data){
  }
 }
 function render(data){
- const manual=data.campaign?.version>=3;
+ const manual=data.campaign?.version>=3||data.chicago;
  const finishing=data.phase==='FINISHED'&&!document.body.classList.contains('game-finished');document.body.classList.toggle('game-finished',data.phase==='FINISHED');
  renderVoteProgress($('voteProgress'),data);
  renderPhaseClock($('phaseClock'),data);
@@ -93,11 +93,12 @@ function render(data){
  $('identityPanel').hidden=data.phase!=='READY';
  if(!identityDirty&&document.activeElement!==$('chosenName'))$('chosenName').value=self.name==='Nom à choisir'?'':self.name;
  set('terminalSession','Session '+data.code+' · Équipe '+self.id);set('familyName',self.name);appendFamilyRoles($('familyName'),data,self.id);set('phase',(nice[data.phase]||data.phase)+(manual&&data.clock?.paused?' · Pause':''));
- set('turn',data.phase==='COUNCIL'?(c.turn===self.id?'C’est à vous.':c.turn?'En attente — '+teamLabel(data,c.turn)+' joue actuellement.':c.phase==='await_moderator'?'Arbitrage':'Choix du Maire'):'—');
+ set('turn',data.phase==='COUNCIL'?(c.turn===self.id?'C’est à vous.':c.turn?'En attente — '+teamLabel(data,c.turn)+' joue actuellement.':c.phase==='await_moderator'?'Arbitrage':data.chicago?'Choix · '+roleLabel(data,'mayor'):'Choix du Maire'):'—');
  set('dilemmaLabel',data.dilemma?'Chapitre '+data.dilemma.chapter:'Conseil des Fondateurs');
  set('dilemmaTitle',data.dilemma?.title||(data.phase==='FINISHED'?'Fin de la campagne':'Conseil en préparation'));
  set('dilemmaText',data.dilemma?.public_text||'');
  set('question',data.dilemma?.vote_question||'');
+ renderChicagoChoices($('chicagoChoices'),data);
  const image=$('familyDilemmaImage'),src=data.dilemma?.image?.url;
  if(data.campaign){
   renderHotspringStage($('hotspringStage'),data,charter=>command('supportCharter',{charter}));
@@ -109,8 +110,22 @@ function render(data){
  }
  set('influence',self.power);set('dollars',self.dollars);
  set('influenceLabel',data.skin.labels.influence);set('dollarLabel',data.skin.labels.currency);set('offerAmountLabel',data.skin.labels.currency+' proposés');
- set('objective',data.privateCampaign?.trajectory??self.objective);
- $('goalProgress').hidden=Boolean(data.campaign);
+  set('objective',data.chicagoAmbition?.specialty??data.privateCampaign?.trajectory??self.objective);
+ const ambition=$('chicagoAmbition');
+ ambition.hidden=!data.chicagoAmbition;ambition.replaceChildren();
+ if(data.chicagoAmbition){
+  const list=document.createElement('ul');
+  for(const goal of data.chicagoAmbition.goals){
+   const item=document.createElement('li');item.textContent=goal.points+' points · '+goal.condition;list.append(item);
+  }
+  const heading=document.createElement('p');heading.textContent='Pivots à soutenir';
+  const pivots=document.createElement('ul');
+  for(const pivot of data.chicagoAmbition.pivots){
+   const item=document.createElement('li');item.textContent=pivot.title+' · '+pivot.proposal;pivots.append(item);
+  }
+  ambition.append(list,heading,pivots);
+ }
+ $('goalProgress').hidden=Boolean(data.campaign||data.chicago);
  $('chapterObjectivesNote').hidden=!data.campaign;
  if(!data.campaign&&data.goalCard&&data.goalProgress){
   const card=data.goalCard,progress=data.goalProgress;
@@ -135,10 +150,15 @@ function render(data){
  for(const b of $('firstVote').querySelectorAll('[data-vote="pour"],[data-vote="contre"]')){
   const side=b.dataset.vote;
   if(!b.dataset.defaultLabel)b.dataset.defaultLabel=b.textContent;
-  b.textContent=data.campaign&&data.dilemma?' '+side.toUpperCase()+' · '+data.dilemma.labels[side]:b.dataset.defaultLabel;
+  b.textContent=(data.campaign||data.chicago)&&data.dilemma?' '+side.toUpperCase()+' · '+data.dilemma.labels[side]:b.dataset.defaultLabel;
  }
  $('familyStatsBlock').hidden=Boolean(data.campaign);
- if(!data.campaign)set('familyStats',self.members+' membre(s) · Maire : '+teamLabel(data,data.leader)+' · Shérif : '+teamLabel(data,data.moderator));
+ if(!data.campaign)set('familyStats',self.members+' membre(s) · '+roleLabel(data,'mayor')+' : '+teamLabel(data,data.leader)+' · '+roleLabel(data,'sheriff')+' : '+teamLabel(data,data.moderator));
+ if(data.chicago){
+  $('firstVote').querySelector('[data-vote="passe_moderateur"]').textContent='ABSTENTION · '+roleLabel(data,'sheriff');
+  $('moderatorTie').querySelector('p').textContent=roleLabel(data,'sheriff')+' départage le Conseil.';
+  $('moderatorLeader').querySelector('p').textContent='Choisissez la famille qui reprend le rôle « '+roleLabel(data,'mayor')+' ».';
+ }
  set('committed',self.choice?'Votre position : '+self.choice+' · Mise engagée : '+self.bid:'Aucun vote engagé pour ce dilemme.');
  set('voteHint',self.mayVote?'Votre famille doit décider maintenant.':data.phase==='COUNCIL'?'Vous pouvez négocier en attendant votre tour.':'Le Conseil attend la prochaine phase.');
  $('firstVote').hidden=!(self.mayVote&&self.choice===null);
@@ -188,16 +208,17 @@ function render(data){
  campaignRules.hidden=!data.campaign;
  if(data.campaign&&!campaignRules.firstElementChild)campaignRules.append(createHotspringRules({manual}));
  $('rulesIntroduction').hidden=Boolean(data.campaign);
- $('rulesLegacy').hidden=data.experienceVersion===2;$('rulesV2').hidden=data.experienceVersion!==2||Boolean(data.campaign);
+ $('rulesLegacy').hidden=data.experienceVersion===2;$('rulesV2').hidden=data.experienceVersion!==2||Boolean(data.campaign||data.chicago);
+ $('rulesChicago').hidden=!data.chicago;
  const target=$('targetFamily'),prev=target.value;target.replaceChildren();
  for(const f of data.families.filter(f=>f.id!==self.id)){
   const option=document.createElement('option');option.value=f.id;option.textContent=teamCaption(f);target.append(option);
  }
  if(Array.from(target.options).some(x=>x.value===prev))target.value=prev;
  const reveal=$('lastReveal');reveal.hidden=!data.reveal;
- if(data.reveal){set('resultTitle',data.campaign?data.reveal.chronicle.title:data.reveal.winner==='pour'?'Proposition adoptée':'Proposition rejetée');set('resultNarration',data.reveal.narration);}
+ if(data.reveal){set('resultTitle',(data.campaign||data.chicago)?data.reveal.chronicle.title:data.reveal.winner==='pour'?'Proposition adoptée':'Proposition rejetée');set('resultNarration',data.reveal.narration);}
  gauge(data);offers(data);renderOfferDialog(data);
- if(data.phase==='FINISHED'){const board=$('boardPanel');board.prepend($('familyEpilogue'));board.prepend($('personalResult'));if(finishing){selectTab(0);$('personalResult').scrollIntoView({block:'start'});}}
+ if(data.phase==='FINISHED'){const board=$('boardPanel');board.prepend($('familyEpilogue'));board.prepend($('personalResult'));if(finishing){selectTab(0);$(data.chicago?'familyEpilogue':'personalResult').scrollIntoView({block:'start'});}}
  $('familyEpilogue').hidden=!data.narrativeEnding||Boolean(data.campaign);$('familyEpilogue').replaceChildren();
  if(data.narrativeEnding&&!data.campaign){const h=document.createElement('h2');h.textContent=data.narrativeEnding.title;$('familyEpilogue').append(h);for(const t of data.narrativeEnding.paragraphs){const p=document.createElement('p');p.textContent=t;$('familyEpilogue').append(p);}}
 }
@@ -206,7 +227,7 @@ function renderOfferDialog(data){
  if(!offer||data.clock?.paused){if(dialog.open)dialog.close();return;}
  if(dialog.dataset.offer===offer.id&&dialog.open)return;
  dialog.dataset.offer=offer.id;
- const manual=data.campaign?.version>=3,binding=isPoliticalOffer(offer);
+ const manual=data.campaign?.version>=3||data.chicago,binding=isPoliticalOffer(offer);
  const side=binding?offer.commitment.choice.toUpperCase():'';
  const sender=data.families.find(f=>f.id===offer.from)?.name??offer.from;
  set('receivedOffer',manual?'La famille « '+sender+' » vous propose '+offer.amount+' $'+(binding?' en échange d’un vote '+side:'')+'.':teamLabel(data,offer.from)+' vous propose '+offer.amount+' '+data.skin.labels.currency+'.');
@@ -244,7 +265,7 @@ $('offerForm').addEventListener('submit',e=>{
  e.preventDefault();
  const id=crypto.randomUUID();
  const choice=$('offerCommitment').value;
- const minInfluence=current?.campaign?.version>=3?1:Number($('offerMinimum').value);
+ const minInfluence=current?.campaign?.version>=3||current?.chicago?1:Number($('offerMinimum').value);
  command('offer',{id,to:$('targetFamily').value,amount:Number($('offerAmount').value),reason:$('offerReason').value.trim(),commitment:{choice,...(choice==='gift'?{}:{minInfluence:['pour','contre'].includes(choice)?minInfluence:0})}});
 });
 $('chosenName').addEventListener('input',()=>{identityDirty=true;set('identityNotice','');});
@@ -271,4 +292,4 @@ tabs.forEach((tab,i)=>{
 });
 refresh();setInterval(refresh,2500);
 
-$('offerCommitment').addEventListener('change',()=>{$('offerMinimumField').hidden=current?.campaign?.version>=3||!['pour','contre'].includes($('offerCommitment').value);});
+$('offerCommitment').addEventListener('change',()=>{$('offerMinimumField').hidden=current?.campaign?.version>=3||current?.chicago||!['pour','contre'].includes($('offerCommitment').value);});

@@ -20,6 +20,20 @@ export class FirestoreNarrativeSessions{
     await this.db.doc("pacteNarrativeConfigurations/" + id).create({ id, ownerId, updated: now, dataJson: JSON.stringify(data2) });
     return { id, ...data2 };
   }
+ async getCosaNostraPreparation(ownerId){
+  const snapshot=await this.db.collection('pacteCosaNostraPreparations').doc(ownerId).get();
+  return snapshot.exists?JSON.parse(snapshot.data().dataJson):null;
+ }
+ async saveCosaNostraPreparation(ownerId,data,revision){
+  const ref=this.db.collection('pacteCosaNostraPreparations').doc(ownerId);
+  return this.db.runTransaction(async tx=>{
+   const previous=await tx.get(ref);
+   check((previous.data()?.revision??0)===revision,'La préparation a changé. Rechargez la page.');
+   const saved={...data,revision:revision+1};
+   tx.set(ref,{revision:saved.revision,dataJson:JSON.stringify(saved)});
+   return saved;
+  });
+ }
  async listDilemmaDrafts(ownerId){
   const q=await this.db.pipeline().collection('pacteHotspringDilemmaDrafts')
    .where(Pipelines.field('ownerId').equal(ownerId)).sort(Pipelines.descending('updated')).limit(100).execute();

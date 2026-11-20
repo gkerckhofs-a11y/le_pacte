@@ -13,6 +13,7 @@ export class LocalNarrativeSessions{
   db.exec('CREATE TABLE IF NOT EXISTS founders_configurations(id TEXT PRIMARY KEY,owner_id TEXT NOT NULL,data_json TEXT NOT NULL,updated INTEGER NOT NULL)');
   db.exec('CREATE TABLE IF NOT EXISTS founders_sessions(id TEXT PRIMARY KEY,code TEXT UNIQUE NOT NULL,owner_id TEXT NOT NULL,state_json TEXT NOT NULL,updated INTEGER NOT NULL,archived_at INTEGER,facilitator_email TEXT); CREATE TABLE IF NOT EXISTS founders_access(session_id TEXT NOT NULL,family TEXT NOT NULL,hash TEXT NOT NULL UNIQUE,expires INTEGER NOT NULL,PRIMARY KEY(session_id,family));');
   db.exec('CREATE TABLE IF NOT EXISTS hotspring_dilemma_drafts(id TEXT PRIMARY KEY,owner_id TEXT NOT NULL,data_json TEXT NOT NULL,updated INTEGER NOT NULL)');
+  db.exec('CREATE TABLE IF NOT EXISTS cosa_nostra_preparations(owner_id TEXT PRIMARY KEY, data_json TEXT NOT NULL)');
   const columns=db.prepare('PRAGMA table_info(founders_sessions)').all().map(column=>column.name);
   if(!columns.includes('archived_at'))db.exec('ALTER TABLE founders_sessions ADD COLUMN archived_at INTEGER');
   if(!columns.includes('facilitator_email'))db.exec('ALTER TABLE founders_sessions ADD COLUMN facilitator_email TEXT');
@@ -26,6 +27,20 @@ export class LocalNarrativeSessions{
   const id=randomBytes(12).toString('hex');
   this.db.prepare('INSERT INTO founders_configurations(id,owner_id,data_json,updated) VALUES(?,?,?,?)').run(id,ownerId,JSON.stringify(data),now);
   return {id,...data};
+ }
+ getCosaNostraPreparation(ownerId){
+  const row=this.db.prepare('SELECT data_json FROM cosa_nostra_preparations WHERE owner_id=?').get(ownerId);
+  return row?JSON.parse(row.data_json):null;
+ }
+ saveCosaNostraPreparation(ownerId,data,revision){
+  return this.transaction(()=>{
+   const previous=this.getCosaNostraPreparation(ownerId);
+   check((previous?.revision??0)===revision,'La préparation a changé. Rechargez la page.');
+   const saved={...data,revision:revision+1};
+   this.db.prepare('INSERT INTO cosa_nostra_preparations VALUES(?,?) ON CONFLICT(owner_id) DO UPDATE SET data_json=excluded.data_json')
+    .run(ownerId,JSON.stringify(saved));
+   return saved;
+  });
  }
  listDilemmaDrafts(ownerId){
   return this.db.prepare('SELECT id,data_json,updated FROM hotspring_dilemma_drafts WHERE owner_id=? ORDER BY updated DESC LIMIT 100')
