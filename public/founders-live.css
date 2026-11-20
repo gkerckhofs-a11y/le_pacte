@@ -367,3 +367,12 @@ button.danger{background:#a83333!important;color:#fff!important;border-color:#a8
 .projection-dashboard:is(.game-finished,.projection-stage-reading) .projection-results>.panel:first-child{display:none}
 .projection-dashboard:is(.game-finished,.projection-stage-reading) .projection-results{grid-template-columns:minmax(0,1fr)}
 .family-dashboard.game-finished #boardPanel>.layout{display:none}.family-dashboard.game-finished #familyEpilogue{margin-top:20px}
+
+.chicago-v3 { --gold:#B79562; color:#EEE3D0; background-color:#15191B; }
+.chicago-v3 h1,.chicago-v3 h2,.chicago-v3 h3 { font-family:Georgia,serif; }
+.chicago-v3 #chicagoChoices { padding:0; list-style:none; }
+.chicago-v3 #chicagoChoices li { background:#202A2E; color:#EEE3D0; padding:.7rem 1rem; border-inline-start:3px solid #B79562; margin-block:.45rem; }
+.chicago-v3 #chicagoChoices p { margin:.3rem 0; }
+.chicago-v3 #chicagoSuccession { grid-column:1/-1; }
+.chicago-v3 #chicagoSuccession button { margin:.25rem; }
+.chicago-panorama { width:100%; height:100%; object-fit:cover; aspect-ratio:16/9; }

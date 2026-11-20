@@ -18,6 +18,7 @@ export function councilGuidance(s){
   if(s.campaign.version>=3&&s.phase==='NEGOTIATION')return {step:3,title:'Les familles négocient',hint:'Laissez les équipes discuter. Cliquez sur « Ouvrir le vote » quand elles sont prêtes.'};
   if(phases[s.phase])return phases[s.phase];
  }
+ if(s.succession&&s.phase==='SUCCESSION')return {step:3,title:'La succession du Parrain',hint:'Suivez le scrutin et sa proclamation dans la Commission.'};
  if(s.chicago&&s.phase==='READY')return {step:2,title:'Préparez les cinq familles de Chicago',hint:'Distribuez les accès des porte-paroles et ouvrez la projection avant de lancer le premier Conseil.'};
  if(s.chicago&&s.phase==='NEGOTIATION')return {step:3,title:'Les familles négocient',hint:'Ouvrez le vote lorsque les familles sont prêtes.'};
  if(s.chicago&&s.phase==='FINISHED')return {step:3,title:'Les Conseils sont terminés',hint:'Les décisions et les jauges finales restent consultables dans la régie.'};

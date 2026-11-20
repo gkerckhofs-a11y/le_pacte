@@ -1,3 +1,5 @@
+import {renderChicagoGaugeLevels} from './founders-live-ui.js';
+import {renderSuccession,chicagoImage,chicagoPhase} from './chicago-succession.js';
 import {CAMPAIGN_PHASES,setHotspringImage,renderTendencies,renderHotspringStage,campaignScoreText,hotspringWinners} from './founders-hotspring.js';
 import {decorateGauge,formatGaugeNumber,renderPhaseClock,voteTotals,appendGaugeDelta,renderChicagoChoices} from './founders-live-ui.js';
 import {renderVoteProgress} from './founders-vote-progress.js';
@@ -30,6 +32,7 @@ async function call(method='GET',payload){
 }
 function gauge(data){
  const root=$('gauges');root.replaceChildren();
+ if(renderChicagoGaugeLevels(root,data))return;
  for(const indicator of Object.keys(data.city)){
   const item=document.createElement('div');item.className='gauge';
   const top=document.createElement('div');top.className='gauge-head';
@@ -79,12 +82,16 @@ function offers(data){
  }
 }
 function render(data){
+ document.body.classList.toggle('chicago-v3',Boolean(data.succession));
  const manual=data.campaign?.version>=3||data.chicago;
  const finishing=data.phase==='FINISHED'&&!document.body.classList.contains('game-finished');document.body.classList.toggle('game-finished',data.phase==='FINISHED');
  renderVoteProgress($('voteProgress'),data);
  renderPhaseClock($('phaseClock'),data);
  set('familyVoteTotals',(()=>{const t=voteTotals(data);return 'POUR '+t.yes+' · CONTRE '+t.no+' · ABSTENTIONS '+t.abstentions;})());
  current=data;
+ renderSuccession($('chicagoSuccession'),data,'team',command);
+ $('chicagoEquity').hidden=$('chicagoPriority').hidden=!data.succession;
+ if(data.succession)set('chicagoPriority','Ordre tiré au lancement · '+data.finalTieOrder.map(id=>teamLabel(data,id)).join(' → '));
  renderCouncilRoles($('councilRoles'),data);
  const self=data.self,c=data.council;
  document.body.classList.toggle('campaign-hotspring',Boolean(data.campaign));
@@ -92,7 +99,7 @@ function render(data){
  set('teamIdentity',self.color.symbol+' Équipe '+self.color.label+' · Porte-parole');
  $('identityPanel').hidden=data.phase!=='READY';
  if(!identityDirty&&document.activeElement!==$('chosenName'))$('chosenName').value=self.name==='Nom à choisir'?'':self.name;
- set('terminalSession','Session '+data.code+' · Équipe '+self.id);set('familyName',self.name);appendFamilyRoles($('familyName'),data,self.id);set('phase',(nice[data.phase]||data.phase)+(manual&&data.clock?.paused?' · Pause':''));
+ set('terminalSession','Session '+data.code+' · Équipe '+self.id);set('familyName',self.name);appendFamilyRoles($('familyName'),data,self.id);set('phase',(chicagoPhase(data)||nice[data.phase]||data.phase)+(manual&&data.clock?.paused?' · Pause':''));
  set('turn',data.phase==='COUNCIL'?(c.turn===self.id?'C’est à vous.':c.turn?'En attente — '+teamLabel(data,c.turn)+' joue actuellement.':c.phase==='await_moderator'?'Arbitrage':data.chicago?'Choix · '+roleLabel(data,'mayor'):'Choix du Maire'):'—');
  set('dilemmaLabel',data.dilemma?'Chapitre '+data.dilemma.chapter:'Conseil des Fondateurs');
  set('dilemmaTitle',data.dilemma?.title||(data.phase==='FINISHED'?'Fin de la campagne':'Conseil en préparation'));
@@ -100,7 +107,8 @@ function render(data){
  set('question',data.dilemma?.vote_question||'');
  renderChicagoChoices($('chicagoChoices'),data);
  const image=$('familyDilemmaImage'),src=data.dilemma?.image?.url;
- if(data.campaign){
+ if(data.succession){chicagoImage(image,data.reveal?.visual??data.dilemma?.image);}
+ else if(data.campaign){
   renderHotspringStage($('hotspringStage'),data,charter=>command('supportCharter',{charter}));
   renderTendencies($('hotspringTendencies'),data.phase==='REVEALED'?null:data.dilemma);
   setHotspringImage(image,data.phase==='REVEALED'?data.reveal?.visual:data.dilemma?.image);
@@ -118,7 +126,7 @@ function render(data){
   for(const goal of data.chicagoAmbition.goals){
    const item=document.createElement('li');item.textContent=goal.points+' points · '+goal.condition;list.append(item);
   }
-  const heading=document.createElement('p');heading.textContent='Pivots à soutenir';
+  const heading=document.createElement('p');heading.textContent='Issues favorables à votre ambition majeure';
   const pivots=document.createElement('ul');
   for(const pivot of data.chicagoAmbition.pivots){
    const item=document.createElement('li');item.textContent=pivot.title+' · '+pivot.proposal;pivots.append(item);
@@ -137,7 +145,11 @@ function render(data){
       ' · Points provisoires : '+progress.points+'/'+progress.maxPoints);
  }
  const final=$('personalResult');final.hidden=!data.finalResults;
- if(data.campaign&&data.finalResults){
+ if(data.succession&&data.finalResults){
+  const row=data.finalResults.rows.find(r=>r.family===self.id);
+  set('personalResultText',data.narrativeEnding.title);
+  set('personalScoreBreakdown','Ambitions '+row.secret+' pts · '+row.support+' soutien(s) × 2 = '+row.total+' points au total.');
+ }else if(data.campaign&&data.finalResults){
   const score=data.privateCampaign.score;
   set('personalResultText',hotspringWinners(data));
   set('personalScoreBreakdown',score.total+'/'+score.maximum+' · '+campaignScoreText(score));
@@ -263,7 +275,7 @@ document.querySelectorAll('[data-vote]').forEach(button=>{
 document.querySelectorAll('[data-tie]').forEach(button=>button.addEventListener('click',()=>command('resolveTie',{winner:button.dataset.tie})));
 $('offerForm').addEventListener('submit',e=>{
  e.preventDefault();
- const id=crypto.randomUUID();
+ const id=crypto.randomUUID?.()??Array.from(crypto.getRandomValues(new Uint8Array(16)),n=>n.toString(16).padStart(2,'0')).join('');
  const choice=$('offerCommitment').value;
  const minInfluence=current?.campaign?.version>=3||current?.chicago?1:Number($('offerMinimum').value);
  command('offer',{id,to:$('targetFamily').value,amount:Number($('offerAmount').value),reason:$('offerReason').value.trim(),commitment:{choice,...(choice==='gift'?{}:{minInfluence:['pour','contre'].includes(choice)?minInfluence:0})}});

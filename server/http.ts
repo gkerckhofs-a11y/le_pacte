@@ -24,7 +24,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
  if(!/^[A-Za-z0-9_-]{32,128}$/.test(organizerToken))throw new Error('Clé régie : au moins 32 caractères');
  const tokenDigest=Buffer.from(tokenHash(organizerToken),'hex');
  const staticFiles:Record<string,[string,string]>={ '/founders-regie-flow.js':['founders-regie-flow.js','text/javascript; charset=utf-8'], '/founders-name-save.js':['founders-name-save.js','text/javascript; charset=utf-8'], '/founders-painted-western.js':['founders-painted-western.js','text/javascript; charset=utf-8'], '/founders-skins.json':['../content/founders-skins-v1.json','application/json; charset=utf-8'], '/founders-skins.html':['founders-skins.html','text/html; charset=utf-8'], '/founders-skins.js':['founders-skins.js','text/javascript; charset=utf-8'], '/founders-skin-theme.js':['founders-skin-theme.js','text/javascript; charset=utf-8'], '/founders-skin-scenes.js':['founders-skin-scenes.js','text/javascript; charset=utf-8'], '/founders-identity.js':['founders-identity.js','text/javascript; charset=utf-8'], '/founders-city-scene.js':['founders-city-scene.js','text/javascript; charset=utf-8'], '/founders-live.css':['founders-live.css','text/css; charset=utf-8'], '/founders-city.html':['founders-city.html','text/html; charset=utf-8'], '/founders-city.js':['founders-city.js','text/javascript; charset=utf-8'], '/founders-family.html':['founders-family.html','text/html; charset=utf-8'], '/founders-family.js':['founders-family.js','text/javascript; charset=utf-8'], '/founders-regie.html':['founders-regie.html','text/html; charset=utf-8'], '/founders-regie.js':['founders-regie.js','text/javascript; charset=utf-8'], '/founders-import.html':['founders-import.html','text/html; charset=utf-8'], '/founders-import.js':['founders-import.js','text/javascript; charset=utf-8'], '/founders-setup.html':['founders-setup.html','text/html; charset=utf-8'], '/founders-setup.js':['founders-setup.js','text/javascript; charset=utf-8'], '/western-board.js':['western-board.js','text/javascript; charset=utf-8'],'/western-territories.js':['western-territories.js','text/javascript; charset=utf-8'],'/far-west.html':['far-west.html','text/html; charset=utf-8'],'/western-preview.js':['western-preview.js','text/javascript; charset=utf-8'],'/assets/western/frontier-terrain-v1.webp':['assets/western/frontier-terrain-v1.webp','image/webp'], '/':['index.html','text/html; charset=utf-8'],'/app.js':['app.js','text/javascript; charset=utf-8'],'/studio.js':['studio.js','text/javascript; charset=utf-8'],'/animation.js':['animation.js','text/javascript; charset=utf-8'],'/style.css':['style.css','text/css; charset=utf-8']};
- for(const name of ['pacte-entry','founders-workspace','founders-live-ui','founders-print','founders-council-monitor','founders-vote-progress','founders-role-badges','founders-chronicle','founders-agreements','founders-fullscreen','founders-hotspring','hotspring-panorama','hotspring-rules','founders-univers','founders-atelier'])staticFiles['/'+name+'.js']=[name+'.js','text/javascript; charset=utf-8'];
+ for(const name of ['pacte-entry','founders-workspace','founders-live-ui','founders-print','founders-council-monitor','founders-vote-progress','founders-role-badges','founders-chronicle','founders-agreements','founders-fullscreen','founders-hotspring','hotspring-panorama','hotspring-rules','founders-univers','founders-atelier','chicago-succession'])staticFiles['/'+name+'.js']=[name+'.js','text/javascript; charset=utf-8'];
  staticFiles['/hotspring.css']=['hotspring.css','text/css; charset=utf-8'];
  staticFiles['/territorial.html']=['territorial.html','text/html; charset=utf-8'];
  staticFiles['/regie']=staticFiles['/hotspring']=staticFiles['/founders-regie.html'];
@@ -66,7 +66,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
   try {
    const url=new URL(req.url??'/','http://localhost');const path=url.pathname;
    if(!options.apiOnly&&req.method==='GET'&&staticFiles[path]){const [file,type]=staticFiles[path];res.writeHead(200,{'Content-Type':type});res.end(readFileSync(new URL(`../public/${file}`,import.meta.url)));return;}
-   if(!options.apiOnly&&req.method==='GET'&&/^\/assets\/hotspring\/v1\/\w+\/[\w-]+\.webp$/.test(path)){
+   if(!options.apiOnly&&req.method==='GET'&&(/^\/assets\/chicago\/v3\/[a-z0-9-]+\.webp$/.test(path)||/^\/assets\/hotspring\/v1\/\w+\/[\w-]+\.webp$/.test(path))){
     const file=new URL('../public'+path,import.meta.url);
     if(existsSync(file)){res.writeHead(200,{'Content-Type':'image/webp','Cache-Control':'public, max-age=86400'});res.end(readFileSync(file));return;}
    }
@@ -166,7 +166,8 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
     const actor=await requireOrg(req);
     const previous=await store.narrative.getCosaNostraPreparation(actor.id);
     if(req.method==='GET'){
-     const preparation=previous&&!previous.ballots?{...prepareCosaNostra(previous.campaign,previous.crisisIds),revision:previous.revision}:previous;
+     const preparation=previous?.campaign?.metadata?.vote_format==='POUR_CONTRE'?previous:null;
+     if(previous&&!preparation){json(200,{preparation:null,legacyRevision:previous.revision});return;}
      json(200,{preparation});return;
     }
     if(req.method==='PUT'){
@@ -175,9 +176,10 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
       json(409,{error:'La préparation a changé. Rechargez la page.'});return;
      }
      const importing=Object.hasOwn(input,'campaign');
-     if(!importing&&!previous)throw new Error('Importez la campagne V2 avant de préparer le parcours.');
+     if(!importing&&!previous)throw new Error('Importez la campagne V3 avant de préparer le parcours.');
      if(!importing&&!Array.isArray(input.crisisIds))throw new Error('Sélection de crises requise.');
-     const prepared=importing?prepareCosaNostra(input.campaign):prepareCosaNostra(previous.campaign,input.crisisIds,Object.hasOwn(input,'ballots')?input.ballots:previous.ballots);
+     if(Object.hasOwn(input,'ballots'))throw new Error('Les issues POUR/CONTRE sont fixées dans la campagne V3.');
+     const prepared=importing?prepareCosaNostra(input.campaign):prepareCosaNostra(previous.campaign,input.crisisIds);
      try{
       json(200,{preparation:await store.narrative.saveCosaNostraPreparation(actor.id,prepared,input.revision)});
      }catch(error){
@@ -194,7 +196,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
     const stored=await store.narrative.getCosaNostraPreparation(actor.id);
     if(!stored)throw new Error('Importez la campagne avant de créer une répétition.');
     if(input?.revision!==stored.revision){json(409,{error:'La préparation a changé. Rechargez la page.'});return;}
-    const preparation=prepareCosaNostra(stored.campaign,stored.crisisIds,stored.ballots);
+    const preparation=prepareCosaNostra(stored.campaign,stored.crisisIds);
     const {preview,names}=chicagoSessionPreview(preparation,input.members);
     const created=await store.narrative.create({ownerId:actor.id,preview,names,code:input.code,title:input.title,now,
      timing:{negotiationSeconds:480,voteSeconds:180,resolutionSeconds:20,autoAdvance:false}});
@@ -231,6 +233,15 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
     const actor=await requireOrg(req);
     if(!store.narrative)throw new Error('Parties narratives non disponibles');
     json(200,{archived:await store.narrative.archiveAll(actor.id,now)});return;
+   }
+   const artMatch=path.match(/^\/api\/founders\/sessions\/([a-f0-9]{24})\/illustrations\/(0[1-5]0[1-6]-(?:intro|pour|contre)\.webp)$/);
+   if(artMatch && req.method==='GET'){
+    const view=await store.narrative.view(artMatch[1],{role:'public'},now);
+    const visible=view.dilemma?.image?.url===path || view.history.some(h=>h.image?.url===path);
+    const file=new URL('../content/chicago-media/'+artMatch[2],import.meta.url);
+    if(!view.succession || !visible || !existsSync(file)){json(404,{error:'Illustration indisponible'});return;}
+    res.writeHead(200,{'Content-Type':'image/webp','Cache-Control':'private, max-age=86400'});
+    res.end(readFileSync(file));return;
    }
    const narrativeMatch=path.match(/^\/api\/founders\/sessions\/([a-f0-9]{24})(?:\/(commands|access|variant|facilitator)(?:\/([A-F]))?)?$/);
    if(narrativeMatch){

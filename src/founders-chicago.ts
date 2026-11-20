@@ -10,3 +10,5 @@ export function chicagoAmbition(session, family) {
   pivots: ambition.pivots.map(({id, title, proposal}) => ({id, title, proposal}))
  };
 }
+
+export const hasChicagoSuccession = s => isChicago(s) && s.scenario.chicago?.version === 3;

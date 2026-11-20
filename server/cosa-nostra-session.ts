@@ -6,7 +6,7 @@ const mafia = mafiaSkins.skins.find(skin => skin.id === 'mafia');
 const alias = id => 'CN_' + id.replace('.', '_');
 
 export function chicagoSessionPreview(preparation, members) {
- const {campaign, crisisIds, ballots, checksum} = preparation;
+ const {campaign, crisisIds, checksum} = preparation;
  const {metadata} = campaign;
  const ordered = [...campaign.dilemmas].sort((a,b) => a.chapter - b.chapter || a.number - b.number);
  const selected = ordered.filter(scene => scene.type === 'Pivot' || crisisIds.includes(scene.id));
@@ -28,23 +28,25 @@ export function chicagoSessionPreview(preparation, members) {
   }];
  }));
  const dilemmas = selected.map((scene, index) => {
-  const ballot = ballots[scene.id];
-  const options = Object.fromEntries(['pour', 'contre'].map(side => [side, scene.options.find(option => option.choice === ballot[side])]));
+  const media = (suffix, alt) => ({url:'/assets/chicago/v3/' + scene.id.replace('.', '') + '-' + suffix + '.webp', alt});
+  const options = Object.fromEntries(['pour', 'contre'].map(side => [side, scene.options.find(option => option.choice === side.toUpperCase())]));
   const next = selected[index + 1];
   const outcomes = Object.fromEntries(Object.entries(options).map(([side, option]) => [side, {
    narration: option.after,
    effects: Object.entries(option.effects).map(([indicator, value]) => ({indicator, operation:'delta', value})),
    next_id: next ? alias(next.id) : null,
-   chronicle:{title:option.title}
+   chronicle:{title:option.title, image:media(side, option.city_visual_result)}
   }]));
   return {
-   id: alias(scene.id), sourceId: scene.id, sourceChoices: ballot, chapter: scene.chapter, title: scene.title,
+   id: alias(scene.id), sourceId: scene.id, chapter: scene.chapter, title: scene.title,
    public_text: scene.intro + '\n\n' + scene.tension,
-   vote_question: 'La Commission doit-elle ' + options.pour.title[0].toLocaleLowerCase('fr') + options.pour.title.slice(1) + ' ?',
-   labels:{pour:options.pour.title, contre:options.contre.title}, image:null, outcomes
+   vote_question: 'Quelle proposition la Commission adopte-t-elle ?',
+   publicOptions: Object.fromEntries(Object.entries(options).map(([side,o]) => [side,{description:o.public_description,
+    trends:o.public_trends.map(t=>({name:t.name,direction:t.direction})),compromise:o.public_compromise}])),
+   labels:{pour:options.pour.title, contre:options.contre.title}, image:media('intro', scene.visual_direction.opening_scene), outcomes
   };
  });
- const selection = {scenarioId:CHICAGO_SCENARIO_ID,scenarioVersion:'2.0.0',skinId:'mafia',skinVersion:mafia.version};
+ const selection = {scenarioId:CHICAGO_SCENARIO_ID,scenarioVersion:'3.0.0',skinId:'mafia',skinVersion:mafia.version};
  return {
   names, preview:{
    kind:'founders-session-preview-v2.3', previewOnly:true, selection, game,
@@ -52,7 +54,7 @@ export function chicagoSessionPreview(preparation, members) {
    skin:{...mafia,title:'Cosa Nostra — Le Trône de Chicago',
     labels:{currency:'Dollars',influence:'Influence',resources:metadata.gauges}},
    scenario:{schema_version:'2.0.0',scenario:{id:CHICAGO_SCENARIO_ID,title:metadata.universe,
-    location:'Chicago',year:1931,entry_dilemma:dilemmas[0].id},dilemmas,chicago:{ambitions,epilogues:metadata.winner_epilogues}}
+    location:'Chicago',year:1931,entry_dilemma:dilemmas[0].id},dilemmas,chicago:{version:3,ambitions,epilogues:metadata.winner_epilogues}}
   }
  };
 }

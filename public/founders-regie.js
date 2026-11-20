@@ -1,3 +1,4 @@
+import {renderSuccession,showChicagoRanking,chicagoPhase} from './chicago-succession.js';
 import {isHotspring,isCurrentHotspring,narrativeRegie} from './founders-univers.js';
 import {rememberAccess} from './founders-workspace.js';
 import {CAMPAIGN_PHASES,renderHotspringStage,renderTendencies,renderCampaignAdmin,renderCampaignActions,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
@@ -155,6 +156,7 @@ function renderFacilitator(s){
  $('facilitatorLink').value=s.facilitatorEmail?new URL(narrativeRegie(s.id,Boolean(s.campaign)),location.origin).href:'';
 }
 function render(s){
+ document.body.classList.toggle('chicago-v3',Boolean(s.succession));
  applySkin(document.body,s.skin);
  if(s.campaign)labelWorld();
  if(s.chicago){
@@ -164,6 +166,7 @@ function render(s){
  }
  renderFacilitator(s);
  current=s;
+ renderSuccession($('chicagoSuccession'),s,'organizer',command);
  document.body.classList.toggle('campaign-hotspring',Boolean(s.campaign));
  renderCampaignActions($('campaignActions'),s,command);
  renderCampaignAdmin($('hotspringAdmin'),s,s.sessionRole==='facilitator'?null:newVariant);
@@ -174,7 +177,7 @@ function render(s){
  $('preparation').hidden=s.phase!=='READY';
  const named=s.families.filter(f=>f.name&&f.name!=='Nom à choisir').length;set('teamReadyCount',named+'/'+s.families.length+' équipes ont un nom');
  $('preparePublicLink').href='/founders-city.html?session='+s.id;
- set('phase',labels[s.phase]||s.phase);set('sessionCode',s.code+' · '+s.selection.scenarioVersion+' · skin '+s.selection.skinId);
+ set('phase',chicagoPhase(s)||labels[s.phase]||s.phase);set('sessionCode',s.code+' · '+s.selection.scenarioVersion+' · skin '+s.selection.skinId);
  set('sessionTitle',s.title);set('revision','Révision '+s.revision);
  set('dilemmaInfo',s.dilemma?'Délibération : '+s.dilemma.title+(s.dilemma.vote_question?' — '+s.dilemma.vote_question:''):'');
  set('tiePriority','Tirage de départage final : '+s.finalTieOrder.map(id=>teamLabel(s,id)).join(' → '));
@@ -182,12 +185,13 @@ function render(s){
  $('reveal').hidden=s.phase!=='AWAITING_REVEAL';
  $('next').hidden=s.phase!=='REVEALED';
  $('next').textContent=(s.progression?s.progression.terminal:s.reveal?.nextId===null)?'Terminer la partie':'Dilemme suivant';
- if(s.chicago&&s.reveal?.nextId===null)$('next').textContent='Clôturer la répétition';
+ if(s.succession&&s.reveal?.nextId===null)$('next').hidden=true;
+ if(s.chicago&&s.reveal?.nextId===null)$('next').textContent=s.succession?'Déclencher la finale':'Clôturer la répétition';
  if(s.campaign){
   $('next').hidden=!['INTRO','PRESENTATION','REVEALED','CHECKPOINT'].includes(s.phase);
   $('next').textContent=({INTRO:'Présenter le dilemme',PRESENTATION:'Ouvrir la négociation',REVEALED:s.reveal?.id==='D30'?'Lire l’épilogue':'Poursuivre',CHECKPOINT:s.campaign.chapter===6?'Qualifier les chartes':'Reprendre — chapitre suivant'})[s.phase]??'Poursuivre';
  }
- $('tiePriority').closest('details').hidden=Boolean(s.campaign||s.chicago);
+ $('tiePriority').closest('details').hidden=Boolean(s.campaign||s.chicago&&!s.succession);
  renderActionAvailability(s);
  $('reservePanel').hidden=!s.progression||s.progression.terminal;
  const choice=$('nextDilemma'),previousChoice=choice.value;choice.replaceChildren();
@@ -214,7 +218,9 @@ function render(s){
   el.append(details);families.append(el);
  }
  const final=$('finalPanel');final.hidden=!s.finalResults;
- if(s.campaign&&s.finalResults){
+ if(s.succession&&s.finalResults){
+  set('finalWinner',s.narrativeEnding.title);set('finalScoreRule','Deux points par soutien reçu.');showChicagoRanking($('ranking'),s);
+ }else if(s.campaign&&s.finalResults){
   set('finalWinner',hotspringWinners(s));
   set('finalScoreRule',s.finalResults.rows[0].maximum+' points possibles par famille.');
   const root=$('ranking');root.replaceChildren();
@@ -245,7 +251,7 @@ async function command(kind,data={}){
  busy=true;set('actionMessage','Enregistrement…');renderActionAvailability(current);
  try{
   const s=await api('/commands','POST',{kind,data,expectedRevision:current.revision});
-  render(s);set('actionMessage',kind==='reveal'?'Décision révélée sur la projection.':s.phase==='FINISHED'?(s.chicago?'Répétition terminée.':'Partie terminée : classement affiché.'):s.campaign?(labels[s.phase]??s.phase)+'.':'Le prochain dilemme est ouvert.');
+  render(s);set('actionMessage',s.succession&&s.phase==='SUCCESSION'?'Commission mise à jour.':kind==='reveal'?'Décision révélée sur la projection.':s.phase==='FINISHED'?(s.chicago?'Répétition terminée.':'Partie terminée : classement affiché.'):s.campaign?(labels[s.phase]??s.phase)+'.':'Le prochain dilemme est ouvert.');
  }catch(e){set('actionMessage',e.message);try{render(await api(''));}catch{}}
  finally{busy=false;renderActionAvailability(current);}
 }
@@ -358,7 +364,7 @@ function renderV2Controls(s){
  set('beginVote',manual?'Ouvrir le vote':'Ouvrir le vote maintenant');
  set('v2ControlsTitle',manual?'Réglages':'Chronos et réglages');
  $('timingForm').hidden=manual||Boolean(s.chicago);
- const ended=['EPILOGUE','FINISHED'].includes(s.phase),suspended=s.phase==='SUSPENDED',v2=s.experienceVersion===2;
+ const ended=['EPILOGUE','FINISHED','SUCCESSION'].includes(s.phase),suspended=s.phase==='SUSPENDED',v2=s.experienceVersion===2;
  for(const id of ['addTime','removeTime'])$(id).hidden=!v2||manual||s.clock?.remainingMs==null||ended||suspended;
  $('pauseGame').hidden=!v2||ended||suspended||Boolean(s.clock?.paused);
  $('resumeGame').hidden=!v2||suspended||!s.clock?.paused;

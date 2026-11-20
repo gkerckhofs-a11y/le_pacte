@@ -16,13 +16,13 @@ export function latestChronicle(view){
   winner:h.winner,decisionLabel:h.decisionLabel??h.winner,yes:h.yes,no:h.no,
   image:h.image??(view.dilemma?.id===h.id?view.dilemma.image:null),changes};
 }
-export function chronicleChangeText(change,label){
+export function chronicleChangeText(change,label,maximum=10){
  const {before,after,delta,operation,planned}=change;
- if(delta===null)return label+' : '+(after===null?'valeur non archivée':after+'/10')+' · évolution non archivée';
- let text=label+' : '+before+' → '+after+'/10 ('+(delta>0?'+':'')+delta+')';
+ if(delta===null)return label+' : '+(after===null?'valeur non archivée':after+'/'+maximum)+' · évolution non archivée';
+ let text=label+' : '+before+' → '+after+'/'+maximum+' ('+(delta>0?'+':'')+delta+')';
  if(operation==='toward_center')text+=' · retour vers le centre';
  if(operation==='away_from_center')text+=' · éloignement du centre';
- if(operation==='delta'&&delta!==planned)text+=' · effet prévu '+(planned>0?'+':'')+planned+', limité par la borne '+(planned>0?'10':'0');
+ if(operation==='delta'&&delta!==planned)text+=' · effet prévu '+(planned>0?'+':'')+planned+', limité par la borne '+(planned>0?String(maximum):'0');
  if(operation==='toward_center'&&delta===0)text+=' · déjà au centre';
  if(operation==='away_from_center'&&delta===0)text+=' · borne atteinte';
  return text;
@@ -42,7 +42,7 @@ export function renderChronicle(root,view){
   return node;
  };
  const image=chapter.image;
- if(typeof image?.url==='string'&&(/^https:\/\/\S+$/.test(image.url)||view.campaign&&/^\/assets\/hotspring\/v1\/[\w/-]+\.webp$/.test(image.url))){
+ if(typeof image?.url==='string'&&(/^https:\/\/\S+$/.test(image.url)||(view.succession && image.url.startsWith('/api/founders/sessions/'+view.id+'/illustrations/'))||view.campaign&&/^\/assets\/hotspring\/v1\/[\w/-]+\.webp$/.test(image.url))){
   const img=el('img','chronicle-image');img.src=image.url;
   img.alt=image.alt||'Illustration du dilemme résolu : '+chapter.title;
   // Reuse the dilemma artwork until an outcome-specific illustration is authored.
@@ -55,7 +55,7 @@ export function renderChronicle(root,view){
   el('p','small muted','Vote révélé · '+chapter.yes+' Influence POUR / '+chapter.no+' CONTRE'),
   el('p','chronicle-narration',expanded?chapter.narration:chapter.summary));
  const list=el('ul','chronicle-changes');
- for(const c of chapter.changes)list.append(el('li','',chronicleChangeText(c,view.skin.labels.resources[c.indicator]??c.indicator)));
+ for(const c of chapter.changes)list.append(el('li','',chronicleChangeText(c,view.skin.labels.resources[c.indicator]??c.indicator,view.gaugeMaximum??10)));
  if(!chapter.changes.length)list.append(el('li','','Aucune variation de jauge pour cette décision.'));
  body.append(list);
  if(expanded)body.append(el('p','small muted','Les autres indicateurs restent inchangés.'));

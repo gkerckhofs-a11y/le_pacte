@@ -1,4 +1,5 @@
-import {isChicago,chicagoAmbition} from './founders-chicago.ts';
+import {finalCommands,chicagoCommand,chicagoFinalView} from './chicago-succession.ts';
+import {isChicago,chicagoAmbition,hasChicagoSuccession} from './founders-chicago.ts';
 import {isV2,GOALS_V2,TIMING_V2,validateTiming,validateThresholds,setPhaseClock,beginNegotiation,beginVote,revealResolution,nextV2,finishV2,continueHotspring,suspendHotspring,resumeHotspring,revealHotspringResults} from './founders-v2.ts';
 import {isHotspring,isManualHotspring,createHotspringState,campaignDilemma,campaignFamily,campaignOrganizer,campaignPresentation,hotspringSupports,crisisCandidates,hotspringCityIndicators,hotspringOutcome,HOTSPRING_INDICATORS} from './founders-hotspring.ts';
 import {DEFAULT_TEAM_COLORS,DEFAULT_TEAM_NAMES,teamColor} from '../public/founders-identity.js';
@@ -49,6 +50,7 @@ export function createNarrativeSession(preview,{id,ownerId,code,title,objectives
   objectives=Object.values(families).map(f=>f.briefing);
   goalCards=GOALS_V2;scoreRules=DEFAULT_SCORE_RULES;
  }
+ if(hasChicagoSuccession(preview))objectives=ids.map(id=>preview.scenario.chicago.ambitions[id].specialty);
  if(v2){
   if(goalCards===DEFAULT_GOAL_CARDS)goalCards=GOALS_V2;
   if(objectives===TEST_FAMILY_OBJECTIVES)objectives=ids.map(id=>goalCards[id].description);
@@ -81,6 +83,13 @@ export function createNarrativeSession(preview,{id,ownerId,code,title,objectives
   phase:'READY',currentDilemmaId:preview.scenario.scenario.entry_dilemma,
   lastReveal:null,revealedHistory:[],offers:{},revision:0,createdAt:now,updatedAt:now
  };
+ if (hasChicagoSuccession(session)) {
+  for (const scene of session.scenario.dilemmas) {
+   for (const image of [scene.image,scene.outcomes.pour.chronicle.image,scene.outcomes.contre.chronicle.image]) {
+    image.url='/api/founders/sessions/'+id+'/illustrations/'+image.url.split('/').at(-1);
+   }
+  }
+ }
  check(Buffer.byteLength(JSON.stringify(session),'utf8')<=720000,'Partie trop volumineuse pour le stockage');
  return session;
 }
@@ -133,10 +142,19 @@ function validateOfferCommitment(s,to,commitment){
 export function applyNarrativeCommand(input,actor,command,now){
  check(input?.kind==='founders-live-session-v2.5','Partie narrative invalide');
  validateActor(input,actor);
- check(command&&Number.isSafeInteger(command.expectedRevision)&&command.expectedRevision===input.revision,'Révision périmée : actualiser la partie');
+ check(command&&Number.isSafeInteger(command.expectedRevision)&&(command.expectedRevision===input.revision ||
+  (command.kind==='castChicagoBallot' && command.expectedRevision>=0 && command.expectedRevision<input.revision &&
+   input.succession?.stage==='ballot' && command.data?.round===input.succession.rounds.at(-1)?.number)),'Révision périmée : actualiser la partie');
  check(Number.isSafeInteger(now)&&now>=0,'Horodatage invalide');
  check(command&&typeof command.kind==='string','Commande invalide');
  const s=copy(input),data=command.data??{},kind=command.kind;
+ if (finalCommands.includes(kind)) {
+  chicagoCommand(s,actor,kind,data,now);
+  s.revision++;s.updatedAt=now;
+  check(totalPower(s.game)===expectedFoundersPowerSupply(s.game),'Conservation de l’Influence violée');
+  return s;
+ }
+ check(!s.succession,'Les Conseils sont figés pour la succession.');
  const manual=isManualHotspring(s);
  check(!s.clock?.paused||['pause','resume','configureTiming','adjustTime','correctResource','correctCity','finish','endSitting'].includes(kind),'Partie en pause');
  check(s.phase!=='SUSPENDED'||['resumeSitting','finish'].includes(kind),'Séance sauvegardée');
@@ -306,12 +324,13 @@ export function applyNarrativeCommand(input,actor,command,now){
  return s;
 }
 function publicDilemma(s){
- if(s.phase==='READY'||s.phase==='FINISHED')return null;
+ if(s.phase==='READY'||s.phase==='FINISHED'||s.succession||(hasChicagoSuccession(s)&&s.phase==='REVEALED'))return null;
  const d=dilemma(s);
  const campaign=isHotspring(s)?campaignDilemma(s,d):null;
  if(isHotspring(s)&&!campaign)return null;
  return {id:d.id,chapter:d.chapter,title:d.title,public_text:d.public_text,
   ...(isHybrid(s.scenario)?{sequence:s.revealedHistory.length+(s.phase==='REVEALED'?0:1)}:{}),
+  ...(hasChicagoSuccession(s)?{publicOptions:copy(d.publicOptions)}:{}),
   vote_question:d.vote_question,labels:copy(d.labels),image:copy(d.image),...campaign};
 }
 function publicInfluenceReserve(s,resolved){
@@ -328,6 +347,7 @@ function publicInfluenceReserve(s,resolved){
 export function narrativePublicView(s){
  check(s?.kind==='founders-live-session-v2.5','Partie inconnue');
  const v=s.game.vote,resolved=(s.phase==='REVEALED'||s.phase==='FINISHED')?s.game.history.at(-1):null;
+ const qualitative=hasChicagoSuccession(s)&&['READY','NEGOTIATION','COUNCIL'].includes(s.phase);
  const snapshot=record=>{
   const view=copy(record);
   if(isHotspring(s)&&s.campaign.version>=2&&view){
@@ -339,11 +359,14 @@ export function narrativePublicView(s){
  return {
   kind:s.kind,id:s.id,code:s.code,title:s.title,phase:s.phase,revision:s.revision,
   ...(isV2(s)?{experienceVersion:2,timing:copy(s.timing),clock:copy(s.clock),gaugeThresholds:copy(s.gaugeThresholds)}:{}),
+  ...(hasChicagoSuccession(s)?{succession:chicagoFinalView(s)}:{}),
   ...(isChicago(s)?{chicago:true,gaugeMaximum:s.game.cityMaximum}:{}),
   ...(isHotspring(s)?{campaign:campaignPresentation(s),influenceReserve:publicInfluenceReserve(s,resolved)}:{}),
   story:{id:s.scenario.scenario.id,title:s.scenario.scenario.title,location:s.scenario.scenario.location,year:s.scenario.scenario.year,schemaVersion:s.scenario.schema_version},
   skin:{id:s.skin.id,title:s.skin.title,labels:copy(s.skin.labels),theme:copy(s.skin.theme),publicScene:copy(s.skin.publicScene)},
-  city:isHotspring(s)?hotspringCityIndicators(s.game.city):copy(s.game.city),families:activeFounders(s.game).map((id,i)=>({id,name:s.names[id],color:copy(teamColor(s.colors?.[id]??DEFAULT_TEAM_COLORS[i])),members:s.game.families[id].members})),
+  ...(qualitative?{cityLevels:Object.fromEntries(Object.entries(s.game.city).map(([k,value])=>
+   [k,s.gaugeThresholds.filter(t=>Number(value)*10/s.game.cityMaximum>t).length]))}:{}),
+  city:qualitative?{}:isHotspring(s)?hotspringCityIndicators(s.game.city):copy(s.game.city),families:activeFounders(s.game).map((id,i)=>({id,name:s.names[id],color:copy(teamColor(s.colors?.[id]??DEFAULT_TEAM_COLORS[i])),members:s.game.families[id].members})),
   leader:s.game.leader,moderator:s.game.moderator,
   dilemma:publicDilemma(s),
   council:v?{phase:v.phase,turn:v.turn,bids:copy(v.bids),choices:copy(v.choices),
@@ -376,11 +399,15 @@ export function narrativeFamilyView(s,family){
   mayVote:!s.clock?.paused&&s.phase==='COUNCIL'&&v?.phase==='voting'&&v?.turn===family,
   mayResolve:!s.clock?.paused&&s.phase==='COUNCIL'&&v?.phase==='await_moderator'&&s.game.moderator===family,
   mayChooseLeader:!s.clock?.paused&&s.phase==='COUNCIL'&&v?.phase==='await_leader'&&s.game.moderator===family},
+  ...(hasChicagoSuccession(s)?{succession:chicagoFinalView(s,family)}:{}),
   ...(isChicago(s)?{chicagoAmbition:chicagoAmbition(s,family)}:isHotspring(s)?{privateCampaign:campaignFamily(s,family)}:{goalCard:copy(card),goalProgress:progress}),
   offers,voteCommitment:acceptedVoteCommitment(s,family)};
 }
 export function narrativeOrganizerView(s){
- return {...narrativePublicView(s),familyGoals:isChicago(s)?Object.fromEntries(activeFounders(s.game).map(id=>[id,chicagoAmbition(s,id).specialty])):copy(s.goals),familyResources:copy(s.game.families),
+ return {...narrativePublicView(s),...(hasChicagoSuccession(s)?{city:copy(s.game.city)}:{}),
+  ...(s.succession?{successionAudit:{frozen:copy(s.succession.frozen),request:copy(s.succession.request),events:copy(s.succession.audit),
+   rounds:s.succession.rounds.filter(r=>r.closedAt!==null).map(copy),arbitration:copy(s.succession.arbitration??null)}}:{}),
+  familyGoals:isChicago(s)?Object.fromEntries(activeFounders(s.game).map(id=>[id,chicagoAmbition(s,id).specialty])):copy(s.goals),familyResources:copy(s.game.families),
   ...(isHotspring(s)?{campaignAdmin:campaignOrganizer(s),privateFamilies:Object.fromEntries(activeFounders(s.game).map(id=>[id,campaignFamily(s,id)]))}:{}),
   effectsPreview:hotspringEffectsPreview(s),
   progression:s.phase==='REVEALED'?narrativeReserve(s):null,
