@@ -1,6 +1,6 @@
 # Validation visuelle de la projection
 
-Chromium en plein écran, 20 novembre 2026. La scène 16:9 occupe la moitié de la hauteur à 1280 × 720, 1920 × 1080, 2560 × 1440 et 3840 × 2160. Elle est centrée entre deux marges latérales pour conserver le cadrage. Le contrôle porte sur un vote et sa résolution avec la campagne V3. Les commandes de projection sont sous l’image.
+Chromium en plein écran, 20 novembre 2026. Le bandeau occupe toute la largeur et 46 % de la hauteur à 1280 × 720, 1920 × 1080, 2560 × 1440 et 3840 × 2160. Les sources 16:9 sont recadrées verticalement, sans déformation. Le contrôle porte sur un vote et sa résolution avec la campagne V3. Les commandes de projection sont sous l’image.
 
 | Moment | Avant | Après en 1080p | Après en 4K |
 |---|---|---|---|

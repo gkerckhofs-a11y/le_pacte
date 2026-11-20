@@ -403,14 +403,15 @@ button.danger{background:#a83333!important;color:#fff!important;border-color:#a8
 /* Chicago is a single film frame above the Commission's three desks. */
 .projection-dashboard.chicago-v3{display:flex;flex-direction:column;height:auto;min-height:100dvh;background:#101313}
 #cineHero{display:flex;align-items:center;justify-content:center;position:relative;background:radial-gradient(ellipse at center,#38342c,#0d1010 75%);border-bottom:1px solid #64523c}
-#cineHero figure{position:relative;background:#141819;width:min(100%,88.89dvh);aspect-ratio:16/9;margin:0;display:grid;place-items:center}
+#cineHero figure{position:relative;background:#141819;width:100%;height:min(56.25vw,46dvh);margin:0;display:grid;place-items:center}
 #cineImage{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
 #cineMissing{color:#cec0ac;font:italic 1.1em Georgia,serif}
 .cine-brand,#cineChapter{position:absolute;z-index:1;max-width:22vw;color:#e3c28c}
-.cine-brand{left:3vw;display:grid;gap:.45em}
-.cine-brand strong{color:#f3e8d6;font:clamp(22px,3vw,100px)/1 Georgia,serif}
+.cine-brand,#cineChapter:not(:empty){padding:.55em .85em;background:#0d1010d9;border-radius:4px}
+.cine-brand{left:2vw;top:1.6vh;display:grid;gap:.25em}
+.cine-brand strong{color:#f3e8d6;font:clamp(22px,2.1vw,80px)/1 Georgia,serif}
 .cine-brand span,#cineChapter{font:650 clamp(11px,.82vw,25px)/1.4 system-ui;text-transform:uppercase;letter-spacing:.13em}
-#cineChapter{right:3vw;text-align:right}
+#cineChapter{right:2vw;top:1.6vh;text-align:right}
 .chicago-v3.projection-dashboard .top{justify-content:flex-end;padding:4px 1vw}.chicago-v3.projection-dashboard .top>div:first-child{display:none}
 .chicago-v3.projection-dashboard .projection-grid{height:auto;grid-template-columns:minmax(0,.92fr) minmax(0,2.1fr) minmax(0,1.18fr);grid-template-rows:auto;align-items:start}
 .chicago-v3.projection-dashboard .projection-city{display:none}
