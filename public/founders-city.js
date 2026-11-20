@@ -234,15 +234,6 @@ async function tick(){
   text('connection','● Synchronisé');text('notice','');
  }catch(e){text('connection','○ Hors ligne');text('notice',e.message);}
 }
-const wideProjection=globalThis.matchMedia?.('(min-width: 850px) and (orientation: landscape)');
-function placeArtwork(){
- const destination=document.fullscreenElement&&wideProjection?.matches?$('projectionViewport'):$('dilemmaPanel');
- const artwork=$('dilemmaArtwork');
- if(artwork.parentElement!==destination)destination.append(artwork);
-}
-document.addEventListener('fullscreenchange',placeArtwork);
-wideProjection?.addEventListener('change',placeArtwork);
-
 $('decisionImage').addEventListener('error',()=>{
  if($('decisionImage').onerror)return;
  $('decisionImage').removeAttribute('src');
