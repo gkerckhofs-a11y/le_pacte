@@ -376,3 +376,8 @@ button.danger{background:#a83333!important;color:#fff!important;border-color:#a8
 .chicago-v3 #chicagoSuccession { grid-column:1/-1; }
 .chicago-v3 #chicagoSuccession button { margin:.25rem; }
 .chicago-panorama { width:100%; height:100%; object-fit:cover; aspect-ratio:16/9; }
+
+.rehearsal-panel{margin-block:1rem;border-inline-start:4px solid currentColor}
+.rehearsal-panel h4{margin:.75rem 0;font-size:1.15rem}
+.rehearsal-panel input{max-width:7rem}
+.rehearsal-panel .secondary{margin-top:.75rem}

@@ -12,7 +12,7 @@
  <nav class="breadcrumb" aria-label="Navigation"><a href="/">Univers</a></nav>
  <h1>Cosa Nostra — Le Trône de Chicago</h1>
  <p class="context">Régie de préparation · Chicago, 1931</p>
- <p>Préparez le parcours et lancez une répétition des Conseils. Chaque dilemme propose un vote POUR/CONTRE avec les deux propositions de la campagne V3.</p>
+ <p>Préparez le parcours des Conseils pour votre groupe ou pour un test en solo. Chaque dilemme propose un vote POUR/CONTRE avec les deux propositions de la campagne V3.</p>
  <p id="status" role="status" aria-live="polite"></p>
  <section id="loginPanel" class="form-panel" aria-label="Connexion à la régie">
   <div id="localLogin" hidden><label for="localKey">Clé de répétition locale</label><input id="localKey" type="password" autocomplete="off"></div>
@@ -20,7 +20,7 @@
  </section>
  <div id="workspace" hidden>
   <section class="form-panel" aria-labelledby="sessionsHeading">
-   <h2 id="sessionsHeading">Mes répétitions Chicago</h2>
+   <h2 id="sessionsHeading">Mes parties Chicago</h2>
    <ul id="sessions"></ul>
   </section>
   <form class="form-panel" id="importForm">
@@ -40,12 +40,14 @@
    </form>
    <div>
     <form class="form-panel" id="sessionForm">
-     <h2>Nouvelle répétition</h2>
+     <h2>Nouvelle partie</h2>
      <p class="help">Les cinq jauges démarrent à 50/100 pour la recette. La régie peut convoquer la succession à tout moment.</p>
+     <label for="sessionMode">Mode de jeu</label>
+     <select id="sessionMode"><option value="live">Partie avec joueurs</option><option value="test">Régie de test · je vote pour les familles</option></select>
      <label for="sessionTitle">Nom de la partie</label>
-     <input id="sessionTitle" maxlength="100" value="Cosa Nostra — Répétition" required>
+     <input id="sessionTitle" maxlength="100" value="Cosa Nostra" required>
      <div id="members"></div>
-     <div class="actions"><button id="createSession">Créer la répétition</button></div>
+     <div class="actions"><button id="createSession">Créer et ouvrir la régie</button></div>
     </form>
     <aside class="form-panel" aria-labelledby="familiesHeading">
      <h2 id="familiesHeading">Familles et ambitions privées</h2>

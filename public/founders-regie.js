@@ -1,3 +1,4 @@
+import {renderRehearsal} from './founders-rehearsal.js';
 import {renderSuccession,showChicagoRanking,chicagoPhase} from './chicago-succession.js';
 import {isHotspring,isCurrentHotspring,narrativeRegie} from './founders-univers.js';
 import {rememberAccess} from './founders-workspace.js';
@@ -68,7 +69,7 @@ async function listSessions(){
  for(const session of sessions){
   if(!validNarrativeSession(session.id))continue;
   const row=document.createElement('div');row.className='card row between';
-  const title=document.createElement('strong');title.textContent=session.code+' · '+session.title+' · '+(labels[session.phase]||session.phase);
+  const title=document.createElement('strong');title.textContent=(session.rehearsal?'Test · ':'')+session.code+' · '+session.title+' · '+(labels[session.phase]||session.phase);
   const link=document.createElement('a');link.textContent='Ouvrir la régie →';link.href=narrativeRegie(session.id,isHotspring(session));row.append(title,link);root.append(row);
  }
  $('archiveSessions').hidden=hotspringHome||!root.children.length;
@@ -167,6 +168,7 @@ function render(s){
  }
  renderFacilitator(s);
  current=s;
+ renderRehearsal(s,command);
  renderSuccession($('chicagoSuccession'),s,'organizer',command);
  document.body.classList.toggle('campaign-hotspring',Boolean(s.campaign));
  renderCampaignActions($('campaignActions'),s,command);
@@ -177,7 +179,8 @@ function render(s){
  if(s.campaign){renderHotspringStage($('hotspringStage'),s);renderTendencies($('hotspringTendencies'),s.phase==='REVEALED'?null:s.dilemma);}
  printKit.sync(s);renderPhaseClock($('phaseClock'),s);renderV2Controls(s);
  renderCouncilMonitor($('councilMonitor'),s);
- const guidance=councilGuidance(s);step(guidance.step);set('stageTitle',guidance.title);set('stageHint',guidance.hint);
+ const guidance=councilGuidance(s);step(guidance.step);set('stageTitle',guidance.title);set('stageHint',s.rehearsal&&s.phase==='READY'?'Lancez la partie pour tester les décisions depuis cet écran.':
+  s.rehearsalTurn?'Validez la décision de la famille dans la régie de test.':guidance.hint);
  $('preparation').hidden=s.phase!=='READY';
  const named=s.families.filter(f=>f.name&&f.name!=='Nom à choisir').length;set('teamReadyCount',named+'/'+s.families.length+' équipes ont un nom');
  $('preparePublicLink').href='/founders-city.html?session='+s.id;
@@ -258,11 +261,13 @@ async function command(kind,data={}){
  busy=true;set('actionMessage','Enregistrement…');renderActionAvailability(current);
  try{
   const s=await api('/commands','POST',{kind,data,expectedRevision:current.revision});
-  render(s);set('actionMessage',s.succession&&s.phase==='SUCCESSION'?'Commission mise à jour.':kind==='reveal'?'Décision révélée sur la projection.':s.phase==='FINISHED'?(s.chicago?'Répétition terminée.':'Partie terminée : classement affiché.'):s.campaign?(labels[s.phase]??s.phase)+'.':'Le prochain dilemme est ouvert.');
+  render(s);set('actionMessage',kind==='rehearsalAction'||kind==='rehearsalPass'?'Décision enregistrée.':s.succession&&s.phase==='SUCCESSION'?'Commission mise à jour.':kind==='reveal'?'Décision révélée sur la projection.':s.phase==='FINISHED'?(s.chicago?'Répétition terminée.':'Partie terminée : classement affiché.'):s.campaign?(labels[s.phase]??s.phase)+'.':'Le prochain dilemme est ouvert.');
  }catch(e){set('actionMessage',e.message);try{render(await api(''));}catch{}}
  finally{busy=false;renderActionAvailability(current);}
 }
 function renderActionAvailability(s){
+ const rehearsal=document.getElementById('rehearsalDecision');
+ if(rehearsal)rehearsal.inert=busy;
  for(const button of $('actions').querySelectorAll('button')){
   const advance=['start','next','reveal','beginVote'].includes(button.id);
   button.disabled=busy||Boolean(advance&&s?.clock?.paused)||Boolean(button.id==='next'&&s?.progression?.blocked);

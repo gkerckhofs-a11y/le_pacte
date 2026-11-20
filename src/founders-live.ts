@@ -36,7 +36,7 @@ export const TEST_FAMILY_OBJECTIVES=Object.freeze([
   'Objectif de test : préserver l’autonomie des fondateurs en affaiblissant la Stabilité (voir les paliers de votre ambition).'
 ]);
 
-export function createNarrativeSession(preview,{id,ownerId,code,title,objectives=TEST_FAMILY_OBJECTIVES,names,colors=DEFAULT_TEAM_COLORS,goalCards=DEFAULT_GOAL_CARDS,scoreRules=DEFAULT_SCORE_RULES,initiativeOrder,timing=TIMING_V2,gaugeThresholds=[2,4,6,8],crisisMode,presentationSeconds,now=Date.now()}) {
+export function createNarrativeSession(preview,{id,ownerId,code,title,objectives=TEST_FAMILY_OBJECTIVES,names,colors=DEFAULT_TEAM_COLORS,goalCards=DEFAULT_GOAL_CARDS,scoreRules=DEFAULT_SCORE_RULES,initiativeOrder,timing=TIMING_V2,gaugeThresholds=[2,4,6,8],crisisMode,presentationSeconds,rehearsal=false,now=Date.now()}) {
  check(preview?.kind==='founders-session-preview-v2.3'&&preview.previewOnly===true,'Configuration narrative invalide');
  check(typeof id==='string'&&/^[a-f0-9]{24}$/.test(id),'Identifiant de session invalide');
  check(str(ownerId,128),'Organisateur requis');
@@ -69,8 +69,9 @@ export function createNarrativeSession(preview,{id,ownerId,code,title,objectives
  check(Number.isSafeInteger(now)&&now>=0,'Horodatage invalide');
  check(preview.scenario?.dilemmas?.some(d=>d.id===preview.scenario?.scenario?.entry_dilemma),'Dilemme de départ introuvable');
  check(preview.game?.ruleset==='founders-v2-prototype','Moteur de votes incompatible');
+ if(rehearsal)check(families||hasChicagoSuccession(preview),'Régie de test réservée à Hotspring et Chicago');
  const session={
-  kind:'founders-live-session-v2.5',id,ownerId,code,title,
+  kind:'founders-live-session-v2.5',id,ownerId,code,title,...(rehearsal?{rehearsal:true}:{}),
   selection:copy(preview.selection),scenario:copy(preview.scenario),skin:copy(preview.skin),
   source:copy(preview.source),game:copy(preview.game),
   names:Object.fromEntries(ids.map((id,i)=>[id,names[i]])),
@@ -147,6 +148,13 @@ export function applyNarrativeCommand(input,actor,command,now){
    input.succession?.stage==='ballot' && command.data?.round===input.succession.rounds.at(-1)?.number)),'Révision périmée : actualiser la partie');
  check(Number.isSafeInteger(now)&&now>=0,'Horodatage invalide');
  check(command&&typeof command.kind==='string','Commande invalide');
+ if(command.kind==='rehearsalAction'||command.kind==='rehearsalPass'){
+  check(input.rehearsal===true&&['organizer','facilitator'].includes(actor.role),'Commande réservée à la régie de test');
+  if(command.kind==='rehearsalPass')return passRehearsalVotes(input,now);
+  const {family,action,payload}=command.data??{};
+  check(['vote','chooseLeader','resolveTie','supportCharter','castChicagoBallot','arbitrateChicago'].includes(action),'Décision de famille inconnue');
+  return applyNarrativeCommand(input,{role:'team',family},{kind:action,data:payload,expectedRevision:input.revision},now);
+ }
  const s=copy(input),data=command.data??{},kind=command.kind;
  if (finalCommands.includes(kind)) {
   chicagoCommand(s,actor,kind,data,now);
@@ -418,8 +426,46 @@ export function narrativeFamilyView(s,family){
   ...(isChicago(s)?{chicagoAmbition:chicagoAmbition(s,family)}:isHotspring(s)?{privateCampaign:campaignFamily(s,family)}:{goalCard:copy(card),goalProgress:progress}),
   offers,voteCommitment:acceptedVoteCommitment(s,family)};
 }
+// A rehearsal shortcut records ordinary votes. Any tie is left to the operator.
+function passRehearsalVotes(input,now){
+ check(input.phase==='COUNCIL'&&input.game.vote?.phase==='voting','Aucune mise en cours');
+ let state=input;
+ while(state.phase==='COUNCIL'&&state.game.vote?.phase==='voting'){
+  const vote=state.game.vote, family=vote.turn;
+  let data;
+  if(has(vote.choices,family))data={kind:'maintien'};
+  else{
+   const commitment=acceptedVoteCommitment(state,family);
+   data=commitment?{kind:commitment.choice,amount:commitment.minInfluence}:{kind:'passe_pouvoir'};
+  }
+  state=applyNarrativeCommand(state,{role:'team',family},{kind:'vote',data,expectedRevision:state.revision},now);
+ }
+ return state;
+}
+function rehearsalTurn(s){
+ if(s.clock?.paused)return null;
+ if(s.phase==='COUNCIL'){
+  const vote=s.game.vote;
+  if(vote.phase==='voting')return {family:vote.turn,kind:'vote',commitment:acceptedVoteCommitment(s,vote.turn)};
+  if(vote.phase==='await_moderator')return {family:s.game.moderator,kind:'resolveTie'};
+  if(vote.phase==='await_leader')return {family:s.game.moderator,kind:'chooseLeader',candidates:vote.pendingLeaderChoices};
+ }
+ const families=activeFounders(s.game);
+ if(s.phase==='CHARTER_SUPPORT'){
+  const q=s.campaign.qualification;
+  return {family:families.find(id=>!has(q.supports,id)),kind:'supportCharter',candidates:q.candidates};
+ }
+ if(s.phase==='SUCCESSION'){
+  for(const family of families){
+   const f=chicagoFinalView(s,family);
+   if(f.candidates?.length)return {family,kind:'castChicagoBallot',round:f.round,candidates:f.candidates};
+   if(f.arbitrate?.length)return {family,kind:'arbitrateChicago',candidates:f.arbitrate};
+  }
+ }
+ return null;
+}
 export function narrativeOrganizerView(s){
- return {...narrativePublicView(s),...(hasChicagoSuccession(s)?{city:chicagoCityIndicators(s.game.city),finalResults:s.phase==='FINISHED'?copy(s.finalResults):null}:{}),
+ return {...narrativePublicView(s),...(s.rehearsal?{rehearsal:true,rehearsalTurn:rehearsalTurn(s)}:{}),...(hasChicagoSuccession(s)?{city:chicagoCityIndicators(s.game.city),finalResults:s.phase==='FINISHED'?copy(s.finalResults):null}:{}),
   ...(hasChicagoSuccession(s)&&s.phase==='SUSPENDED'?{sittingSummary:chicagoScores(s).map(({family,secret,wealth})=>({family,total:secret+wealth})).sort((a,b)=>b.total-a.total)}:{}),
   ...(s.succession?{successionAudit:{frozen:copy(s.succession.frozen),request:copy(s.succession.request),events:copy(s.succession.audit),
    rounds:s.succession.rounds.filter(r=>r.closedAt!==null).map(copy),arbitration:copy(s.succession.arbitration??null)}}:{}),

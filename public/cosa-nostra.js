@@ -4,6 +4,7 @@ import {organizerWorkspace,rememberAccess} from './founders-workspace.js';
 const route = '/api/founders/cosa-nostra/preparation';
 const chapterTitles = ['L’Héritage', 'Le Partage', 'La Guerre des ombres', 'Les Trahisons', 'La Commission'];
 const $ = id => document.getElementById(id);
+if(new URLSearchParams(location.search).get('mode')==='test')$('sessionMode').value='test';
 let preparation = null, writing = false, legacyRevision = 0;
 
 function element(tag, text) {
@@ -22,12 +23,12 @@ const request = organizerWorkspace({
   render(response.preparation);
   const links = sessions.filter(isCurrentChicago).map(session => {
    const item = element('li');
-   const a = element('a', session.title + ' · ' + session.code);
+   const a = element('a', (session.rehearsal?'Test · ':'') + session.title + ' · ' + session.code);
    a.href = narrativeRegie(session.id);
    item.append(a);
    return item;
   });
-  $('sessions').replaceChildren(...(links.length ? links : [element('li', 'Aucune répétition enregistrée.')]));
+  $('sessions').replaceChildren(...(links.length ? links : [element('li', 'Aucune partie enregistrée.')]));
 
   $('loginPanel').hidden = true;
   $('workspace').hidden = false;
@@ -188,7 +189,7 @@ $('sessionForm').addEventListener('submit', async event => {
   const members = [...$('members').querySelectorAll('input')].map(field => Number(field.value));
   const code = 'CN' + Array.from(crypto.getRandomValues(new Uint8Array(5)),n=>n.toString(16).padStart(2,'0')).join('').toUpperCase();
   const result = await request('/api/founders/cosa-nostra/sessions', 'POST', {
-   members, code, title:$('sessionTitle').value.trim(), revision:preparation.revision
+   members, code, rehearsal:$('sessionMode').value==='test', title:$('sessionTitle').value.trim(), revision:preparation.revision
   });
   rememberAccess(result);
   location.assign(narrativeRegie(result.id));
