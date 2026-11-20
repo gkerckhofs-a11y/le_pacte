@@ -32,7 +32,7 @@ export function renderRehearsal(s,command){
  const {family,kind}=turn;
  const name=id=>teamLabel(s,id);
  const decide=payload=>command('rehearsalAction',{family,action:kind,payload});
- add(root,'h4',name(family));
+ add(root,'h4','Au tour de '+name(family));
  const choices=add(root,'div','');
  choices.className='row';
  if(kind==='vote'){
@@ -53,10 +53,10 @@ export function renderRehearsal(s,command){
   }else{
    const locked=choice=>!!turn.commitment&&turn.commitment.choice!==choice;
    for(const side of ['pour','contre']){
-    button(choices,side.toUpperCase()+' · '+s.dilemma.labels[side],()=>vote(side,true),power<minimum||locked(side));
+    button(choices,'Valider '+side.toUpperCase()+' · '+s.dilemma.labels[side],()=>vote(side,true),power<minimum||locked(side));
    }
-   button(choices,'Abstention · récupérer de l’Influence',()=>vote('passe_pouvoir'),locked('passe_pouvoir'));
-   button(choices,'Abstention · revendiquer le rôle de '+roleLabel(s,'sheriff'),()=>vote('passe_moderateur'),
+   button(choices,'Valider l’abstention · récupérer de l’Influence',()=>vote('passe_pouvoir'),locked('passe_pouvoir'));
+   button(choices,'Valider l’abstention · revendiquer le rôle de '+roleLabel(s,'sheriff'),()=>vote('passe_moderateur'),
     s.game.vote.moderatorClaimed||locked('passe_moderateur'));
   }
   const quick=button(root,'Terminer les mises de ce Conseil',()=>command('rehearsalPass'));

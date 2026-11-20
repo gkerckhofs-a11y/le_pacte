@@ -32,6 +32,8 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
  staticFiles['/hotspring/atelier']=['founders-atelier.html','text/html; charset=utf-8'];
  staticFiles['/cosa-nostra']=staticFiles['/cosa-nostra.html']=['cosa-nostra.html','text/html; charset=utf-8'];
  staticFiles['/cosa-nostra.js']=['cosa-nostra.js','text/javascript; charset=utf-8'];
+ staticFiles['/regie-test']=staticFiles['/regie-test.html']=['regie-test.html','text/html; charset=utf-8'];
+ staticFiles['/regie-test.js']=['regie-test.js','text/javascript; charset=utf-8'];
  staticFiles['/univers.css']=['univers.css','text/css; charset=utf-8'];
  for(let i=1;i<=10;i++){const path='/assets/western/dilemmas/d'+String(i).padStart(2,'0')+'.jpg';staticFiles[path]=[path.slice(1),'image/jpeg'];}
  for(const name of ['reference',...['economie','securite','satisfaction','bien_etre','developpement','stabilite'].flatMap(k=>[k+'-low',k+'-high'])]){
