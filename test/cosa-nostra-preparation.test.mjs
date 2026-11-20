@@ -128,6 +128,7 @@ test('Répétition Chicago à cinq terminaux : choix binaires, accords, jauges e
  assert.equal(publicView.phase,'PRESENTATION');
  assert.equal(publicView.clock.deadline,null);
  assert.equal(publicView.stabilityLevel,2);
+ assert.equal(publicView.stabilityScore,50);
  assert.deepEqual(publicView.dilemma.labels, {pour:declined.title,contre:adopted.title});
  assert.equal(publicView.dilemma.outcomes,undefined);
  const artUrl=publicView.dilemma.image.url;

@@ -67,7 +67,8 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
    const url=new URL(req.url??'/','http://localhost');const path=url.pathname;
    if(!options.apiOnly&&req.method==='GET'&&staticFiles[path]){const [file,type]=staticFiles[path];res.writeHead(200,{'Content-Type':type});res.end(readFileSync(new URL(`../public/${file}`,import.meta.url)));return;}
    if(!options.apiOnly&&req.method==='GET'&&(/^\/assets\/chicago\/v3\/[a-z0-9-]+\.webp$/.test(path)||/^\/assets\/hotspring\/v1\/\w+\/[\w-]+\.webp$/.test(path))){
-    const file=new URL('../public'+path,import.meta.url);
+    const chicago=path.match(/^\/assets\/chicago\/v3\/(0[1-5]0[1-6]-(?:intro|pour|contre)\.webp)$/);
+    const file=new URL(chicago?'../content/chicago-media/'+chicago[1]:'../public'+path,import.meta.url);
     if(existsSync(file)){res.writeHead(200,{'Content-Type':'image/webp','Cache-Control':'public, max-age=86400'});res.end(readFileSync(file));return;}
    }
    if(!path.startsWith('/api/')){json(404,{error:'Page introuvable'});return;}

@@ -46,6 +46,7 @@ jobs:
             curl --fail --silent --show-error --retry 4 --retry-all-errors --max-time 20 "$url/$file" -o "$RUNNER_TEMP/$file"
             cmp "$RUNNER_TEMP/$file" "dist/public/$file"
           done
+          node scripts/verify-chicago-media.mjs --url=https://games-of-influence.web.app
           curl --fail --silent --show-error --retry 4 --retry-all-errors --max-time 20 "$url/api/catalog" -o "$RUNNER_TEMP/pacte-catalog.json"
           node -e 'const data = require(process.argv[1]); if (data.authMode !== "firebase") process.exit(1)' "$RUNNER_TEMP/pacte-catalog.json"
           url=https://games-of-influence.web.app
