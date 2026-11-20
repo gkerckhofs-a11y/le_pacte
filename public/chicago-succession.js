@@ -12,7 +12,7 @@ export function chicagoImage(img, art) {
  img.hidden=!art?.url;
  if(!art?.url){img.removeAttribute('src');return;}
  img.alt=art.alt||'Chicago, 1931';
- img.onerror=()=>{img.onerror=null;img.src='/assets/chicago/v3/chicago.webp';img.alt='Panorama de Chicago en 1931';img.hidden=false;};
+ img.onerror=()=>{img.hidden=true;};
  if(img.getAttribute('src')!==art.url)img.src=art.url;
 }
 export const chicagoPhase = s => s.phase==='SUCCESSION'?'Succession du Parrain':null;
