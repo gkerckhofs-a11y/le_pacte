@@ -6,7 +6,7 @@ import {Resvg} from '@resvg/resvg-js';
 import {GameStore} from '../server/store.ts';
 import {createGameServer} from '../server/http.ts';
 import {VALLEY_PLATE,renderPanoramaSvg} from '../public/hotspring-panorama.js';
-import {renderHotspringStage,renderTendencies,renderHotspringPanorama} from '../public/founders-hotspring.js';
+import {renderHotspringStage,renderTendencies,renderHotspringPanorama,setHotspringOverview} from '../public/founders-hotspring.js';
 import {narrativePublicView} from '../src/founders-live.ts';
 import {newCampaign,simulateCampaign,trajectories} from './helpers/hotspring.mjs';
 import {visualComposition} from './helpers/hotspring-visual-compositions.mjs';
@@ -87,6 +87,62 @@ test('Hotspring : les calques évoluent, ancrages invariants, rendu 1080p et 4K'
   const image=new Resvg(svg,{fitTo:{mode:'width',value:width}}).render();
   assert.equal(image.width,width);assert.equal(image.height,width*9/16);
  }
+});
+
+test('Du camp aux maisons, chaque tente reste sur sa parcelle jusqu’au vote de construction',()=>{
+ for(const site of ['pour','contre']){
+  for(const timber of ['pour','contre']){
+   const g=newCampaign();g.command('start');
+   const landscape=()=>narrativePublicView(g.state).campaign.landscape;
+   const frame=map=>parseHTML(renderPanoramaSvg(map)).document.querySelector('svg');
+   const camp=frame(landscape());
+   assert.equal(camp.getAttribute('viewBox'),'0 0 1000 562.5');
+   assert.equal(camp.querySelector('.hotspring-hearth'),null);
+   g.vote(site);
+   const opening=landscape(),first=frame(opening),lots=['plankLot','homes','porchLot'];
+   const parcel=(map,id)=>map.layers.find(l=>l.id===id);
+   const footprint=(map,id)=>[parcel(map,id).x,parcel(map,id).y];
+   assert.ok(first.querySelector('[data-layer="homestead"] .hotspring-hearth'));
+   assert.ok(first.querySelector('[data-residents="homes"] image'));
+   assert.notEqual(first.getAttribute('viewBox'),camp.getAttribute('viewBox'));
+   assert.equal(first.querySelectorAll('[data-kind="tent"] image').length,3);
+   for(const [choice,remaining] of [[site,2],[site,1],[timber,timber==='pour'?0:1],[site,0]]){
+    g.command('next');
+    if(g.state.phase==='CHECKPOINT')g.command('next');
+    g.vote(choice);
+    const map=landscape(),svg=frame(map);
+    assert.equal(map.layers.filter(l=>l.kind==='tent').length,remaining);
+    for(const id of lots){
+     assert.deepEqual(footprint(map,id),footprint(opening,id));
+     const l=parcel(map,id),el=svg.querySelector('[data-layer="'+id+'"]');
+     assert.ok(el.querySelector('image'),id);
+     assert.equal(Boolean(el.querySelector('.hotspring-hearth')),l.kind!=='tent');
+    }
+   }
+   g.state.campaign.markers.push('QUARTIER_BRULE');
+   const burned=frame(landscape());
+   for(const id of [...lots,'homestead'])assert.equal(burned.querySelector('[data-layer="'+id+'"] .hotspring-hearth'),null);
+  }
+ }
+});
+
+test('Le plan large reste sélectionné pendant les votes, sans relancer la révélation',()=>{
+ const {document}=parseHTML('<div id="map"></div>');
+ const saved=globalThis.document;globalThis.document=document;
+ try{
+  const g=newCampaign();g.command('start');g.vote('contre');
+  const root=document.getElementById('map');
+  const draw=()=>renderHotspringPanorama(root,narrativePublicView(g.state),{showResultStill:false});
+  draw();const first=root.querySelector('.hotspring-map'),village=first.getAttribute('viewBox');
+  setHotspringOverview(root,true);draw();
+  assert.equal(first,root.querySelector('.hotspring-map'));
+  assert.equal(first.getAttribute('viewBox'),'0 0 1000 562.5');
+  g.command('next');draw();g.vote('pour');draw();
+  assert.equal(root.querySelector('.hotspring-after').getAttribute('viewBox'),'0 0 1000 562.5');
+  assert.ok(root.querySelector('.hotspring-construction [data-layer="plankLot"][data-state="building"]'));
+  setHotspringOverview(root,false);
+  for(const svg of root.querySelectorAll('.hotspring-map'))assert.equal(svg.getAttribute('viewBox'),village);
+ }finally{globalThis.document=saved;}
 });
 
 test('Hotspring : les deux sites gardent les bâtiments sur la terre ferme et les voies sous les façades',()=>{

@@ -1,6 +1,6 @@
 import {gaugeLevelLabel,renderChicagoGaugeLevels} from './founders-live-ui.js';
 import {renderSuccession,showChicagoRanking,chicagoImage,chicagoPhase} from './chicago-succession.js';
-import {CAMPAIGN_PHASES,renderHotspringPanorama,setHotspringImage,renderTendencies,renderHotspringStage,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
+import {CAMPAIGN_PHASES,renderHotspringPanorama,setHotspringOverview,setHotspringImage,renderTendencies,renderHotspringStage,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
 import {decorateGauge,formatGaugeNumber,renderPhaseClock,voteTotals,appendGaugeDelta,gaugeDelta,renderChicagoChoices} from './founders-live-ui.js';
 import {voteProgress} from './founders-vote-progress.js';
 import {appendFamilyRoles} from './founders-role-badges.js';
@@ -131,6 +131,7 @@ function render(s){
  drawPanoramaStability(s,manual);
  $('chronicleOpen').hidden=!(s.history?.length);
  if($('chronicleDialog').open)renderChronicle($('cityChronicle'),s);
+ $('panoramaOverview').hidden=!s.campaign?.landscape?.location||Boolean(s.campaign.landscape.epilogue);
  if(s.campaign){
   renderHotspringPanorama($('city'),s,{showResultStill:false});
   if(!results)renderHotspringStage($('hotspringStage'),s,undefined,{showIntroImage:false});
@@ -244,6 +245,11 @@ $('chronicleOpen').addEventListener('click',()=>{
  $('chronicleDialog').showModal();
  // Render the current chronicle even when opening it between two state revisions.
  if(latestView)renderChronicle($('cityChronicle'),latestView);
+});
+$('panoramaOverview').addEventListener('click',event=>{
+ const button=event.currentTarget,overview=button.getAttribute('aria-pressed')!=='true';
+ button.setAttribute('aria-pressed',String(overview));
+ setHotspringOverview($('city'),overview);
 });
 setupProjectionFullscreen($('projectionFullscreen'),$('notice'));
 tick();setInterval(tick,2500);

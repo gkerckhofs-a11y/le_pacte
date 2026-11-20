@@ -23,7 +23,7 @@ hr{border:0;border-top:1px solid var(--border);margin:20px 0}
 #notice{white-space:pre-wrap;color:var(--gold);min-height:24px}
 .status-good{color:#87c7a3}.status-bad{color:#e9a29a}
 #city{width:100%;overflow:hidden;border-radius:12px;border:1px solid #75644d;background:linear-gradient(#b3a78e,#dfbc89)}
-#city svg{display:block;width:100%;height:auto}
+#city:not(.hotspring-panorama) svg,#city.hotspring-panorama .hotspring-map{display:block;width:100%;height:auto}
 .town-sign{font-family:Georgia,serif;font-size:28px;fill:#3a231a;letter-spacing:2px}
 #decisionImage{max-height:230px;object-fit:cover;width:100%;border-radius:10px;margin-bottom:12px}
 #decisionImage[hidden]{display:none}

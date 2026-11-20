@@ -5,22 +5,22 @@ export const CAMP_ORIGIN = [58, 66.5] as const;
 
 // Ground contact points on the valley plate, as percentages of its width and height.
 const lowlandOffsets={
- surveyed:[3,0],homes:[0,4],shops:[4,5],well:[-5,5],school:[1,8],saloon:[7,7],clinic:[-7,9],
+ plankLot:[6.5,-4.5],porchLot:[10,11],homestead:[-6,9.5],surveyed:[3,0],homes:[0,1.8],shops:[4,5],well:[-4.8,2],school:[1,8],saloon:[7,7],clinic:[-12,7],
  territory:[-11,-1],trade:[-6,-3],rail:[7,-6],housing:[15,11],
  bank:[5,2.5],stockyard:[-11,-6.5],store:[-3,2],marshal:[-9,3],jail:[-11,7],sanitation:[4,15],
- tax:[8,1],council:[-1,-3],camp:[-3,5],refuge:[13,14],waterReserve:[2,13],depot:[11,-3]
+ tax:[8,1],council:[-1,-3],camp:[7,4.5],refuge:[13,14],waterReserve:[2,13],depot:[11,-3]
 };
 // The terrace has a shallow, sloping rim. Its plots follow the ridge and leave the footpath clear.
 const terracePlots={
- surveyed:[78,36.4],homes:[71.2,40.2],shops:[77.8,40.4],well:[72,36.1],school:[84.5,39.8],
- saloon:[77.2,35.5],clinic:[67.9,35.7],territory:[66.9,31.3],trade:[64,35],rail:[80,29],
+ plankLot:[69.5,31],porchLot:[82,41.6],homestead:[74.1,40.6],surveyed:[78,36.4],homes:[68,37.9],shops:[77.8,40.4],well:[72,36.1],school:[84.5,39.8],
+ saloon:[77.2,35.5],clinic:[63.5,35.6],territory:[66.9,31.3],trade:[64,35],rail:[80,29],
  housing:[92,38.5],bank:[81.1,36],stockyard:[51,60],store:[72.3,33.1],marshal:[67.2,38.4],
- jail:[64.7,38.2],sanitation:[90,42.2],tax:[86.8,35.3],council:[77.7,32],camp:[73.8,38.2],
+ jail:[64.7,38.2],sanitation:[90,42.2],tax:[86.8,35.3],council:[77.7,32],camp:[85.5,35.6],
  refuge:[96,40],waterReserve:[90.3,33.4],depot:[84.5,32.7]
 };
 const districts={
  CENTRE_BRULE:['shops','bank','saloon','store','tax'],
- QUARTIER_BRULE:['housing','homes'],
+ QUARTIER_BRULE:['housing','homes','homestead','plankLot','porchLot'],
  QUARTIERS_INONDES:['housing','well','stockyard','saloon'],
  FRET_SACRIFIE:['rail','depot','stockyard']
 };
@@ -37,20 +37,29 @@ export function hotspringLandscape(s){
   const [dx,dy]=lowlandOffsets[id]??[0,0];
   const [x,y]=fixed??(high?terracePlots[id]:[townX+dx,townY+dy]);
   const onTerrace=high&&!fixed&&id!=='stockyard';
-  layers.push({id,kind,label,x,y,state:scars.includes(id)?'damaged':state,scale:scale*(onTerrace?.76:1)});
+  layers.push({id,kind,label,x,y,state:scars.includes(id)?'damaged':state,scale:scale*(onTerrace?.94:1)});
  }
  const surveyed=h('CENTRE_PRIVE')||h('RESERVES_PUBLIQUES');
- if(s.phase!=='READY'&&!surveyed)add('camp','camp','Chariots et tentes des fondateurs',{fixed:founded?null:CAMP_ORIGIN});
- if(s.revealedHistory.some(d=>d.id==='D02')&&!surveyed)add('homes','cottages','Premiers abris',{scale:.75,state:'building'});
+ const water=h('EAU_COMMUNALE')||h('EAU_PRIVEE');
+ const timberReady=h('SCIERIE_INTENSIVE')||h('COUPE_REGULEE')&&(h('ECOLE')||h('ECOLE_REPORTEE'));
+ if(s.phase!=='READY'&&!surveyed){
+  if(!founded)add('camp','camp','Chariots et tentes des fondateurs',{fixed:CAMP_ORIGIN});
+  else add('camp',water?'wagon':'wagons','Derniers chariots des fondateurs',{scale:.85});
+ }
+ if(founded){
+  add('homestead','homestead','Premier foyer des colons, avec une famille devant sa maison');
+  add('plankLot',water?'plankCottage':'tent',water?'Maison en planches':'Tente des bûcherons');
+  add('homes',surveyed?'cottages':'tent',surveyed?'Maisons des premières familles':'Tente des premières familles',{scale:surveyed?.86:1.12});
+  add('porchLot',timberReady?'porchHouse':'tent',timberReady?'Maison en bois à perron':'Tente au bord du village');
+ }
  if(surveyed){
   add('surveyed',h('REGLEMENT_INCENDIE')?'roadwide':'road','Main Street');
-  add('homes','cottages','Habitation des familles');
   add('shops',h('CENTRE_PRIVE')?'shops':'vacant',h('CENTRE_PRIVE')?'Commerces des lots privés':'Lots réservés à la ville');
   if(h('SCIERIE_INTENSIVE')||h('COUPE_REGULEE'))
    add('sawmill',h('SCIERIE_INTENSIVE')?'mill':'logging',h('SCIERIE_INTENSIVE')?'Scierie à vapeur':'Zone de coupe limitée',
     {fixed:[23.5,35.4],scale:.68});
  }
- if(h('EAU_COMMUNALE')||h('EAU_PRIVEE'))
+ if(water)
   add('well',h('EAU_COMMUNALE')?'well':'tower',h('EAU_COMMUNALE')?'Puits communal':'Tour d’eau de la concession',{scale:.85});
  if(h('ECOLE'))add('school','school','École publique');
  if(h('GRAND_SALOON'))add('saloon','saloon','Saloon et chambres');
@@ -122,6 +131,7 @@ export function hotspringLandscape(s){
    ...(recipe.dilemma==='D22'?{clean:h('ASSAINISSEMENT')}: {})});
  }
  const usedKinds=new Set(layers.map(l=>l.kind));
+ if(usedKinds.has('wagons'))usedKinds.add('wagon');
  if(usedKinds.has('camp')||ending){usedKinds.add('wagon');usedKinds.add('tent');}
  if(founded){
   usedKinds.add('people');
