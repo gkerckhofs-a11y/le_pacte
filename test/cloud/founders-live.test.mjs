@@ -88,3 +88,26 @@ test('Firestore : l’archivage retire les anciennes parties du compte et conser
  assert.equal((await sessions.view(other.id,{role:'public'},now+1000)).id,other.id);
  assert.equal(await sessions.archiveAll(ownerId,now+1000),0);
 });
+
+test('Firestore Chicago : cinq votes simultanés isolés, reprise et verrouillage unique',async()=>{
+ const {prepareCosaNostra}=await import('../../server/cosa-nostra-preparation.ts');
+ const {chicagoSessionPreview}=await import('../../server/cosa-nostra-session.ts');
+ const {fixture}=await import('../helpers/chicago.mjs');
+ const now=Date.now(),ownerId='chicago-'+randomBytes(6).toString('hex'),staff={role:'organizer',id:ownerId};
+ const {preview,names}=chicagoSessionPreview(prepareCosaNostra(fixture()),[1,2,3,4,5]);
+ const {id,access}=await sessions.create({ownerId,preview,names,code:'CN'+randomBytes(4).toString('hex').toUpperCase(),title:'Chicago test',now});
+ await sessions.command(id,staff,{kind:'requestChicagoFinale',expectedRevision:0,data:{confirm:true}},now+1);
+ const open=await sessions.command(id,staff,{kind:'openChicagoBallot',expectedRevision:1},now+2);
+ const actors=await Promise.all(access.map(key=>sessions.authenticate(id,key.token,now+3)));
+ const votes=actors.map(actor=>({kind:'castChicagoBallot',expectedRevision:open.revision,data:{round:1,candidate:actor.family==='A'?'B':'A'}}));
+ await Promise.all(actors.map((actor,i)=>sessions.command(id,actor,votes[i],now+3)));
+ await assert.rejects(sessions.command(id,actors[0],votes[0],now+4),/déjà enregistré/);
+ const publicActor={role:'public'},fresh=new FirestoreNarrativeSessions(db);
+ const view=await fresh.view(id,publicActor,now+5);
+ assert.deepEqual(view.succession,{stage:'ballot',round:1,received:5});
+ assert.equal((await fresh.view(id,actors[4],now+5)).succession.hasVoted,true);
+ const sealed=await fresh.command(id,staff,{kind:'closeChicagoBallot',expectedRevision:view.revision},now+6);
+ assert.equal(sealed.finalResults,null);
+ const final=await fresh.command(id,staff,{kind:'revealChicago',expectedRevision:sealed.revision},now+7);
+ assert.equal(final.finalResults.winner,'A');assert.equal(final.finalResults.rows[0].total,8);
+});

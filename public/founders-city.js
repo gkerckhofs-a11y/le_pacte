@@ -1,3 +1,5 @@
+import {renderChicagoGaugeLevels} from './founders-live-ui.js';
+import {renderSuccession,showChicagoRanking,chicagoImage,chicagoPhase} from './chicago-succession.js';
 import {CAMPAIGN_PHASES,renderHotspringPanorama,setHotspringImage,renderTendencies,renderHotspringStage,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
 import {decorateGauge,formatGaugeNumber,renderPhaseClock,voteTotals,appendGaugeDelta,gaugeDelta,renderChicagoChoices} from './founders-live-ui.js';
 import {voteProgress} from './founders-vote-progress.js';
@@ -32,7 +34,8 @@ function drawIllustration(s,sceneOnly){
  const image=$('decisionImage');
  const previous=image.getAttribute('src');
  const art=s.reveal?.visual??s.campaign?.intro?.visual??(!sceneOnly&&!s.reveal?s.dilemma?.image:null);
- if(s.campaign)setHotspringImage(image,art);
+ if(s.succession)chicagoImage(image,art);
+ else if(s.campaign)setHotspringImage(image,art);
  else if(typeof art?.url==='string'&&/^https:\/\/\S+$/.test(art.url)){
   if(previous!==art.url)image.src=art.url;
   image.alt=art.alt||s.dilemma.title;
@@ -42,6 +45,7 @@ function drawIllustration(s,sceneOnly){
 }
 function drawGauges(s){
  const root=$('gauges');root.replaceChildren();
+ if(renderChicagoGaugeLevels(root,s))return;
  const compact=Boolean(s.campaign)&&Object.hasOwn(s.city,'bien_etre');
  root.classList.toggle('projection-gauges-grid',compact);
  for(const key of Object.keys(s.city)){
@@ -83,12 +87,15 @@ function drawPanoramaStability(s,manual){
  decorateGauge(bar,state,value,s,{compact:true});
 }
 function render(s){
+ document.body.classList.toggle('chicago-v3',Boolean(s.succession));
+ renderSuccession($('chicagoSuccession'),s,'public');
  const manual=s.campaign?.version>=3;
  const epilogueScores=s.campaign?.epilogueResults;
  const results=s.finalResults??epilogueScores;
  document.body.classList.toggle('game-finished',Boolean(s.finalResults));
  document.body.classList.toggle('projection-manual-hotspring',manual);
- $('dilemmaPanel').hidden=Boolean(results);
+ $('dilemmaPanel').hidden=Boolean(results)||s.phase==='SUCCESSION';
+ $('ballots').closest('.panel').hidden=s.phase==='SUCCESSION'||Boolean(s.succession&&s.finalResults);
  const stageReading=Boolean(s.campaign)&&['CHECKPOINT','SUSPENDED','CHARTER_SUPPORT','EPILOGUE'].includes(s.phase);
  document.body.classList.toggle('projection-stage-reading',stageReading);
  document.body.classList.toggle('projection-qualification',s.phase==='CHARTER_SUPPORT');
@@ -97,7 +104,7 @@ function render(s){
  $('phase').hidden=!$('phaseClock').hidden;
  const totals=voteTotals(s);
  applySkin(document.body,s.skin);document.body.classList.toggle('campaign-hotspring',Boolean(s.campaign));text('universeTitle',s.campaign?s.story.title:'Games of Influence · '+s.skin.title);
- text('pageTitle',s.story.location+' · '+s.story.year);text('phase',(pretty[s.phase]||s.phase)+(manual&&s.clock?.paused?' · Pause':''));
+ text('pageTitle',s.story.location+' · '+s.story.year);text('phase',(chicagoPhase(s)||pretty[s.phase]||s.phase)+(manual&&s.clock?.paused?' · Pause':''));
  text('chapter',s.dilemma?(s.dilemma.sequence?'Conseil '+s.dilemma.sequence:'Chapitre '+s.dilemma.chapter):s.chicago?'La Commission':'Le Conseil des Fondateurs');
  const sceneOnly=s.campaign&&['INTRO','CHECKPOINT','SUSPENDED','CHARTER_SUPPORT','EPILOGUE','FINISHED'].includes(s.phase);
  $('dilemmaTitle').hidden=Boolean(sceneOnly);$('dilemmaText').hidden=Boolean(sceneOnly||s.reveal);
@@ -114,6 +121,13 @@ function render(s){
   if(!results)renderHotspringStage($('hotspringStage'),s,undefined,{showIntroImage:false});
   renderTendencies($('hotspringTendencies'),sceneOnly||s.reveal?null:s.dilemma);
   status('cityEvolution','');
+ }else if(s.succession){
+  const root=$('city');
+  let photo=root.querySelector('img');
+  if(!photo){photo=document.createElement('img');photo.className='chicago-panorama';root.replaceChildren(photo);}
+  const final=s.phase==='SUCCESSION'||s.phase==='FINISHED';
+  chicagoImage(photo,final?{url:'/assets/chicago/v3/commission.webp',alt:'La Commission finale'}:
+   (s.history.at(-1)?.image??{url:'/assets/chicago/v3/chicago.webp',alt:'Panorama de Chicago en 1931'}));
  }else if(s.chicago){
   if(mountedSkin!=='chicago'){
    const root=$('city');
@@ -164,7 +178,9 @@ function render(s){
   for(const paragraph of s.narrativeEnding.paragraphs){const p=document.createElement('p');p.textContent=paragraph;epilogue.append(p);}
  }
  $('legacyScoreExplanation').hidden=Boolean(s.campaign||s.chicago);
- if(s.campaign&&results){
+ if(s.succession&&s.finalResults){
+  text('winnerTitle',s.narrativeEnding.title);showChicagoRanking($('finalRanking'),s);$('narrativeEnding').open=true;
+ }else if(s.campaign&&results){
   text('winnerTitle',hotspringWinners(s,results));
   const root=$('finalRanking');root.replaceChildren();
   if(s.finalResults){

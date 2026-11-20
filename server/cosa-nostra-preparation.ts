@@ -2,7 +2,7 @@ import {createHash} from 'node:crypto';
 
 const families = ['Moretti', 'Bellini', 'Caruso', 'Vitale', 'Falcone'];
 const gauges = ['PRO', 'EMP', 'POL', 'UNI', 'DIS'];
-const choices = ['A', 'B', 'C'];
+const choices = ['POUR', 'CONTRE'];
 const chapters = [1, 2, 3, 4, 5];
 const text = (value: unknown) => typeof value === 'string' && value.trim().length > 0;
 
@@ -10,12 +10,13 @@ function requireValid(condition: unknown, message: string): asserts condition {
  if (!condition) throw new Error(message);
 }
 
-export function prepareCosaNostra(campaign, crisisIds?, ballots?) {
+export function prepareCosaNostra(campaign, crisisIds?) {
  const {metadata, dilemmas} = campaign ?? {};
  requireValid(metadata?.universe === 'Cosa Nostra — Le Trône de Chicago' && text(metadata.version) &&
   metadata.teams === 5 && metadata.chapters === 5 && metadata.dilemmas === 30 &&
   Object.keys(metadata.gauges ?? {}).length === 5 && gauges.every(code => text(metadata.gauges[code])),
  'Métadonnées de la campagne Cosa Nostra invalides.');
+ requireValid(metadata.vote_format === 'POUR_CONTRE' && metadata.choice_count === 2, 'Importez la campagne V3 binaire POUR/CONTRE.');
  requireValid(Array.isArray(dilemmas) && dilemmas.length === 30, 'La campagne doit contenir 30 dilemmes.');
  const byId = new Map<string, any>();
  for (const dilemma of dilemmas) {
@@ -25,11 +26,18 @@ export function prepareCosaNostra(campaign, crisisIds?, ballots?) {
    !byId.has(dilemma.id) && ['Pivot', 'Crise'].includes(dilemma.type) &&
    [dilemma.title, dilemma.intro, dilemma.tension, dilemma.visual_direction?.opening_scene].every(text),
   'Identifiant, chapitre ou lecture de dilemme invalide.');
-  requireValid(Array.isArray(dilemma.options) && dilemma.options.length === 3 &&
+  requireValid(Array.isArray(dilemma.options) && dilemma.options.length === 2 &&
    choices.every(choice => dilemma.options.filter(option => option?.choice === choice).length === 1),
-  'Trois issues A, B et C sont requises pour le dilemme ' + dilemma.id + '.');
+  'Deux issues POUR et CONTRE sont requises pour le dilemme ' + dilemma.id + '.');
   for (const option of dilemma.options) {
    const effects = option.effects;
+   const trends = option.public_trends;
+   requireValid(text(option.public_description) && text(option.public_compromise) &&
+    Array.isArray(trends) && trends.length > 0 && trends.length <= 3 &&
+    new Set(trends.map(t => t?.gauge)).size === trends.length &&
+    trends.every(t => gauges.includes(t?.gauge) && t.name === metadata.gauges[t.gauge] &&
+     (t.direction === '↑' ? effects?.[t.gauge] > 0 : t.direction === '↓' && effects?.[t.gauge] < 0)),
+   'Présentation publique ou tendance invalide dans le dilemme ' + dilemma.id + '.');
    requireValid([option.title, option.after, option.city_visual_result].every(text) &&
     effects && typeof effects === 'object' && !Array.isArray(effects) &&
     Object.entries(effects).every(([code, delta]) => gauges.includes(code) &&
@@ -46,6 +54,7 @@ export function prepareCosaNostra(campaign, crisisIds?, ballots?) {
   families.every(family => gauges.includes(metadata.gauge_mapping?.[family]) && text(metadata.winner_epilogues?.[family])),
  'Familles, jauges associées ou épilogues invalides.');
  const pivots = new Map<string, string>();
+ const markers = new Set<string>();
  for (const objective of objectives) {
   requireValid(text(objective.specialty) && text(objective.small?.condition) && objective.small.points === 2 &&
    text(objective.medium?.condition) && objective.medium.points === 3 &&
@@ -55,10 +64,11 @@ export function prepareCosaNostra(campaign, crisisIds?, ballots?) {
   for (const slot of objective.major_slots) {
    requireValid(Array.isArray(slot) && slot.length === 3, 'Référence de pivot invalide.');
    const [id, choice, marker] = slot;
-   requireValid(!pivots.has(id) && byId.get(id)?.type === 'Pivot' &&
+   requireValid(!markers.has(marker) && !pivots.has(id) && byId.get(id)?.type === 'Pivot' &&
     byId.get(id).options.find(option => option.choice === choice)?.secret_success === marker && text(marker),
    'Marqueur ou référence de pivot invalide pour la famille ' + objective.family + '.');
    pivots.set(id, choice);
+   markers.add(marker);
   }
  }
  const ordered = [...dilemmas].sort((a, b) => a.chapter - b.chapter || a.number - b.number);
@@ -70,18 +80,10 @@ export function prepareCosaNostra(campaign, crisisIds?, ballots?) {
   selected.every(id => byId.get(id)?.type === 'Crise') &&
   chapters.every(chapter => selected.filter(id => byId.get(id).chapter === chapter).length <= 2),
  'Choisissez au maximum deux crises par chapitre, sans doublon.');
- requireValid(ballots === undefined || ballots && typeof ballots === 'object' && !Array.isArray(ballots) &&
-  Object.keys(ballots).length === dilemmas.length, 'Définissez les deux issues jouables pour les 30 dilemmes.');
- const binary = Object.fromEntries(ordered.map(scene => {
-  const protectedChoice = pivots.get(scene.id);
-  const pair = ballots === undefined ? {pour:'A', contre:protectedChoice === 'C' ? 'C' : 'B'} : ballots[scene.id];
-  requireValid(ballots === undefined || Object.hasOwn(ballots, scene.id),
-   'Correspondance manquante pour le dilemme ' + scene.id + '.');
-  requireValid(pair && choices.includes(pair.pour) && choices.includes(pair.contre) && pair.pour !== pair.contre &&
-   (!protectedChoice || [pair.pour,pair.contre].includes(protectedChoice)),
-   'Choisissez deux issues distinctes et conservez l’issue de pivot pour le dilemme ' + scene.id + '.');
-  return [scene.id, {pour:pair.pour, contre:pair.contre}];
- }));
- return {campaign, crisisIds: crises.filter(d => selected.includes(d.id)).map(d => d.id), ballots:binary,
+ for (const scene of ordered) {
+  requireValid(scene.options.every(option => option.choice === pivots.get(scene.id) || option.secret_success == null),
+   'Marqueur secret en dehors du pivot ' + scene.id + '.');
+ }
+ return {campaign, crisisIds: crises.filter(d => selected.includes(d.id)).map(d => d.id),
   checksum: createHash('sha256').update(JSON.stringify(campaign)).digest('hex')};
 }

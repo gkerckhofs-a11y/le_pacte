@@ -4,7 +4,7 @@ import {organizerWorkspace,rememberAccess} from './founders-workspace.js';
 const route = '/api/founders/cosa-nostra/preparation';
 const chapterTitles = ['L’Héritage', 'Le Partage', 'La Guerre des ombres', 'Les Trahisons', 'La Commission'];
 const $ = id => document.getElementById(id);
-let preparation = null, writing = false;
+let preparation = null, writing = false, legacyRevision = 0;
 
 function element(tag, text) {
  const node = document.createElement(tag);
@@ -18,6 +18,7 @@ function status(text, error = false) {
 const request = organizerWorkspace({
  async onOpen() {
   const [response, {sessions}] = await Promise.all([request(route),request('/api/founders/sessions')]);
+  legacyRevision = response.legacyRevision ?? 0;
   render(response.preparation);
   const links = sessions.filter(isCurrentChicago).map(session => {
    const item = element('li');
@@ -35,7 +36,7 @@ const request = organizerWorkspace({
  localAction: 'Ouvrir la régie'
 });
 
-function scene(dilemma, metadata, selected, ballot, protectedChoice) {
+function scene(dilemma, metadata, selected) {
  const row = element('div');
  row.className = 'scene';
  if (dilemma.type === 'Crise') {
@@ -51,33 +52,13 @@ function scene(dilemma, metadata, selected, ballot, protectedChoice) {
  }
  const details = element('details');
  details.append(element('summary', 'Lecture et issues'), element('p', dilemma.intro), element('p', dilemma.tension));
- const label = element('label', 'Deux issues soumises au vote');
- const pairing = element('select');
- pairing.dataset.scene = dilemma.id;
- for (const pour of dilemma.options) {
-  for (const contre of dilemma.options) {
-   if (pour === contre || protectedChoice && ![pour.choice,contre.choice].includes(protectedChoice)) continue;
-   const option = element('option', 'POUR ' + pour.choice + ' · CONTRE ' + contre.choice);
-   option.value = pour.choice + contre.choice;
-   option.selected = pour.choice === ballot.pour && contre.choice === ballot.contre;
-   pairing.append(option);
-  }
- }
- const reserve = element('p');
- function showReserve() {
-  const reserved = dilemma.options.find(option => !pairing.value.includes(option.choice));
-  reserve.textContent = 'En réserve · ' + reserved.choice + ' — ' + reserved.title;
- }
- label.append(pairing);
- pairing.addEventListener('change', showReserve);
- showReserve();
- details.append(label, reserve);
  const options = element('ul');
  for (const option of dilemma.options) {
   const li = element('li');
   const effects = Object.entries(option.effects).map(([code, delta]) =>
    metadata.gauges[code] + ' ' + (delta > 0 ? '+' : '') + delta);
-  li.append(element('strong', option.choice + ' · ' + option.title), element('p', option.after),
+  li.append(element('strong', option.choice + ' · ' + option.title), element('p', option.public_description),
+   element('p',option.public_trends.map(t=>t.name+' '+t.direction).join(' · ')), element('p',option.public_compromise), element('p', option.after),
    element('p', effects.join(' · ') || 'Aucun effet sur les jauges'));
   options.append(li);
  }
@@ -93,14 +74,8 @@ function scene(dilemma, metadata, selected, ballot, protectedChoice) {
 function selectedCrises() {
  return [...$('chapters').querySelectorAll('input:checked')].map(input => input.value);
 }
-function selectedBallots() {
- return Object.fromEntries([...$('chapters').querySelectorAll('select[data-scene]')].map(input =>
-  [input.dataset.scene, {pour:input.value[0],contre:input.value[1]}]));
-}
 function dirty() {
- return selectedCrises().join(',') !== preparation.crisisIds.join(',') ||
-  Object.entries(selectedBallots()).some(([id,value]) => value.pour !== preparation.ballots[id].pour ||
-   value.contre !== preparation.ballots[id].contre);
+ return selectedCrises().join(',') !== preparation.crisisIds.join(',');
 }
 function updateSelection() {
  for (const chapter of $('chapters').querySelectorAll('fieldset')) {
@@ -121,8 +96,6 @@ function render(saved) {
  $('campaignPanel').hidden = !saved;
  if (!saved) return;
  const {metadata, dilemmas} = saved.campaign;
- const protectedChoices = new Map(metadata.family_objectives.flatMap(objective =>
-  objective.major_slots.map(([id,choice]) => [id,choice])));
  $('members').replaceChildren(...metadata.family_objectives.map(({family}) => {
   const label = element('label', 'Effectif · ' + family);
   const count = element('input');
@@ -137,7 +110,7 @@ function render(saved) {
   chapter.append(element('legend', 'Chapitre ' + (index + 1) + ' · ' + title));
   const scenes = dilemmas.filter(dilemma => dilemma.chapter === index + 1).sort((a, b) => a.number - b.number);
   for (const dilemma of scenes) {
-   chapter.append(scene(dilemma, metadata, saved.crisisIds, saved.ballots[dilemma.id], protectedChoices.get(dilemma.id)));
+   chapter.append(scene(dilemma, metadata, saved.crisisIds));
   }
   return chapter;
  }));
@@ -173,7 +146,8 @@ $('importForm').addEventListener('submit', async event => {
   let campaign;
   try { campaign = JSON.parse(await file.text()); }
   catch { throw new Error('Le fichier doit contenir un JSON valide.'); }
-  const response = await request(route, 'PUT', {revision: preparation?.revision ?? 0, campaign});
+  const response = await request(route, 'PUT', {revision: preparation?.revision ?? legacyRevision, campaign});
+  legacyRevision = response.legacyRevision ?? 0;
   render(response.preparation);
   $('importForm').reset();
   status('Campagne importée. Le parcours initial retient les deux premières crises de chaque chapitre.');
@@ -192,8 +166,8 @@ $('planForm').addEventListener('submit', async event => {
  writing = true;
  updateSelection();
  try {
-  const crisisIds = selectedCrises(), ballots = selectedBallots();
-  const response = await request(route, 'PUT', {revision: preparation.revision, crisisIds, ballots});
+  const crisisIds = selectedCrises();
+  const response = await request(route, 'PUT', {revision: preparation.revision, crisisIds});
   preparation = response.preparation;
   status('Parcours enregistré.');
  } catch (error) {
@@ -211,7 +185,7 @@ $('sessionForm').addEventListener('submit', async event => {
  updateSelection();
  try {
   const members = [...$('members').querySelectorAll('input')].map(field => Number(field.value));
-  const code = 'CN' + crypto.randomUUID().replaceAll('-','').slice(0,10).toUpperCase();
+  const code = 'CN' + Array.from(crypto.getRandomValues(new Uint8Array(5)),n=>n.toString(16).padStart(2,'0')).join('').toUpperCase();
   const result = await request('/api/founders/cosa-nostra/sessions', 'POST', {
    members, code, title:$('sessionTitle').value.trim(), revision:preparation.revision
   });

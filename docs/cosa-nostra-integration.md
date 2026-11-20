@@ -1,34 +1,70 @@
-# Cosa Nostra — Régie de préparation
+# Cosa Nostra — Le Trône de Chicago · recette V3
 
-Cette tranche part de `deploy/firebase` au commit `6328b69`, qui contient l’accueil des univers et la régie Hotspring. La carte Cosa Nostra ouvre `/cosa-nostra`. Cette page reprend la connexion organisateur et les composants visuels de la préparation Hotspring. Elle permet d’importer la campagne V2, de relire ses trois issues par scène et d’enregistrer un parcours de 15 pivots et jusqu’à 10 crises. Par défaut, elle sélectionne les deux premières crises de chaque chapitre.
+Le 20 novembre 2026, la page publiée sur `/cosa-nostra` correspondait octet pour octet au fichier de la branche `deploy/firebase` au commit `1f45a94e0653906bb748a927c8b928f9db5b3e3a`. Empreinte SHA-256 de la page : `c1125164eec38dbe781db159588e289bc899ccd0b6a8c9e40ffac4edaaecc205`. [Publication vérifiée](https://github.com/gkerckhofs-a11y/le_pacte/actions/runs/44717612822).
 
-Le JSON d’origine reste dans la préparation privée de l’organisateur et conserve ses identifiants, textes, jauges, objectifs, marqueurs, briefs et épilogues. La régie affiche les ambitions uniquement après authentification. Les mises à jour utilisent une révision pour détecter les modifications simultanées. Aucun export de la campagne complète ne fait partie des fichiers publics du site.
+## Contrats vérifiés et correspondance
 
-## Répétition des Conseils
-
-La régie définit, pour chaque dilemme, la variante POUR et la variante CONTRE. Le troisième choix reste dans la campagne privée. Le moteur refuse un couple qui écarte l’issue d’une ambition majeure. Les couples sont préremplis avec A/B, ou A/C si C porte le marqueur d’un pivot. Les organisateurs peuvent modifier les couples autorisés avant la création de la répétition.
-
-La répétition fige les décisions éditoriales et crée un accès privé par famille. Elle réutilise les Conseils ordinaires, l’Influence, la réserve, les offres financières, les engagements et le départage du moteur. Les jauges de Chicago démarrent à 50/100 pour la recette. La projection emprunte le décor Mafia existant en attendant les illustrations propres à chaque scène. Le dernier Conseil clôt la répétition. La succession secrète reste une phase à intégrer et à tester.
-
-## Audit des écarts avec Hotspring
-
-| Élément | Moteur vérifié sur `6328b69` | Adaptation proposée |
+| Source ou fonction | Version publiée | Version de recette |
 | --- | --- | --- |
-| Issues A/B/C | Le catalogue accepte `pour` et `contre`. Le moteur gère aussi des actions d’abstention, qui ne constituent pas une troisième issue. | Écrire, pour chaque dilemme, une question binaire et lier explicitement chaque camp à une issue source. Pour chaque pivot, inclure l’issue qui porte le marqueur ainsi qu’une alternative validée. La troisième issue reste au catalogue éditorial. Suivre le texte, les effets, le marqueur et le visuel à partir de la même correspondance. |
-| Identifiants | Le catalogue impose un identifiant commençant par une lettre et le moteur refuse le point à l’ouverture du vote. | Conserver `01.04` comme identifiant source. Produire un alias d’exécution réversible comme `CN_01_04` et conserver la table de correspondance dans le scénario versionné. |
-| Jauges et granularité | Les clés, le calibrage, la borne de 10 et le rendu de plusieurs écrans sont codés dans le moteur ou l’habillage des scénarios existants. Hotspring calcule aussi une Stabilité dérivée. | Ajouter au scénario Chicago les cinq clés PRO, EMP, POL, UNI, DIS et une échelle entière sur 100 à la lecture et à l’application des effets. Garder les valeurs de départ côté configuration jusqu’au calibrage. Diviser les variations par dix et les arrondir modifierait les effets et le passage du seuil 60. |
-| Rôles | Le Maire ouvre le vote et son rôle peut évoluer à la clôture. L’abstention correspondante peut transférer le rôle de Shérif, qui arbitre les égalités ordinaires et certains choix du prochain Maire. L’historique conserve les deux titulaires à la clôture. | Mapper les noms vers « L’Homme du Maire » et « L’Homme du Commissaire ». Prendre les titulaires du dernier Conseil résolu pour le départage final, sous réserve des règles d’éligibilité. |
-| Arrêt pendant un Conseil | Des mises sont engagées dans le vote. L’acceptation d’une offre financière applique le transfert immédiatement et l’enregistre. La pause et la sauvegarde prolongent une séance en cours. | Pour terminer le Conseil, attendre sa résolution. Pour l’annuler, définir la frontière des transactions à conserver. Un instantané à l’ouverture du Conseil pourrait restaurer l’Influence et les transactions de ce Conseil sans toucher aux accords antérieurs. L’arbitrage produit est requis avant d’ajouter cette transition. |
-| Finale et score | La fin Hotspring utilise un parcours et un calcul de score propres à sa campagne. L’historique commun conserve choix et mises des Conseils résolus. | Ajouter une séquence Chicago distincte. Calculer les petits objectifs à partir des issues adoptées et de l’Influence effectivement engagée. Pour les ambitions majeures, tester la neutralisation avant que chaque famille ait eu une occasion, puis la comparaison sur un nombre commun d’occasions. Valider les seuils et le départage après simulation. |
-| Bulletins et révélation | Les vues de projection, famille et régie sont séparées. Le Conseil expose publiquement les positions et mises. | Stocker les bulletins de succession côté serveur, avec un bulletin immuable par famille, sans autovote. Avant révélation, seul l’accusé de réception est visible par le votant. Tester l’isolement des vues, puis révéler les scores agrégés et l’épilogue. |
-| Médias | Le JSON V2 fournit des briefs et références, sans les fichiers finaux. | Conserver les références par identifiant et par issue, y compris les issues placées en réserve. Brancher les fichiers 16:9 après production et validation des deux issues jouables. |
+| Préparation privée | V2, trois issues avec correspondance configurable | Import V3 à deux choix étiquetés. Le remplacement d'une préparation V2 requiert sa révision. Les sessions V2 déjà créées gardent leur scénario figé. |
+| Source V3 du 20 novembre | JSON de l’organisateur | Empreinte du fichier original `ab5d9fc66d00f623f6e99e1ad41619db9a855016abe452840e9f662a6331558c`. L’import conserve le JSON intégral dans la préparation du propriétaire et calcule une seconde empreinte sur le JSON sérialisé. |
+| `id, chapter, number, title, type` | Identifiant technique sans point | `01.02` reste l’ID éditorial ; `CN_01_02` est l’alias dans l’historique des votes. L’ordre est celui des chapitres et des scènes. 15 pivots obligatoires, 0 à 2 crises par chapitre. |
+| `intro, tension` | Un bloc narratif | Lecture neutre identique à la V3. Les 30 introductions et les deux descriptions de chaque scène proviennent du fichier. |
+| `choice, title, public_description, public_trends, public_compromise` | Deux libellés choisis en régie | Deux camps fixes, une carte par camp sur les écrans de jeu. Projection et terminaux reçoivent uniquement la description, les tendances et le compromis de chaque proposition. |
+| `effects, after, city_visual_result` | Résolution du camp adopté | Valeurs entières sur 100, bornées après application. Récit et image de la seule issue adoptée après le vote. La chronique mémorise le résultat. Avant vote, les jauges courantes sont qualitatives sur les écrans publics. |
+| `visual_direction, city_visual_asset_suggestion` | Décor générique | Référence originale conservée dans la préparation. Fichier d'ouverture et résultat POUR/CONTRE identifiés par la scène. Les variantes sont servies par l’API après contrôle de la phase de cette session. |
+| `family_objectives, major_slots, secret_success, gauge_mapping` | Cinq fiches privées | Le serveur vérifie 15 pivots uniques, trois par famille et les marqueurs. Il associe chaque participant votant à une seule famille. Les noms d’équipe affichés restent personnalisables. |
+| `winner_epilogues` | Fin des Conseils | Le texte de la famille élue apparaît après proclamation. |
+| Vote, accords et détenteurs | Mises publiques, surenchère, abstentions, dons et engagements | Mêmes fonctions de vote, de transfert et de résolution. Les deux appuis politiques portent les noms de Chicago. Les ressources et la réserve conservent les règles du moteur. |
 
-### Exemple vérifié sur le moteur
+Les deux documents de conception et le guide MJ datés du 20 novembre 2026 prescrivent la campagne binaire. Les règles Western remises aux joueurs le 17 novembre donnent le contexte. Pour la mécanique, voir [le moteur de vote de référence](https://github.com/gkerckhofs-a11y/le_pacte/blob/1f45a94e0653906bb748a927c8b928f9db5b3e3a/src/founders.ts) et [le traitement des commandes de référence](https://github.com/gkerckhofs-a11y/le_pacte/blob/1f45a94e0653906bb748a927c8b928f9db5b3e3a/src/founders-live.ts).
 
-Sur un pivot de test dont le marqueur se trouve sur C, la correspondance **POUR → C**, **CONTRE → A**, **B en réserve** conserve le vote binaire. Le test joue les deux résultats avec cinq familles, vérifie le rejet d’un bulletin direct « C » et confirme que seul le bon résultat restitue le marqueur. Les textes, effets et visuels de chaque issue proviennent de la même entrée JSON. Les correspondances de la campagne réelle restent dans la régie et sont à valider avant leur utilisation en partie.
+## Finale et arbitrages de recette
 
-### Recette
+- La régie peut convoquer la Commission dès la préparation, après résolution, en négociation, pendant le vote ou en pause. Pendant un Conseil, elle peut attendre sa résolution ou annuler celui-ci. Une demande différée en pause reste conservée jusqu’à la reprise.
+- L’instantané est pris au début de la négociation. Interrompre restaure les soldes, l’Influence, la réserve et les titulaires de cet instantané. Le journal conserve les mises, les transferts, les statuts des offres et les corrections annulés. Les Conseils précédents sont acquis. Ce choix de recette fixe la frontière transactionnelle.
+- Les objectifs mineurs comptent deux soutiens gagnants ou plus avec Influence engagée et amélioration réellement observée de la jauge. À la borne 100, un effet théorique positif sans augmentation effective ne compte pas. L’objectif intermédiaire requiert 60/100.
+- Pour chaque famille, la base commune est le minimum des nombres de pivots effectivement résolus. Seules ses premières occasions dans l’ordre réel sont retenues. À zéro occasion commune, la majeure et son critère de départage sont neutralisés pour tous. Aux bases 1, 2 et 3, les seuils sont respectivement 1/1, 2/2 et 2/3. Le détail reste consultable en régie.
+- Négociations finales de durée libre, cinq bulletins, verrouillage par le MJ, résultat scellé, puis proclamation. Chaque porte-parole choisit une autre famille. Un tour numéroté et un bulletin immuable par identité permettent les votes simultanés et les reconnexions.
+- Égalité de total, puis de voix, puis de pivots retenus : le dernier Homme du Maire neutre tranche, à défaut le dernier Homme du Commissaire neutre. Seuls les titulaires du dernier Conseil résolu sont éligibles. À défaut, nouveau scrutin secret entre ex æquo ; s’il reste plusieurs premiers, les deux premiers du tour sont sélectionnés, avec le tirage initial pour départager la qualification. Dernier tour puis priorité initiale si nécessaire. Les bulletins des tours supplémentaires ne rapportent aucun point électoral supplémentaire.
+- Le serveur fige le résultat à la proclamation. L’historique et l’export JSON privé restent accessibles à la régie. La projection reçoit les points, le classement, le nombre de soutiens et l’épilogue. Les choix électoraux individuels restent confidentiels.
 
-Depuis l’accueil local, ouvrir Cosa Nostra, se connecter, importer le JSON V2 et enregistrer un parcours. Le test automatisé vérifie la validation, la limite de deux crises par chapitre, le rejet des accès joueur, l’isolement des comptes et le conflit d’écriture. Pour lancer le test ciblé avec le fichier original local, utiliser `COSA_NOSTRA_TEST_CAMPAIGN=/chemin/campagne.json node --test test/cosa-nostra-preparation.test.mjs`.
+Le départ à 50/100, la politique des occasions communes et le départage exceptionnel sont des paramètres de recette. Les mécanismes de cette branche s’activent uniquement sur une nouvelle session Chicago V3.
 
-La campagne et les choix propres à l’organisateur restent privés. Le retrait du commit retire le bouton et la route tout en laissant les préparations privées stockées. La fusion vers `deploy/firebase` déclenche le déploiement de production et requiert l’accord de l’organisateur.
+## Vérification et démo
+
+Avec Node.js 24 et les dépendances installées par `npm ci` :
+
+```sh
+npm test
+COSA_NOSTRA_TEST_CAMPAIGN=/chemin/campagne-v3.json node --test test/cosa-nostra-preparation.test.mjs test/chicago-succession.test.mjs
+node scripts/chicago-calibration.mjs /chemin/campagne-v3.json 100
+npm run build:firebase
+node scripts/verify-cloud-build.mjs
+node scripts/chicago-rehearsal.mjs /chemin/campagne-v3.json
+```
+
+Le lanceur utilise une base SQLite distincte. En mode `--lan`, le PC et les cinq téléphones utilisent le même Wi-Fi. Le kit organisateur contient la campagne privée. Seuls les liens individuels sont destinés aux familles.
+
+## Simulations du 20 novembre 2026
+
+Deux séries de 100 campagnes sur le parcours standard, graine reproductible 20261120. Chaque campagne est évaluée aux cinq arrêts. Dans la stratégie individuelle, chaque famille soutient son pivot ou l’option la plus favorable à sa jauge, avec une mise d’un point. Quand les deux options se valent, le choix est tiré au sort. Une récupération d’Influence intervient si la famille a épuisé sa réserve ou avec une probabilité de 17 %. Les voix de succession sont réparties au hasard entre familles éligibles. Dans la seconde série, trois familles se coordonnent autour d’une famille dont l’identité tourne entre les répétitions. Ses deux alliés lui donnent leur voix quand elle est éligible. Les trois familles soutiennent sa préférence au Conseil.
+
+| Stratégie | Conseils résolus | Pivots communs | Victoires Moretti | Bellini | Caruso | Vitale | Falcone |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| individuelle | 0 | 0 | 23 | 23 | 20 | 15 | 19 |
+| individuelle | 3 | 0 | 49 | 13 | 14 | 11 | 13 |
+| individuelle | 7 | 1 | 36 | 2 | 13 | 35 | 14 |
+| individuelle | 15 | 1 | 27 | 5 | 12 | 40 | 16 |
+| individuelle | 25 | 3 | 45 | 8 | 3 | 34 | 10 |
+| coalition | 0 | 0 | 21 | 20 | 22 | 18 | 19 |
+| coalition | 3 | 0 | 31 | 14 | 17 | 23 | 15 |
+| coalition | 7 | 1 | 27 | 10 | 14 | 28 | 21 |
+| coalition | 15 | 1 | 23 | 12 | 20 | 24 | 21 |
+| coalition | 25 | 3 | 22 | 14 | 22 | 22 | 20 |
+
+Après trois Conseils, Moretti atteint le seuil de jauge de 60 dans 43 répétitions individuelles et réussit son petit objectif dans 32. À cet arrêt, aucun des quatre autres clans n’atteint le seuil de 60. À 25 Conseils, les victoires de la série individuelle vont de 3 à 45 sur 100. Avec les coalitions tournantes, elles vont de 14 à 22 sur 100. La neutralisation des pivots corrige le nombre d’occasions, mais les chances observées restent sensibles aux enjeux du début de partie et aux alliances. Ces fréquences décrivent ces stratégies et ces tirages. Une validation avec des joueurs est encore nécessaire avant de fixer le barème.
+
+## Changement et retour arrière
+
+La PR cible la branche de publication. Sa fusion déclencherait le workflow de production. La recette utilise la branche de travail séparée. Pour revenir à la version publiée pendant la recette, arrêter le serveur local puis ouvrir la version habituelle du site. La répétition et sa base locale restent disponibles pour un nouvel essai. Pour un éventuel retour arrière après une publication ultérieure, revenir par un revert des commits de la PR et redéployer la révision vérifiée après autorisation. Préserver les préparations et états V3 : le code V2 ne sait pas reprendre une succession V3 en cours.

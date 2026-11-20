@@ -12,7 +12,7 @@
  <nav class="breadcrumb" aria-label="Navigation"><a href="/">Univers</a></nav>
  <h1>Cosa Nostra — Le Trône de Chicago</h1>
  <p class="context">Régie de préparation · Chicago, 1931</p>
- <p>Préparez le parcours et lancez une répétition des Conseils. Chaque dilemme propose un vote POUR/CONTRE avec une troisième issue en réserve.</p>
+ <p>Préparez le parcours et lancez une répétition des Conseils. Chaque dilemme propose un vote POUR/CONTRE avec les deux propositions de la campagne V3.</p>
  <p id="status" role="status" aria-live="polite"></p>
  <section id="loginPanel" class="form-panel" aria-label="Connexion à la régie">
   <div id="localLogin" hidden><label for="localKey">Clé de répétition locale</label><input id="localKey" type="password" autocomplete="off"></div>
@@ -24,8 +24,8 @@
    <ul id="sessions"></ul>
   </section>
   <form class="form-panel" id="importForm">
-   <h2>Campagne narrative V2</h2>
-   <p id="sourceVersion">Importez le fichier Cosa_Nostra_30_dilemmes_V2_Direction_Artistique.json pour ouvrir la campagne dans votre régie.</p>
+   <h2>Campagne narrative V3</h2>
+   <p id="sourceVersion">Importez le fichier Cosa_Nostra_Campagne_30_Dilemmes_V3_Binaire.json pour ouvrir la campagne dans votre régie.</p>
    <label for="campaignFile">Fichier de campagne JSON</label>
    <input id="campaignFile" type="file" accept=".json,application/json" required>
    <div class="actions"><button id="importCampaign">Importer la campagne</button></div>
@@ -41,7 +41,7 @@
    <div>
     <form class="form-panel" id="sessionForm">
      <h2>Nouvelle répétition</h2>
-     <p class="help">Les cinq jauges démarrent à 50/100 pour la recette. Cette répétition couvre les Conseils ordinaires.</p>
+     <p class="help">Les cinq jauges démarrent à 50/100 pour la recette. La régie peut convoquer la succession à tout moment.</p>
      <label for="sessionTitle">Nom de la partie</label>
      <input id="sessionTitle" maxlength="100" value="Cosa Nostra — Répétition" required>
      <div id="members"></div>

@@ -1,4 +1,5 @@
-import {isChicago} from './founders-chicago.ts';
+import {checkpointChicago,freezeChicago} from './chicago-succession.ts';
+import {isChicago,hasChicagoSuccession} from './founders-chicago.ts';
 import {openFoundersDilemma,applyFoundersCityEffects,activeFounders} from './founders.ts';
 import {calculateFoundersFinal} from './founders-scoring.ts';
 import {isHybrid,chooseNarrativeNext,narrativeReserve,narrativeEpilogue} from './founders-progression.ts';
@@ -30,7 +31,7 @@ export function setPhaseClock(s,now){
  const seconds=isManualHotspring(s)?null:reading?s.campaign.presentationSeconds:s.phase==='NEGOTIATION'?s.timing.negotiationSeconds:s.phase==='COUNCIL'?s.timing.voteSeconds:s.phase==='REVEALED'?s.timing.resolutionSeconds:null;
  s.clock={phase:s.phase,deadline:seconds===null?null:now+seconds*1000,remainingMs:seconds===null?null:seconds*1000,paused:false};
 }
-export function beginNegotiation(s,now){s.phase='NEGOTIATION';setPhaseClock(s,now);}
+export function beginNegotiation(s,now){checkpointChicago(s);s.phase='NEGOTIATION';setPhaseClock(s,now);}
 export function beginVote(s,now){s.game=openFoundersDilemma(s.game,s.currentDilemmaId);s.phase='COUNCIL';setPhaseClock(s,now);}
 export function revealResolution(s,now){
  const result=s.game.history.at(-1);check(result?.id===s.currentDilemmaId,'Résultat du vote introuvable');
@@ -40,8 +41,10 @@ export function revealResolution(s,now){
  s.game=applyFoundersCityEffects(s.game,outcome.effects.map(e=>({resource:e.indicator,kind:e.operation,...(e.operation==='delta'?{amount:e.value}:{})})));
  for(const o of Object.values(s.offers))if(o.status==='pending')o.status='expired';
  s.lastReveal={id:d.id,title:d.title,winner:result.winner,yes:result.yes,no:result.no,narration:outcome.narration,effects:structuredClone(outcome.effects),cityBefore,cityAfter:cityIndicators(s.game.city),nextId:outcome.next_id,...(outcome.chronicle?{chronicle:structuredClone(outcome.chronicle)}:{})};
+ if(hasChicagoSuccession(s))s.lastReveal.visual=structuredClone(outcome.chronicle.image);
  if(campaign)Object.assign(s.lastReveal,{chapter:d.chapter,visual:outcome.visual});
  s.revealedHistory.push({...structuredClone(s.lastReveal),city:cityIndicators(s.game.city)});s.phase='REVEALED';setPhaseClock(s,now);
+ if(hasChicagoSuccession(s)){delete s.chicagoCheckpoint;if(s.chicagoRequest)freezeChicago(s,now);}
 }
 export function finishV2(s,now){
  // Interrupting a council refunds all its bids; no unfinished decision affects city or score.
@@ -51,6 +54,7 @@ export function finishV2(s,now){
   s.campaign.suspension=null;
   s.phase='EPILOGUE';s.narrativeEnding=campaignEpilogue(s);setPhaseClock(s,now);return;
  }
+ if(hasChicagoSuccession(s)){freezeChicago(s,now);return;}
  if(isChicago(s)){
   s.phase='FINISHED';s.lastReveal=null;
   s.narrativeEnding={title:'Conseils de Chicago terminés',paragraphs:['Le parcours de répétition est terminé. Le scrutin de succession fera l’objet d’une recette séparée.']};

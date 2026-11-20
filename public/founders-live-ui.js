@@ -5,6 +5,16 @@ export function gaugeState(value,thresholds=[2,4,6,8]){const level=thresholds.fi
 const gaugeNumber=new Intl.NumberFormat('fr-BE',{maximumFractionDigits:1});
 const stabilityNumber=new Intl.NumberFormat('fr-BE',{minimumFractionDigits:1,maximumFractionDigits:1});
 export const formatGaugeNumber=(value,decimal=false)=>(decimal?stabilityNumber:gaugeNumber).format(value);
+export function renderChicagoGaugeLevels(root,s){
+ if(!s.cityLevels)return false;
+ for(const [code,level] of Object.entries(s.cityLevels)){
+  const line=document.createElement('div');line.className='gauge gauge-head';
+  const label=document.createElement('span');label.textContent=s.skin.labels.resources[code];
+  const state=document.createElement('strong');state.textContent=levels[level];
+  line.append(label,state);root.append(line);
+ }
+ return true;
+}
 export function decorateGauge(bar,label,value,s,{compact=false}={}){
  const state=gaugeState(value*10/(s.gaugeMaximum??10),s.gaugeThresholds);bar.style.background=state.color;
  if(compact)label.title=state.label;
@@ -51,6 +61,13 @@ export function renderChicagoChoices(root,s){
  for(const side of ['pour','contre']){
   const choice=document.createElement('li');
   choice.textContent=side.toUpperCase()+' · '+s.dilemma.labels[side];
+  const option=s.dilemma.publicOptions?.[side];
+  if(option){
+   const heading=document.createElement('strong');heading.textContent=choice.textContent;choice.replaceChildren(heading);
+   for(const line of [option.description,option.trends.map(t=>t.name+' '+t.direction).join(' · '),option.compromise]){
+    const paragraph=document.createElement('p');paragraph.textContent=line;choice.append(paragraph);
+   }
+  }
   root.append(choice);
  }
 }
