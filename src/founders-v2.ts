@@ -10,6 +10,7 @@ export const LABELS_V2={economie:'Économie',ecologie:'Écologie',securite:'Séc
 export const TIMING_V2={negotiationSeconds:480,voteSeconds:180,resolutionSeconds:20,autoAdvance:true};
 const check=(ok,m)=>{if(!ok)throw new Error(m);};
 export const isV2=s=>s.experienceVersion===2;
+export const usesManualCouncil=s=>isManualHotspring(s)||hasChicagoSuccession(s);
 export function validateTiming(t){
  check(t&&typeof t==='object'&&!Array.isArray(t)&&Object.keys(t).every(k=>Object.hasOwn(TIMING_V2,k)),'Paramétrage des chronos invalide');
  for(const k of ['negotiationSeconds','voteSeconds','resolutionSeconds'])check(Number.isSafeInteger(t[k])&&t[k]>=5&&t[k]<=7200,'Durée : de 5 à 7200 secondes');
@@ -28,9 +29,10 @@ export function setPhaseClock(s,now){
  if(!isV2(s))return;
  if(isHotspring(s))s.campaign.justResumed=false;
  const reading=['INTRO','PRESENTATION'].includes(s.phase);
- const seconds=isManualHotspring(s)?null:reading?s.campaign.presentationSeconds:s.phase==='NEGOTIATION'?s.timing.negotiationSeconds:s.phase==='COUNCIL'?s.timing.voteSeconds:s.phase==='REVEALED'?s.timing.resolutionSeconds:null;
+ const seconds=usesManualCouncil(s)?null:reading?s.campaign.presentationSeconds:s.phase==='NEGOTIATION'?s.timing.negotiationSeconds:s.phase==='COUNCIL'?s.timing.voteSeconds:s.phase==='REVEALED'?s.timing.resolutionSeconds:null;
  s.clock={phase:s.phase,deadline:seconds===null?null:now+seconds*1000,remainingMs:seconds===null?null:seconds*1000,paused:false};
 }
+export function presentDilemma(s,now){s.phase='PRESENTATION';setPhaseClock(s,now);}
 export function beginNegotiation(s,now){checkpointChicago(s);s.phase='NEGOTIATION';setPhaseClock(s,now);}
 export function beginVote(s,now){s.game=openFoundersDilemma(s.game,s.currentDilemmaId);s.phase='COUNCIL';setPhaseClock(s,now);}
 export function revealResolution(s,now){
@@ -67,12 +69,13 @@ export function nextV2(s,now,requested){
  const next=isHybrid(s.scenario)?chooseNarrativeNext(s,requested):s.lastReveal.nextId;
  if(next===null){finishV2(s,now);return;}
  check(s.revealedHistory.length<=s.scenario.dilemmas.length*3,'Nombre maximal de dilemmes atteint');
- s.currentDilemmaId=next;s.lastReveal=null;beginNegotiation(s,now);
+ s.currentDilemmaId=next;s.lastReveal=null;
+ if(usesManualCouncil(s))presentDilemma(s,now);else beginNegotiation(s,now);
 }
 
 export function continueHotspring(s,now,requested){
  const c=s.campaign;
- if(s.phase==='INTRO'){s.phase='PRESENTATION';setPhaseClock(s,now);return;}
+ if(s.phase==='INTRO'){presentDilemma(s,now);return;}
  if(s.phase==='PRESENTATION'){beginNegotiation(s,now);return;}
  if(s.phase==='CHECKPOINT'){
   c.publicRanking=null;c.interlude=null;
@@ -93,28 +96,33 @@ export function continueHotspring(s,now,requested){
   });
   s.phase='CHECKPOINT';
  }else {
-  s.currentDilemmaId=next.id;s.lastReveal=null;s.phase='PRESENTATION';
+  s.currentDilemmaId=next.id;s.lastReveal=null;presentDilemma(s,now);return;
  }
  setPhaseClock(s,now);
 }
 
-export function suspendHotspring(s,now){
- check(!['READY','FINISHED','EPILOGUE','SUSPENDED'].includes(s.phase),'Fin de séance indisponible');
- const c=s.campaign;
+export function suspendSitting(s,now){
+ check(!['READY','FINISHED','EPILOGUE','SUSPENDED','SUCCESSION'].includes(s.phase),'Fin de séance indisponible');
+ const storage=s.campaign??s;
  const clock=structuredClone(s.clock);
- if(clock.deadline!==null)clock.remainingMs=Math.max(0,clock.deadline-now);
+ if(usesManualCouncil(s))clock.remainingMs=null;
+ else if(clock.deadline!==null)clock.remainingMs=Math.max(0,clock.deadline-now);
  clock.deadline=null;
- c.suspension={phase:s.phase,clock};
- c.publicRanking=hotspringScores(s).rows.map(r=>({family:r.family,name:r.name,total:r.total,maximum:r.maximum}));
+ storage.suspension={phase:s.phase,clock};
+ if(isHotspring(s))s.campaign.publicRanking=hotspringScores(s).rows.map(r=>({family:r.family,name:r.name,total:r.total,maximum:r.maximum}));
  s.phase='SUSPENDED';setPhaseClock(s,now);
 }
 
-export function resumeHotspring(s,now){
- const c=s.campaign,{phase,clock}=c.suspension;
+export function resumeSitting(s,now){
+ const storage=s.campaign??s,{phase,clock}=storage.suspension;
  s.phase=phase;s.clock=clock;
  if(!clock.paused&&clock.remainingMs!==null)clock.deadline=now+clock.remainingMs;
- c.suspension=null;c.crisesThisSitting=0;c.justResumed=true;
- if(phase!=='CHECKPOINT')c.publicRanking=null;
+ delete storage.suspension;
+ if(isHotspring(s)){
+  const c=s.campaign;
+  c.suspension=null;c.crisesThisSitting=0;c.justResumed=true;
+  if(phase!=='CHECKPOINT')c.publicRanking=null;
+ }
 }
 
 export function revealHotspringResults(s,now){
@@ -138,7 +146,7 @@ export function epilogueV2(s){
 }
 /** Called transactionally on reads, including projection polling; the server clock owns transitions. */
 export function advanceNarrativeTime(input,now){
- if(!isV2(input)||isManualHotspring(input)||input.clock?.paused||!input.timing.autoAdvance||!input.clock?.deadline||now<input.clock.deadline)return input;
+ if(!isV2(input)||usesManualCouncil(input)||input.clock?.paused||!input.timing.autoAdvance||!input.clock?.deadline||now<input.clock.deadline)return input;
  const s=structuredClone(input);
  if(isHotspring(s)&&['INTRO','PRESENTATION'].includes(s.phase))continueHotspring(s,now);
  else if(s.phase==='NEGOTIATION')beginVote(s,now);

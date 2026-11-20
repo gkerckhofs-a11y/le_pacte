@@ -16,6 +16,7 @@ function game(){
   }};
 }
 function finishCouncil(g) {
+ if(g.s.phase==='PRESENTATION')g.cmd('next');
  g.cmd('beginVote');
  while(g.s.game.vote){
   const v=g.s.game.vote,who=v.turn;
@@ -30,7 +31,7 @@ function ballot(g,choices){
  g.cmd('closeChicagoBallot');
 }
 test('Interruption du Conseil en pause : restaure les ressources, accords et titulaires du début du Conseil',()=>{
- const g=game();g.cmd('start');finishCouncil(g);g.cmd('next');
+ const g=game();g.cmd('start');finishCouncil(g);g.cmd('next');g.cmd('next');
  const before=structuredClone(g.s.game);
  g.cmd('offer',{id:'offre-0001',to:'B',amount:2,commitment:{choice:'gift'}},'A');
  g.cmd('acceptOffer',{id:'offre-0001'},'B');
@@ -42,7 +43,7 @@ test('Interruption du Conseil en pause : restaure les ressources, accords et tit
  assert.throws(()=>g.cmd('resume'),/figés/);assert.throws(()=>g.cmd('requestChicagoFinale',{confirm:true}));
 });
 test('Termine le Conseil en cours et conserve sa résolution une seule fois',()=>{
- const g=game();g.cmd('start');g.cmd('requestChicagoFinale',{mode:'finish',confirm:true});
+ const g=game();g.cmd('start');g.cmd('next');g.cmd('requestChicagoFinale',{mode:'finish',confirm:true});
  assert.equal(g.view().succession.stage,'requested');finishCouncil(g);
  assert.equal(g.view().phase,'SUCCESSION');assert.equal(g.s.revealedHistory.length,1);
  assert.equal(g.s.succession.frozen.roles.mayor,g.s.game.history[0].leader);
@@ -62,7 +63,9 @@ test('Cinq bulletins immuables, concurrence, confidentialité et proclamation',(
  for(const id of ids.slice(1))g.cmd('castChicagoBallot',{round:1,candidate:'A'},id,rev);
  g.cmd('closeChicagoBallot');assert.equal(g.view().finalResults,null);
  assert.equal(g.view().succession.stage,'sealed');g.cmd('revealChicago');
- const winner=g.view().finalResults.rows[0];assert.equal(winner.family,'A');assert.equal(winner.total,8);
+ const winner=g.view().finalResults.rows[0];assert.equal(winner.family,'A');assert.equal(winner.total,14);assert.equal(winner.secret,undefined);
+ assert.equal(g.view('A').finalResults.rows[0].wealth,3);
+ assert.equal(g.view('B').finalResults.rows[0].wealth,undefined);
  assert.equal(g.view().narrativeEnding.paragraphs[0],fixture().metadata.winner_epilogues.Moretti);
  assert.throws(()=>g.cmd('revealChicago'));
 });
@@ -98,9 +101,56 @@ for(const [mayor,commissioner,eligible] of [['C','D','C'],['A','D','D']]){
   assert.equal(g.view().finalResults.rows[0].family,'B');
  });
 }
-test('Plafond de 18 points pour dix points d’ambition et quatre voix',()=>{
+test('Plafond de 21 points pour dix points d’ambition, la fortune et quatre voix',()=>{
  const g=game();g.cmd('requestChicagoFinale',{confirm:true});
  Object.assign(g.s.succession.frozen.scores[0],{small:2,medium:3,major:5,secret:10});
  g.cmd('openChicagoBallot');ballot(g,['B','A','A','A','A']);g.cmd('revealChicago');
- assert.equal(g.view().finalResults.rows[0].total,18);
+ assert.equal(g.view().finalResults.rows[0].total,21);
+});
+
+test('Alignement Hotspring : présentation, vote sans chrono et conservation intégrale à la reprise',()=>{
+ const g=game();
+ g.cmd('start');
+ assert.equal(g.s.phase,'PRESENTATION');
+ assert.equal(g.view().city.stabilite,undefined);
+ assert.throws(()=>g.cmd('beginVote'),/négociation/);
+ assert.throws(()=>g.cmd('configureTiming',{timing:g.s.timing}),/Chronos indisponibles/);
+ g.cmd('next');
+ g.cmd('offer',{id:'sitting-offer',to:'B',amount:2,commitment:{choice:'contre',minInfluence:1}},'A');
+ g.cmd('acceptOffer',{id:'sitting-offer'},'B');
+ g.cmd('beginVote');
+ const turn=g.s.game.vote.turn;
+ assert.equal(g.view().influenceReserve.available,g.s.game.pool);
+ g.cmd('vote',{kind:turn==='B'?'contre':'pour',amount:1},turn);
+ const savedGame=structuredClone(g.s.game),savedOffers=structuredClone(g.s.offers);
+ g.cmd('endSitting');
+ assert.equal(g.s.phase,'SUSPENDED');
+ assert.equal(g.view().sittingSummary,undefined);
+ assert.equal(narrativeView(g.s,organizer).sittingSummary.length,5);
+ assert.throws(()=>g.cmd('vote',{kind:'passe_pouvoir'},g.s.game.vote.turn),/sauvegardée/);
+ assert.throws(()=>g.cmd('requestChicagoFinale',{confirm:true}),/indisponible/);
+ g.cmd('resumeSitting');
+ assert.equal(g.s.phase,'COUNCIL');
+ assert.equal(g.s.clock.deadline,null);
+ assert.deepEqual(g.s.game,savedGame);
+ assert.deepEqual(g.s.offers,savedOffers);
+ assert.equal(g.view('B').voteCommitment.choice,'contre');
+});
+
+test('Trajectoires et fortunes ex æquo, et stabilité calculée en lecture seule',()=>{
+ const g=game();
+ g.cmd('start');g.cmd('pause');
+ const values=[80,70,70,50,40],fortunes=[14,10,10,7,4];
+ for(const [i,id] of ids.entries()){
+  g.cmd('correctCity',{indicator:g.s.scenario.chicago.ambitions[id].indicator,value:values[i]});
+  g.cmd('correctResource',{family:id,resource:'dollars',value:fortunes[i]});
+ }
+ assert.throws(()=>g.cmd('correctCity',{indicator:'stabilite',value:100}),/jauge fondamentale/);
+ assert.equal(narrativeView(g.s,organizer).city.stabilite,62);
+ assert.deepEqual(chicagoScores(g.s).map(r=>r.medium),[3,3,3,0,0]);
+ assert.deepEqual(chicagoScores(g.s).map(r=>r.wealthRank),[1,2,2,4,5]);
+ assert.deepEqual(chicagoScores(g.s).map(r=>r.wealth),[3,2,2,0,0]);
+ g.cmd('requestChicagoFinale',{confirm:true});
+ assert.equal(g.s.phase,'SUCCESSION');
+ assert.equal(g.view().city.stabilite,undefined);
 });

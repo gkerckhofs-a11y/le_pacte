@@ -1,5 +1,7 @@
 // Keep the compact print wording alongside the detailed terminal rules.
-export function createHotspringRules({print=false,manual=false}={}){
+import {roleLabel} from './founders-role-badges.js';
+
+export function createHotspringRules({print=false,manual=false,chicago=false}={}){
  const heading=print?'h4':'h3';
  const template=document.createElement('template');
  template.innerHTML=`
@@ -107,5 +109,26 @@ export function createHotspringRules({print=false,manual=false}={}){
   </section>
  </section>
  `;
- return template.content.firstElementChild;
+ const root=template.content.firstElementChild;
+ if(chicago){
+  const goal=root.querySelector('.print-reminder-columns section, .hotspring-rules-columns section');
+  goal.innerHTML='<'+heading+'>Votre but</'+heading+'>'+
+   '<p>Devenez le Parrain de Chicago. Gardez vos ambitions secrètes.</p>'+
+   '<ul><li>Soutiens gagnants qui font progresser votre jauge : 2 points.</li>'+
+   '<li>Trajectoire : 3 points si votre jauge est parmi les deux plus élevées, ex æquo compris.</li>'+
+   '<li>Pivots décisifs : jusqu’à 5 points selon les occasions communes.</li>'+
+   '<li>Fortune : jusqu’à 3 points.</li>'+
+   '<li>Scrutin secret : 2 points par voix reçue, jusqu’à 8 points. Chaque famille vote pour une autre famille.</li></ul>'+
+   '<p>Maximum : 21 points. La Stabilité est la moyenne des cinq jauges.</p>';
+  const leader=roleLabel({chicago},'mayor'),arbitrator=roleLabel({chicago},'sheriff');
+  const substitutions={'LES COLONS DE HOTSPRING':'COSA NOSTRA','Construisez Hotspring.':'Façonnez Chicago.',
+   Hotspring:'Chicago','Le Maire':leader,'Le Shérif':arbitrator,'nouveau Maire':'nouveau titulaire du rôle « '+leader+' »',
+   'de Maire':'« '+leader+' »',Maire:leader,Shérif:arbitrator};
+  const walker=document.createTreeWalker(root,4);
+  while(walker.nextNode()){
+   const node=walker.currentNode;
+   node.textContent=node.textContent.replace(/LES COLONS DE HOTSPRING|Construisez Hotspring\.|Hotspring|Le Maire|Le Shérif|nouveau Maire|de Maire|Maire|Shérif/g,word=>substitutions[word]);
+  }
+ }
+ return root;
 }

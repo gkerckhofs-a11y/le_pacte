@@ -94,18 +94,19 @@ export function mountPrintKit({session,view,request,renew}){
    if(new Set(cards.map(c=>c.token)).size!==s.families.length)throw new Error('Les accès des familles ne sont pas uniques');
    // All-or-nothing: never print a partial kit or silently skip a failed family.
    for(const {f,data} of cards){
-    const c=card(root,f,s.campaign?null:'Accès privé · terminal officiel');c.dataset.family=f.id;
+    const standard=s.campaign||s.manualCouncil;
+    const c=card(root,f,standard?null:'Accès privé · terminal officiel');c.dataset.family=f.id;
     const image=node('div',undefined,'print-qr'),svg=new DOMParser().parseFromString(data.svg,'image/svg+xml').documentElement;
     if(svg.localName!=='svg'||svg.querySelector('parsererror'))throw new Error('Image QR invalide');
     image.append(document.importNode(svg,true));
-    if(s.campaign){
+    if(standard){
      c.classList.add('print-hotspring');
      if(f.name.length>48)c.classList.add('print-long-name');
      const access=node('header',undefined,'print-hotspring-access'),identity=node('div');
      c.querySelector('.print-kicker').textContent=s.story.title;
      identity.append(...c.children,node('p','Porte-parole, scannez le QR de votre équipe. Gardez cette page ouverte pendant la partie.','print-scan'));
      access.append(identity,image);
-     c.append(access,createHotspringRules({print:true,manual:s.campaign.version>=3}));
+     c.append(access,createHotspringRules({print:true,manual:s.manualCouncil||s.campaign?.version>=3,chicago:Boolean(s.chicago)}));
     }else{
      c.append(image,node('p','Session '+s.code+' · Équipe '+f.id,'print-reference'));
      const instructions=node('ol');for(const t of ['Scannez le QR code.','Vérifiez le nom de votre famille et le code de session affichés.','Gardez cette page ouverte pendant toute la partie.','Un seul terminal officiel est utilisé pour votre famille.'])instructions.append(node('li',t));c.append(instructions);
@@ -113,9 +114,9 @@ export function mountPrintKit({session,view,request,renew}){
      for(const [title,body] of [['Accueil','« Ma table » : votre situation et vos ressources.'],['Vote','« Votre décision politique » : POUR, CONTRE ou ABSTENTION, puis ajout d’Influence ou passage.'],['Négociation et finances','« Vos négociations » : envoyez une proposition, acceptez ou refusez une somme ; vos fonds sont dans « Vos ressources ».'],['Objectifs','Votre ambition secrète et ses paliers se trouvent sur « Ma table ».']])c.append(node('p',title+' — '+body));
      c.append(node('p','Le porte-parole utilise l’interface officielle. Les autres membres de l’équipe peuvent librement négocier avec les autres familles.'));
     }
-    const link=node('a',s.campaign?'Ouvrir le terminal':'Ouvrir le terminal de '+f.name,s.campaign?'print-preview-link':null);
+    const link=node('a',standard?'Ouvrir le terminal':'Ouvrir le terminal de '+f.name,standard?'print-preview-link':null);
     link.href=data.link;c.append(link);
-    if(!s.campaign)c.append(node('p','Confidentiel. Accès valable 24 h après sa création. Régénérer un accès invalide le QR précédent.','small'));
+    if(!standard)c.append(node('p','Confidentiel. Accès valable 24 h après sa création. Régénérer un accès invalide le QR précédent.','small'));
    }
    prepared={fingerprint:stamp,cards};$('printReadyQR').disabled=false;
    $('printStatus').textContent=cards.length+'/'+s.families.length+' fiches vérifiées. Les accès absents ou expirés ont été remplacés ; distribuez ces nouvelles fiches.';

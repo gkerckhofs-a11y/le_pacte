@@ -37,7 +37,7 @@ function gauge(data){
   const item=document.createElement('div');item.className='gauge';
   const top=document.createElement('div');top.className='gauge-head';
   const name=document.createElement('span');name.textContent=data.skin.labels.resources[indicator]||indicator;
-  const n=document.createElement('strong');n.textContent=formatGaugeNumber(data.city[indicator],indicator==='stabilite'&&data.campaign?.version>=2)+'/'+(data.gaugeMaximum??10);appendGaugeDelta(n,data,indicator);top.append(name,n);
+  const n=document.createElement('strong');n.textContent=formatGaugeNumber(data.city[indicator],indicator==='stabilite'&&(data.campaign?.version>=2||data.manualCouncil))+'/'+(data.gaugeMaximum??10);appendGaugeDelta(n,data,indicator);top.append(name,n);
   const bar=document.createElement('div');bar.className='track';
   const inside=document.createElement('div');inside.className='bar';inside.style.width=data.city[indicator]*100/(data.gaugeMaximum??10)+'%';
   decorateGauge(inside,name,data.city[indicator],data);bar.append(inside);item.append(top,bar);root.append(item);
@@ -83,7 +83,7 @@ function offers(data){
 }
 function render(data){
  document.body.classList.toggle('chicago-v3',Boolean(data.succession));
- const manual=data.campaign?.version>=3||data.chicago;
+ const manual=data.manualCouncil||data.campaign?.version>=3||data.chicago;
  const finishing=data.phase==='FINISHED'&&!document.body.classList.contains('game-finished');document.body.classList.toggle('game-finished',data.phase==='FINISHED');
  renderVoteProgress($('voteProgress'),data);
  renderPhaseClock($('phaseClock'),data);
@@ -91,6 +91,7 @@ function render(data){
  current=data;
  renderSuccession($('chicagoSuccession'),data,'team',command);
  $('chicagoEquity').hidden=$('chicagoPriority').hidden=!data.succession;
+ $('chicagoLegacyRules').hidden=Boolean(data.manualCouncil);
  if(data.succession)set('chicagoPriority','Ordre tiré au lancement · '+data.finalTieOrder.map(id=>teamLabel(data,id)).join(' → '));
  renderCouncilRoles($('councilRoles'),data);
  const self=data.self,c=data.council;
@@ -148,7 +149,7 @@ function render(data){
  if(data.succession&&data.finalResults){
   const row=data.finalResults.rows.find(r=>r.family===self.id);
   set('personalResultText',data.narrativeEnding.title);
-  set('personalScoreBreakdown','Ambitions '+row.secret+' pts · '+row.support+' soutien(s) × 2 = '+row.total+' points au total.');
+  set('personalScoreBreakdown','Ambitions '+row.secret+' pts · Fortune '+(row.wealth??0)+' pts · '+row.support+' soutien(s) × 2 = '+row.total+' points au total.');
  }else if(data.campaign&&data.finalResults){
   const score=data.privateCampaign.score;
   set('personalResultText',hotspringWinners(data));
@@ -217,9 +218,9 @@ function render(data){
  $('sendOffer').disabled=Boolean(manual&&self.dollars===0);
  $('offerBalanceHint').hidden=!manual||self.dollars>0;
  const campaignRules=$('rulesHotspring');
- campaignRules.hidden=!data.campaign;
- if(data.campaign&&!campaignRules.firstElementChild)campaignRules.append(createHotspringRules({manual}));
- $('rulesIntroduction').hidden=Boolean(data.campaign);
+ campaignRules.hidden=!(data.campaign||data.manualCouncil);
+ if(!campaignRules.hidden&&!campaignRules.firstElementChild)campaignRules.append(createHotspringRules({manual,chicago:Boolean(data.chicago)}));
+ $('rulesIntroduction').hidden=!campaignRules.hidden;
  $('rulesLegacy').hidden=data.experienceVersion===2;$('rulesV2').hidden=data.experienceVersion!==2||Boolean(data.campaign||data.chicago);
  $('rulesChicago').hidden=!data.chicago;
  const target=$('targetFamily'),prev=target.value;target.replaceChildren();
@@ -239,7 +240,7 @@ function renderOfferDialog(data){
  if(!offer||data.clock?.paused){if(dialog.open)dialog.close();return;}
  if(dialog.dataset.offer===offer.id&&dialog.open)return;
  dialog.dataset.offer=offer.id;
- const manual=data.campaign?.version>=3||data.chicago,binding=isPoliticalOffer(offer);
+ const manual=data.manualCouncil||data.campaign?.version>=3||data.chicago,binding=isPoliticalOffer(offer);
  const side=binding?offer.commitment.choice.toUpperCase():'';
  const sender=data.families.find(f=>f.id===offer.from)?.name??offer.from;
  set('receivedOffer',manual?'La famille « '+sender+' » vous propose '+offer.amount+' $'+(binding?' en échange d’un vote '+side:'')+'.':teamLabel(data,offer.from)+' vous propose '+offer.amount+' '+data.skin.labels.currency+'.');

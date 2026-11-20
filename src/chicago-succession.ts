@@ -1,4 +1,5 @@
 import {activeFounders} from './founders.ts';
+import {fortuneScore,leadingIndicatorThreshold} from './founders-scoring.ts';
 import {hasChicagoSuccession} from './founders-chicago.ts';
 
 function requireRule(condition, message) {
@@ -9,8 +10,8 @@ export const openCouncil = s => ['NEGOTIATION','COUNCIL'].includes(s.phase);
 
 export function checkpointChicago(s) {
  if (!hasChicagoSuccession(s)) return;
- const {families, pool, powerSupply, leader, moderator, transactions} = s.game;
- s.chicagoCheckpoint = {families:clone(families), pool, powerSupply, leader, moderator,
+ const {families, city, pool, powerSupply, leader, moderator, transactions} = s.game;
+ s.chicagoCheckpoint = {families:clone(families), city:clone(city), pool, powerSupply, leader, moderator,
   transactionsLength:transactions.length, correctionsLength:s.corrections?.length ?? 0};
 }
 
@@ -33,11 +34,12 @@ export function chicagoScores(s) {
   return {family,gauge,supports,pivots,value:s.game.city[gauge]};
  });
  const common = Math.min(...audit.map(row => row.pivots.length));
+ const trajectoryThreshold=leadingIndicatorThreshold(Object.values(s.game.city));
  return audit.map(row => {
   const favorable = row.pivots.slice(0, common).filter(p => p.favorable).length;
   const major = common > 0 && favorable >= Math.ceil(2 * common / 3) ? 5 : 0;
-  const small = row.supports.length >= 2 ? 2 : 0, medium = row.value >= 60 ? 3 : 0;
-  return {...row,common,required:Math.ceil(2 * common / 3),favorable,small,medium,major,secret:small+medium+major};
+  const small = row.supports.length >= 2 ? 2 : 0, medium = row.value >= trajectoryThreshold ? 3 : 0;
+  return {...row,...fortuneScore(s.game,row.family),trajectoryThreshold,common,required:Math.ceil(2 * common / 3),favorable,small,medium,major,secret:small+medium+major};
  });
 }
 
@@ -81,7 +83,7 @@ function requestFinale(s, data, now) {
   if (s.corrections) s.corrections.length = correctionsLength;
   for (const offer of offers) offer.status = 'cancelled';
  } else {
-  requireRule(['READY','REVEALED'].includes(s.phase), 'Finale indisponible.');
+  requireRule(['READY','PRESENTATION','REVEALED'].includes(s.phase), 'Finale indisponible.');
   s.chicagoRequest = {mode:'immediate',at:now};
  }
  freezeChicago(s,now);
@@ -106,7 +108,7 @@ function resolveRound(s, now) {
  f.audit.push({stage:'verrouillage',round:round.number,at:now});
  if (round.number === 1) {
   f.ranking = f.frozen.scores.map(r => ({family:r.family,small:r.small,medium:r.medium,major:r.major,secret:r.secret,
-   favorable:r.favorable,support:counts[r.family],total:r.secret+2*counts[r.family]}));
+   favorable:r.favorable,wealth:r.wealth??0,support:counts[r.family],total:r.secret+(r.wealth??0)+2*counts[r.family]}));
   f.ranking.sort((a,b) => b.total-a.total || b.support-a.support || b.favorable-a.favorable ||
    s.initiativeOrder.indexOf(a.family)-s.initiativeOrder.indexOf(b.family));
   const top = f.ranking[0];

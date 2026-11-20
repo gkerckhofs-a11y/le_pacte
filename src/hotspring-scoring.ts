@@ -1,3 +1,4 @@
+import {fortuneScore,leadingIndicatorThreshold} from './founders-scoring.ts';
 import {activeFounders} from './founders.ts';
 
 export const HOTSPRING_INDICATORS=Object.freeze(['economie','ecologie','securite','bien_etre','demographie']);
@@ -25,10 +26,7 @@ export function hotspringTrajectoryTarget(campaign,indicator){
  return indicator==='autonomy'?2:campaign.initialCity[indicator]+1;
 }
 
-export function hotspringLeadingThreshold(city){
- // The second position sets the threshold. Any gauge tied at that level qualifies.
- return HOTSPRING_INDICATORS.map(indicator=>city[indicator]).sort((left,right)=>right-left)[1];
-}
+export const hotspringLeadingThreshold=city=>leadingIndicatorThreshold(HOTSPRING_INDICATORS.map(indicator=>city[indicator]));
 
 export function chapterObjective(definition,markers){
  return definition.groups.filter(group=>group.some(m=>markers.has(m))).length>=definition.required?2:0;
@@ -55,9 +53,7 @@ export function hotspringScores(s,{final=false}={}){
    key==='whitmore'?campaign.trust>=3||markers.has('ALLIANCE_VALLEE'):markers.has(legacy[key].government)
   )?1:0;
   const dollars=s.game.families[family].dollars;
-  // Counting only strictly richer families gives shared ranks and skips occupied places.
-  const wealthRank=final?1+families.filter(id=>s.game.families[id].dollars>dollars).length:0;
-  const wealth=final?Math.max(0,4-wealthRank):0;
+  const {wealthRank,wealth}=final?fortuneScore(s.game,family):{wealthRank:0,wealth:0};
   return {family,name:s.names[family],chapterPoints,trajectory,charter,governance,hasLegacy,
    ...(final?{dollars,wealthRank,wealth}:{}),
    total:chapterPoints.reduce((sum,c)=>sum+c.points,0)+trajectory+charter+governance+wealth,

@@ -164,3 +164,16 @@ export function analyzeFoundersGoalReachability(story,cards=DEFAULT_GOAL_CARDS,{
  return {endings:endCities.length,truncated,invalidPaths,goals:counts,initialCity:copy(initialCity),
   note:'Exploration combinatoire (choix 50/50 non présumé), sans négociations ni probabilité humaine.'};
 }
+
+export const averageIndicators=values=>values.reduce((sum,value)=>sum+value,0)/values.length;
+
+export function leadingIndicatorThreshold(values){
+ // The second position sets the threshold. Any gauge tied at that level qualifies.
+ return [...values].sort((left,right)=>right-left)[1];
+}
+
+export function fortuneScore(game,family){
+ const dollars=game.families[family].dollars;
+ const wealthRank=1+activeFounders(game).filter(id=>game.families[id].dollars>dollars).length;
+ return {wealthRank,wealth:Math.max(0,4-wealthRank)};
+}
