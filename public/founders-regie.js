@@ -215,17 +215,20 @@ function render(s){
  set('tiePriority','Tirage de départage final : '+s.finalTieOrder.map(id=>teamLabel(s,id)).join(' → '));
  $('start').hidden=s.phase!=='READY';
  $('reveal').hidden=s.phase!=='AWAITING_REVEAL';
- $('next').hidden=s.phase!=='REVEALED';
- $('next').textContent=(s.progression?s.progression.terminal:s.reveal?.nextId===null)?'Terminer la partie':'Dilemme suivant';
- if(s.manualCouncil&&s.chicago&&s.phase==='PRESENTATION'){
-  $('next').hidden=false;$('next').textContent='Ouvrir la négociation';
- }
- if(s.succession&&s.reveal?.nextId===null)$('next').hidden=true;
- if(s.chicago&&s.reveal?.nextId===null)$('next').textContent=s.succession?'Déclencher la finale':'Clôturer la répétition';
+ const terminal=s.progression?s.progression.terminal:s.reveal?.nextId===null;
+ let nextLabel=null,finalLabel=null;
  if(s.campaign){
-  $('next').hidden=!['INTRO','PRESENTATION','REVEALED','CHECKPOINT'].includes(s.phase);
-  $('next').textContent=({INTRO:'Présenter le dilemme',PRESENTATION:'Ouvrir la négociation',REVEALED:s.reveal?.id==='D30'?'Lire l’épilogue':'Poursuivre',CHECKPOINT:s.campaign.chapter===6?'Qualifier les chartes':'Reprendre — chapitre suivant'})[s.phase]??'Poursuivre';
+  if(s.phase==='CHECKPOINT'&&s.campaign.chapter>=5)finalLabel=s.campaign.chapter===6?'Qualifier les chartes':'Ouvrir le chapitre final';
+  else if(s.phase==='REVEALED'&&s.reveal?.id==='D30')finalLabel='Lire l’épilogue';
+  else nextLabel=({INTRO:'Présenter le dilemme',PRESENTATION:'Ouvrir la négociation',REVEALED:'Poursuivre',CHECKPOINT:'Reprendre — chapitre suivant'})[s.phase];
+ }else if(s.manualCouncil&&s.chicago&&s.phase==='PRESENTATION')nextLabel='Ouvrir la négociation';
+ else if(s.phase==='REVEALED'){
+  if(!terminal)nextLabel='Dilemme suivant';
+  else if(!s.succession)finalLabel=s.chicago?'Clôturer la répétition':'Terminer la partie';
  }
+ $('next').hidden=!nextLabel;if(nextLabel)set('next',nextLabel);
+ $('finalNext').hidden=!finalLabel;if(finalLabel)set('finalNext',finalLabel);
+ $('sessionControls').hidden=['pauseGame','resumeGame','endSitting','resumeSitting','finalNext','showResults','finishGame','chicagoSuccession','sittingSummary'].every(id=>$(id).hidden);
  $('tiePriority').closest('details').hidden=Boolean(s.campaign||s.chicago&&!s.succession);
  renderActionAvailability(s);
  $('reservePanel').hidden=!s.progression||s.progression.terminal;
@@ -291,11 +294,10 @@ async function command(kind,data={}){
  finally{busy=false;renderActionAvailability(current);}
 }
 function renderActionAvailability(s){
- const rehearsal=document.getElementById('rehearsalDecision');
- if(rehearsal)rehearsal.inert=busy;
- for(const button of $('actions').querySelectorAll('button')){
-  const advance=['start','next','reveal','beginVote'].includes(button.id);
-  button.disabled=busy||Boolean(advance&&s?.clock?.paused)||Boolean(button.id==='next'&&s?.progression?.blocked);
+ $('actions').inert=busy;
+ for(const id of ['start','next','finalNext','reveal','beginVote']){
+  const next=id==='next'||id==='finalNext';
+  $(id).disabled=busy||Boolean(s?.clock?.paused)||Boolean(next&&s?.progression?.blocked);
  }
 }
 async function newVariant(){
@@ -330,7 +332,7 @@ $('start').addEventListener('click',async()=>{
  finally{busy=false;renderActionAvailability(current);}
 });
 $('reveal').addEventListener('click',()=>command('reveal'));
-$('next').addEventListener('click',()=>command('next',current?.progression&&$('nextDilemma').value?{dilemmaId:$('nextDilemma').value}:{}));
+for(const id of ['next','finalNext'])$(id).addEventListener('click',()=>command('next',current?.progression&&$('nextDilemma').value?{dilemmaId:$('nextDilemma').value}:{}));
 $('copyAccess').addEventListener('click',async()=>{
  try{await navigator.clipboard.writeText($('newAccessLink').value);set('notice','Lien copié.');}
  catch{set('notice','Sélectionnez et copiez le lien dans le champ.');}
@@ -405,7 +407,13 @@ function renderV2Controls(s){
  for(const id of ['addTime','removeTime'])$(id).hidden=!v2||manual||s.clock?.remainingMs==null||ended||suspended;
  $('pauseGame').hidden=!v2||ended||suspended||Boolean(s.clock?.paused);
  $('resumeGame').hidden=!v2||suspended||!s.clock?.paused;
- $('finishGame').hidden=!v2||ended||s.chicago;
+ const canSave=Boolean(s.campaignAdmin||s.manualCouncil);
+ $('endSitting').hidden=!canSave||ended||suspended||s.phase==='READY';
+ $('resumeSitting').hidden=!canSave||!suspended;
+ $('showResults').hidden=!s.campaignAdmin||s.phase!=='EPILOGUE'||s.clock.paused;
+ // At these two checkpoints the normal final transition and an early finish lead to the same step.
+ const finalCheckpoint=s.campaign&&s.phase==='CHECKPOINT'&&s.campaign.chapter>=5&&!s.clock.paused;
+ $('finishGame').hidden=!v2||ended||s.chicago||finalCheckpoint;
  $('finishDescription').textContent=s.campaign&&s.phase==='CHECKPOINT'&&s.campaign.chapter>=5?
   'La régie ouvrira la prochaine étape du final. Les familles décideront du gouvernement et de la charte.':
   s.campaign?'La régie ouvrira l’épilogue et affichera les scores issus des décisions déjà prises.':
@@ -422,7 +430,7 @@ function renderV2Controls(s){
  const pending=Object.values(s.offers).filter(o=>o.status==='pending');
  set('pendingOffers',pending.length?'Offres en attente : '+pending.map(o=>teamLabel(s,o.from)+' → '+teamLabel(s,o.to)+' : '+o.amount+' '+s.skin.labels.currency).join(' ; '):'Aucune proposition financière en attente.');
 }
-$('beginVote').addEventListener('click',()=>command('beginVote'));
+for(const id of ['beginVote','endSitting','resumeSitting','showResults'])$(id).addEventListener('click',()=>command(id));
 $('pauseGame').addEventListener('click',()=>command('pause'));
 $('resumeGame').addEventListener('click',()=>command('resume'));
 $('addTime').addEventListener('click',()=>command('adjustTime',{seconds:60}));

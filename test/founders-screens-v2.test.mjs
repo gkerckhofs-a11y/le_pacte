@@ -7,6 +7,9 @@ import {webcrypto} from 'node:crypto';
 import {parseHTML} from 'linkedom';
 import {foundersPreview,foundersCatalogFor} from '../server/founders-catalog.ts';
 import {createNarrativeSession,applyNarrativeCommand,narrativeView} from '../src/founders-live.ts';
+import {prepareCosaNostra} from '../server/cosa-nostra-preparation.ts';
+import {chicagoSessionPreview} from '../server/cosa-nostra-session.ts';
+import {fixture as chicagoCampaign} from './helpers/chicago.mjs';
 import {newCampaign,team} from './helpers/hotspring.mjs';
 const owner={role:'organizer',id:'host'};
 let state=createNarrativeSession(foundersPreview({scenarioId:'hot-spring-reserve-hybride',scenarioVersion:'2.0.0',skinId:'western',members:[1,1,1,1,1]}),{ownerId:'host',id:'1'.repeat(24),code:'SCREENV2',title:'Test écrans',now:1000});
@@ -198,9 +201,8 @@ test('Hotspring V1.2 : Stabilité sous le panorama et ouverture manuelle depuis 
  const regie=(await screen('regie',g.state)).document;
  const controls=regie.querySelector('.regie-animation');
  assert.equal(controls.nextElementSibling.id,'councilMonitor');
- assert.ok(controls.contains(regie.getElementById('beginVote')));
- assert.ok(controls.contains(regie.getElementById('pauseGame')));
- assert.ok(controls.contains(regie.getElementById('finishGame')));
+ assert.ok(controls.querySelector('#playControls #beginVote'));
+ for(const id of ['pauseGame','endSitting','finishGame'])assert.equal(controls.querySelector('#sessionControls #'+id).hidden,false);
  assert.equal(regie.getElementById('timingForm').hidden,true);
  assert.equal(regie.getElementById('beginVote').hidden,false);
  assert.equal(regie.getElementById('beginVote').textContent,'Ouvrir le vote');
@@ -239,7 +241,7 @@ test('Hotspring : l’épilogue annonce le classement avant le détail des objec
  assert.equal(get('narrativeEnding').hidden,false);
  assert.ok(get('endingText').textContent.includes('Qu’avez-vous fait de Hotspring'));
  const regie=(await screen('regie',game.state)).document;
- assert.match(regie.getElementById('actions').textContent,/Dévoiler les objectifs et le détail des scores/);
+ assert.equal(regie.querySelector('#sessionControls #showResults').hidden,false);
  assert.match(regie.getElementById('hotspringStage').textContent,/Les Doyle · 5 \/ 5/);
  game.command('showResults',{},owner);
  await projection.update(game.state);
@@ -280,4 +282,37 @@ test('Préparation : cinq familles Hotspring et aucun catalogue de prototypes',a
 test('Famille : une proposition reçue ouvre immédiatement une fenêtre avec acceptation et refus',async()=>{
  let s=command(state,owner,'next');s=command(s,{role:'team',family:'B'},'offer',{id:'popup_001',to:'A',amount:3,reason:'Votez avec nous'});
  const {document}=await screen('family',s);assert.equal(document.getElementById('offerDialog').open,true);assert.match(document.getElementById('receivedOffer').textContent,/3/);assert.match(document.getElementById('receivedCommitment').textContent,/ne vous engage pas/);assert.equal(document.getElementById('offerAccept').textContent,'Accepter');
+});
+
+test('Régie de Chicago : distinguer le vote des familles, la suspension et le scrutin final',async()=>{
+ const {preview,names}=chicagoSessionPreview(prepareCosaNostra(chicagoCampaign()),[5,5,5,5,5]);
+ let s=createNarrativeSession(preview,{ownerId:owner.id,id:'c'.repeat(24),code:'BUREAU',title:'Chicago',rehearsal:true,names,now:1000});
+ const advance=(kind,data={})=>{s=command(s,owner,kind,data);};
+ advance('start');advance('next');
+ const {document,update}=await screen('regie',s);
+ const play=document.getElementById('playControls'),session=document.getElementById('sessionControls');
+ assert.equal(play.querySelector('#beginVote').hidden,false);
+ assert.equal(session.querySelector('#endSitting').hidden,false);
+ assert.match(session.querySelector('#chicagoSuccession').textContent,/Interrompre ce Conseil et lancer la finale/);
+ advance('beginVote');await update(s);
+ assert.match(play.querySelector('#rehearsalDecision').textContent,/Valider POUR/);
+ advance('endSitting');await update(s);
+ assert.equal(session.querySelector('#resumeSitting').hidden,false);
+ advance('resumeSitting');advance('requestChicagoFinale',{mode:'interrupt',confirm:true});advance('openChicagoBallot');await update(s);
+ const lock=[...session.querySelectorAll('#chicagoSuccession button')].find(b=>b.textContent==='Verrouiller le scrutin');
+ assert.ok(lock?.disabled,'Le scrutin final attend les cinq bulletins');
+});
+
+test('Le dernier bouton de progression de Hotspring quitte les commandes ordinaires',async()=>{
+ const g=newCampaign({scenarioVersion:'1.2.0',ownerId:owner.id});
+ g.command('start',{},owner);
+ const {document,update}=await screen('regie',g.state);
+ for(const [chapter,label] of [[5,'Ouvrir le chapitre final'],[6,'Qualifier les chartes']]){
+  g.state.phase='CHECKPOINT';g.state.campaign.chapter=chapter;g.state.revision++;
+  await update(g.state);
+  assert.equal(document.querySelector('#playControls #next').hidden,true);
+  const next=document.querySelector('#sessionControls #finalNext');
+  assert.equal(next.hidden,false);assert.equal(next.textContent,label);
+  assert.equal(document.querySelector('#finishGame').hidden,true);
+ }
 });

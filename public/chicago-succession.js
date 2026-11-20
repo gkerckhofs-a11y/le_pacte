@@ -32,9 +32,9 @@ export function renderSuccession(root,s,role,command) {
   if(['NEGOTIATION','COUNCIL'].includes(s.phase)){
    add(root,'h3','Déclencher la finale');
    if(!available)add(root,'p',words.requested);
-   else button(root,'Terminer ce Conseil, puis lancer la finale',()=>request('finish'));
-   button(root,'Interrompre ce Conseil et lancer la finale',()=>request('interrupt'));
-  }else button(root,'Déclencher la finale',()=>request('immediate'));
+   else button(root,'Terminer ce Conseil, puis lancer la finale',()=>request('finish')).className='secondary';
+   button(root,'Interrompre ce Conseil et lancer la finale',()=>request('interrupt')).className='danger';
+  }else button(root,'Déclencher la finale',()=>request('immediate')).className='secondary';
   return;
  }
  if(!done){

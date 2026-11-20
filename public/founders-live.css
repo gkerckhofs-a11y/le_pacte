@@ -248,10 +248,22 @@ body[data-skin=western].family-dashboard .identity-panel label{font-size:14px;fo
 /* Organizer: explicit connection, preparation and running council. */
 .regie-steps{display:flex;gap:20px;list-style:none;padding:0 0 22px;margin:0;color:var(--muted);border-bottom:1px solid var(--border);font-size:14px;flex-wrap:wrap}.regie-steps li{display:flex;gap:9px;align-items:center}.regie-steps b{display:inline-grid;place-items:center;width:28px;height:28px;border:1px solid var(--border);border-radius:50%}.regie-steps [aria-current=step]{color:var(--gold);font-weight:700}.regie-steps [aria-current=step] b{background:var(--gold);color:var(--bg);border-color:var(--gold)}
 .regie-login{max-width:760px;margin:24px 0}.regie-login h2{font-size:28px;margin-top:12px}.regie-login #login{font-size:18px;padding:15px 24px}.regie-login #localLogin{margin-bottom:18px}.regie-login #loginMessage{margin-bottom:0}.regie-account{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:20px 0;color:var(--muted);font-size:13px}.regie-account button{font-size:12px;padding:8px 12px}
-.regie-animation{margin-bottom:16px;padding:16px 20px;border-left:4px solid var(--gold)}
-.regie-next-action h2{font-size:25px;margin:0 0 5px}.regie-next-action p{margin:0;line-height:1.5}
-.regie-animation #actions{margin-top:12px}
-.regie-animation #actions button:not(.secondary):not(.danger){font-size:19px;padding:12px 21px}
+.regie-animation{margin-bottom:16px}
+.regie-command-groups{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(270px,1fr);gap:20px;align-items:start}
+.regie-command-groups>.panel{min-width:0;padding:clamp(16px,2vw,24px)}
+.regie-play{border-top:4px solid var(--gold)}
+.regie-session{border-top:4px double var(--muted)}
+.regie-command-groups h2{font-size:clamp(20px,2vw,26px);margin:0 0 14px}
+.regie-next-action h3{font-size:18px;margin:0 0 4px}
+.regie-next-action p{margin:0;line-height:1.5}
+.regie-play-actions:has(> :not([hidden])){margin-top:12px}
+.regie-play-actions button:not(.secondary){font-size:19px;padding:12px 21px}
+.regie-session .row:has(> :not([hidden]))~.regie-ending-actions:has(> :not([hidden])),
+.regie-session #chicagoSuccession{border-top:1px solid var(--border);padding-top:12px;margin-top:12px}
+.regie-session #chicagoSuccession h3{font-size:17px;margin:0 0 6px}
+.regie-session button,.regie-play-actions button{max-width:100%;overflow-wrap:anywhere}
+.regie-play:has(+ [hidden]){grid-column:1/-1}
+@media(max-width:800px){.regie-command-groups{grid-template-columns:minmax(0,1fr);gap:16px}}
 .regie-animation .regie-crisis{max-width:360px}
 .regie-animation #actionMessage{min-height:0;margin:8px 0 0}
 .regie-animation #actionMessage:empty{display:none}

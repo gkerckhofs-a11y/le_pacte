@@ -289,13 +289,10 @@ export function renderCampaignActions(root,s,command){
  root.replaceChildren();root.hidden=true;
  const a=s.campaignAdmin;
  if(!a&&!s.manualCouncil)return;
- const action=(label,kind,primary=false)=>{
-  const b=node('button',label,primary?null:'secondary');b.type='button';b.addEventListener('click',()=>command(kind));return b;
- };
- if(s.phase==='SUSPENDED')root.append(action('Reprendre la séance','resumeSitting',true));
- if(a?.mayResumeCrises&&!s.clock.paused)root.append(action('Reprendre les crises en réserve','resumeCrises'));
- if(s.phase==='EPILOGUE'&&!s.clock.paused)root.append(action('Dévoiler les objectifs et le détail des scores','showResults',true));
- if(!['READY','SUSPENDED','EPILOGUE','FINISHED','SUCCESSION'].includes(s.phase))root.append(action('Terminer la séance','endSitting'));
+ if(a?.mayResumeCrises&&!s.clock.paused){
+  const button=node('button','Reprendre les crises en réserve','secondary');button.type='button';
+  button.addEventListener('click',()=>command('resumeCrises'));root.append(button);
+ }
  if(a?.crisisMode==='extended'&&s.phase==='REVEALED'&&!s.clock.paused&&/^D2[3-8]/.test(s.reveal?.id??'')){
   const opts=a.crises.filter(c=>c.available);
   if(opts.length){

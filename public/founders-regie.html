@@ -30,27 +30,45 @@
 </dialog>
 <div id="regieContent" hidden>
  <p id="monitorConnection" class="small" role="status"></p>
- <section class="panel regie-animation" aria-label="Commandes d’animation">
-   <div class="regie-next-action"><h2 id="stageTitle"></h2><p id="stageHint"></p></div>
-   <div id="reservePanel" class="card" hidden>
-    <label for="nextDilemma">Prochain chapitre admissible</label>
-    <select id="nextDilemma"><option value="">Laisser le moteur choisir</option></select>
-    <p id="reserveStatus" class="small muted"></p>
-   </div>
-   <section id="rehearsalPanel" class="card rehearsal-panel" aria-label="Régie de test" hidden>
-    <h3 id="rehearsalHeading">Votes des familles en régie</h3><div id="rehearsalDecision"></div>
+ <section class="regie-animation" aria-label="Commandes de la partie">
+  <div id="actions" class="regie-command-groups">
+   <section id="playControls" class="panel regie-play" aria-labelledby="playHeading">
+    <h2 id="playHeading">Animer la partie</h2>
+    <div class="regie-next-action"><h3 id="stageTitle"></h3><p id="stageHint"></p></div>
+    <div id="reservePanel" class="card" hidden>
+     <label for="nextDilemma">Prochain chapitre admissible</label>
+     <select id="nextDilemma"><option value="">Laisser le moteur choisir</option></select>
+     <p id="reserveStatus" class="small muted"></p>
+    </div>
+    <div class="row regie-play-actions">
+     <button id="start" type="button" hidden>Lancer la partie</button>
+     <button id="beginVote" type="button" hidden>Ouvrir le vote maintenant</button>
+     <button id="reveal" type="button" hidden>Révéler la décision</button>
+     <button id="next" type="button" hidden>Dilemme suivant</button>
+     <div id="campaignActions" class="row" hidden></div>
+     <button id="addTime" type="button" class="secondary" hidden>+ 1 minute</button><button id="removeTime" type="button" class="secondary" hidden>− 1 minute</button>
+    </div>
+    <section id="rehearsalPanel" class="card rehearsal-panel" aria-label="Régie de test" hidden>
+     <h3 id="rehearsalHeading">Votes des familles en régie</h3><div id="rehearsalDecision"></div>
+    </section>
    </section>
-   <div class="row" id="actions">
-    <button id="beginVote" type="button" hidden>Ouvrir le vote maintenant</button><button id="start" type="button" hidden>Lancer la partie</button>
-    <button id="reveal" type="button" hidden>Révéler la décision</button>
-    <button id="next" type="button" hidden>Dilemme suivant</button>
-    <div id="campaignActions" class="row" hidden></div>
+   <section id="sessionControls" class="panel regie-session" aria-labelledby="sessionHeading" hidden>
+    <h2 id="sessionHeading">Pause et fin de partie</h2>
+    <div class="row">
+     <button id="pauseGame" type="button" class="secondary" hidden>Mettre en pause</button>
+     <button id="resumeGame" type="button" class="secondary" hidden>Reprendre la partie</button>
+     <button id="endSitting" type="button" class="secondary" hidden>Sauvegarder et suspendre la séance</button>
+     <button id="resumeSitting" type="button" class="secondary" hidden>Reprendre la séance</button>
+    </div>
     <p id="sittingSummary" class="small" hidden></p>
-    <button id="pauseGame" type="button" class="secondary" hidden>Pause</button><button id="resumeGame" type="button" class="secondary" hidden>Reprendre</button>
-    <button id="addTime" type="button" class="secondary" hidden>+ 1 minute</button><button id="removeTime" type="button" class="secondary" hidden>− 1 minute</button>
-    <button id="finishGame" type="button" class="danger" hidden>Terminer la partie</button>
-   </div>
-   <section id="chicagoSuccession" class="panel" aria-live="polite" hidden></section>
+    <div class="row regie-ending-actions">
+     <button id="finalNext" type="button" class="secondary" hidden>Passer au final</button>
+     <button id="showResults" type="button" class="secondary" hidden>Dévoiler les objectifs et le détail des scores</button>
+     <button id="finishGame" type="button" class="danger" hidden>Terminer la partie</button>
+    </div>
+    <section id="chicagoSuccession" aria-label="Succession du Parrain" aria-live="polite" hidden></section>
+   </section>
+  </div>
    <p id="actionMessage" class="regie-message" role="status" aria-live="polite"></p>
  </section>
  <section id="councilMonitor" class="panel council-monitor" aria-label="Suivi du Conseil"></section>
