@@ -377,6 +377,15 @@ button.danger{background:#a83333!important;color:#fff!important;border-color:#a8
 .chicago-v3 #chicagoChoices { padding:0; list-style:none; }
 .chicago-v3 #chicagoChoices li { background:#202A2E; color:#EEE3D0; padding:.7rem 1rem; border-inline-start:3px solid #B79562; margin-block:.45rem; }
 .chicago-v3 #chicagoChoices p { margin:.3rem 0; }
+.projection-dashboard.chicago-v3 #chicagoChoices:not([hidden]){
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:6px 0;
+}
+.projection-dashboard.chicago-v3 #chicagoChoices>li{min-width:0;padding:6px;margin:0}
+.projection-dashboard.chicago-v3 #chicagoChoices :is(strong,p){display:block;font-size:.86em;line-height:1.25}
+.projection-dashboard.chicago-v3 #chicagoChoices p{margin:2px 0}
+@media(max-width:550px){
+ .projection-dashboard.chicago-v3 #chicagoChoices:not([hidden]){grid-template-columns:1fr}
+}
 .chicago-v3 #chicagoSuccession { grid-column:1/-1; }
 .chicago-v3 #chicagoSuccession button { margin:.25rem; }
 .chicago-panorama { width:100%; height:100%; object-fit:cover; aspect-ratio:16/9; }
