@@ -166,6 +166,12 @@ function render(s){
   set('regieTitle','Régie · Cosa Nostra');
   $('createAnotherSession').href='/cosa-nostra';
  }
+ if(s.rehearsal){
+  const title='Régie de test · '+(s.chicago?'Cosa Nostra':'Les Colons de Hotspring');
+  document.title=title;set('regieTitle',title);
+  $('createAnotherSession').href=s.chicago?'/cosa-nostra?mode=test#sessionForm':'/hotspring/nouvelle-partie?mode=test';
+  set('createAnotherSession','Créer un autre test');
+ }
  renderFacilitator(s);
  current=s;
  renderRehearsal(s,command);
@@ -181,7 +187,7 @@ function render(s){
  renderCouncilMonitor($('councilMonitor'),s);
  const guidance=councilGuidance(s);step(guidance.step);set('stageTitle',guidance.title);set('stageHint',s.rehearsal&&s.phase==='READY'?'Lancez la partie pour tester les décisions depuis cet écran.':
   s.rehearsalTurn?'Validez la décision de la famille dans la régie de test.':guidance.hint);
- $('preparation').hidden=s.phase!=='READY';
+ $('preparation').hidden=s.phase!=='READY'||s.rehearsal===true;
  const named=s.families.filter(f=>f.name&&f.name!=='Nom à choisir').length;set('teamReadyCount',named+'/'+s.families.length+' équipes ont un nom');
  $('preparePublicLink').href='/founders-city.html?session='+s.id;
  set('phase',chicagoPhase(s)||labels[s.phase]||s.phase);set('sessionCode',s.code+' · '+s.selection.scenarioVersion+' · skin '+s.selection.skinId);
@@ -300,7 +306,7 @@ $('start').addEventListener('click',async()=>{
  busy=true;$('start').disabled=true;set('actionMessage','Ouverture du premier dilemme…');
  try{
   const result=await startCouncil(api);render(result.view);
-  set('actionMessage',result.started?(result.view.chicago?'Répétition lancée. Le premier Conseil est ouvert aux négociations.':'Partie lancée. Le premier dilemme est affiché ; le Maire peut voter sur son écran d’équipe.'):'La partie a déjà démarré. La régie affiche son état actuel.');
+  set('actionMessage',result.started?(result.view.rehearsal?'Test lancé. Présentez le dilemme, puis ouvrez le vote pour saisir les choix des familles ici.':result.view.chicago?'Répétition lancée. Le premier Conseil est ouvert aux négociations.':'Partie lancée. Le premier dilemme est affiché ; le Maire peut voter sur son écran d’équipe.'):'La partie a déjà démarré. La régie affiche son état actuel.');
  }catch(error){set('actionMessage',organizerError(error));try{render(await api(''));}catch{}}
  finally{busy=false;renderActionAvailability(current);}
 });
@@ -373,7 +379,7 @@ function renderV2Controls(s){
  const manual=s.manualCouncil||s.campaign?.version>=3;
  $('v2Controls').hidden=s.experienceVersion!==2;
  $('beginVote').hidden=s.phase!=='NEGOTIATION';
- set('beginVote',manual?'Ouvrir le vote':'Ouvrir le vote maintenant');
+ set('beginVote',s.rehearsal?'Ouvrir le vote en régie':manual?'Ouvrir le vote':'Ouvrir le vote maintenant');
  set('v2ControlsTitle',manual?'Réglages':'Chronos et réglages');
  $('timingForm').hidden=manual||Boolean(s.chicago);
  const ended=['EPILOGUE','FINISHED','SUCCESSION'].includes(s.phase),suspended=s.phase==='SUSPENDED',v2=s.experienceVersion===2;

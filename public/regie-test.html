@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fr">
+<head>
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+ <title>Régie de test · Games of Influence</title>
+ <link rel="stylesheet" href="/univers.css">
+ <script type="module" src="/regie-test.js"></script>
+</head>
+<body>
+<header class="mast"><div class="mast-brand"><a href="/" class="brand">Games of Influence</a><span>Le Ludificateur</span></div><a href="/">Tous les univers</a></header>
+<main>
+ <h1>Régie de test</h1>
+ <p>Joue les cinq familles et valide leurs votes depuis la régie.</p>
+ <section class="form-panel">
+  <h2>Créer un test</h2>
+  <div class="actions">
+   <a class="button" href="/hotspring/nouvelle-partie?mode=test">Tester Les Colons de Hotspring</a>
+   <a class="button" href="/cosa-nostra?mode=test#sessionForm">Tester Cosa Nostra</a>
+  </div>
+ </section>
+ <section class="form-panel" aria-labelledby="resumeTests">
+  <h2 id="resumeTests">Mes parties de test</h2>
+  <div id="loginPanel">
+   <p>Connecte-toi avec ton compte organisateur pour retrouver tes parties.</p>
+   <div id="localLogin" hidden><label for="localKey">Clé de répétition locale</label><input id="localKey" type="password" autocomplete="off"></div>
+   <button id="connect" type="button" disabled>Connexion…</button>
+  </div>
+  <ul id="testsList" hidden></ul>
+  <p id="status" role="status" aria-live="polite"></p>
+ </section>
+</main>
+</body>
+</html>

@@ -35,6 +35,10 @@
       ],
       "rewrites": [
         {
+          "source": "/regie-test",
+          "destination": "/regie-test.html"
+        },
+        {
           "source": "/regie",
           "destination": "/founders-regie.html"
         },
@@ -106,6 +110,10 @@
         "**/node_modules/**"
       ],
       "rewrites": [
+        {
+          "source": "/regie-test",
+          "destination": "/regie-test.html"
+        },
         {
           "source": "/regie",
           "destination": "/founders-regie.html"
