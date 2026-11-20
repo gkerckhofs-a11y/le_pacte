@@ -49,6 +49,3 @@ button.secondary{color:var(--text);background:transparent;border-color:var(--lin
 .cosa-nostra-page .scene details{padding:0 0 0 1.5rem;border:0}
 .cosa-nostra-page .scene li{margin-bottom:.85rem}
 .cosa-nostra-page h3{font-size:1rem}
-
-.mast-brand{display:grid;gap:2px}.mast-brand span{font-size:.8rem}
-#testsList li+li{margin-top:.65rem}
