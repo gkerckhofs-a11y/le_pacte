@@ -992,5 +992,26 @@
     "status": "validé",
     "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
     "license": null
+  },
+  "sprite_homestead": {
+    "url": "/assets/hotspring/v1/buildings/settlers_homestead.webp",
+    "alt": "Maison de rondins des premiers colons. Une famille coupe du bois et étend du linge.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_plankCottage": {
+    "url": "/assets/hotspring/v1/buildings/settlers_plank_cottage.webp",
+    "alt": "Petite maison en planches avec une réserve de bois.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
+  },
+  "sprite_porchHouse": {
+    "url": "/assets/hotspring/v1/buildings/settlers_porch_house.webp",
+    "alt": "Maison à perron en bois avec un tuyau de poêle.",
+    "status": "validé",
+    "credit": "Visuel généré pour Games of Influence avec OpenAI ImageGen.",
+    "license": null
   }
 }

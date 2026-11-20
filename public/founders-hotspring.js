@@ -1,4 +1,4 @@
-import {renderPanoramaSvg} from './hotspring-panorama.js';
+import {panoramaViewBox,renderPanoramaSvg} from './hotspring-panorama.js';
 
 export const CAMPAIGN_PHASES={
  INTRO:'Ouverture du chapitre',PRESENTATION:'Lecture du dilemme',CHECKPOINT:'Bilan du chapitre',
@@ -22,7 +22,7 @@ const cue={
  D23:['build','lamps'],D24:['smoke','fire'],D25:['dusk','dense'],D26A:['rain','water'],D26B:['dust','dusk'],
  D27:['smoke','dust'],D28:['lamps','barrier'],D29:['lamps','survey'],D30:['lamps','dusk']
 };
-const constructions=new Set(['well','tower','school','saloon','inn','clinic','mill','station','mine','planned','bank','stockyard','office','jail','drains','hall','trade']);
+const constructions=new Set(['cottages','plankCottage','porchHouse','well','tower','school','saloon','inn','clinic','mill','station','mine','planned','bank','stockyard','office','jail','drains','hall','trade']);
 const panes=new WeakMap();
 const cachedImages=new Map();
 
@@ -36,6 +36,29 @@ function image(url){
  return img;
 }
 
+function framePanorama(svg,from,to){
+ svg.querySelector('animate.panorama-zoom')?.remove();
+ svg.setAttribute('viewBox',to);
+ if(!from||from===to||!globalThis.matchMedia?.('(prefers-reduced-motion: no-preference)').matches)return;
+ const zoom=document.createElementNS('http://www.w3.org/2000/svg','animate');
+ if(typeof zoom.beginElement!=='function')return;
+ zoom.setAttribute('class','panorama-zoom');
+ zoom.setAttribute('attributeName','viewBox');
+ zoom.setAttribute('from',from);zoom.setAttribute('to',to);
+ zoom.setAttribute('dur','1.6s');zoom.setAttribute('begin','indefinite');
+ zoom.setAttribute('calcMode','spline');zoom.setAttribute('keyTimes','0;1');
+ zoom.setAttribute('keySplines','.35 0 .25 1');
+ svg.append(zoom);zoom.beginElement();
+}
+
+export function setHotspringOverview(root,overview){
+ const state=panes.get(root);
+ if(!state?.map)return;
+ state.overview=overview;
+ const to=panoramaViewBox(state.map,overview);
+ for(const svg of root.querySelectorAll('.hotspring-map'))framePanorama(svg,svg.getAttribute('viewBox'),to);
+}
+
 export function renderHotspringPanorama(root,s,{showResultStill=true}={}){
  const map=s.campaign.landscape;
  let state=panes.get(root);
@@ -47,9 +70,11 @@ export function renderHotspringPanorama(root,s,{showResultStill=true}={}){
  if(state.key===key&&state.effectKey===effectKey)return;
  const previous=root.querySelector('.hotspring-map:not(.hotspring-before)');
  const prior=state.map;
- root.innerHTML=renderPanoramaSvg(map,{campMemory:ending});
+ root.innerHTML=renderPanoramaSvg(map,{campMemory:ending,overview:state.overview});
  state.key=key;state.effectKey=effectKey;state.map=map;
  const current=root.querySelector('.hotspring-map');
+ const changingFrame=previous&&previous.getAttribute('viewBox')!==current.getAttribute('viewBox');
+ if(changingFrame&&!ending)framePanorama(current,previous.getAttribute('viewBox'),current.getAttribute('viewBox'));
  if(s.phase==='INTRO'&&s.campaign.chapter===1)current.classList.add('hotspring-prologue');
  if(ending){
   current.classList.add('hotspring-epilogue');
@@ -66,21 +91,23 @@ export function renderHotspringPanorama(root,s,{showResultStill=true}={}){
  if(!reveal)return;
  const chosen=(cue[reveal.id]??['build','survey'])[reveal.winner==='pour'?0:1];
  current.classList.add('hotspring-after','scene-'+chosen);
+ if(changingFrame)current.classList.add('hotspring-reframe');
  if(previous){
   previous.classList.remove('hotspring-after');
   previous.classList.add('hotspring-before');
+  if(changingFrame)previous.classList.add('hotspring-leaving-frame');
   previous.setAttribute('aria-hidden','true');
   root.prepend(previous);
  }
  if(prior){
-  const priorIds=new Set(prior.layers.map(l=>l.id));
-  const newBuildings=map.layers.filter(l=>l.state==='complete'&&constructions.has(l.kind)&&!priorIds.has(l.id));
+  const priorKinds=new Map(prior.layers.map(l=>[l.id,l.kind]));
+  const newBuildings=map.layers.filter(l=>l.state==='complete'&&constructions.has(l.kind)&&priorKinds.get(l.id)!==l.kind);
   if(newBuildings.length){
    const ids=new Set(newBuildings.map(l=>l.id));
    const construction=document.createElement('div');
    construction.className='hotspring-construction';
    construction.setAttribute('aria-hidden','true');
-   construction.innerHTML=renderPanoramaSvg({...map,layers:map.layers.map(l=>ids.has(l.id)?{...l,state:'building'}:l)});
+   construction.innerHTML=renderPanoramaSvg({...map,layers:map.layers.map(l=>ids.has(l.id)?{...l,state:'building'}:l)},{overview:state.overview});
    root.append(construction);
   }
  }
