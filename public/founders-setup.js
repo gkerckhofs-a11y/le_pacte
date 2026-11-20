@@ -3,6 +3,7 @@ import {TEAM_COLORS,DEFAULT_TEAM_COLORS} from './founders-identity.js';
 import {HOTSPRING, isCurrentHotspring, narrativeRegie} from './founders-univers.js';
 
 const $=id=>document.getElementById(id);
+if(new URLSearchParams(location.search).get('mode')==='test')$('sessionMode').value='test';
 const defaults=['Les Mercer','Les Doyle','Les Vance','Les Caldwell','Les Whitmore'];
 let configurations=[],retainedSettings={};
 const resources=['initialPower','initialDollars','initialPool'];
@@ -74,7 +75,7 @@ $('gameForm').addEventListener('submit',async event=>{
   const config=selection();if(!config)return;
   const code='HS'+crypto.randomUUID().replaceAll('-','').slice(0,10).toUpperCase();
   status('Création de la partie…');
-  const result=await api('sessions','POST',{...config,title:$('gameTitle').value.trim(),code});
+  const result=await api('sessions','POST',{...config,rehearsal:$('sessionMode').value==='test',title:$('gameTitle').value.trim(),code});
   rememberAccess(result);
   location.assign(narrativeRegie(result.id,true));
  }catch(e){status(e.message,true);}

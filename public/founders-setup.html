@@ -21,7 +21,9 @@
    </div>
    <form id="gameForm" hidden>
     <h2>La partie</h2>
-    <label for="gameTitle">Nom de la partie</label><input id="gameTitle" value="Les Colons de Hotspring" maxlength="100" required>
+    <label for="sessionMode">Mode de jeu</label>
+     <select id="sessionMode"><option value="live">Partie avec joueurs</option><option value="test">Régie de test · je vote pour les familles</option></select>
+     <label for="gameTitle">Nom de la partie</label><input id="gameTitle" value="Les Colons de Hotspring" maxlength="100" required>
     <fieldset><legend>Les cinq familles</legend>
      <p class="help">Adapte les noms, les couleurs et les effectifs. Chaque famille dispose d’un seul accès de vote.</p>
      <div id="familySettings" class="families-grid"></div>

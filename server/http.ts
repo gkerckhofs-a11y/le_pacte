@@ -24,7 +24,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
  if(!/^[A-Za-z0-9_-]{32,128}$/.test(organizerToken))throw new Error('Clé régie : au moins 32 caractères');
  const tokenDigest=Buffer.from(tokenHash(organizerToken),'hex');
  const staticFiles:Record<string,[string,string]>={ '/founders-regie-flow.js':['founders-regie-flow.js','text/javascript; charset=utf-8'], '/founders-name-save.js':['founders-name-save.js','text/javascript; charset=utf-8'], '/founders-painted-western.js':['founders-painted-western.js','text/javascript; charset=utf-8'], '/founders-skins.json':['../content/founders-skins-v1.json','application/json; charset=utf-8'], '/founders-skins.html':['founders-skins.html','text/html; charset=utf-8'], '/founders-skins.js':['founders-skins.js','text/javascript; charset=utf-8'], '/founders-skin-theme.js':['founders-skin-theme.js','text/javascript; charset=utf-8'], '/founders-skin-scenes.js':['founders-skin-scenes.js','text/javascript; charset=utf-8'], '/founders-identity.js':['founders-identity.js','text/javascript; charset=utf-8'], '/founders-city-scene.js':['founders-city-scene.js','text/javascript; charset=utf-8'], '/founders-live.css':['founders-live.css','text/css; charset=utf-8'], '/founders-city.html':['founders-city.html','text/html; charset=utf-8'], '/founders-city.js':['founders-city.js','text/javascript; charset=utf-8'], '/founders-family.html':['founders-family.html','text/html; charset=utf-8'], '/founders-family.js':['founders-family.js','text/javascript; charset=utf-8'], '/founders-regie.html':['founders-regie.html','text/html; charset=utf-8'], '/founders-regie.js':['founders-regie.js','text/javascript; charset=utf-8'], '/founders-import.html':['founders-import.html','text/html; charset=utf-8'], '/founders-import.js':['founders-import.js','text/javascript; charset=utf-8'], '/founders-setup.html':['founders-setup.html','text/html; charset=utf-8'], '/founders-setup.js':['founders-setup.js','text/javascript; charset=utf-8'], '/western-board.js':['western-board.js','text/javascript; charset=utf-8'],'/western-territories.js':['western-territories.js','text/javascript; charset=utf-8'],'/far-west.html':['far-west.html','text/html; charset=utf-8'],'/western-preview.js':['western-preview.js','text/javascript; charset=utf-8'],'/assets/western/frontier-terrain-v1.webp':['assets/western/frontier-terrain-v1.webp','image/webp'], '/':['index.html','text/html; charset=utf-8'],'/app.js':['app.js','text/javascript; charset=utf-8'],'/studio.js':['studio.js','text/javascript; charset=utf-8'],'/animation.js':['animation.js','text/javascript; charset=utf-8'],'/style.css':['style.css','text/css; charset=utf-8']};
- for(const name of ['pacte-entry','founders-workspace','founders-live-ui','founders-print','founders-council-monitor','founders-vote-progress','founders-role-badges','founders-chronicle','founders-agreements','founders-fullscreen','founders-hotspring','hotspring-panorama','hotspring-rules','founders-univers','founders-atelier','chicago-succession'])staticFiles['/'+name+'.js']=[name+'.js','text/javascript; charset=utf-8'];
+ for(const name of ['pacte-entry','founders-workspace','founders-live-ui','founders-print','founders-council-monitor','founders-vote-progress','founders-role-badges','founders-chronicle','founders-agreements','founders-fullscreen','founders-hotspring','hotspring-panorama','hotspring-rules','founders-univers','founders-atelier','founders-rehearsal','chicago-succession'])staticFiles['/'+name+'.js']=[name+'.js','text/javascript; charset=utf-8'];
  staticFiles['/hotspring.css']=['hotspring.css','text/css; charset=utf-8'];
  staticFiles['/territorial.html']=['territorial.html','text/html; charset=utf-8'];
  staticFiles['/regie']=staticFiles['/hotspring']=staticFiles['/founders-regie.html'];
@@ -198,7 +198,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
     if(input?.revision!==stored.revision){json(409,{error:'La préparation a changé. Rechargez la page.'});return;}
     const preparation=prepareCosaNostra(stored.campaign,stored.crisisIds);
     const {preview,names}=chicagoSessionPreview(preparation,input.members);
-    const created=await store.narrative.create({ownerId:actor.id,preview,names,code:input.code,title:input.title,now,
+    const created=await store.narrative.create({ownerId:actor.id,preview,names,code:input.code,title:input.title,rehearsal:input.rehearsal===true,now,
      timing:{negotiationSeconds:480,voteSeconds:180,resolutionSeconds:20,autoAdvance:false}});
     json(201,created);return;
    }
@@ -223,7 +223,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
      const d=await body(req,16000);
      const preview=await foundersPreviewFor(store,actor.id,d);
      const created=await store.narrative.create({
-      ownerId:actor.id,preview,code:d.code,title:d.title,
+      ownerId:actor.id,preview,code:d.code,title:d.title,rehearsal:d.rehearsal===true,
       objectives:d.objectives,names:d.names,colors:d.colors,goalCards:d.goalCards,scoreRules:d.scoreRules,timing:d.timing,gaugeThresholds:d.gaugeThresholds,crisisMode:d.crisisMode,presentationSeconds:d.presentationSeconds,now
      });
      json(201,created);return;

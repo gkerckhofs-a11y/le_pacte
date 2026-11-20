@@ -71,7 +71,7 @@ export class LocalNarrativeSessions{
   check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
   return this.db.prepare('SELECT id,code,state_json FROM founders_sessions WHERE owner_id=? AND archived_at IS NULL ORDER BY updated DESC LIMIT 100').all(ownerId).map(row=>{
    const s=JSON.parse(row.state_json);
-   return{id:s.id,code:s.code,title:s.title,phase:s.phase,revision:s.revision,
+   return{id:s.id,code:s.code,title:s.title,...(s.rehearsal?{rehearsal:true}:{}),phase:s.phase,revision:s.revision,
     scenarioId:s.selection.scenarioId,scenarioVersion:s.selection.scenarioVersion,skinId:s.selection.skinId};
   });
  }
@@ -80,11 +80,11 @@ export class LocalNarrativeSessions{
   return this.db.prepare("UPDATE founders_sessions SET archived_at=? WHERE owner_id=? AND archived_at IS NULL AND json_extract(state_json,'$.createdAt')<=?").run(now,ownerId,now).changes;
  }
 
- create({ownerId,preview,code,title,objectives,names,colors,goalCards,scoreRules,timing,gaugeThresholds,crisisMode,presentationSeconds,now}){
+ create({ownerId,preview,code,title,objectives,names,colors,goalCards,scoreRules,timing,gaugeThresholds,crisisMode,presentationSeconds,rehearsal,now}){
   check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
   return this.transaction(()=>{
    const id=randomBytes(12).toString('hex');
-   const s=createNarrativeSession(preview,{id,ownerId,code,title,objectives,names,colors,goalCards,scoreRules,timing,gaugeThresholds,crisisMode,presentationSeconds,initiativeOrder:shuffle(activeFounders(preview.game)),now});
+   const s=createNarrativeSession(preview,{id,ownerId,code,title,objectives,names,colors,goalCards,scoreRules,timing,gaugeThresholds,crisisMode,presentationSeconds,rehearsal,initiativeOrder:shuffle(activeFounders(preview.game)),now});
    return this.insert(s);
   });
  }

@@ -70,7 +70,7 @@ export class FirestoreNarrativeSessions{
   const q=await this.activeSessions(ownerId).sort(Pipelines.descending('updated')).limit(100).execute();
   return q.results.map(d=>{
    const s=JSON.parse(d.data().stateJson);
-   return{id:s.id,code:s.code,title:s.title,phase:s.phase,revision:s.revision,
+   return{id:s.id,code:s.code,title:s.title,...(s.rehearsal?{rehearsal:true}:{}),phase:s.phase,revision:s.revision,
     scenarioId:s.selection.scenarioId,scenarioVersion:s.selection.scenarioVersion,skinId:s.selection.skinId};
   });
  }
@@ -87,10 +87,10 @@ export class FirestoreNarrativeSessions{
    });
   }
  }
- async create({ownerId,preview,code,title,objectives,names,colors,goalCards,scoreRules,timing,gaugeThresholds,crisisMode,presentationSeconds,now}){
+ async create({ownerId,preview,code,title,objectives,names,colors,goalCards,scoreRules,timing,gaugeThresholds,crisisMode,presentationSeconds,rehearsal,now}){
   check(typeof ownerId==='string'&&ownerId.length>0,'Organisateur requis');
   const id=randomBytes(12).toString('hex');
-  const s=createNarrativeSession(preview,{id,ownerId,code,title,objectives,names,colors,goalCards,scoreRules,timing,gaugeThresholds,crisisMode,presentationSeconds,initiativeOrder:shuffle(activeFounders(preview.game)),now});
+  const s=createNarrativeSession(preview,{id,ownerId,code,title,objectives,names,colors,goalCards,scoreRules,timing,gaugeThresholds,crisisMode,presentationSeconds,rehearsal,initiativeOrder:shuffle(activeFounders(preview.game)),now});
   return this.insert(s);
  }
  async duplicate(id,ownerId,now){
