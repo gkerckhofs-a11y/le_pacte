@@ -19,7 +19,7 @@ export const chicagoPhase = s => s.phase==='SUCCESSION'?'Succession du Parrain':
 export function renderSuccession(root,s,role,command) {
  const f=s.succession;
  const available=f?.stage==='available',done=f?.stage==='revealed';
- root.hidden=!f||(available&&role!=='organizer')||(done&&role!=='organizer');
+ root.hidden=!f||s.phase==='SUSPENDED'||(available&&role!=='organizer')||(done&&role!=='organizer');
  root.replaceChildren();
  if(root.hidden)return;
  if(role==='organizer'&&['available','requested'].includes(f.stage)){
@@ -62,7 +62,7 @@ export function renderSuccession(root,s,role,command) {
   const details=add(root,'details','');add(details,'summary','Calcul privé des ambitions');
   const n=a.frozen.scores[0].common;
   add(details,'p',n?'Base commune · '+n+' première(s) occasion(s) par famille.':'Ambition majeure neutralisée pour les cinq familles. Une famille au moins n’a joué aucun pivot.');
-  for(const r of a.frozen.scores)add(details,'p',name(s,r.family)+' · soutiens '+r.supports.length+' ('+r.small+' pts) · jauge '+r.value+'/100 ('+r.medium+' pts) · pivots favorables '+r.favorable+'/'+n+' ('+r.major+' pts).');
+  for(const r of a.frozen.scores)add(details,'p',name(s,r.family)+' · soutiens '+r.supports.length+' ('+r.small+' pts) · jauge '+r.value+'/100 ('+r.medium+' pts) · pivots favorables '+r.favorable+'/'+n+' ('+r.major+' pts) · fortune '+(r.wealth??0)+' pts.');
   if(done)button(details,'Exporter le journal privé',()=>{
    const blob=new Blob([JSON.stringify({session:s.code,audit:a,history:s.history,results:s.finalResults},null,2)],{type:'application/json'});
    const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=s.code+'-commission.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
@@ -74,7 +74,8 @@ export function showChicagoRanking(root,s){
  for(const [i,row] of s.finalResults.rows.entries()){
   const line=add(root,'div','');line.className='card';
   add(line,'strong',(i+1)+'. '+name(s,row.family)+' · '+row.total+' points');
-  add(line,'p',row.ambition+' · '+row.indicator+' · objectifs '+row.small+' + '+row.medium+' + '+row.major+' · '+row.support+' soutien(s) × 2');
+  add(line,'p',row.ambition?row.ambition+' · '+row.indicator+' · objectifs '+row.small+' + '+row.medium+' + '+row.major+
+   ' · fortune '+(row.wealth??0)+' pts · '+row.support+' soutien(s) × 2':row.support+' soutien(s) au premier tour');
  }
  add(root,'p',s.finalResults.reason);
 }

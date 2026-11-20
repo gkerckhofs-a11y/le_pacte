@@ -247,15 +247,15 @@ export function renderCampaignActions(root,s,command){
  const previous=root.querySelector('select')?.value;
  root.replaceChildren();root.hidden=true;
  const a=s.campaignAdmin;
- if(!a)return;
+ if(!a&&!s.manualCouncil)return;
  const action=(label,kind,primary=false)=>{
   const b=node('button',label,primary?null:'secondary');b.type='button';b.addEventListener('click',()=>command(kind));return b;
  };
  if(s.phase==='SUSPENDED')root.append(action('Reprendre la séance','resumeSitting',true));
- if(a.mayResumeCrises&&!s.clock.paused)root.append(action('Reprendre les crises en réserve','resumeCrises'));
+ if(a?.mayResumeCrises&&!s.clock.paused)root.append(action('Reprendre les crises en réserve','resumeCrises'));
  if(s.phase==='EPILOGUE'&&!s.clock.paused)root.append(action('Dévoiler les objectifs et le détail des scores','showResults',true));
- if(!['READY','SUSPENDED','EPILOGUE','FINISHED'].includes(s.phase))root.append(action('Terminer la séance','endSitting'));
- if(a.crisisMode==='extended'&&s.phase==='REVEALED'&&!s.clock.paused&&/^D2[3-8]/.test(s.reveal?.id??'')){
+ if(!['READY','SUSPENDED','EPILOGUE','FINISHED','SUCCESSION'].includes(s.phase))root.append(action('Terminer la séance','endSitting'));
+ if(a?.crisisMode==='extended'&&s.phase==='REVEALED'&&!s.clock.paused&&/^D2[3-8]/.test(s.reveal?.id??'')){
   const opts=a.crises.filter(c=>c.available);
   if(opts.length){
    const label=node('label','Choisir une crise', 'regie-crisis');

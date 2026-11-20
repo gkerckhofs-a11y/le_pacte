@@ -111,7 +111,7 @@ test('Répétition Chicago à cinq terminaux : choix binaires, accords, jauges e
  let publicView = await game.projection();
  assert.equal(publicView.chicago,true);
  assert.equal(publicView.gaugeMaximum,100);
- assert.deepEqual(Object.values((await game.regie()).city),[50,50,50,50,50]);
+ assert.deepEqual(Object.values((await game.regie()).city),[50,50,50,50,50,50]);
  assert.deepEqual(publicView.city,{});
  assert.equal(Object.keys(publicView.cityLevels).length,5);
  assert.deepEqual(publicView.families.map(f => f.name),campaign.metadata.family_objectives.map(objective => objective.family));
@@ -125,7 +125,9 @@ test('Répétition Chicago à cinq terminaux : choix binaires, accords, jauges e
  assert.equal(publicView.chicagoAmbition,undefined);
  await game.command(publicView,'start');
  publicView = await game.projection();
- assert.equal(publicView.phase,'NEGOTIATION');
+ assert.equal(publicView.phase,'PRESENTATION');
+ assert.equal(publicView.clock.deadline,null);
+ assert.equal(publicView.stabilityLevel,2);
  assert.deepEqual(publicView.dilemma.labels, {pour:declined.title,contre:adopted.title});
  assert.equal(publicView.dilemma.outcomes,undefined);
  const artUrl=publicView.dilemma.image.url;
@@ -134,6 +136,9 @@ test('Répétition Chicago à cinq terminaux : choix binaires, accords, jauges e
  assert.equal(publicView.dilemma.publicOptions.pour.compromise,declined.public_compromise);
  assert.equal(JSON.stringify(publicView).includes(declined.after),false);
  assert.equal(publicView.dilemma.sourceChoices,undefined);
+ await game.command(publicView,'next');
+ publicView=await game.projection();
+ assert.equal(publicView.phase,'NEGOTIATION');
  await game.command(publicView,'offer',{id:'chicago-binding-1',to:'B',amount:1,reason:'Accord test',commitment:{choice:'contre',minInfluence:1}},'A');
  await game.command(await game.projection(),'acceptOffer',{id:'chicago-binding-1'},'B');
  assert.equal((await game.family('B')).voteCommitment.choice,'contre');
@@ -176,6 +181,7 @@ test('Répétition Chicago à cinq terminaux : choix binaires, accords, jauges e
   assert.equal(view.dilemma,null);
   assert.ok(view.reveal.visual.url.endsWith('-contre.webp'));
   await game.command(view,'next');
+  if(index+1<scenes.length)await game.command(await game.projection(),'next');
  }
  const ending = await game.projection();
  assert.equal(ending.phase,'SUCCESSION');

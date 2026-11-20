@@ -52,7 +52,7 @@ export function chicagoSessionPreview(preparation, members) {
    kind:'founders-session-preview-v2.3', previewOnly:true, selection, game,
    source:{type:'private_campaign',checksum},
    skin:{...mafia,title:'Cosa Nostra — Le Trône de Chicago',
-    labels:{currency:'Dollars',influence:'Influence',resources:metadata.gauges}},
+    labels:{currency:'Dollars',influence:'Influence',resources:{...metadata.gauges,stabilite:'Stabilité'}}},
    scenario:{schema_version:'2.0.0',scenario:{id:CHICAGO_SCENARIO_ID,title:metadata.universe,
     location:'Chicago',year:1931,entry_dilemma:dilemmas[0].id},dilemmas,chicago:{version:3,ambitions,epilogues:metadata.winner_epilogues}}
   }

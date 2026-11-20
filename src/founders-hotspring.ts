@@ -1,4 +1,5 @@
 import {activeFounders} from './founders.ts';
+import {averageIndicators} from './founders-scoring.ts';
 import {hotspringScores,autonomyIndex,hotspringTrajectoryTarget,HOTSPRING_INDICATORS} from './hotspring-scoring.ts';
 import {hotspringLandscape} from './hotspring-landscape.ts';
 import art from '../content/hotspring-art-index-v1.json' with {type:'json'};
@@ -46,7 +47,7 @@ export function validateHotspring(payload){
 }
 
 export function calculateHotspringStability(city){
- return HOTSPRING_INDICATORS.reduce((sum,key)=>sum+city[key],0)/HOTSPRING_INDICATORS.length;
+ return averageIndicators(HOTSPRING_INDICATORS.map(key=>city[key]));
 }
 
 const stabilityStates=['Ville condamnée','Ville fantôme','Ville en perdition','Ville en crise',

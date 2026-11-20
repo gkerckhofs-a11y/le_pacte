@@ -68,3 +68,13 @@ Après trois Conseils, Moretti atteint le seuil de jauge de 60 dans 43 répétit
 ## Changement et retour arrière
 
 La PR cible la branche de publication. Sa fusion déclencherait le workflow de production. La recette utilise la branche de travail séparée. Pour revenir à la version publiée pendant la recette, arrêter le serveur local puis ouvrir la version habituelle du site. La répétition et sa base locale restent disponibles pour un nouvel essai. Pour un éventuel retour arrière après une publication ultérieure, revenir par un revert des commits de la PR et redéployer la révision vérifiée après autorisation. Préserver les préparations et états V3 : le code V2 ne sait pas reprendre une succession V3 en cours.
+
+## Alignement sur Hotspring V1.2
+
+Le Conseil de Chicago V3 suit le protocole commun. La régie présente le dilemme, ouvre la négociation, ouvre le vote, puis passe à la suite après la résolution. Les chronos restent désactivés. La séance peut être sauvegardée et reprise avec son vote, ses mises et ses accords. Le bilan intermédiaire est privé en régie.
+
+Comme dans Hotspring V1.2, la part de récupération est calculée sur la réserve disponible avant la clôture. Les mises gagnantes alimentent ensuite la réserve du Conseil suivant. L’abstention de rôle est exclue du partage. Les fiches QR et leurs rappels emploient le même gabarit d’impression, avec les appellations et la finale de Chicago.
+
+Le classement des deux meilleures jauges, avec égalités incluses, remplace le seuil de 60 de la recette initiale. Chicago conserve ses trois points de trajectoire. La fortune est classée par le même calcul que Hotspring (3, 2, 1, puis 0, avec rangs partagés et sautés). Les ambitions (10), la fortune (3) et le premier scrutin secret (8) donnent un maximum de 21. La Stabilité est la moyenne des cinq jauges. L’organisateur voit les calculs et chaque famille reçoit son propre détail final. La projection affiche le classement et les soutiens agrégés.
+
+Les scores déjà figés au début d’une ancienne succession gardent leur barème d’origine. Les simulations ci-dessus décrivent la recette initiale au seuil de 60. Les visuels dédiés disponibles s’inscrivent dans la chronique de Chicago; les scènes qui n’ont pas encore d’illustration dédiée utilisent le panorama de repli.

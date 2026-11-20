@@ -7,12 +7,15 @@ import {PNG} from 'pngjs';
 import jsQR from 'jsqr';
 import {GameStore} from '../server/store.ts';
 import {createGameServer} from '../server/http.ts';
+import {prepareCosaNostra} from '../server/cosa-nostra-preparation.ts';
+import {chicagoSessionPreview} from '../server/cosa-nostra-session.ts';
+import {fixture} from './helpers/chicago.mjs';
 import {mountPrintKit} from '../public/founders-print.js';
 const decode=svg=>{
  const png=PNG.sync.read(new Resvg(svg,{fitTo:{mode:'width',value:660}}).render().asPng());
  const result=jsQR(new Uint8ClampedArray(png.data),png.width,png.height);assert.ok(result,'QR lisible par le décodeur indépendant');return result.data;
 };
-for(const [count,version] of [[5,'2.0.0'],[6,'2.0.0'],[5,'1.1.0'],[5,'1.2.0']])test(`Fiches ${count} · ${version} : décodage du SVG imprimé, session, famille, révocation, rechargement et blocage complet`,async t=>{
+for(const [count,version] of [[5,'2.0.0'],[6,'2.0.0'],[5,'1.1.0'],[5,'1.2.0'],[5,'Chicago']])test(`Fiches ${count} · ${version} : décodage du SVG imprimé, session, famille, révocation, rechargement et blocage complet`,async t=>{
  let now=1000;const store=new GameStore(':memory:'),key='organizer-qr-verification-1234567890',server=createGameServer(store,key,()=>now);
  await new Promise(r=>server.listen(0,'127.0.0.1',r));
  t.after(async()=>{server.closeAllConnections();await new Promise(r=>server.close(r));store.close();});
@@ -21,9 +24,10 @@ for(const [count,version] of [[5,'2.0.0'],[6,'2.0.0'],[5,'1.1.0'],[5,'1.2.0']])t
   const r=await fetch(origin+path,{method:data?'POST':'GET',headers:{Authorization:'Bearer '+key,...(data?{'Content-Type':'application/json'}:{})},body:data?JSON.stringify(data):undefined});
   const result=await r.json();if(!r.ok){const e=new Error(result.error);e.accessInvalid=r.status===403&&/expiré|révoqué/.test(e.message);throw e;}return result;
  };
- const campaign=version!=='2.0.0',manual=version==='1.2.0';
+ const chicago=version==='Chicago',campaign=!chicago&&version!=='2.0.0',manual=version==='1.2.0';
  const scenarioId=campaign?'les-colons-de-hotspring':'hot-spring-reserve-hybride';
- const created=await request('/api/founders/sessions',{scenarioId,scenarioVersion:version,skinId:'western',code:'QRTEST'+count,title:'Équipes & vérification',members:Array(count).fill(1),names:['Caldwell','Doyle','Mercer','L’eau & les terres','Les Établis','Sixième'].slice(0,count)});
+ const created=chicago?await store.narrative.create({ownerId:'local-organizer',code:'CNQRTEST',title:'Équipes & vérification',now,...chicagoSessionPreview(prepareCosaNostra(fixture()),Array(count).fill(1))}):
+  await request('/api/founders/sessions',{scenarioId,scenarioVersion:version,skinId:'western',code:'QRTEST'+count,title:'Équipes & vérification',members:Array(count).fill(1),names:['Caldwell','Doyle','Mercer','L’eau & les terres','Les Établis','Sixième'].slice(0,count)});
  let view=await request('/api/founders/sessions/'+created.id);
  const storage=new Map();let prints=0,offline=false,wrong=false;
  const mount=()=>{
@@ -44,7 +48,15 @@ for(const [count,version] of [[5,'2.0.0'],[6,'2.0.0'],[5,'1.1.0'],[5,'1.2.0']])t
   const url=new URL(link);assert.equal(url.searchParams.get('session'),created.id);assert.equal(url.searchParams.get('family'),f);
   const token=new URLSearchParams(url.hash.slice(1)).get('token');tokens.push(token);
   const terminal=await fetch(origin+'/api/founders/sessions/'+created.id,{headers:{Authorization:'Bearer '+token}}).then(r=>r.json());
-  if(campaign){
+  if(chicago){
+   assert.equal(terminal.chicagoAmbition.goals.length,3);
+   assert.match(card.textContent,/Cosa Nostra/i);
+   assert.match(card.textContent,/Maximum : 21 points/);
+   assert.match(card.textContent,/L’Homme du Commissaire/);
+   assert.doesNotMatch(card.textContent,/Hotspring|https?:|#token=|Accès valable 24 h/i);
+   assert.ok(!card.textContent.includes(created.code));
+   assert.equal(card.querySelector('.print-qr').closest('.print-hotspring-access').nextElementSibling.className,'print-reminder');
+  }else if(campaign){
    assert.equal(terminal.privateCampaign.objectives.length,5);
    assert.match(card.textContent,/Les Colons de Hotspring/i);
    assert.doesNotMatch(card.textContent,/https?:|#token=|Accès valable 24 h|V1\.2/i);

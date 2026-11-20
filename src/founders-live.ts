@@ -1,7 +1,7 @@
-import {finalCommands,chicagoCommand,chicagoFinalView} from './chicago-succession.ts';
-import {isChicago,chicagoAmbition,hasChicagoSuccession} from './founders-chicago.ts';
-import {isV2,GOALS_V2,TIMING_V2,validateTiming,validateThresholds,setPhaseClock,beginNegotiation,beginVote,revealResolution,nextV2,finishV2,continueHotspring,suspendHotspring,resumeHotspring,revealHotspringResults} from './founders-v2.ts';
-import {isHotspring,isManualHotspring,createHotspringState,campaignDilemma,campaignFamily,campaignOrganizer,campaignPresentation,hotspringSupports,crisisCandidates,hotspringCityIndicators,hotspringOutcome,HOTSPRING_INDICATORS} from './founders-hotspring.ts';
+import {finalCommands,chicagoCommand,chicagoFinalView,chicagoScores} from './chicago-succession.ts';
+import {isChicago,chicagoAmbition,hasChicagoSuccession,chicagoCityIndicators} from './founders-chicago.ts';
+import {isV2,GOALS_V2,TIMING_V2,validateTiming,validateThresholds,usesManualCouncil,setPhaseClock,presentDilemma,beginNegotiation,beginVote,revealResolution,nextV2,finishV2,continueHotspring,suspendSitting,resumeSitting,revealHotspringResults} from './founders-v2.ts';
+import {isHotspring,createHotspringState,campaignDilemma,campaignFamily,campaignOrganizer,campaignPresentation,hotspringSupports,crisisCandidates,hotspringCityIndicators,hotspringOutcome,HOTSPRING_INDICATORS} from './founders-hotspring.ts';
 import {DEFAULT_TEAM_COLORS,DEFAULT_TEAM_NAMES,teamColor} from '../public/founders-identity.js';
 import {isHybrid,narrativeReserve,chooseNarrativeNext,narrativeEpilogue} from './founders-progression.ts';
 /**
@@ -77,7 +77,7 @@ export function createNarrativeSession(preview,{id,ownerId,code,title,objectives
   colors:Object.fromEntries(ids.map((id,i)=>[id,colors[i]])),
   goals:Object.fromEntries(ids.map((id,i)=>[id,objectives[i]])),
   goalCards:copy(goalCards),scoreRules:copy(scoreRules),initiativeOrder:copy(initiativeOrder),finalResults:null,
-  ...(v2?{experienceVersion:2,timing:validateTiming(preview.scenario.campaign?.version===3?{...timing,autoAdvance:false}:timing),
+  ...(v2?{experienceVersion:2,timing:validateTiming((preview.scenario.campaign?.version===3||hasChicagoSuccession(preview))?{...timing,autoAdvance:false}:timing),
    gaugeThresholds:validateThresholds(gaugeThresholds),clock:{phase:'READY',deadline:null,remainingMs:null,paused:false}}:{}),
   ...(families?{campaign:createHotspringState(preview.game.city,crisisMode,presentationSeconds,preview.scenario.campaign.version)}:{}),
   phase:'READY',currentDilemmaId:preview.scenario.scenario.entry_dilemma,
@@ -116,7 +116,7 @@ const validateActor=(s,actor)=>{
  if(actor.role==='organizer')check(actor.id===s.ownerId,'Accès régie refusé');
  else if(actor.role==='team')check(activeFounders(s.game).includes(actor.family),'Famille inconnue');
 };
-const usesBindingOffers=s=>isManualHotspring(s)||isChicago(s);
+const usesBindingOffers=s=>usesManualCouncil(s)||isChicago(s);
 const activeOffers=s=>Object.values(s.offers).filter(o=>o.status==='pending').length;
 export function acceptedVoteCommitment(s,family){
  const offers=Object.values(s.offers).filter(o=>o.status==='accepted'&&o.to===family&&o.councilNumber===s.game.history.length&&o.commitment?.choice&&o.commitment.choice!=='gift');
@@ -155,7 +155,7 @@ export function applyNarrativeCommand(input,actor,command,now){
   return s;
  }
  check(!s.succession,'Les Conseils sont figés pour la succession.');
- const manual=isManualHotspring(s);
+ const manual=usesManualCouncil(s);
  check(!s.clock?.paused||['pause','resume','configureTiming','adjustTime','correctResource','correctCity','finish','endSitting'].includes(kind),'Partie en pause');
  check(s.phase!=='SUSPENDED'||['resumeSitting','finish'].includes(kind),'Séance sauvegardée');
  const org=()=>check(actor.role==='organizer'||actor.role==='facilitator','Régie uniquement');
@@ -176,6 +176,7 @@ export function applyNarrativeCommand(input,actor,command,now){
   case 'start':
    org();check(s.phase==='READY','La partie est déjà lancée');
    if(isHotspring(s)){s.phase='INTRO';setPhaseClock(s,now);}
+   else if(manual)presentDilemma(s,now);
    else if(isV2(s))beginNegotiation(s,now);else {s.game=openFoundersDilemma(s.game,s.currentDilemmaId);s.phase='COUNCIL';}break;
   case 'vote':
    team();check(s.phase==='COUNCIL','Conseil fermé');
@@ -218,6 +219,7 @@ export function applyNarrativeCommand(input,actor,command,now){
   case 'next': {
    org();
    if(isHotspring(s)){continueHotspring(s,now,data.dilemmaId);break;}
+   if(manual&&s.phase==='PRESENTATION'){beginNegotiation(s,now);break;}
    if(isV2(s)){check(s.phase==='REVEALED','Résolution requise');nextV2(s,now,data.dilemmaId);break;}
   check(s.phase==='REVEALED','Révéler le résultat avant de poursuivre');
    const next=isHybrid(s.scenario)?chooseNarrativeNext(s,data.dilemmaId):s.lastReveal.nextId;
@@ -269,7 +271,7 @@ export function applyNarrativeCommand(input,actor,command,now){
    org();check(isV2(s)&&s.phase!=='FINISHED'&&!s.clock.paused,'Pause indisponible');
    s.clock.remainingMs=s.clock.deadline===null?null:Math.max(0,s.clock.deadline-now);s.clock.deadline=null;s.clock.paused=true;break;
   case 'resume':
-   org();check(isV2(s)&&s.clock.paused,'La partie n’est pas en pause');s.clock.paused=false;s.clock.deadline=s.clock.remainingMs===null?null:now+s.clock.remainingMs;break;
+   org();check(isV2(s)&&s.clock.paused,'La partie n’est pas en pause');s.clock.paused=false;s.clock.deadline=manual||s.clock.remainingMs===null?null:now+s.clock.remainingMs;break;
   case 'adjustTime':
    org();check(isV2(s)&&!manual&&Number.isInteger(data.seconds)&&Math.abs(data.seconds)<=3600&&s.clock.remainingMs!==null,'Ajustement de chrono invalide');
    if(s.clock.paused)s.clock.remainingMs=Math.max(0,s.clock.remainingMs+data.seconds*1000);
@@ -288,9 +290,11 @@ export function applyNarrativeCommand(input,actor,command,now){
   }
   case 'correctCity': {
    org();
-   check(isHotspring(s)&&s.campaign.version>=2&&!['FINISHED','EPILOGUE'].includes(s.phase)&&s.clock.paused,'Mettre la campagne en pause avant de corriger une jauge');
+   check((hasChicagoSuccession(s)||isHotspring(s)&&s.campaign.version>=2)&&!['FINISHED','EPILOGUE','SUSPENDED'].includes(s.phase)&&s.clock.paused,'Mettre la campagne en pause avant de corriger une jauge');
    const {indicator,value}=data;
-   check(HOTSPRING_INDICATORS.includes(indicator)&&Number.isInteger(value)&&value>=0&&value<=10,'Choisir une jauge fondamentale et un entier entre 0 et 10');
+   const chicago=hasChicagoSuccession(s),maximum=chicago?s.game.cityMaximum:10;
+   check((chicago?Object.hasOwn(s.game.city,indicator):HOTSPRING_INDICATORS.includes(indicator))&&Number.isInteger(value)&&value>=0&&value<=maximum,
+    'Choisir une jauge fondamentale et un entier entre 0 et '+maximum);
    (s.corrections??=[]).push({kind:'city',indicator,before:s.game.city[indicator],after:value,at:now});
    s.game.city[indicator]=value;
    break;
@@ -301,9 +305,9 @@ export function applyNarrativeCommand(input,actor,command,now){
    else finishV2(s,now);
    break;
   case 'endSitting':
-   org();check(isHotspring(s),'Campagne Hotspring requise');suspendHotspring(s,now);break;
+   org();check(isHotspring(s)||manual,'Campagne requise');suspendSitting(s,now);break;
   case 'resumeSitting':
-   org();check(isHotspring(s)&&s.phase==='SUSPENDED','Aucune séance à reprendre');resumeHotspring(s,now);break;
+   org();check((isHotspring(s)||manual)&&s.phase==='SUSPENDED','Aucune séance à reprendre');resumeSitting(s,now);break;
   case 'resumeCrises': {
    org();check(isHotspring(s)&&s.phase==='CHECKPOINT'&&s.campaign.chapter===5,'Checkpoint des crises requis');
    const candidates=crisisCandidates(s).filter(c=>c.available).sort((a,b)=>b.risk-a.risk||a.id.localeCompare(b.id));
@@ -324,7 +328,7 @@ export function applyNarrativeCommand(input,actor,command,now){
  return s;
 }
 function publicDilemma(s){
- if(s.phase==='READY'||s.phase==='FINISHED'||s.succession||(hasChicagoSuccession(s)&&s.phase==='REVEALED'))return null;
+ if(s.phase==='READY'||s.phase==='FINISHED'||s.phase==='SUSPENDED'||s.succession||(hasChicagoSuccession(s)&&s.phase==='REVEALED'))return null;
  const d=dilemma(s);
  const campaign=isHotspring(s)?campaignDilemma(s,d):null;
  if(isHotspring(s)&&!campaign)return null;
@@ -344,29 +348,40 @@ function publicInfluenceReserve(s,resolved){
   settled:Boolean(result)
  };
 }
+function visibleFinalResults(s,family=null){
+ if(s.phase!=='FINISHED'||!s.finalResults)return null;
+ if(!hasChicagoSuccession(s))return copy(s.finalResults);
+ const {winner,reason,rows}=s.finalResults;
+ return {winner,reason,rows:rows.map(r=>r.family===family?copy(r):{
+  family:r.family,total:r.total,support:r.support
+ })};
+}
 export function narrativePublicView(s){
  check(s?.kind==='founders-live-session-v2.5','Partie inconnue');
  const v=s.game.vote,resolved=(s.phase==='REVEALED'||s.phase==='FINISHED')?s.game.history.at(-1):null;
- const qualitative=hasChicagoSuccession(s)&&['READY','NEGOTIATION','COUNCIL'].includes(s.phase);
+ const chicago=hasChicagoSuccession(s),manualCouncil=usesManualCouncil(s);
+ const qualitative=chicago&&['READY','PRESENTATION','NEGOTIATION','COUNCIL','SUSPENDED','SUCCESSION'].includes(s.phase);
+ const city=chicago?chicagoCityIndicators(s.game.city):isHotspring(s)?hotspringCityIndicators(s.game.city):copy(s.game.city);
+ const level=value=>s.gaugeThresholds.filter(t=>value*10/s.game.cityMaximum>t).length;
  const snapshot=record=>{
   const view=copy(record);
-  if(isHotspring(s)&&s.campaign.version>=2&&view){
-   for(const key of ['city','cityBefore','cityAfter'])if(view[key])view[key]=hotspringCityIndicators(view[key]);
+  if((chicago||isHotspring(s)&&s.campaign.version>=2)&&view){
+   for(const key of ['city','cityBefore','cityAfter'])if(view[key])view[key]=chicago?chicagoCityIndicators(view[key]):hotspringCityIndicators(view[key]);
   }
   return view;
  };
  // No secrets, unrevealed outcomes, future branches, or source Sheets IDs.
  return {
   kind:s.kind,id:s.id,code:s.code,title:s.title,phase:s.phase,revision:s.revision,
-  ...(isV2(s)?{experienceVersion:2,timing:copy(s.timing),clock:copy(s.clock),gaugeThresholds:copy(s.gaugeThresholds)}:{}),
+  ...(isV2(s)?{experienceVersion:2,manualCouncil,timing:manualCouncil?{...s.timing,autoAdvance:false}:copy(s.timing),clock:manualCouncil?{...s.clock,deadline:null,remainingMs:null}:copy(s.clock),gaugeThresholds:copy(s.gaugeThresholds)}:{}),
   ...(hasChicagoSuccession(s)?{succession:chicagoFinalView(s)}:{}),
   ...(isChicago(s)?{chicago:true,gaugeMaximum:s.game.cityMaximum}:{}),
-  ...(isHotspring(s)?{campaign:campaignPresentation(s),influenceReserve:publicInfluenceReserve(s,resolved)}:{}),
+  ...(isHotspring(s)?{campaign:campaignPresentation(s)}:{}),
+  ...(isHotspring(s)||chicago?{influenceReserve:publicInfluenceReserve(s,resolved)}:{}),
   story:{id:s.scenario.scenario.id,title:s.scenario.scenario.title,location:s.scenario.scenario.location,year:s.scenario.scenario.year,schemaVersion:s.scenario.schema_version},
   skin:{id:s.skin.id,title:s.skin.title,labels:copy(s.skin.labels),theme:copy(s.skin.theme),publicScene:copy(s.skin.publicScene)},
-  ...(qualitative?{cityLevels:Object.fromEntries(Object.entries(s.game.city).map(([k,value])=>
-   [k,s.gaugeThresholds.filter(t=>Number(value)*10/s.game.cityMaximum>t).length]))}:{}),
-  city:qualitative?{}:isHotspring(s)?hotspringCityIndicators(s.game.city):copy(s.game.city),families:activeFounders(s.game).map((id,i)=>({id,name:s.names[id],color:copy(teamColor(s.colors?.[id]??DEFAULT_TEAM_COLORS[i])),members:s.game.families[id].members})),
+  ...(qualitative?{cityLevels:Object.fromEntries(Object.entries(s.game.city).map(([k,value])=>[k,level(value)])),stabilityLevel:level(city.stabilite)}:{}),
+  city:qualitative?{}:city,families:activeFounders(s.game).map((id,i)=>({id,name:s.names[id],color:copy(teamColor(s.colors?.[id]??DEFAULT_TEAM_COLORS[i])),members:s.game.families[id].members})),
   leader:s.game.leader,moderator:s.game.moderator,
   dilemma:publicDilemma(s),
   council:v?{phase:v.phase,turn:v.turn,bids:copy(v.bids),choices:copy(v.choices),
@@ -384,7 +399,7 @@ export function narrativePublicView(s){
     decisionLabel:h.id==='D30'&&isHotspring(s)?c.title:d?.labels?.[h.winner]??h.winner};
   }),
   finalTieOrder:copy(s.initiativeOrder??activeFounders(s.game)),
-  finalResults:s.phase==='FINISHED'?copy(s.finalResults):null
+  finalResults:visibleFinalResults(s)
  };
 }
 export function narrativeFamilyView(s,family){
@@ -399,30 +414,33 @@ export function narrativeFamilyView(s,family){
   mayVote:!s.clock?.paused&&s.phase==='COUNCIL'&&v?.phase==='voting'&&v?.turn===family,
   mayResolve:!s.clock?.paused&&s.phase==='COUNCIL'&&v?.phase==='await_moderator'&&s.game.moderator===family,
   mayChooseLeader:!s.clock?.paused&&s.phase==='COUNCIL'&&v?.phase==='await_leader'&&s.game.moderator===family},
-  ...(hasChicagoSuccession(s)?{succession:chicagoFinalView(s,family)}:{}),
+  ...(hasChicagoSuccession(s)?{succession:chicagoFinalView(s,family),finalResults:visibleFinalResults(s,family)}:{}),
   ...(isChicago(s)?{chicagoAmbition:chicagoAmbition(s,family)}:isHotspring(s)?{privateCampaign:campaignFamily(s,family)}:{goalCard:copy(card),goalProgress:progress}),
   offers,voteCommitment:acceptedVoteCommitment(s,family)};
 }
 export function narrativeOrganizerView(s){
- return {...narrativePublicView(s),...(hasChicagoSuccession(s)?{city:copy(s.game.city)}:{}),
+ return {...narrativePublicView(s),...(hasChicagoSuccession(s)?{city:chicagoCityIndicators(s.game.city),finalResults:s.phase==='FINISHED'?copy(s.finalResults):null}:{}),
+  ...(hasChicagoSuccession(s)&&s.phase==='SUSPENDED'?{sittingSummary:chicagoScores(s).map(({family,secret,wealth})=>({family,total:secret+wealth})).sort((a,b)=>b.total-a.total)}:{}),
   ...(s.succession?{successionAudit:{frozen:copy(s.succession.frozen),request:copy(s.succession.request),events:copy(s.succession.audit),
    rounds:s.succession.rounds.filter(r=>r.closedAt!==null).map(copy),arbitration:copy(s.succession.arbitration??null)}}:{}),
   familyGoals:isChicago(s)?Object.fromEntries(activeFounders(s.game).map(id=>[id,chicagoAmbition(s,id).specialty])):copy(s.goals),familyResources:copy(s.game.families),
   ...(isHotspring(s)?{campaignAdmin:campaignOrganizer(s),privateFamilies:Object.fromEntries(activeFounders(s.game).map(id=>[id,campaignFamily(s,id)]))}:{}),
-  effectsPreview:hotspringEffectsPreview(s),
+  effectsPreview:councilEffectsPreview(s),
   progression:s.phase==='REVEALED'?narrativeReserve(s):null,
   source:copy(s.source),selection:copy(s.selection),offers:copy(s.offers),
   goalCards:copy(s.goalCards??DEFAULT_GOAL_CARDS),scoreRules:copy(s.scoreRules??DEFAULT_SCORE_RULES),initiativeOrder:copy(s.initiativeOrder??activeFounders(s.game)),
   game:copy(s.game),scenario:copy(s.scenario)};
 }
-function hotspringEffectsPreview(s){
- if(!isHotspring(s)||s.campaign.version<2||!['PRESENTATION','NEGOTIATION','COUNCIL'].includes(s.phase))return null;
+function councilEffectsPreview(s){
+ const chicago=hasChicagoSuccession(s);
+ if(!(chicago||isHotspring(s)&&s.campaign.version>=2)||!['PRESENTATION','NEGOTIATION','COUNCIL'].includes(s.phase))return null;
  const dilemma=s.scenario.dilemmas.find(d=>d.id===s.currentDilemmaId);
- const cityBefore=hotspringCityIndicators(s.game.city);
+ const indicators=chicago?chicagoCityIndicators:hotspringCityIndicators;
+ const cityBefore=indicators(s.game.city);
  return ['pour','contre'].map(side=>{
-  const effects=hotspringOutcome(copy(s),dilemma,side).effects;
+  const effects=chicago?copy(dilemma.outcomes[side].effects):hotspringOutcome(copy(s),dilemma,side).effects;
   const projectedGame=applyFoundersCityEffects({...s.game,vote:null},effects.map(e=>({resource:e.indicator,kind:e.operation,amount:e.value})));
-  return {side,effects,cityBefore,cityAfter:hotspringCityIndicators(projectedGame.city)};
+  return {side,effects,cityBefore,cityAfter:indicators(projectedGame.city)};
  });
 }
 export function narrativeView(s,actor){

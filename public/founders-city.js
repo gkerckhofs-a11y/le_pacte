@@ -1,4 +1,4 @@
-import {renderChicagoGaugeLevels} from './founders-live-ui.js';
+import {gaugeLevelLabel,renderChicagoGaugeLevels} from './founders-live-ui.js';
 import {renderSuccession,showChicagoRanking,chicagoImage,chicagoPhase} from './chicago-succession.js';
 import {CAMPAIGN_PHASES,renderHotspringPanorama,setHotspringImage,renderTendencies,renderHotspringStage,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
 import {decorateGauge,formatGaugeNumber,renderPhaseClock,voteTotals,appendGaugeDelta,gaugeDelta,renderChicagoChoices} from './founders-live-ui.js';
@@ -49,7 +49,7 @@ function drawGauges(s){
  const compact=Boolean(s.campaign)&&Object.hasOwn(s.city,'bien_etre');
  root.classList.toggle('projection-gauges-grid',compact);
  for(const key of Object.keys(s.city)){
-  if(key==='stabilite'&&s.campaign?.version>=3)continue;
+  if(key==='stabilite'&&(s.manualCouncil||s.campaign?.version>=3))continue;
   const g=document.createElement('div');g.className='gauge';
   const row=document.createElement('div');row.className='gauge-head';
   const label=document.createElement('span');label.textContent=s.skin.labels.resources[key]||key;
@@ -75,25 +75,29 @@ function drawGauges(s){
 
 }
 function drawPanoramaStability(s,manual){
- $('panoramaStability').hidden=!manual;
- if(!manual)return;
  const value=s.city.stabilite,track=$('stabilityTrack'),bar=$('stabilityBar'),state=$('stabilityState');
- text('stabilityTitle','Stabilité — '+formatGaugeNumber(value,true)+' / 10');
+ const qualitative=Number.isInteger(s.stabilityLevel),maximum=s.gaugeMaximum??10;
+ $('panoramaStability').hidden=!manual||(!qualitative&&!Number.isFinite(value));
+ if($('panoramaStability').hidden)return;
+ track.hidden=qualitative;
+ text('stabilityTitle',qualitative?'Stabilité':'Stabilité — '+formatGaugeNumber(value,true)+' / '+maximum);
+ text('stabilityState',s.campaign?.stabilityLabel??(qualitative?gaugeLevelLabel(s.stabilityLevel):'Moyenne des cinq jauges'));
+ if(qualitative)return;
  appendGaugeDelta($('stabilityTitle'),s,'stabilite');
- text('stabilityState',s.campaign.stabilityLabel);
+ track.setAttribute('aria-valuemax',String(maximum));
  track.setAttribute('aria-valuenow',String(value));
- track.setAttribute('aria-valuetext',formatGaugeNumber(value,true)+' sur 10. '+s.campaign.stabilityLabel);
- bar.style.width=value*10+'%';
+ track.setAttribute('aria-valuetext',formatGaugeNumber(value,true)+' sur '+maximum+'. '+state.textContent);
+ bar.style.width=value*100/maximum+'%';
  decorateGauge(bar,state,value,s,{compact:true});
 }
 function render(s){
  document.body.classList.toggle('chicago-v3',Boolean(s.succession));
  renderSuccession($('chicagoSuccession'),s,'public');
- const manual=s.campaign?.version>=3;
+ const manual=s.manualCouncil||s.campaign?.version>=3;
  const epilogueScores=s.campaign?.epilogueResults;
  const results=s.finalResults??epilogueScores;
  document.body.classList.toggle('game-finished',Boolean(s.finalResults));
- document.body.classList.toggle('projection-manual-hotspring',manual);
+ document.body.classList.toggle('projection-manual-hotspring',s.campaign?.version>=3);
  $('dilemmaPanel').hidden=Boolean(results)||s.phase==='SUCCESSION';
  $('ballots').closest('.panel').hidden=s.phase==='SUCCESSION'||Boolean(s.succession&&s.finalResults);
  const stageReading=Boolean(s.campaign)&&['CHECKPOINT','SUSPENDED','CHARTER_SUPPORT','EPILOGUE'].includes(s.phase);
@@ -106,9 +110,10 @@ function render(s){
  applySkin(document.body,s.skin);document.body.classList.toggle('campaign-hotspring',Boolean(s.campaign));text('universeTitle',s.campaign?s.story.title:'Games of Influence · '+s.skin.title);
  text('pageTitle',s.story.location+' · '+s.story.year);text('phase',(chicagoPhase(s)||pretty[s.phase]||s.phase)+(manual&&s.clock?.paused?' · Pause':''));
  text('chapter',s.dilemma?(s.dilemma.sequence?'Conseil '+s.dilemma.sequence:'Chapitre '+s.dilemma.chapter):s.chicago?'La Commission':'Le Conseil des Fondateurs');
- const sceneOnly=s.campaign&&['INTRO','CHECKPOINT','SUSPENDED','CHARTER_SUPPORT','EPILOGUE','FINISHED'].includes(s.phase);
+ const sceneOnly=s.phase==='SUSPENDED'||s.campaign&&['INTRO','CHECKPOINT','SUSPENDED','CHARTER_SUPPORT','EPILOGUE','FINISHED'].includes(s.phase);
  $('dilemmaTitle').hidden=Boolean(sceneOnly);$('dilemmaText').hidden=Boolean(sceneOnly||s.reveal);
  text('dilemmaTitle',s.dilemma?.title||(s.phase==='FINISHED'?(s.chicago?'Les Conseils de Chicago sont terminés':'La ville entre dans l’histoire'):'Bienvenue au Conseil'));
+ if(s.chicago&&s.phase==='SUSPENDED')text('chapter','Séance sauvegardée');
  text('dilemmaText',s.dilemma?.public_text||(s.phase==='FINISHED'?'Les délibérations sont terminées.':'Le Conseil attend le signal de la régie.'));
  text('question',sceneOnly?'':s.dilemma?.vote_question||'');
  renderChicagoChoices($('chicagoChoices'),s);
@@ -125,9 +130,12 @@ function render(s){
   const root=$('city');
   let photo=root.querySelector('img');
   if(!photo){photo=document.createElement('img');photo.className='chicago-panorama';root.replaceChildren(photo);}
-  const final=s.phase==='SUCCESSION'||s.phase==='FINISHED';
-  chicagoImage(photo,final?{url:'/assets/chicago/v3/commission.webp',alt:'La Commission finale'}:
-   (s.history.at(-1)?.image??{url:'/assets/chicago/v3/chicago.webp',alt:'Panorama de Chicago en 1931'}));
+  const previous=photo.getAttribute('src'),last=s.history.at(-1);
+  chicagoImage(photo,last?.image??{url:'/assets/chicago/v3/chicago.webp',alt:'Panorama de Chicago en 1931'});
+  if(previous&&previous!==photo.getAttribute('src')&&s.reveal&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
+   photo.animate([{opacity:0.35},{opacity:1}],{duration:450});
+  }
+  status('cityEvolution',last?'Dernière décision du Conseil · '+last.title+' — '+last.decisionLabel:'');
  }else if(s.chicago){
   if(mountedSkin!=='chicago'){
    const root=$('city');

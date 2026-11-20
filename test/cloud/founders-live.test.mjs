@@ -109,5 +109,5 @@ test('Firestore Chicago : cinq votes simultanés isolés, reprise et verrouillag
  const sealed=await fresh.command(id,staff,{kind:'closeChicagoBallot',expectedRevision:view.revision},now+6);
  assert.equal(sealed.finalResults,null);
  const final=await fresh.command(id,staff,{kind:'revealChicago',expectedRevision:sealed.revision},now+7);
- assert.equal(final.finalResults.winner,'A');assert.equal(final.finalResults.rows[0].total,8);
+ assert.equal(final.finalResults.winner,'A');assert.equal(final.finalResults.rows[0].total,14);
 });

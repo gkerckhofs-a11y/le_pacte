@@ -111,14 +111,14 @@ function gauge(s){
   const el=document.createElement('div');el.className='gauge';
   const row=document.createElement('div');row.className='gauge-head';
   const label=document.createElement('span');label.textContent=s.skin.labels.resources[k]||k;
-  const n=document.createElement('strong');n.textContent=formatGaugeNumber(s.city[k],k==='stabilite'&&s.campaign?.version>=2)+'/'+(s.gaugeMaximum??10);appendGaugeDelta(n,s,k);row.append(label,n);
+  const n=document.createElement('strong');n.textContent=formatGaugeNumber(s.city[k],k==='stabilite'&&(s.campaign?.version>=2||s.manualCouncil))+'/'+(s.gaugeMaximum??10);appendGaugeDelta(n,s,k);row.append(label,n);
   const track=document.createElement('div');track.className='track';
   const bar=document.createElement('div');bar.className='bar';bar.style.width=s.city[k]*100/(s.gaugeMaximum??10)+'%';decorateGauge(bar,label,s.city[k],s);track.append(bar);el.append(row,track);root.append(el);
  }
  renderCityAudit(s);
 }
 function renderCityAudit(s){
- const expanded=s.campaign?.version>=2,formula=$('stabilityFormula'),correction=$('cityCorrection'),audit=$('cityEffectAudit');
+ const expanded=s.campaign?.version>=2||Boolean(s.chicago&&s.manualCouncil),formula=$('stabilityFormula'),correction=$('cityCorrection'),audit=$('cityEffectAudit');
  formula.hidden=correction.hidden=!expanded;
  audit.replaceChildren();audit.hidden=true;
  if(!expanded)return;
@@ -128,7 +128,8 @@ function renderCityAudit(s){
  if(!select.options.length)for(const key of indicators){
   const option=document.createElement('option');option.value=key;option.textContent=s.skin.labels.resources[key];select.append(option);
  }
- for(const field of $('cityCorrectionForm').querySelectorAll('select,input,button'))field.disabled=!s.clock.paused||['FINISHED','EPILOGUE','SUSPENDED'].includes(s.phase);
+ $('correctIndicatorValue').max=String(s.gaugeMaximum??10);
+ for(const field of $('cityCorrectionForm').querySelectorAll('select,input,button'))field.disabled=!s.clock.paused||['FINISHED','EPILOGUE','SUSPENDED','SUCCESSION'].includes(s.phase);
  const records=s.reveal?[{...s.reveal,side:s.reveal.winner}]:s.effectsPreview;
  if(!records?.length)return;
  audit.hidden=false;
@@ -169,6 +170,9 @@ function render(s){
  renderSuccession($('chicagoSuccession'),s,'organizer',command);
  document.body.classList.toggle('campaign-hotspring',Boolean(s.campaign));
  renderCampaignActions($('campaignActions'),s,command);
+ const summary=$('sittingSummary');
+ summary.hidden=!s.sittingSummary;
+ summary.textContent=s.sittingSummary?'Bilan intermédiaire privé · '+s.sittingSummary.map(row=>teamLabel(s,row.family)+' : '+row.total+' pts').join(' · '):'';
  renderCampaignAdmin($('hotspringAdmin'),s,s.sessionRole==='facilitator'?null:newVariant);
  if(s.campaign){renderHotspringStage($('hotspringStage'),s);renderTendencies($('hotspringTendencies'),s.phase==='REVEALED'?null:s.dilemma);}
  printKit.sync(s);renderPhaseClock($('phaseClock'),s);renderV2Controls(s);
@@ -185,6 +189,9 @@ function render(s){
  $('reveal').hidden=s.phase!=='AWAITING_REVEAL';
  $('next').hidden=s.phase!=='REVEALED';
  $('next').textContent=(s.progression?s.progression.terminal:s.reveal?.nextId===null)?'Terminer la partie':'Dilemme suivant';
+ if(s.manualCouncil&&s.chicago&&s.phase==='PRESENTATION'){
+  $('next').hidden=false;$('next').textContent='Ouvrir la négociation';
+ }
  if(s.succession&&s.reveal?.nextId===null)$('next').hidden=true;
  if(s.chicago&&s.reveal?.nextId===null)$('next').textContent=s.succession?'Déclencher la finale':'Clôturer la répétition';
  if(s.campaign){
@@ -358,7 +365,7 @@ const printKit=mountPrintKit({session:sid,view:()=>current,request:async(path,bo
 }});
 
 function renderV2Controls(s){
- const manual=s.campaign?.version>=3;
+ const manual=s.manualCouncil||s.campaign?.version>=3;
  $('v2Controls').hidden=s.experienceVersion!==2;
  $('beginVote').hidden=s.phase!=='NEGOTIATION';
  set('beginVote',manual?'Ouvrir le vote':'Ouvrir le vote maintenant');

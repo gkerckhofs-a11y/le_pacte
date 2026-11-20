@@ -5,6 +5,7 @@ export function gaugeState(value,thresholds=[2,4,6,8]){const level=thresholds.fi
 const gaugeNumber=new Intl.NumberFormat('fr-BE',{maximumFractionDigits:1});
 const stabilityNumber=new Intl.NumberFormat('fr-BE',{minimumFractionDigits:1,maximumFractionDigits:1});
 export const formatGaugeNumber=(value,decimal=false)=>(decimal?stabilityNumber:gaugeNumber).format(value);
+export const gaugeLevelLabel=level=>levels[level]??'';
 export function renderChicagoGaugeLevels(root,s){
  if(!s.cityLevels)return false;
  for(const [code,level] of Object.entries(s.cityLevels)){
@@ -23,7 +24,7 @@ export function decorateGauge(bar,label,value,s,{compact=false}={}){
 const clocks=new Map();
 export function renderPhaseClock(root,s){
  if(!root)return;
- root.hidden=s.experienceVersion!==2||s.campaign?.version>=3;
+ root.hidden=s.experienceVersion!==2||s.manualCouncil||s.campaign?.version>=3;
  if(root.hidden){clocks.delete(root);return;}
  clocks.set(root,{s,started:performance.now()});drawClock(root,clocks.get(root));
 }
