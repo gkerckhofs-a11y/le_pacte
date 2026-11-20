@@ -169,13 +169,13 @@ export function moderatorChooseFoundersLeader(input,id,leader) {
 }
 export function applyFoundersCityEffects(input,effects) {
  requireThat(!input.vote&&Array.isArray(effects),'Effets uniquement après le vote');
- const s=clone(input);
+ const s=clone(input),maximum=s.cityMaximum??10;
  for(const e of effects){
   requireThat(e&&Object.hasOwn(s.city,e.resource),'Ressource de la ville inconnue');
   const current=s.city[e.resource];
   if(e.kind==='delta'){
-   requireThat(integer(e.amount,-10,10),'Delta entier requis');
-   s.city[e.resource]=Math.max(0,Math.min(10,current+e.amount));
+   requireThat(integer(e.amount,-maximum,maximum),'Delta entier requis');
+   s.city[e.resource]=Math.max(0,Math.min(maximum,current+e.amount));
   } else if(e.kind==='toward_center'){
    requireThat(e.resource==='stabilite','Centrage réservé à la Stabilité');
    s.city.stabilite=current===5?5:current+(current<5?1:-1);

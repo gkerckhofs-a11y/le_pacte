@@ -129,3 +129,112 @@ test('La régie est reliée à l’accueil et sa préparation est authentifiée,
  assert.equal(saved.checksum, preparation.checksum);
  assert.deepEqual(saved.campaign, campaign);
 });
+
+test('Un pivot conserve sa variante favorable et le changement de correspondance est validé', () => {
+ const campaign = fixture();
+ const {ballots} = prepareCosaNostra(campaign);
+ const [id, favorable] = campaign.metadata.family_objectives.find(o => o.major_slots.some(slot => slot[1] === 'C'))
+  .major_slots.find(slot => slot[1] === 'C');
+ assert.equal(favorable, 'C');
+ assert.ok(Object.values(ballots[id]).includes('C'));
+ assert.throws(() => prepareCosaNostra(campaign, [], {...ballots, [id]: {pour:'A',contre:'B'}}), /issue de pivot/);
+ assert.throws(() => prepareCosaNostra(campaign, [], {...ballots, [id]: {pour:'C',contre:'C'}}), /issues distinctes/);
+ assert.throws(() => prepareCosaNostra(campaign, [], {...ballots, [id]: null}), /issues distinctes/);
+ assert.deepEqual(prepareCosaNostra(campaign, [], {...ballots, [id]: {pour:'C',contre:'A'}}).ballots[id], {pour:'C',contre:'A'});
+});
+
+test('Répétition Chicago à cinq terminaux : choix binaires, accords, jauges et confidentialité', async t => {
+ const {serveHotspringTest,hotspringClient,hotspringTestKey} = await import('./helpers/hotspring-http.mjs');
+ const server = await serveHotspringTest();
+ t.after(server.close);
+ const campaign = fixture();
+ const {ballots,crisisIds} = prepareCosaNostra(campaign);
+ const scenes = campaign.dilemmas.filter(d => d.type === 'Pivot' || crisisIds.includes(d.id)).sort((a,b) => a.id.localeCompare(b.id));
+ const scene = scenes[0];
+ const favorable = scene.options.find(option => option.secret_success) ?? scene.options[2];
+ const other = scene.options.find(option => option !== favorable);
+ const excluded = scene.options.find(option => option !== favorable && option !== other);
+ ballots[scene.id] = {pour:other.choice,contre:favorable.choice};
+ const put = async body => {
+  const response = await fetch(server.origin + route, {
+   method:'PUT',headers:{Authorization:'Bearer '+hotspringTestKey,'Content-Type':'application/json'},body:JSON.stringify(body)
+  });
+  assert.equal(response.status, 200);
+  return (await response.json()).preparation;
+ };
+ const imported = await put({campaign,revision:0});
+ const saved = await put({revision:imported.revision,crisisIds,ballots});
+ const created = await server.request('/api/founders/cosa-nostra/sessions',{
+  body:{revision:saved.revision,members:[2,3,4,5,6],code:'CN_TEST',title:'Chicago en répétition'},
+  token:hotspringTestKey,status:201
+ });
+ assert.equal(created.access.length,5);
+ const game = hotspringClient(server,created);
+ let publicView = await game.projection();
+ assert.equal(publicView.chicago,true);
+ assert.equal(publicView.gaugeMaximum,100);
+ assert.deepEqual(Object.values(publicView.city),[50,50,50,50,50]);
+ assert.deepEqual(publicView.families.map(f => f.name),campaign.metadata.family_objectives.map(objective => objective.family));
+ assert.deepEqual(publicView.families.map(f => f.members),[2,3,4,5,6]);
+ for(const [index, {family}] of created.access.entries()){
+  const view = await game.family(family);
+  assert.deepEqual(view.chicagoAmbition.pivots.map(pivot => pivot.id),campaign.metadata.family_objectives[index].major_slots.map(slot => slot[0]));
+  assert.equal(view.chicagoAmbition.pivots.length,3);
+  assert.equal(view.scenario,undefined);
+ }
+ assert.equal(publicView.chicagoAmbition,undefined);
+ await game.command(publicView,'start');
+ publicView = await game.projection();
+ assert.equal(publicView.phase,'NEGOTIATION');
+ assert.deepEqual(publicView.dilemma.labels, {pour:other.title,contre:favorable.title});
+ assert.equal(publicView.dilemma.outcomes,undefined);
+ if(favorable.secret_success)assert.equal(JSON.stringify(publicView).includes(favorable.secret_success),false);
+ assert.equal(publicView.dilemma.sourceChoices,undefined);
+ if (excluded.title !== other.title && excluded.title !== favorable.title) {
+  assert.equal(JSON.stringify(publicView.dilemma).includes(excluded.title),false);
+ }
+ await game.command(publicView,'offer',{id:'chicago-binding-1',to:'B',amount:1,reason:'Accord test',commitment:{choice:'contre',minInfluence:1}},'A');
+ await game.command(await game.projection(),'acceptOffer',{id:'chicago-binding-1'},'B');
+ assert.equal((await game.family('B')).voteCommitment.choice,'contre');
+ assert.equal((await game.family('A')).self.dollars,9);
+ assert.equal((await game.family('B')).self.dollars,11);
+ await game.command(await game.projection(),'pause');
+ assert.equal((await game.projection()).clock.paused,true);
+ await game.command(await game.projection(),'resume');
+
+ for(let index=0;index<scenes.length;index++){
+  await game.command(await game.projection(),'beginVote');
+  let view = await game.projection();
+  for(let turn=0;turn<12&&view.phase==='COUNCIL';turn++){
+   const council = view.council;
+   if(council.phase==='await_moderator')await game.command(view,'resolveTie',{winner:'contre'},view.moderator);
+   else if(council.phase==='await_leader')await game.command(view,'chooseLeader',{family:council.pendingLeaderChoices[0]},view.moderator);
+   else {
+    const actor = await game.family(council.turn);
+    const voted = Object.hasOwn(council.choices,council.turn);
+    await game.command(view,'vote',voted?{kind:'maintien'}:
+     actor.self.power?{kind:'contre',amount:1}:{kind:'passe_pouvoir'},council.turn);
+   }
+   view = await game.projection();
+  }
+  assert.equal(view.phase,'REVEALED');
+  assert.equal(view.reveal.winner,'contre');
+  assert.equal(view.reveal.id,'CN_'+scenes[index].id.replace('.','_'));
+  const outcome=scenes[index].options.find(o=>o.choice===ballots[scenes[index].id].contre);
+  assert.equal(view.reveal.narration,outcome.after);
+  for(const [gauge,delta] of Object.entries(outcome.effects)){
+   assert.equal(view.city[gauge],Math.max(0,Math.min(100,view.reveal.cityBefore[gauge]+delta)));
+  }
+  if(index===0){
+   assert.equal(view.reveal.narration,favorable.after);
+   for(const [gauge,delta] of Object.entries(favorable.effects))assert.equal(view.city[gauge],50+delta);
+   assert.equal(view.reveal.sourceChoices,undefined);
+  }
+  await game.command(view,'next');
+ }
+ const ending = await game.projection();
+ assert.equal(ending.phase,'FINISHED');
+ assert.equal(ending.history.length,25);
+ assert.ok(ending.history.every(record => /^CN_0[1-5]_0[1-6]$/.test(record.id)));
+ assert.equal(ending.finalResults,null);
+});

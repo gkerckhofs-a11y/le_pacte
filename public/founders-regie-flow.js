@@ -1,3 +1,4 @@
+import {roleLabel} from './founders-role-badges.js';
 import {teamLabel} from './founders-identity.js';
 export const validNarrativeSession=id=>typeof id==='string'&&/^[a-f0-9]{24}$/.test(id);
 export function councilGuidance(s){
@@ -17,9 +18,13 @@ export function councilGuidance(s){
   if(s.campaign.version>=3&&s.phase==='NEGOTIATION')return {step:3,title:'Les familles négocient',hint:'Laissez les équipes discuter. Cliquez sur « Ouvrir le vote » quand elles sont prêtes.'};
   if(phases[s.phase])return phases[s.phase];
  }
+ if(s.chicago&&s.phase==='READY')return {step:2,title:'Préparez les cinq familles de Chicago',hint:'Distribuez les accès des porte-paroles et ouvrez la projection avant de lancer le premier Conseil.'};
+ if(s.chicago&&s.phase==='NEGOTIATION')return {step:3,title:'Les familles négocient',hint:'Ouvrez le vote lorsque les familles sont prêtes.'};
+ if(s.chicago&&s.phase==='FINISHED')return {step:3,title:'Les Conseils sont terminés',hint:'Les décisions et les jauges finales restent consultables dans la régie.'};
+ if(s.chicago&&s.phase==='REVEALED'&&s.reveal?.nextId===null)return {step:3,title:'Le dernier résultat est affiché',hint:'Vous pouvez clôturer la répétition.'};
  if(s.phase==='READY')return {step:2,title:'Votre partie est prête à être lancée',hint:'Distribuez les accès aux porte-paroles des familles actives et ouvrez l’écran à projeter. Cliquez ensuite sur « Lancer la partie » : le premier dilemme s’affichera et le Maire pourra voter.'};
  if(s.phase==='NEGOTIATION')return {step:3,title:'Les familles négocient',hint:'Le vote s’ouvre à la fin du chrono si les transitions automatiques sont activées. Vous pouvez aussi l’ouvrir maintenant.'};
- if(s.phase==='COUNCIL')return {step:3,title:'La partie est lancée',hint:s.council.turn?'Le vote se fait sur les écrans des équipes. C’est au tour de '+name(s.council.turn)+'.':s.council.phase==='await_moderator'?'Le Shérif doit départager le vote sur son écran d’équipe.':'Le Shérif doit choisir le nouveau Maire sur son écran d’équipe.'};
+ if(s.phase==='COUNCIL')return {step:3,title:'La partie est lancée',hint:s.council.turn?'Le vote se fait sur les écrans des équipes. C’est au tour de '+name(s.council.turn)+'.':s.council.phase==='await_moderator'?(s.chicago?roleLabel(s,'sheriff'):'Le Shérif')+' doit départager le vote sur son écran d’équipe.':s.chicago?roleLabel(s,'sheriff')+' doit désigner le nouveau titulaire du rôle « '+roleLabel(s,'mayor')+' ».':'Le Shérif doit choisir le nouveau Maire sur son écran d’équipe.'};
  if(s.phase==='AWAITING_REVEAL')return {step:3,title:'Le vote est terminé : révélez la décision',hint:'Cliquez sur « Révéler la décision ». Les conséquences et l’évolution des indicateurs seront affichées sur la projection.'};
  if(s.phase==='REVEALED'){
   if(s.progression?.blocked)return {step:3,title:'La réserve narrative nécessite une vérification',hint:s.progression.blocked};

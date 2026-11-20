@@ -1,3 +1,4 @@
+import {chicagoSessionPreview} from './cosa-nostra-session.ts';
 import {prepareCosaNostra} from './cosa-nostra-preparation.ts';
 import qrcode from 'qrcode-generator';
 import {checkedDilemmaDraft} from './hotspring-dilemma-drafts.ts';
@@ -164,7 +165,10 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
    if(path==='/api/founders/cosa-nostra/preparation'){
     const actor=await requireOrg(req);
     const previous=await store.narrative.getCosaNostraPreparation(actor.id);
-    if(req.method==='GET'){json(200,{preparation:previous});return;}
+    if(req.method==='GET'){
+     const preparation=previous&&!previous.ballots?{...prepareCosaNostra(previous.campaign,previous.crisisIds),revision:previous.revision}:previous;
+     json(200,{preparation});return;
+    }
     if(req.method==='PUT'){
      const input=await body(req,200_000);
      if(input?.revision!==(previous?.revision??0)){
@@ -173,7 +177,7 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
      const importing=Object.hasOwn(input,'campaign');
      if(!importing&&!previous)throw new Error('Importez la campagne V2 avant de préparer le parcours.');
      if(!importing&&!Array.isArray(input.crisisIds))throw new Error('Sélection de crises requise.');
-     const prepared=importing?prepareCosaNostra(input.campaign):prepareCosaNostra(previous.campaign,input.crisisIds);
+     const prepared=importing?prepareCosaNostra(input.campaign):prepareCosaNostra(previous.campaign,input.crisisIds,Object.hasOwn(input,'ballots')?input.ballots:previous.ballots);
      try{
       json(200,{preparation:await store.narrative.saveCosaNostraPreparation(actor.id,prepared,input.revision)});
      }catch(error){
@@ -183,6 +187,18 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
      return;
     }
     json(405,{error:'Méthode refusée'});return;
+   }
+
+   if(path==='/api/founders/cosa-nostra/sessions'&&req.method==='POST'){
+    const actor=await requireOrg(req), input=await body(req,4000);
+    const stored=await store.narrative.getCosaNostraPreparation(actor.id);
+    if(!stored)throw new Error('Importez la campagne avant de créer une répétition.');
+    if(input?.revision!==stored.revision){json(409,{error:'La préparation a changé. Rechargez la page.'});return;}
+    const preparation=prepareCosaNostra(stored.campaign,stored.crisisIds,stored.ballots);
+    const {preview,names}=chicagoSessionPreview(preparation,input.members);
+    const created=await store.narrative.create({ownerId:actor.id,preview,names,code:input.code,title:input.title,now,
+     timing:{negotiationSeconds:480,voteSeconds:180,resolutionSeconds:20,autoAdvance:false}});
+    json(201,created);return;
    }
 
    const draftMatch=path.match(/^\/api\/founders\/hotspring\/drafts(?:\/([a-f0-9]{24}))?$/);

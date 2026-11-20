@@ -10,7 +10,7 @@ function requireValid(condition: unknown, message: string): asserts condition {
  if (!condition) throw new Error(message);
 }
 
-export function prepareCosaNostra(campaign, crisisIds?) {
+export function prepareCosaNostra(campaign, crisisIds?, ballots?) {
  const {metadata, dilemmas} = campaign ?? {};
  requireValid(metadata?.universe === 'Cosa Nostra — Le Trône de Chicago' && text(metadata.version) &&
   metadata.teams === 5 && metadata.chapters === 5 && metadata.dilemmas === 30 &&
@@ -45,7 +45,7 @@ export function prepareCosaNostra(campaign, crisisIds?) {
   new Set(families.map(family => metadata.gauge_mapping?.[family])).size === 5 &&
   families.every(family => gauges.includes(metadata.gauge_mapping?.[family]) && text(metadata.winner_epilogues?.[family])),
  'Familles, jauges associées ou épilogues invalides.');
- const pivots = new Set<string>();
+ const pivots = new Map<string, string>();
  for (const objective of objectives) {
   requireValid(text(objective.specialty) && text(objective.small?.condition) && objective.small.points === 2 &&
    text(objective.medium?.condition) && objective.medium.points === 3 &&
@@ -58,7 +58,7 @@ export function prepareCosaNostra(campaign, crisisIds?) {
    requireValid(!pivots.has(id) && byId.get(id)?.type === 'Pivot' &&
     byId.get(id).options.find(option => option.choice === choice)?.secret_success === marker && text(marker),
    'Marqueur ou référence de pivot invalide pour la famille ' + objective.family + '.');
-   pivots.add(id);
+   pivots.set(id, choice);
   }
  }
  const ordered = [...dilemmas].sort((a, b) => a.chapter - b.chapter || a.number - b.number);
@@ -70,6 +70,18 @@ export function prepareCosaNostra(campaign, crisisIds?) {
   selected.every(id => byId.get(id)?.type === 'Crise') &&
   chapters.every(chapter => selected.filter(id => byId.get(id).chapter === chapter).length <= 2),
  'Choisissez au maximum deux crises par chapitre, sans doublon.');
- return {campaign, crisisIds: crises.filter(d => selected.includes(d.id)).map(d => d.id),
+ requireValid(ballots === undefined || ballots && typeof ballots === 'object' && !Array.isArray(ballots) &&
+  Object.keys(ballots).length === dilemmas.length, 'Définissez les deux issues jouables pour les 30 dilemmes.');
+ const binary = Object.fromEntries(ordered.map(scene => {
+  const protectedChoice = pivots.get(scene.id);
+  const pair = ballots === undefined ? {pour:'A', contre:protectedChoice === 'C' ? 'C' : 'B'} : ballots[scene.id];
+  requireValid(ballots === undefined || Object.hasOwn(ballots, scene.id),
+   'Correspondance manquante pour le dilemme ' + scene.id + '.');
+  requireValid(pair && choices.includes(pair.pour) && choices.includes(pair.contre) && pair.pour !== pair.contre &&
+   (!protectedChoice || [pair.pour,pair.contre].includes(protectedChoice)),
+   'Choisissez deux issues distinctes et conservez l’issue de pivot pour le dilemme ' + scene.id + '.');
+  return [scene.id, {pour:pair.pour, contre:pair.contre}];
+ }));
+ return {campaign, crisisIds: crises.filter(d => selected.includes(d.id)).map(d => d.id), ballots:binary,
   checksum: createHash('sha256').update(JSON.stringify(campaign)).digest('hex')};
 }

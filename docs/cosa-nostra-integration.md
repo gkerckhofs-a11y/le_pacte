@@ -4,7 +4,13 @@ Cette tranche part de `deploy/firebase` au commit `6328b69`, qui contient l’ac
 
 Le JSON d’origine reste dans la préparation privée de l’organisateur et conserve ses identifiants, textes, jauges, objectifs, marqueurs, briefs et épilogues. La régie affiche les ambitions uniquement après authentification. Les mises à jour utilisent une révision pour détecter les modifications simultanées. Aucun export de la campagne complète ne fait partie des fichiers publics du site.
 
-## Écarts à traiter avant la première partie jouable
+## Répétition des Conseils
+
+La régie définit, pour chaque dilemme, la variante POUR et la variante CONTRE. Le troisième choix reste dans la campagne privée. Le moteur refuse un couple qui écarte l’issue d’une ambition majeure. Les couples sont préremplis avec A/B, ou A/C si C porte le marqueur d’un pivot. Les organisateurs peuvent modifier les couples autorisés avant la création de la répétition.
+
+La répétition fige les décisions éditoriales et crée un accès privé par famille. Elle réutilise les Conseils ordinaires, l’Influence, la réserve, les offres financières, les engagements et le départage du moteur. Les jauges de Chicago démarrent à 50/100 pour la recette. La projection emprunte le décor Mafia existant en attendant les illustrations propres à chaque scène. Le dernier Conseil clôt la répétition. La succession secrète reste une phase à intégrer et à tester.
+
+## Audit des écarts avec Hotspring
 
 | Élément | Moteur vérifié sur `6328b69` | Adaptation proposée |
 | --- | --- | --- |
@@ -25,4 +31,4 @@ Sur un pivot de test dont le marqueur se trouve sur C, la correspondance **POUR 
 
 Depuis l’accueil local, ouvrir Cosa Nostra, se connecter, importer le JSON V2 et enregistrer un parcours. Le test automatisé vérifie la validation, la limite de deux crises par chapitre, le rejet des accès joueur, l’isolement des comptes et le conflit d’écriture. Pour lancer le test ciblé avec le fichier original local, utiliser `COSA_NOSTRA_TEST_CAMPAIGN=/chemin/campagne.json node --test test/cosa-nostra-preparation.test.mjs`.
 
-La préparation n’est pas un scénario publié. Le retrait du commit retire le bouton et la route tout en laissant les préparations privées stockées. La fusion vers `deploy/firebase` déclenche le déploiement de production et requiert l’accord de l’organisateur.
+La campagne et les choix propres à l’organisateur restent privés. Le retrait du commit retire le bouton et la route tout en laissant les préparations privées stockées. La fusion vers `deploy/firebase` déclenche le déploiement de production et requiert l’accord de l’organisateur.

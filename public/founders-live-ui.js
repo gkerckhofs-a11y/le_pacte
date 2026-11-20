@@ -6,7 +6,7 @@ const gaugeNumber=new Intl.NumberFormat('fr-BE',{maximumFractionDigits:1});
 const stabilityNumber=new Intl.NumberFormat('fr-BE',{minimumFractionDigits:1,maximumFractionDigits:1});
 export const formatGaugeNumber=(value,decimal=false)=>(decimal?stabilityNumber:gaugeNumber).format(value);
 export function decorateGauge(bar,label,value,s,{compact=false}={}){
- const state=gaugeState(value,s.gaugeThresholds);bar.style.background=state.color;
+ const state=gaugeState(value*10/(s.gaugeMaximum??10),s.gaugeThresholds);bar.style.background=state.color;
  if(compact)label.title=state.label;
  else label.textContent+=' · '+state.label;
 }
@@ -37,9 +37,20 @@ export function gaugeDelta(s,key){
  const value=Math.round((after-before)*10)/10;
  const format=number=>formatGaugeNumber(number,key==='stabilite'&&s.campaign?.version>=2);
  const description=key==='stabilite'&&s.campaign?.version>=2?'Moyenne calculée, ':'Effet du dilemme : ';
- return {value,text:value>0?'+'+format(value):value<0?'−'+format(Math.abs(value)):format(0),kind:value>0?'positive':value<0?'negative':'neutral',description:description+format(before)+' → '+format(after)+'/10'};
+ return {value,text:value>0?'+'+format(value):value<0?'−'+format(Math.abs(value)):format(0),kind:value>0?'positive':value<0?'negative':'neutral',description:description+format(before)+' → '+format(after)+'/'+(s.gaugeMaximum??10)};
 }
 export function appendGaugeDelta(root,s,key){
  const delta=gaugeDelta(s,key);if(!delta)return;
  const badge=document.createElement('span');badge.className='gauge-delta gauge-delta-'+delta.kind;badge.textContent=delta.text;badge.title=delta.description;badge.setAttribute('aria-label',delta.description);root.append(badge);
+}
+
+export function renderChicagoChoices(root,s){
+ root.hidden=!s.chicago||!s.dilemma||Boolean(s.reveal);
+ root.replaceChildren();
+ if(root.hidden)return;
+ for(const side of ['pour','contre']){
+  const choice=document.createElement('li');
+  choice.textContent=side.toUpperCase()+' · '+s.dilemma.labels[side];
+  root.append(choice);
+ }
 }

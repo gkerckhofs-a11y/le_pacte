@@ -1,9 +1,10 @@
+import {roleLabel} from './founders-role-badges.js';
 import {renderVoteProgress} from './founders-vote-progress.js';
 import {teamLabel,teamCaption,colorize} from './founders-identity.js';
 const choices={pour:'POUR',contre:'CONTRE',passe_pouvoir:'Passe · récupération',passe_moderateur:'Passe · Shérif'};
 export function councilMonitor(s){
  const active=s.game.vote;
- const manual=s.campaign?.version>=3,preVote=['INTRO','PRESENTATION','NEGOTIATION'].includes(s.phase);
+ const manual=s.campaign?.version>=3||s.chicago,preVote=['INTRO','PRESENTATION','NEGOTIATION'].includes(s.phase);
  const closed=s.phase!=='READY'&&s.phase!=='COUNCIL'&&!(manual&&preVote)?s.game.history.at(-1):null;
  const vote=active??closed;
  const bids=vote?.bids??{},positions=vote?.choices??{};
@@ -13,15 +14,15 @@ export function councilMonitor(s){
  const arbitration=active?.phase==='await_moderator'||active?.phase==='await_leader';
  const actor=turn??(arbitration?s.moderator:null);
  const action=turn?(positions[turn]?'Maintenir ou surenchérir dans le même camp ; une abstention reste définitive.':'Choisir POUR, CONTRE ou passer sur son écran d’équipe.'):
- active?.phase==='await_moderator'?'Le Shérif doit départager POUR et CONTRE.':
- active?.phase==='await_leader'?'Le Shérif doit désigner le Maire parmi : '+active.pendingLeaderChoices.map(id=>teamLabel(s,id)).join(', '):
+ active?.phase==='await_moderator'?(s.chicago?roleLabel(s,'sheriff'):'Le Shérif')+' doit départager POUR et CONTRE.':
+ active?.phase==='await_leader'?(s.chicago?roleLabel(s,'sheriff')+' doit désigner '+roleLabel(s,'mayor')+' parmi : ':'Le Shérif doit désigner le Maire parmi : ')+active.pendingLeaderChoices.map(id=>teamLabel(s,id)).join(', '):
  manual&&s.phase==='NEGOTIATION'?'Ouvrez le vote lorsque les familles ont terminé de négocier.':
  manual&&preVote?'Présentez le dilemme avant la négociation.':
  s.phase==='READY'?'La régie peut lancer le premier Conseil.':s.phase==='AWAITING_REVEAL'?'Vote clos : la régie doit révéler les conséquences.':s.phase==='FINISHED'?'Partie terminée.':'Résolution affichée : poursuivre vers le prochain chapitre.';
  return {yes,no,actor,action,closed:Boolean(closed),pool:s.game.pool,
  balance:closed?'Résultat : '+closed.winner.toUpperCase():!vote?'Vote non ouvert':yes===no?'Égalité provisoire':(yes>no?'POUR':'CONTRE')+' en tête de '+Math.abs(yes-no)+' Influence',
- rows:s.families.map(f=>({family:f,roles:[f.id===s.leader?'Maire':null,f.id===s.moderator?'Shérif':null].filter(Boolean).join(' · '),
- current:f.id===actor,choice:choices[positions[f.id]]??'Pas encore voté',bid:bids[f.id]??0,power:s.familyResources[f.id].power,dollars:s.familyResources[f.id].dollars})),
+ rows:s.families.map(f=>({family:f,roles:[f.id===s.leader?roleLabel(s,'mayor'):null,f.id===s.moderator?roleLabel(s,'sheriff'):null].filter(Boolean).join(' · '),
+ current:f.id===actor,choice:s.chicago&&positions[f.id]==='passe_moderateur'?'Passe · '+roleLabel(s,'sheriff'):choices[positions[f.id]]??'Pas encore voté',bid:bids[f.id]??0,power:s.familyResources[f.id].power,dollars:s.familyResources[f.id].dollars})),
  steps:vote?.steps??[],settlement:closed?`Réserve : ${closed.poolBefore} → ${closed.poolAfter}. Chaque famille ayant passé pour récupérer reçoit ${closed.recapturedPerPassingTeam} Influence.`:null};
 }
 export function renderCouncilMonitor(root,s){
@@ -29,7 +30,7 @@ export function renderCouncilMonitor(root,s){
  root.replaceChildren();
  root.append(el('h2','Le Conseil en direct'));
  const roles=el('div',null,'council-roles');
- for(const [label,id] of [['Maire',s.leader],['Shérif',s.moderator],['À la parole',m.actor]]){
+ for(const [label,id] of [[roleLabel(s,'mayor'),s.leader],[roleLabel(s,'sheriff'),s.moderator],['À la parole',m.actor]]){
   const card=el('div',null,'card');card.append(el('span',label,'eyeline'),el('strong',id?teamLabel(s,id):'Régie'));roles.append(card);
  }
  root.append(roles,el('p',m.action,'council-prompt'));

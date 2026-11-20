@@ -1,9 +1,10 @@
-import {organizerWorkspace} from './founders-workspace.js';
+import {isCurrentChicago,narrativeRegie} from './founders-univers.js';
+import {organizerWorkspace,rememberAccess} from './founders-workspace.js';
 
 const route = '/api/founders/cosa-nostra/preparation';
 const chapterTitles = ['L’Héritage', 'Le Partage', 'La Guerre des ombres', 'Les Trahisons', 'La Commission'];
 const $ = id => document.getElementById(id);
-let preparation = null;
+let preparation = null, writing = false;
 
 function element(tag, text) {
  const node = document.createElement(tag);
@@ -16,8 +17,17 @@ function status(text, error = false) {
 }
 const request = organizerWorkspace({
  async onOpen() {
-  const response = await request(route);
+  const [response, {sessions}] = await Promise.all([request(route),request('/api/founders/sessions')]);
   render(response.preparation);
+  const links = sessions.filter(isCurrentChicago).map(session => {
+   const item = element('li');
+   const a = element('a', session.title + ' · ' + session.code);
+   a.href = narrativeRegie(session.id);
+   item.append(a);
+   return item;
+  });
+  $('sessions').replaceChildren(...(links.length ? links : [element('li', 'Aucune répétition enregistrée.')]));
+
   $('loginPanel').hidden = true;
   $('workspace').hidden = false;
  },
@@ -25,7 +35,7 @@ const request = organizerWorkspace({
  localAction: 'Ouvrir la régie'
 });
 
-function scene(dilemma, metadata, selected) {
+function scene(dilemma, metadata, selected, ballot, protectedChoice) {
  const row = element('div');
  row.className = 'scene';
  if (dilemma.type === 'Crise') {
@@ -41,6 +51,27 @@ function scene(dilemma, metadata, selected) {
  }
  const details = element('details');
  details.append(element('summary', 'Lecture et issues'), element('p', dilemma.intro), element('p', dilemma.tension));
+ const label = element('label', 'Deux issues soumises au vote');
+ const pairing = element('select');
+ pairing.dataset.scene = dilemma.id;
+ for (const pour of dilemma.options) {
+  for (const contre of dilemma.options) {
+   if (pour === contre || protectedChoice && ![pour.choice,contre.choice].includes(protectedChoice)) continue;
+   const option = element('option', 'POUR ' + pour.choice + ' · CONTRE ' + contre.choice);
+   option.value = pour.choice + contre.choice;
+   option.selected = pour.choice === ballot.pour && contre.choice === ballot.contre;
+   pairing.append(option);
+  }
+ }
+ const reserve = element('p');
+ function showReserve() {
+  const reserved = dilemma.options.find(option => !pairing.value.includes(option.choice));
+  reserve.textContent = 'En réserve · ' + reserved.choice + ' — ' + reserved.title;
+ }
+ label.append(pairing);
+ pairing.addEventListener('change', showReserve);
+ showReserve();
+ details.append(label, reserve);
  const options = element('ul');
  for (const option of dilemma.options) {
   const li = element('li');
@@ -62,6 +93,15 @@ function scene(dilemma, metadata, selected) {
 function selectedCrises() {
  return [...$('chapters').querySelectorAll('input:checked')].map(input => input.value);
 }
+function selectedBallots() {
+ return Object.fromEntries([...$('chapters').querySelectorAll('select[data-scene]')].map(input =>
+  [input.dataset.scene, {pour:input.value[0],contre:input.value[1]}]));
+}
+function dirty() {
+ return selectedCrises().join(',') !== preparation.crisisIds.join(',') ||
+  Object.entries(selectedBallots()).some(([id,value]) => value.pour !== preparation.ballots[id].pour ||
+   value.contre !== preparation.ballots[id].contre);
+}
 function updateSelection() {
  for (const chapter of $('chapters').querySelectorAll('fieldset')) {
   const full = chapter.querySelectorAll('input:checked').length >= 2;
@@ -71,7 +111,9 @@ function updateSelection() {
  const count = 15 + crisisIds.length;
  $('planSummary').textContent = count + ' Conseils sur 25 au maximum · 15 pivots et ' +
   crisisIds.length + (crisisIds.length === 1 ? ' crise' : ' crises');
- $('savePlan').disabled = crisisIds.join(',') === preparation.crisisIds.join(',');
+ $('savePlan').disabled = writing || !dirty();
+ $('createSession').disabled = writing || dirty();
+ $('importCampaign').disabled = writing;
 }
 
 function render(saved) {
@@ -79,6 +121,15 @@ function render(saved) {
  $('campaignPanel').hidden = !saved;
  if (!saved) return;
  const {metadata, dilemmas} = saved.campaign;
+ const protectedChoices = new Map(metadata.family_objectives.flatMap(objective =>
+  objective.major_slots.map(([id,choice]) => [id,choice])));
+ $('members').replaceChildren(...metadata.family_objectives.map(({family}) => {
+  const label = element('label', 'Effectif · ' + family);
+  const count = element('input');
+  Object.assign(count, {type:'number',min:'1',max:'300',value:'5',required:true});
+  label.append(count);
+  return label;
+ }));
  $('sourceVersion').textContent = metadata.version;
  $('importCampaign').textContent = 'Remplacer la campagne';
  $('chapters').replaceChildren(...chapterTitles.map((title, index) => {
@@ -86,7 +137,7 @@ function render(saved) {
   chapter.append(element('legend', 'Chapitre ' + (index + 1) + ' · ' + title));
   const scenes = dilemmas.filter(dilemma => dilemma.chapter === index + 1).sort((a, b) => a.number - b.number);
   for (const dilemma of scenes) {
-   chapter.append(scene(dilemma, metadata, saved.crisisIds));
+   chapter.append(scene(dilemma, metadata, saved.crisisIds, saved.ballots[dilemma.id], protectedChoices.get(dilemma.id)));
   }
   return chapter;
  }));
@@ -113,7 +164,10 @@ $('importForm').addEventListener('submit', async event => {
  const file = $('campaignFile').files[0];
  if (!file) return;
  if (preparation && !confirm('Remplacer la campagne ? Le parcours reviendra à la sélection initiale.')) return;
- $('importCampaign').disabled = true;
+ if (writing) return;
+ writing = true;
+ if (preparation) updateSelection();
+ else $('importCampaign').disabled = true;
  try {
   if (file.size > 195_000) throw new Error('Le fichier de campagne est trop volumineux.');
   let campaign;
@@ -126,21 +180,47 @@ $('importForm').addEventListener('submit', async event => {
  } catch (error) {
   status(error.message, true);
  } finally {
-  $('importCampaign').disabled = false;
+  writing = false;
+  if (preparation) updateSelection();
+  else $('importCampaign').disabled = false;
  }
 });
 
 $('planForm').addEventListener('submit', async event => {
  event.preventDefault();
- $('savePlan').disabled = true;
+ if (writing) return;
+ writing = true;
+ updateSelection();
  try {
-  const crisisIds = selectedCrises();
-  const response = await request(route, 'PUT', {revision: preparation.revision, crisisIds});
+  const crisisIds = selectedCrises(), ballots = selectedBallots();
+  const response = await request(route, 'PUT', {revision: preparation.revision, crisisIds, ballots});
   preparation = response.preparation;
   status('Parcours enregistré.');
  } catch (error) {
   status(error.message, true);
  } finally {
+  writing = false;
+  updateSelection();
+ }
+});
+
+$('sessionForm').addEventListener('submit', async event => {
+ event.preventDefault();
+ if (writing || dirty()) return;
+ writing = true;
+ updateSelection();
+ try {
+  const members = [...$('members').querySelectorAll('input')].map(field => Number(field.value));
+  const code = 'CN' + crypto.randomUUID().replaceAll('-','').slice(0,10).toUpperCase();
+  const result = await request('/api/founders/cosa-nostra/sessions', 'POST', {
+   members, code, title:$('sessionTitle').value.trim(), revision:preparation.revision
+  });
+  rememberAccess(result);
+  location.assign(narrativeRegie(result.id));
+ } catch (error) {
+  status(error.message, true);
+ } finally {
+  writing = false;
   updateSelection();
  }
 });
