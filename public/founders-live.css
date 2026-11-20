@@ -255,7 +255,6 @@ body[data-skin=western].family-dashboard .identity-panel label{font-size:14px;fo
 .regie-animation .regie-crisis{max-width:360px}
 .regie-animation #actionMessage{min-height:0;margin:8px 0 0}
 .regie-animation #actionMessage:empty{display:none}
-@media(min-width:900px) and (min-height:660px){.regie-dashboard:has(#phaseClock[hidden]) .regie-animation:has(#actions button:not([hidden])){position:sticky;top:8px;z-index:4}}
 .regie-message{min-height:1.5em;white-space:pre-wrap;color:var(--gold);line-height:1.6;font-weight:600}.regie-checklist{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}.regie-checklist p{border:1px solid var(--border);background:var(--panel2);border-radius:5px;padding:14px;margin:0}.regie-checklist strong,.regie-checklist span{display:block}.regie-checklist strong{color:var(--paper);margin-bottom:7px}.regie-checklist span{font-size:13px;color:var(--muted);line-height:1.6}.regie-projection-link{display:inline-block;font-weight:700;color:var(--gold);padding:10px 0}.regie-control details{margin-top:18px}.regie-dashboard #sessionPicker{margin:20px 0}.regie-dashboard #accountPanel[hidden],.regie-dashboard #sessionPicker[hidden]{display:none}
 @media(max-width:700px){.regie-steps{gap:10px;font-size:12px}.regie-checklist{grid-template-columns:1fr}.regie-account{align-items:flex-start;flex-direction:column}.regie-login h2,.regie-next-action h2{font-size:22px}}
 
@@ -359,6 +358,7 @@ html:fullscreen{overflow-y:auto;background:#15191b}
  body.printing-kit .print-qr{print-color-adjust:exact;-webkit-print-color-adjust:exact}
 }
 .phase-clock{position:sticky;top:0;z-index:5;background:#253e45;color:#fff;padding:12px 24px;font-size:clamp(20px,3vw,34px);font-weight:800;text-align:center;border-bottom:3px solid #e5b867;font-variant-numeric:tabular-nums}
+.regie-dashboard .phase-clock{position:static}
 .time-up{background:#782626}.clock-paused{background:#4c465b}.vote-progress strong{font-size:clamp(20px,3vw,32px)}
 dialog{max-width:620px;background:var(--panel);color:var(--paper);border:2px solid var(--gold);padding:28px;border-radius:12px}dialog::backdrop{background:#000b}
 body[data-skin=western].family-dashboard #offerDialog h2{color:inherit}
