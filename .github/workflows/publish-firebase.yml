@@ -49,12 +49,13 @@ jobs:
           curl --fail --silent --show-error --retry 4 --retry-all-errors --max-time 20 "$url/api/catalog" -o "$RUNNER_TEMP/pacte-catalog.json"
           node -e 'const data = require(process.argv[1]); if (data.authMode !== "firebase") process.exit(1)' "$RUNNER_TEMP/pacte-catalog.json"
           url=https://games-of-influence.web.app
-          for route in / /hotspring /hotspring/nouvelle-partie /hotspring/atelier /api/catalog; do
+          for route in / /hotspring /hotspring/nouvelle-partie /hotspring/atelier /cosa-nostra /api/catalog; do
             case "$route" in
               /) expected=dist/public/index.html ;;
               /hotspring) expected=dist/public/founders-regie.html ;;
               /hotspring/nouvelle-partie) expected=dist/public/founders-setup.html ;;
               /hotspring/atelier) expected=dist/public/founders-atelier.html ;;
+              /cosa-nostra) expected=dist/public/cosa-nostra.html ;;
               *) expected= ;;
             esac
             curl --fail --silent --show-error --retry 8 --retry-all-errors --max-time 20 "$url$route" -o "$RUNNER_TEMP/games-of-influence-check"

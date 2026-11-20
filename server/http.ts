@@ -1,3 +1,4 @@
+import {prepareCosaNostra} from './cosa-nostra-preparation.ts';
 import qrcode from 'qrcode-generator';
 import {checkedDilemmaDraft} from './hotspring-dilemma-drafts.ts';
 import {checkedConfiguration} from './founders-configurations.ts';
@@ -28,6 +29,8 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
  staticFiles['/regie']=staticFiles['/hotspring']=staticFiles['/founders-regie.html'];
  staticFiles['/hotspring/nouvelle-partie']=staticFiles['/founders-setup.html'];
  staticFiles['/hotspring/atelier']=['founders-atelier.html','text/html; charset=utf-8'];
+ staticFiles['/cosa-nostra']=staticFiles['/cosa-nostra.html']=['cosa-nostra.html','text/html; charset=utf-8'];
+ staticFiles['/cosa-nostra.js']=['cosa-nostra.js','text/javascript; charset=utf-8'];
  staticFiles['/univers.css']=['univers.css','text/css; charset=utf-8'];
  for(let i=1;i<=10;i++){const path='/assets/western/dilemmas/d'+String(i).padStart(2,'0')+'.jpg';staticFiles[path]=[path.slice(1),'image/jpeg'];}
  for(const name of ['reference',...['economie','securite','satisfaction','bien_etre','developpement','stabilite'].flatMap(k=>[k+'-low',k+'-high'])]){
@@ -156,6 +159,30 @@ export function createGameServer(store:StorePort,organizerToken:string,clock=()=
       checksum:parsed.checksum,now
     });
     json(201,{...published,warnings:parsed.warnings});return;
+   }
+
+   if(path==='/api/founders/cosa-nostra/preparation'){
+    const actor=await requireOrg(req);
+    const previous=await store.narrative.getCosaNostraPreparation(actor.id);
+    if(req.method==='GET'){json(200,{preparation:previous});return;}
+    if(req.method==='PUT'){
+     const input=await body(req,200_000);
+     if(input?.revision!==(previous?.revision??0)){
+      json(409,{error:'La préparation a changé. Rechargez la page.'});return;
+     }
+     const importing=Object.hasOwn(input,'campaign');
+     if(!importing&&!previous)throw new Error('Importez la campagne V2 avant de préparer le parcours.');
+     if(!importing&&!Array.isArray(input.crisisIds))throw new Error('Sélection de crises requise.');
+     const prepared=importing?prepareCosaNostra(input.campaign):prepareCosaNostra(previous.campaign,input.crisisIds);
+     try{
+      json(200,{preparation:await store.narrative.saveCosaNostraPreparation(actor.id,prepared,input.revision)});
+     }catch(error){
+      if(error.message!=='La préparation a changé. Rechargez la page.')throw error;
+      json(409,{error:error.message});
+     }
+     return;
+    }
+    json(405,{error:'Méthode refusée'});return;
    }
 
    const draftMatch=path.match(/^\/api\/founders\/hotspring\/drafts(?:\/([a-f0-9]{24}))?$/);

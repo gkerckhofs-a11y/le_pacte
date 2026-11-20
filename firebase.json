@@ -54,6 +54,10 @@
           "destination": "/founders-setup.html"
         },
         {
+          "source": "/cosa-nostra",
+          "destination": "/cosa-nostra.html"
+        },
+        {
           "source": "/hotspring/atelier",
           "destination": "/founders-atelier.html"
         },
@@ -120,6 +124,10 @@
         {
           "source": "/hotspring/nouvelle-partie",
           "destination": "/founders-setup.html"
+        },
+        {
+          "source": "/cosa-nostra",
+          "destination": "/cosa-nostra.html"
         },
         {
           "source": "/hotspring/atelier",
