@@ -20,21 +20,31 @@ function status(id,value){
  text(id,value);
  $(id).hidden=!value;
 }
+function influenceAmount(id,value,showUnit){
+ const amount=$(id);
+ amount.textContent=String(value);
+ if(showUnit){
+  const unit=document.createElement('small');
+  unit.className='projection-unit';
+  unit.textContent=' Influence';
+  amount.append(unit);
+ }
+}
 function drawInfluenceReserve(reserve,manual){
  $('influenceReserve').hidden=!reserve;
  if(!reserve)return;
- const units=manual?' Influence':'';
  text('influenceAvailableLabel',manual?'Réserve commune':'Influence en réserve');
- text('influenceAvailable',reserve.available+units);
+ influenceAmount('influenceAvailable',reserve.available,manual);
  text('influenceParticipants',reserve.participants);
  text('influencePartLabel',reserve.settled?'Part versée par famille':'Part estimée par famille');
- text('influencePart',reserve.participants?reserve.perFamily+units:'—');
+ influenceAmount('influencePart',reserve.participants?reserve.perFamily:'—',manual&&reserve.participants>0);
 }
 function drawIllustration(s,sceneOnly){
  const image=$('decisionImage');
  const previous=image.getAttribute('src');
  const art=s.reveal?.visual??s.campaign?.intro?.visual??(!sceneOnly&&!s.reveal?s.dilemma?.image:null);
- if(s.succession)chicagoImage(image,art);
+ if($('dilemmaPanel').hidden)image.removeAttribute('src');
+ else if(s.succession)chicagoImage(image,art);
  else if(s.campaign)setHotspringImage(image,art);
  else if(typeof art?.url==='string'&&/^https:\/\/\S+$/.test(art.url)){
   if(previous!==art.url)image.src=art.url;
@@ -157,8 +167,8 @@ function render(s){
  drawInfluenceReserve(s.influenceReserve,manual);
  const out=$('outcome');out.hidden=!s.reveal;
  if(s.reveal){text('outcomeTitle',(s.campaign||s.chicago)?s.reveal.chronicle.title:s.reveal.winner==='pour'?'PROPOSITION ADOPTÉE':'PROPOSITION REJETÉE');text('outcomeText',s.reveal.narration);}
- text('voteForTotal',totals.yes+(manual?' Influence':''));
- text('voteAgainstTotal',totals.no+(manual?' Influence':''));
+ influenceAmount('voteForTotal',totals.yes,manual);
+ influenceAmount('voteAgainstTotal',totals.no,manual);
  text('voteAbstentions',totals.abstentions);
  status('voteSummary',s.phase==='AWAITING_REVEAL'?'Résultat sous scellés · révélation par la régie':manual?'':'Influence engagée');
  const arbitrating=s.phase==='COUNCIL'&&['await_moderator','await_leader'].includes(s.council.phase);
@@ -224,7 +234,17 @@ async function tick(){
   text('connection','● Synchronisé');text('notice','');
  }catch(e){text('connection','○ Hors ligne');text('notice',e.message);}
 }
+const wideProjection=globalThis.matchMedia?.('(min-width: 850px) and (orientation: landscape)');
+function placeArtwork(){
+ const destination=document.fullscreenElement&&wideProjection?.matches?$('projectionViewport'):$('dilemmaPanel');
+ const artwork=$('dilemmaArtwork');
+ if(artwork.parentElement!==destination)destination.append(artwork);
+}
+document.addEventListener('fullscreenchange',placeArtwork);
+wideProjection?.addEventListener('change',placeArtwork);
+
 $('decisionImage').addEventListener('error',()=>{
+ if($('decisionImage').onerror)return;
  $('decisionImage').removeAttribute('src');
  $('decisionImage').hidden=true;
  $('dilemmaArtwork').hidden=true;

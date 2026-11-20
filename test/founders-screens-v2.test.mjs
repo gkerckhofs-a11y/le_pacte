@@ -23,11 +23,12 @@ async function screen(app,s,family='A'){
  const toView=state=>({...narrativeView(state,actor),serverNow:2000});
  let data=toView(s);
  const timers=[];const catalog=await foundersCatalogFor({},'host');
- const context=vm.createContext({document,window,DOMParser:window.DOMParser,location:{origin:'http://localhost',pathname:'/founders-'+app+'.html',search:'?session='+s.id+'&family='+family,hash:''},history:{replaceState(){}},sessionStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},URL,URLSearchParams,Image:class{constructor(){return document.createElement('img');}},crypto:webcrypto,performance:{now:()=>0},requestAnimationFrame:fn=>fn(),setInterval:fn=>{timers.push(fn);return {unref(){}};},fetch:async(path,options)=>({ok:true,json:async()=>path==='/api/catalog'?{authMode:'local'}:path==='/api/founders/catalog'?catalog:path==='/api/founders/preview'?foundersPreview(JSON.parse(options.body)):path==='/api/founders/configurations'?{configurations:[]}:path==='/api/founders/sessions'?{sessions:[]}:data}),console:{log(){},error:e=>errors.push(e)}});
+ const mediaQuery=new window.EventTarget();mediaQuery.matches=true;
+ const context=vm.createContext({document,window,matchMedia:()=>mediaQuery,DOMParser:window.DOMParser,location:{origin:'http://localhost',pathname:'/founders-'+app+'.html',search:'?session='+s.id+'&family='+family,hash:''},history:{replaceState(){}},sessionStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},URL,URLSearchParams,Image:class{constructor(){return document.createElement('img');}},crypto:webcrypto,performance:{now:()=>0},requestAnimationFrame:fn=>fn(),setInterval:fn=>{timers.push(fn);return {unref(){}};},fetch:async(path,options)=>({ok:true,json:async()=>path==='/api/catalog'?{authMode:'local'}:path==='/api/founders/catalog'?catalog:path==='/api/founders/preview'?foundersPreview(JSON.parse(options.body)):path==='/api/founders/configurations'?{configurations:[]}:path==='/api/founders/sessions'?{sessions:[]}:data}),console:{log(){},error:e=>errors.push(e)}});
  const bundle=await build({entryPoints:['public/founders-'+app+'.js'],bundle:true,write:false,format:'iife',platform:'browser',logLevel:'silent'});
  vm.runInContext(bundle.outputFiles[0].text,context);
  for(let i=0;i<10;i++)await new Promise(r=>setImmediate(r));
- return {document,context,errors,update:async next=>{data=toView(next);await timers.at(-1)();}};
+ return {document,context,errors,mediaQuery,update:async next=>{data=toView(next);await timers.at(-1)();}};
 }
 for(const app of ['city','family','regie'])test(`Écran ${app} : quatre jauges, delta visible et épilogue au premier plan`,async()=>{
  const live=await screen(app,state);assert.equal(live.document.querySelectorAll('#gauges .gauge').length,4,live.document.getElementById('notice')?.textContent??'');
@@ -81,6 +82,32 @@ test('Projection Hotspring : le visuel du dilemme et le panorama coexistent',asy
  artwork.dispatchEvent(new document.defaultView.Event('error'));
  assert.equal(document.getElementById('dilemmaArtwork').hidden,true);
  assert.equal(city.hidden,false);
+});
+
+test('Projection en plein écran : un seul visuel déplacé puis restauré',async()=>{
+ const g=newCampaign({scenarioVersion:'1.2.0'});
+ g.command('start');g.command('next');g.command('next');
+ const {document,mediaQuery}=await screen('city',g.state);
+ const get=id=>document.getElementById(id);
+ const artwork=get('dilemmaArtwork'),source=get('decisionImage').getAttribute('src');
+ const changeFullscreen=active=>{
+  Object.defineProperty(document,'fullscreenElement',{configurable:true,value:active?document.documentElement:null});
+  document.dispatchEvent(new document.defaultView.Event('fullscreenchange'));
+ };
+ assert.equal(artwork.parentElement,get('dilemmaPanel'));
+ changeFullscreen(true);
+ assert.equal(artwork.parentElement,get('projectionViewport'));
+ assert.equal(get('decisionImage').getAttribute('src'),source);
+ assert.equal(get('voteForTotal').querySelector('.projection-unit').textContent.trim(),'Influence');
+ assert.equal(get('influenceAvailable').querySelector('.projection-unit').textContent.trim(),'Influence');
+ mediaQuery.matches=false;
+ mediaQuery.dispatchEvent(new document.defaultView.Event('change'));
+ assert.equal(artwork.parentElement,get('dilemmaPanel'));
+ mediaQuery.matches=true;
+ mediaQuery.dispatchEvent(new document.defaultView.Event('change'));
+ assert.equal(artwork.parentElement,get('projectionViewport'));
+ changeFullscreen(false);
+ assert.equal(artwork.parentElement,get('dilemmaPanel'));
 });
 
 test('Hotspring : six valeurs au Terminal et simulation plafonnée en Régie',async()=>{
