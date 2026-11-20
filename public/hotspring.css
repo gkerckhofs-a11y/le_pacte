@@ -107,3 +107,9 @@
  @keyframes hotspring-hearth-drift{from{transform:skewX(-7deg) scaleY(.88)}to{transform:skewX(8deg) scaleY(1.08)}}
  @keyframes hotspring-stroll{0%,24%{transform:translate(0,0)}78%,100%{transform:translate(6px,1px)}}
 }
+
+.hotspring-panorama .hotspring-town.hotspring-after{animation:none}
+.hotspring-panorama .hotspring-town.hotspring-leaving-frame{animation:hotspring-site-chosen 1.15s ease-in-out both}
+@media(prefers-reduced-motion:reduce){
+ .hotspring-panorama .hotspring-town.hotspring-leaving-frame{display:none;animation:none}
+}

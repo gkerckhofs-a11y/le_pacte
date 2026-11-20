@@ -7,17 +7,32 @@ import {PNG} from 'pngjs';
 import {newCampaign,simulateCampaign,trajectories} from '../test/helpers/hotspring.mjs';
 import {visualComposition} from '../test/helpers/hotspring-visual-compositions.mjs';
 import {hotspringLandscape} from '../src/hotspring-landscape.ts';
+import {renderTownPainting} from '../public/hotspring-tableau.js';
 import {renderPanoramaSvg,VALLEY_PLATE} from '../public/hotspring-panorama.js';
 
 const docs='docs/hotspring';
 const folder=join(docs,'captures');
-const magick=(args,options)=>execFileSync('magick',args,options);
+const magick=(args,options)=>execFileSync('magick',args,{maxBuffer:24*1024*1024,...options});
 const plate=magick(['public'+VALLEY_PLATE,'-quality','90','jpeg:-']);
 const background='data:image/jpeg;base64,'+plate.toString('base64');
 const knownSprites=new Map();
 mkdirSync(folder,{recursive:true});
 
-function capture(landscape,width,point=[50,50],zoom=1){
+function captureTown(landscape,width){
+ const svg=renderTownPainting(landscape,{imageUrl:url=>{
+  if(!knownSprites.has(url)){
+   const base=/_(camp|rue)\.webp$/.test(url);
+   const mime=base?'jpeg':'png';
+   const image=magick(['public'+url,'-quality','94',mime+':-']);
+   knownSprites.set(url,'data:image/'+mime+';base64,'+image.toString('base64'));
+  }
+  return knownSprites.get(url);
+ }});
+ return new Resvg(svg,{fitTo:{mode:'width',value:width}}).render().asPng();
+}
+
+function capture(landscape,width,point=[50,50],zoom=1,atlas=false){
+ if(landscape.location&&!atlas)return captureTown(landscape,width);
  const sprites=Object.fromEntries(Object.entries(landscape.sprites).map(([kind,url])=>{
   if(!knownSprites.has(url)){
    const png=magick(['public'+url,'png:-']);
@@ -95,7 +110,27 @@ function captureCampaign(){
   magick(['montage',...images,'-tile','2x2','-geometry','+2+2','-background','#28231e',
    '-strip','-quality','80',join(folder,'installation-du-camp-au-village.webp')]);
  }finally{rmSync(montage,{recursive:true,force:true});}
- return [{file:'captures/installation-du-camp-au-village.webp',alt:'Sur le plateau, les trois tentes cèdent leur place aux maisons au fil des quatre premiers votes.'},
+ const comparison=mkdtempSync(join(tmpdir(),'hotspring-sites-'));
+ try{
+  const columns=[
+   ['Plateau',firstVote('contre'),snapshots[2],snapshots.at(-1)],
+   ['Terres basses',firstVote('pour'),low[2],low.at(-1)]
+  ];
+  const photos=[];
+  for(const [i,caption] of ['Fondation','Premiers services','Épilogue'].entries()){
+   for(const [site,...states] of columns){
+    const file=join(comparison,photos.length+'.png');
+    const picture=capture(hotspringLandscape(states[i]),640);
+    magick(['png:-','-background','#28231e','-gravity','south','-splice','0x38','-fill','#f5e8cd',
+     '-font','DejaVu-Sans','-pointsize','17','-annotate','+0+9',site+' · '+caption,file],{input:picture});
+    photos.push(file);
+   }
+  }
+  magick(['montage',...photos,'-tile','2x3','-geometry','+2+2','-background','#28231e',
+   '-strip','-quality','81',join(folder,'croissance-des-deux-sites.webp')]);
+ }finally{rmSync(comparison,{recursive:true,force:true});}
+ return [{file:'captures/croissance-des-deux-sites.webp',alt:'Deux parties, sur le plateau et en terres basses, de la fondation à l’épilogue.'},
+  {file:'captures/installation-du-camp-au-village.webp',alt:'Sur le plateau, les trois tentes cèdent leur place aux maisons au fil des quatre premiers votes.'},
   ...captures.map(([name,,,alt])=>({file:'captures/'+name+'.webp',alt}))];
 }
 
@@ -112,7 +147,7 @@ function buildMontage(rows,temp,section){
   for(const [i,row] of group.entries()){
    const {scene,point,zoom,alt,rendered}=visualComposition(row);
    const png=join(temp,'tile-'+i+'.png');
-   writeFileSync(png,capture(scene,336,point,zoom));
+   writeFileSync(png,capture(scene,336,point,zoom,true));
    images.push(png);
    row.status='validé';
    row.alt=alt;

@@ -165,6 +165,21 @@
         "variant_D05_RESERVES_PUBLIQUES",
         "variant_D20_CHEMIN_DE_FER"
       ]
+    },
+    {
+      "path": "prompts-tableaux.json",
+      "ids": [
+        "terrasse_tableau",
+        "plaine_tableau",
+        "res",
+        "civic",
+        "industry",
+        "street",
+        "fire",
+        "retail",
+        "service",
+        "district"
+      ]
     }
   ]
 }

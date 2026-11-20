@@ -3,6 +3,7 @@ import {test} from 'node:test';
 import {readFileSync,statSync} from 'node:fs';
 import {parseHTML} from 'linkedom';
 import {Resvg} from '@resvg/resvg-js';
+import {renderTownPainting,townExposure,townViewBox,nextTownImages} from '../public/hotspring-tableau.js';
 import {GameStore} from '../server/store.ts';
 import {createGameServer} from '../server/http.ts';
 import {VALLEY_PLATE,renderPanoramaSvg} from '../public/hotspring-panorama.js';
@@ -135,13 +136,14 @@ test('Le plan large reste sélectionné pendant les votes, sans relancer la rév
   const draw=()=>renderHotspringPanorama(root,narrativePublicView(g.state),{showResultStill:false});
   draw();const first=root.querySelector('.hotspring-map'),village=first.getAttribute('viewBox');
   setHotspringOverview(root,true);draw();
-  assert.equal(first,root.querySelector('.hotspring-map'));
-  assert.equal(first.getAttribute('viewBox'),'0 0 1000 562.5');
+  assert.equal(root.querySelector('.hotspring-map:not(.hotspring-town)')?.getAttribute('viewBox'),'0 0 1000 562.5');
   g.command('next');draw();g.vote('pour');draw();
   assert.equal(root.querySelector('.hotspring-after').getAttribute('viewBox'),'0 0 1000 562.5');
   assert.ok(root.querySelector('.hotspring-construction [data-layer="plankLot"][data-state="building"]'));
   setHotspringOverview(root,false);
-  for(const svg of root.querySelectorAll('.hotspring-map'))assert.equal(svg.getAttribute('viewBox'),village);
+  const restored=root.querySelector('.hotspring-town')?.getAttribute('viewBox');
+  assert.equal(restored,townViewBox(narrativePublicView(g.state).campaign.landscape));
+  assert.ok(Number(restored.split(' ')[2])>Number(village.split(' ')[2]));
  }finally{globalThis.document=saved;}
 });
 
@@ -282,6 +284,8 @@ test('Hotspring : l’épilogue conserve le site du premier camp et utilise les 
   assert.equal(map.querySelectorAll('.hotspring-epilogue-scene img').length,3);
   renderHotspringPanorama(map,narrativePublicView(state));
   assert.equal(map.querySelector('.hotspring-camp-memory'),null);
+  assert.ok(map.querySelector('.hotspring-town'));
+  setHotspringOverview(map,true);
   assert.ok(map.querySelector('[data-layer="council"]'));
  }finally{[globalThis.document,globalThis.Image]=previous;}
 });
@@ -301,4 +305,47 @@ test('Hotspring : les suites de crise laissent des traces aux installations conc
  assert.equal(refuge.kind,'refuge');
  assert.equal(reserve.kind,'tower');
  assert.notDeepEqual([refuge.x,refuge.y],[reserve.x,reserve.y]);
+});
+
+test('Les peintures reprennent les votes, le bon site et les trois parcelles habitées',()=>{
+ for(const site of ['contre','pour']){
+  const g=newCampaign();g.command('start');
+  const current=()=>narrativePublicView(g.state).campaign.landscape;
+  assert.equal(nextTownImages(current(),'D01').length,2);
+  g.vote(site);
+  const parcel=id=>townExposure(current()).find(layer=>layer.id===id)?.key;
+  const siteName=site==='contre'?'terrasse':'plaine';
+  const next=choice=>{
+   g.command('next');if(g.state.phase==='CHECKPOINT')g.command('next');g.vote(choice);
+  };
+  assert.deepEqual(townExposure(current()).map(l=>l.key),['camp']);
+  assert.ok(nextTownImages(current(),'D02').every(path=>path.includes('/'+siteName+'_')));
+  assert.equal(parseHTML(renderTownPainting(current())).document.querySelector('svg').getAttribute('data-site'),siteName);
+  next(site);
+  assert.equal(parcel('well'),site==='contre'?'puits':'tour');
+  assert.equal(parcel('plankLot'),'maison_planches');
+  next(site);
+  assert.equal(parcel('settlement'),'rue');assert.equal(parcel('homes'),'maisons_familles');
+  next(site);
+  assert.equal(parcel('porchLot'),site==='contre'?undefined:'maison_perron');
+  assert.equal(parcel('sawmill'),site==='contre'?undefined:'scierie');
+  next('pour');assert.equal(parcel('porchLot'),'maison_perron');
+  g.state.campaign.markers.push('QUARTIER_BRULE');
+  assert.equal(parcel('homestead'),'foyer_brule');assert.equal(parcel('homes'),'quartier_brule');
+  assert.equal(parcel('porchLot'),undefined);assert.equal(parcel('plankLot'),undefined);
+ }
+});
+
+test('Le cadrage reste dans son tableau et s’élargit jusqu’à l’épilogue sur les deux sites',()=>{
+ for(const policy of [trajectories.commerce,trajectories.institutions]){
+  const {snapshots}=simulateCampaign(policy);
+  let previous=0;
+  for(const state of snapshots.slice(1)){
+   const map=narrativePublicView(state).campaign.landscape;
+   const [x,y,w,h]=townViewBox(map).split(' ').map(Number);
+   assert.ok(x>=0&&y>=0&&x+w<=1000&&y+h<=562.5&&w>=previous);
+   assert.equal(h,w*9/16);previous=w;
+  }
+  assert.equal(previous,1000);
+  }
 });
