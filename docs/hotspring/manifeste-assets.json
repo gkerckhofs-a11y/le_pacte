@@ -36,6 +36,13 @@
       "kinds": [
         "variante"
       ]
+    },
+    {
+      "path": "manifeste-tableaux.json",
+      "count": 48,
+      "kinds": [
+        "panorama"
+      ]
     }
   ]
 }

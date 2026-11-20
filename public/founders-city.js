@@ -131,7 +131,7 @@ function render(s){
  drawPanoramaStability(s,manual);
  $('chronicleOpen').hidden=!(s.history?.length);
  if($('chronicleDialog').open)renderChronicle($('cityChronicle'),s);
- $('panoramaOverview').hidden=!s.campaign?.landscape?.location||Boolean(s.campaign.landscape.epilogue);
+ $('panoramaOverview').hidden=!s.campaign?.landscape?.location;
  if(s.campaign){
   renderHotspringPanorama($('city'),s,{showResultStill:false});
   if(!results)renderHotspringStage($('hotspringStage'),s,undefined,{showIntroImage:false});

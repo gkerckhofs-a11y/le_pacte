@@ -1,4 +1,5 @@
-import {panoramaViewBox,renderPanoramaSvg} from './hotspring-panorama.js';
+import {renderPanoramaSvg} from './hotspring-panorama.js';
+import {nextTownImages,renderTownPainting} from './hotspring-tableau.js';
 
 export const CAMPAIGN_PHASES={
  INTRO:'Ouverture du chapitre',PRESENTATION:'Lecture du dilemme',CHECKPOINT:'Bilan du chapitre',
@@ -53,28 +54,38 @@ function framePanorama(svg,from,to){
 
 export function setHotspringOverview(root,overview){
  const state=panes.get(root);
- if(!state?.map)return;
+ if(!state?.view||state.overview===overview)return;
  state.overview=overview;
- const to=panoramaViewBox(state.map,overview);
- for(const svg of root.querySelectorAll('.hotspring-map'))framePanorama(svg,svg.getAttribute('viewBox'),to);
+ state.modeChanged=true;
+ renderHotspringPanorama(root,state.view,state.options);
 }
 
 export function renderHotspringPanorama(root,s,{showResultStill=true}={}){
  const map=s.campaign.landscape;
  let state=panes.get(root);
  if(!state){root.replaceChildren();root.classList.add('hotspring-panorama');state={};panes.set(root,state);}
+ state.view=s;state.options={showResultStill};
+ const preloadKey=map.location+'|'+s.dilemma?.id;
+ if(preloadKey!==state.preloadKey){
+  state.preloadKey=preloadKey;
+  if(typeof Image!=='undefined')for(const url of nextTownImages(map,s.dilemma?.id))image(url);
+ }
  const key=JSON.stringify(map);
  const reveal=s.phase==='REVEALED'?s.reveal:null;
  const ending=s.phase==='EPILOGUE'&&Boolean(map.epilogue);
  const effectKey=reveal?reveal.id+'_'+reveal.winner:s.phase==='INTRO'||ending?s.phase:null;
- if(state.key===key&&state.effectKey===effectKey)return;
+ const modeChanged=state.modeChanged;
+ if(!modeChanged&&state.key===key&&state.effectKey===effectKey)return;
+ state.modeChanged=false;
  const previous=root.querySelector('.hotspring-map:not(.hotspring-before)');
  const prior=state.map;
- root.innerHTML=renderPanoramaSvg(map,{campMemory:ending,overview:state.overview});
+ const painting=Boolean(map.location)&&!state.overview;
+ root.innerHTML=painting?renderTownPainting(map,{campMemory:ending}):renderPanoramaSvg(map,{campMemory:ending,overview:state.overview});
  state.key=key;state.effectKey=effectKey;state.map=map;
  const current=root.querySelector('.hotspring-map');
  const changingFrame=previous&&previous.getAttribute('viewBox')!==current.getAttribute('viewBox');
- if(changingFrame&&!ending)framePanorama(current,previous.getAttribute('viewBox'),current.getAttribute('viewBox'));
+ const sameView=previous&&!modeChanged&&Boolean(previous.classList.contains('hotspring-town'))===painting;
+ if(changingFrame&&sameView&&!ending)framePanorama(current,previous.getAttribute('viewBox'),current.getAttribute('viewBox'));
  if(s.phase==='INTRO'&&s.campaign.chapter===1)current.classList.add('hotspring-prologue');
  if(ending){
   current.classList.add('hotspring-epilogue');
@@ -88,18 +99,21 @@ export function renderHotspringPanorama(root,s,{showResultStill=true}={}){
    root.append(figure);
   }
  }
- if(!reveal)return;
+ if(!reveal||modeChanged)return;
  const chosen=(cue[reveal.id]??['build','survey'])[reveal.winner==='pour'?0:1];
  current.classList.add('hotspring-after','scene-'+chosen);
  if(changingFrame)current.classList.add('hotspring-reframe');
  if(previous){
   previous.classList.remove('hotspring-after');
   previous.classList.add('hotspring-before');
-  if(changingFrame)previous.classList.add('hotspring-leaving-frame');
+  if(painting){
+   previous.classList.add('hotspring-leaving-frame');
+   if(changingFrame&&sameView)framePanorama(previous,previous.getAttribute('viewBox'),current.getAttribute('viewBox'));
+  }else if(changingFrame)previous.classList.add('hotspring-leaving-frame');
   previous.setAttribute('aria-hidden','true');
   root.prepend(previous);
  }
- if(prior){
+ if(prior&&!painting){
   const priorKinds=new Map(prior.layers.map(l=>[l.id,l.kind]));
   const newBuildings=map.layers.filter(l=>l.state==='complete'&&constructions.has(l.kind)&&priorKinds.get(l.id)!==l.kind);
   if(newBuildings.length){
@@ -111,7 +125,7 @@ export function renderHotspringPanorama(root,s,{showResultStill=true}={}){
    root.append(construction);
   }
  }
- root.append(node('i',null,'hotspring-effect scene-'+chosen));
+ if(!painting)root.append(node('i',null,'hotspring-effect scene-'+chosen));
  const asset=reveal.visual;
  if(showResultStill&&asset?.url){
   const stillImage=image(asset.url);
