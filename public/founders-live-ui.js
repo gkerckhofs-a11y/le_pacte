@@ -19,15 +19,20 @@ export function renderChicagoGauges(root,s){
   const element=document.createElement(tag);element.className=cls;element.textContent=content;return element;
  };
  const resources=s.skin.labels.resources;
+ // Historical deltas describe the last published vote, even after the next dilemma opens.
  const reveal=s.phase==='REVEALED'?s.reveal:null;
+ const lastVote=reveal??s.history?.at(-1);
+ const votedValues=lastVote?.cityAfter??lastVote?.city;
+ const current=s.city;
+ if(lastVote&&!reveal)root.append(el('p','chicago-last-vote','Dernier vote · '+lastVote.title));
  if(reveal)root.append(el('h3','chicago-consequences','Conséquences pour la Cosa Nostra'));
  for(const code of Object.keys(resources).filter(key=>key!=='stabilite')){
-  const value=s.city[code],before=reveal?.cityBefore?.[code];
+  const value=current[code]??votedValues?.[code],before=reveal?.cityBefore?.[code];
   const line=el('div','gauge',''),head=el('div','gauge-head','');
   const label=el('span','',resources[code]);
   const numeric=Number.isFinite(value);
-  head.append(label,el('strong','',numeric?chicagoScore(value,before===value?undefined:before):gaugeLevelLabel(s.cityLevels?.[code])));
-  if(reveal&&before!==value)appendGaugeDelta(head,s,code);
+  head.append(label,el('strong','',numeric?chicagoScore(value,before!==value&&votedValues?.[code]===value?before:undefined):gaugeLevelLabel(s.cityLevels?.[code])));
+  if(lastVote)appendGaugeDelta(head,s,code,lastVote,{hideZero:true});
   line.append(head);
   if(numeric){
    const track=el('div','track',''),bar=el('div','bar','');
@@ -45,13 +50,15 @@ export function renderChicagoGauges(root,s){
   }
   root.append(line);
  }
- const value=s.city.stabilite??s.stabilityScore;
+ const value=current.stabilite??s.stabilityScore??votedValues?.stabilite;
  if(Number.isFinite(value)){
   const box=el('section','chicago-stability','');
   const label=resources.stabilite;
   box.setAttribute('aria-label',label);
-  box.append(el('h3','',label),el('strong','chicago-stability-value',chicagoScore(value,reveal?.cityBefore?.stabilite)),
-   el('span','chicago-stability-state',chicagoStabilityState(value)));
+  const score=el('div','chicago-stability-score','');
+  score.append(el('strong','chicago-stability-value',chicagoScore(value,votedValues?.stabilite===value?reveal?.cityBefore?.stabilite:undefined)));
+  if(lastVote)appendGaugeDelta(score,s,'stabilite',lastVote,{hideZero:true});
+  box.append(el('h3','',label),score,el('span','chicago-stability-state',chicagoStabilityState(value)));
   root.append(box);
  }
  return true;
@@ -82,20 +89,20 @@ export function voteTotals(s){
  return {yes:s.reveal?.yes??sum('pour'),no:s.reveal?.no??sum('contre'),abstentions:ids.filter(id=>['passe_pouvoir','passe_moderateur'].includes(c.choices[id])).length};
 }
 
-export function gaugeDelta(s,key){
- const before=s.reveal?.cityBefore?.[key],after=s.reveal?.cityAfter?.[key];
+export function gaugeDelta(s,key,record=s.reveal){
+ const before=record?.cityBefore?.[key],after=(record?.cityAfter??record?.city)?.[key];
  if(!Number.isFinite(before)||!Number.isFinite(after))return null;
  const value=Math.round((after-before)*10)/10;
  const format=number=>formatGaugeNumber(number,key==='stabilite'&&s.campaign?.version>=2);
  const description=key==='stabilite'&&s.campaign?.version>=2?'Moyenne calculée, ':'Effet du dilemme : ';
  return {value,text:value>0?'+'+format(value):value<0?'−'+format(Math.abs(value)):format(0),kind:value>0?'positive':value<0?'negative':'neutral',description:description+format(before)+' → '+format(after)+'/'+(s.gaugeMaximum??10)};
 }
-export function appendGaugeDelta(root,s,key){
- const delta=gaugeDelta(s,key);if(!delta)return;
+export function appendGaugeDelta(root,s,key,record=s.reveal,{hideZero=false}={}){
+ const delta=gaugeDelta(s,key,record);if(!delta||(hideZero&&delta.value===0))return;
  const badge=document.createElement('span');badge.className='gauge-delta gauge-delta-'+delta.kind;badge.textContent=delta.text;badge.title=delta.description;badge.setAttribute('aria-label',delta.description);root.append(badge);
 }
 
-export function renderChicagoChoices(root,s){
+export function renderChicagoChoices(root,s,keyChoice=null){
  root.hidden=!s.chicago||!s.dilemma||Boolean(s.reveal);
  root.replaceChildren();
  if(root.hidden)return;
@@ -108,6 +115,9 @@ export function renderChicagoChoices(root,s){
    for(const line of [option.description,option.trends.map(t=>t.name+' '+t.direction).join(' · '),option.compromise]){
     const paragraph=document.createElement('p');paragraph.textContent=line;choice.append(paragraph);
    }
+  }
+  if(keyChoice===side.toUpperCase()){
+   const hint=document.createElement('strong');hint.className='key-position';hint.textContent='Votre position-clé : '+keyChoice;choice.append(hint);
   }
   root.append(choice);
  }

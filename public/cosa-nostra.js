@@ -129,12 +129,14 @@ function render(saved) {
   const details = element('details');
   const gauge = metadata.gauges[metadata.gauge_mapping[objective.family]];
   details.append(element('summary', objective.family + ' · ' + gauge), element('p', objective.specialty));
-  const trajectory={...objective.medium,condition:'Votre jauge prioritaire (« '+gauge+' ») figure parmi les deux plus élevées de la Cosa Nostra, ex æquo compris.'};
-  for (const goal of [objective.small, trajectory, objective.major]) {
+  details.append(element('p',objective.narrative));
+  for (const goal of [objective.small, objective.medium, objective.major]) {
    details.append(element('p', goal.points + ' points · ' + goal.condition));
   }
-  details.append(element('p', 'Pivots favorables · ' +
-   objective.major_slots.map(([id, choice]) => id + ' → ' + choice).join(' · ')));
+  for(const [id,choice] of objective.major_slots){
+   const scene=dilemmas.find(d=>d.id===id);
+   details.append(element('p',scene.title+' · '+choice+' — '+scene.options.find(o=>o.choice===choice).title));
+  }
   const epilogue = element('details');
   epilogue.append(element('summary', 'Épilogue de la famille'), element('p', metadata.winner_epilogues[objective.family]));
   details.append(epilogue);

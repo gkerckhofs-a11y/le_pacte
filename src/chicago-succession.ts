@@ -1,6 +1,6 @@
 import {activeFounders} from './founders.ts';
 import {fortuneScore,leadingIndicatorThreshold} from './founders-scoring.ts';
-import {hasChicagoSuccession} from './founders-chicago.ts';
+import {chicagoObjectiveCopy,hasChicagoSuccession} from './founders-chicago.ts';
 
 function requireRule(condition, message) {
  if (!condition) throw new Error(message);
@@ -113,7 +113,7 @@ function resolveRound(s, now) {
    s.initiativeOrder.indexOf(a.family)-s.initiativeOrder.indexOf(b.family));
   const top = f.ranking[0];
   const tied = f.ranking.filter(r => r.total===top.total && r.support===top.support && r.favorable===top.favorable).map(r=>r.family);
-  if (tied.length === 1) return chooseWinner(s,top.family,'Score, soutiens électoraux puis pivots comptabilisés',now);
+  if (tied.length === 1) return chooseWinner(s,top.family,'Score, soutiens électoraux puis décisions-clés réussies',now);
   const roles = f.frozen.roles;
   for (const [role,id] of [['mayor',roles.mayor],['commissioner',roles.commissioner]]) {
    if (id && !tied.includes(id)) {
@@ -157,7 +157,7 @@ export function chicagoCommand(s, actor, kind, data, now) {
  } else if (kind === 'revealChicago') {
   requireRule(f.stage==='sealed','Le résultat doit être verrouillé.');
   const ranking = [f.ranking.find(r=>r.family===f.winner),...f.ranking.filter(r=>r.family!==f.winner)];
-  s.finalResults = {winner:f.winner,reason:f.reason,rows:ranking.map(r=>({...r,ambition:s.scenario.chicago.ambitions[r.family].specialty,
+  s.finalResults = {winner:f.winner,reason:f.reason,rows:ranking.map(r=>({...r,ambition:chicagoObjectiveCopy(s.scenario.chicago.ambitions[r.family].family).specialty,
    indicator:s.skin.labels.resources[s.scenario.chicago.ambitions[r.family].indicator]}))};
   const house = s.scenario.chicago.ambitions[f.winner].family;
   s.narrativeEnding = {title:'Le nouveau Parrain · '+s.names[f.winner],paragraphs:[s.scenario.chicago.epilogues[house]]};

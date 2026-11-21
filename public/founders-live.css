@@ -469,6 +469,8 @@ button.danger{background:#a83333!important;color:#fff!important;border-color:#a8
 .gauge-steps .filled{background:var(--level-color)}
 .chicago-v3 #cineState :is(.track,.gauge-steps){height:clamp(5px,.72vh,17px)}
 .chicago-v3 #cineState .chicago-stability{font-size:clamp(13px,1.1vw,38px);margin:.1em 0 0}
+.chicago-last-vote{margin:0;color:var(--gold);font-size:.92em;line-height:1.2}
+.chicago-stability-score{display:flex;align-items:baseline;gap:.45em;flex-wrap:wrap}
 .chicago-consequences{color:var(--gold);font-size:1em;margin:.4em 0}
 .chicago-stability{border-top:1px solid var(--border);margin-top:.6em;padding-top:.45em;display:grid;gap:.12em}
 .chicago-stability h3{margin:0;font-size:1em}
@@ -487,6 +489,21 @@ button.danger{background:#a83333!important;color:#fff!important;border-color:#a8
  .cine-screen figure{width:100%}
  .chicago-v3 #cineState{grid-area:3/1/4/-1;padding:10px}
  .chicago-v3 #cineState #gauges{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px}
- .chicago-v3 #cineState :is(.chicago-consequences,.chicago-stability){grid-column:1/-1}
+ .chicago-v3 #cineState :is(.chicago-consequences,.chicago-stability,.chicago-last-vote){grid-column:1/-1}
  .chicago-v3.projection-dashboard .projection-grid{display:flex;flex-direction:column;align-items:stretch}
 }
+
+.chicago-v3 #ambitionLink {display:inline-block;margin-bottom:.75rem}
+.chicago-v3 #ambitionLink[hidden] {display:none}
+.chicago-v3 .key-decision-banner {padding:.75rem 1rem;border:2px solid #b79562;background:#28231e;color:#fff4e0}
+.chicago-v3 .key-decision-banner strong,.chicago-v3 .decision-status {text-transform:uppercase;letter-spacing:.04em}
+.chicago-v3 .key-decision-banner p,.chicago-v3 .key-decisions p {margin:.3rem 0}
+.chicago-v3 .key-position {display:block;margin-top:.5rem;color:#ffe1a9}
+.chicago-v3 .key-decisions {list-style:none;padding:0}
+.chicago-v3 .key-decisions li {padding:.65rem .8rem;margin:.5rem 0;border-inline-start:3px solid #b79562;background:#242a2d;color:#f6ecda}
+.chicago-v3 .decision-status {display:block;font-size:.78rem;font-weight:700;color:#e3c899}
+.chicago-v3 #chicagoAmbition h3 {margin:1rem 0 .25rem}
+.chicago-v3 #chicagoAmbition h4 {margin:.75rem 0 .2rem}
+.chicago-v3 #chicagoObjectivesAudit {margin-top:1rem}
+.chicago-v3 #chicagoObjectivesAudit summary {cursor:pointer;font-weight:700}
+.chicago-v3 .objectives-audit-list section+section {margin-top:1rem;border-top:1px solid #887356}

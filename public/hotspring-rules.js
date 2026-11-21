@@ -114,9 +114,9 @@ export function createHotspringRules({print=false,manual=false,chicago=false}={}
   const goal=root.querySelector('.print-reminder-columns section, .hotspring-rules-columns section');
   goal.innerHTML='<'+heading+'>Votre but</'+heading+'>'+
    '<p>Devenez le Parrain de Chicago. Gardez vos ambitions secrètes.</p>'+
-   '<ul><li>Soutiens gagnants qui font progresser votre jauge : 2 points.</li>'+
+   '<ul><li>2 points : engagez au moins 1 Influence dans deux votes gagnants qui améliorent votre jauge prioritaire.</li>'+
    '<li>Trajectoire : 3 points si votre jauge est parmi les deux plus élevées, ex æquo compris.</li>'+
-   '<li>Pivots décisifs : jusqu’à 5 points selon les occasions communes.</li>'+
+   '<li>5 points : faites adopter au moins deux de vos trois décisions-clés. En finale anticipée, votre terminal indique combien de décisions comptent et combien doivent réussir.</li>'+
    '<li>Fortune : jusqu’à 3 points.</li>'+
    '<li>Scrutin secret : 2 points par voix reçue, jusqu’à 8 points. Chaque famille vote pour une autre famille.</li></ul>'+
    '<p>Maximum : 21 points.</p><p>Les cinq jauges décrivent l’état de la Cosa Nostra. Chicago est le théâtre des conséquences de ses décisions. La Stabilité de la Cosa Nostra est leur moyenne sur 100.</p>';

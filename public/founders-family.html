@@ -20,11 +20,13 @@
 <div class="layout">
 <div>
  <section class="panel">
+  <a id="ambitionLink" class="small" href="#objectiveHeading" hidden>Consulter mon ambition et mes décisions-clés ↓</a>
   <div class="eyeline" id="dilemmaLabel">Le conseil municipal</div>
   <h2 id="dilemmaTitle" style="font-size:28px;margin-top:10px">Attente du Conseil</h2>
   <img id="familyDilemmaImage" class="family-dilemma-image" alt="" hidden>
   <p id="dilemmaText" class="small muted"></p>
   <div id="hotspringStage" class="hotspring-stage" hidden></div><div id="hotspringTendencies" class="hotspring-tendencies" hidden></div><p id="question" style="font-size:19px"></p>
+  <div id="keyDecisionBanner" class="key-decision-banner" role="status" hidden></div>
   <ul id="chicagoChoices" hidden></ul>
   <div id="lastReveal" class="card" hidden><strong id="resultTitle"></strong><p id="resultNarration"></p></div>
  </section>
@@ -67,7 +69,7 @@
   <div class="family-stat"><span class="small muted" id="influenceLabel">Influence disponible</span><strong id="influence">—</strong></div>
   <div class="family-stat"><span class="small muted" id="dollarLabel">Dollars</span><strong id="dollars">—</strong></div>
  </div><p class="small muted" id="committed"></p><hr>
- <div class="eyeline">Confidentiel · Votre famille uniquement</div><h2 style="margin-top:10px">Objectif secret</h2><p id="objective">Cet objectif sera visible après connexion.</p><div id="chicagoAmbition" hidden></div>
+ <div class="eyeline">Confidentiel · Votre famille uniquement</div><h2 id="objectiveHeading" style="margin-top:10px">Objectif secret</h2><p id="objective">Cet objectif sera visible après connexion.</p><div id="chicagoAmbition" hidden></div>
  <p class="small muted" id="chapterObjectivesNote" hidden>Les objectifs de chapitre figurent sur la carte confidentielle de votre famille.</p>
  <div class="card" id="goalProgress"><strong id="goalTitle">Votre ambition</strong>
  <p class="small muted" id="goalConditions"></p><p id="goalStatus"></p>
@@ -84,7 +86,7 @@
  <p>Discutez en équipe. Votre chef d’équipe, ou porte-parole, enregistre une décision au nom de toute la famille. Le nombre de membres ne multiplie pas les votes.</p></div>
  <div id="rulesV2" hidden><h3>Vote public et surenchères</h3><p>À son premier passage, chaque famille choisit POUR, CONTRE ou ABSTENTION. Une mise d’au moins 1 Influence est requise pour POUR ou CONTRE. Votre camp est ensuite verrouillé. Une famille qui s’abstient est automatiquement sautée pour la suite du vote.</p><p>Aux passages suivants, ajoutez de l’Influence dans votre camp ou passez ce tour. Le vote se termine après un circuit complet des familles actives sans ajout d’Influence. Une surenchère relance ce circuit. En cas d’égalité, le Shérif tranche sur son terminal.</p><p>Une abstention rapporte 1 dollar et permet de récupérer sa part de la réserve ou de revendiquer le rôle de Shérif si disponible. Les mises gagnantes vont en réserve, les mises perdantes sont rendues. Le résultat et ses effets apparaissent automatiquement.</p><h3>Négocier</h3><p>Envoyez une proposition financière ; l’autre famille accepte ou refuse. Le transfert est effectué après acceptation et contrôle du solde. Votre promesse politique reste libre.</p><h3>Gagner</h3><p>Les jauges de la ville sont Économie, Écologie, Sécurité et Démographie. Votre ambition indique ses deux paliers. Le classement additionne objectif secret, richesse, votes remportés et Influence restante.</p></div>
  <div id="rulesChicago" hidden>
-  <p id="chicagoEquity" hidden>En finale abrégée, les cinq familles comparent le même nombre de premiers pivots résolus. Si une famille n’en a joué aucun, le bonus majeur est neutralisé pour tous. Une voix pour une autre famille vaut deux points. À égalité interviennent les soutiens, puis les pivots, un appui politique neutre, un scrutin de départage et, en dernier recours, le tirage initial.</p><p id="chicagoPriority" hidden></p>
+  <p id="chicagoEquity" hidden>En finale anticipée, on retient autant de décisions-clés par famille que la famille qui en a joué le moins, en commençant par les premières. Si aucune décision ne peut être retenue, personne ne reçoit les 5 points. Avec une décision retenue, il faut la réussir. Avec deux ou trois décisions retenues, il faut en réussir deux. Une voix reçue à la succession vaut deux points. En cas d’égalité au score, on départage d’abord par les voix reçues, puis par les décisions-clés réussies qui comptent au classement. Viennent ensuite l’arbitrage d’un titulaire neutre, le scrutin de départage et l’ordre tiré au lancement.</p><p id="chicagoPriority" hidden></p>
   <div id="chicagoLegacyRules">  <h3>Prendre la parole au Conseil</h3>
   <p>L’Homme du Maire joue en premier. Choisissez POUR ou CONTRE et engagez au moins 1 Influence, ou abstenez-vous pour récupérer votre part de la réserve ou revendiquer le rôle de L’Homme du Commissaire.</p>
   <p>Aux passages suivants, maintenez votre mise ou ajoutez de l’Influence dans le même camp. Le vote se termine après un circuit complet sans surenchère. En cas d’égalité, L’Homme du Commissaire départage. Les mises gagnantes alimentent la réserve, les mises perdantes sont rendues.</p>

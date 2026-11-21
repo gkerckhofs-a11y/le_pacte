@@ -86,6 +86,16 @@ for(const n of [0,3,7,15,25])test('Finale après '+n+' Conseils : opportunités 
   assert.equal(r.major,common&&r.favorable>=Math.ceil(2*common/3)?5:0);assert.ok(r.secret<=10);
  }
  g.cmd('requestChicagoFinale',{confirm:true});assert.deepEqual(g.s.succession.frozen.scores,scores);
+ for(const row of scores){
+  const {pivots,progress}=g.view(row.family).chicagoAmbition;
+  assert.equal(progress.required,row.required);
+  assert.equal(progress.available,common);
+  assert.equal(progress.successes,row.favorable);
+  assert.equal(progress.achieved,row.major===5);
+  assert.equal(pivots.filter(p=>p.status==='unplayed').length,3-row.pivots.length);
+  assert.equal(pivots.filter(p=>p.status==='missed').length,row.pivots.filter(p=>!p.favorable).length);
+  assert.equal(pivots.filter(p=>p.excluded).length,row.pivots.length-common);
+ }
 });
 for(const [mayor,commissioner,eligible] of [['C','D','C'],['A','D','D']]){
  test('Arbitrage entre A et B par le titulaire neutre '+eligible,()=>{
@@ -112,7 +122,7 @@ test('Alignement Hotspring : présentation, vote sans chrono et conservation int
  const g=game();
  g.cmd('start');
  assert.equal(g.s.phase,'PRESENTATION');
- assert.equal(g.view().city.stabilite,undefined);
+ assert.equal(g.view().city.stabilite,50);
  assert.throws(()=>g.cmd('beginVote'),/négociation/);
  assert.throws(()=>g.cmd('configureTiming',{timing:g.s.timing}),/Chronos indisponibles/);
  g.cmd('next');
@@ -152,5 +162,5 @@ test('Trajectoires et fortunes ex æquo, et stabilité calculée en lecture seul
  assert.deepEqual(chicagoScores(g.s).map(r=>r.wealth),[3,2,2,0,0]);
  g.cmd('requestChicagoFinale',{confirm:true});
  assert.equal(g.s.phase,'SUCCESSION');
- assert.equal(g.view().city.stabilite,undefined);
+ assert.equal(g.view().city.stabilite,62);
 });

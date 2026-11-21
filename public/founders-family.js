@@ -1,3 +1,4 @@
+import {renderChicagoAmbition,renderKeyDecisionBanner} from './chicago-objectives.js';
 import {renderChicagoGauges} from './founders-live-ui.js';
 import {renderSuccession,chicagoImage,chicagoPhase} from './chicago-succession.js';
 import {CAMPAIGN_PHASES,setHotspringImage,renderTendencies,renderHotspringStage,campaignScoreText,hotspringWinners} from './founders-hotspring.js';
@@ -107,7 +108,9 @@ function render(data){
  set('dilemmaTitle',data.dilemma?.title||(data.phase==='FINISHED'?'Fin de la campagne':'Conseil en préparation'));
  set('dilemmaText',data.dilemma?.public_text||'');
  set('question',data.dilemma?.vote_question||'');
- renderChicagoChoices($('chicagoChoices'),data);
+ const keyDecision=data.chicagoAmbition?.pivots.find(decision=>decision.current);
+ renderKeyDecisionBanner($('keyDecisionBanner'),keyDecision);
+ renderChicagoChoices($('chicagoChoices'),data,keyDecision?.choice);
  const image=$('familyDilemmaImage'),src=data.dilemma?.image?.url;
  if(data.succession){chicagoImage(image,data.reveal?.visual??data.dilemma?.image);}
  else if(data.campaign){
@@ -120,21 +123,12 @@ function render(data){
  }
  set('influence',self.power);set('dollars',self.dollars);
  set('influenceLabel',data.skin.labels.influence);set('dollarLabel',data.skin.labels.currency);set('offerAmountLabel',data.skin.labels.currency+' proposés');
-  set('objective',data.chicagoAmbition?.specialty??data.privateCampaign?.trajectory??self.objective);
- const ambition=$('chicagoAmbition');
- ambition.hidden=!data.chicagoAmbition;ambition.replaceChildren();
- if(data.chicagoAmbition){
-  const list=document.createElement('ul');
-  for(const goal of data.chicagoAmbition.goals){
-   const item=document.createElement('li');item.textContent=goal.points+' points · '+goal.condition;list.append(item);
-  }
-  const heading=document.createElement('p');heading.textContent='Issues favorables à votre ambition majeure';
-  const pivots=document.createElement('ul');
-  for(const pivot of data.chicagoAmbition.pivots){
-   const item=document.createElement('li');item.textContent=pivot.title+' · '+pivot.proposal;pivots.append(item);
-  }
-  ambition.append(list,heading,pivots);
- }
+ const hasPrivateBrief=Boolean(data.chicagoAmbition?.progress);
+ $('objective').hidden=hasPrivateBrief;
+ $('ambitionLink').hidden=!hasPrivateBrief;
+ set('objectiveHeading',hasPrivateBrief?'Votre ambition':'Objectif secret');
+ set('objective',hasPrivateBrief?'':data.chicagoAmbition?.specialty??data.privateCampaign?.trajectory??self.objective);
+ renderChicagoAmbition($('chicagoAmbition'),data.chicagoAmbition);
  $('goalProgress').hidden=Boolean(data.campaign||data.chicago);
  $('chapterObjectivesNote').hidden=!data.campaign;
  if(!data.campaign&&data.goalCard&&data.goalProgress){

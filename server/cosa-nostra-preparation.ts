@@ -1,3 +1,4 @@
+import {chicagoObjectiveCopy} from '../src/founders-chicago.ts';
 import {createHash} from 'node:crypto';
 
 const families = ['Moretti', 'Bellini', 'Caruso', 'Vitale', 'Falcone'];
@@ -8,6 +9,12 @@ const text = (value: unknown) => typeof value === 'string' && value.trim().lengt
 
 function requireValid(condition: unknown, message: string): asserts condition {
  if (!condition) throw new Error(message);
+}
+
+function withCurrentChicagoObjectives(campaign) {
+ const metadata = campaign.metadata;
+ return {...campaign, metadata:{...metadata, family_objectives:metadata.family_objectives.map(objective =>
+  ({...objective,...chicagoObjectiveCopy(objective.family)}))}};
 }
 
 export function prepareCosaNostra(campaign, crisisIds?) {
@@ -84,6 +91,7 @@ export function prepareCosaNostra(campaign, crisisIds?) {
   requireValid(scene.options.every(option => option.choice === pivots.get(scene.id) || option.secret_success == null),
    'Marqueur secret en dehors du pivot ' + scene.id + '.');
  }
- return {campaign, crisisIds: crises.filter(d => selected.includes(d.id)).map(d => d.id),
-  checksum: createHash('sha256').update(JSON.stringify(campaign)).digest('hex')};
+ const updated = withCurrentChicagoObjectives(campaign);
+ return {campaign:updated, crisisIds: crises.filter(d => selected.includes(d.id)).map(d => d.id),
+  checksum: createHash('sha256').update(JSON.stringify(updated)).digest('hex')};
 }

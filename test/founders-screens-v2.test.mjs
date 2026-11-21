@@ -321,15 +321,16 @@ function chicagoProjectionState(choice){
  const campaign=chicagoCampaign();
  const scene=campaign.dilemmas[0];
  const favor=scene.options.find(o=>o.choice==='POUR');
- favor.effects={PRO:10};
+ favor.effects={PRO:10,POL:-3,DIS:3};
  favor.public_trends=[{gauge:'PRO',name:campaign.metadata.gauges.PRO,direction:'↑'}];
  const {preview,names}=chicagoSessionPreview(prepareCosaNostra(campaign),[5,5,5,5,5]);
  let s=createNarrativeSession(preview,{ownerId:owner.id,id:'c'.repeat(24),code:'CADRAGE',title:'Chicago',names,now:1000});
  // Existing sessions have the original skin labels and must also display the new wording.
  for(const code of Object.keys(s.game.city))s.game.city[code]=54;
  s=command(s,owner,'start');
- if(!choice)return s;
- s=command(command(s,owner,'next'),owner,'beginVote');
+ return choice?resolveChicagoProjectionVote(command(command(s,owner,'next'),owner,'beginVote'),choice):s;
+}
+function resolveChicagoProjectionVote(s,choice){
  while(s.game.vote){
   const v=s.game.vote;
   const who=v.turn;
@@ -351,34 +352,55 @@ test('Cosa Nostra : tous les écrans distinguent les cinq jauges du décor et ga
   assert.equal(gauges.querySelector('.chicago-stability-state').textContent,'Équilibre fragile');
   assert.doesNotMatch(document.body.textContent,/état de Chicago|stabilité de Chicago|moyenne générale de Chicago/i);
   assert.equal(gauges.querySelector('.chicago-consequences'),null);
-  if(app!=='regie')assert.doesNotMatch(gauges.querySelector('.gauge').textContent,/\d/);
+  assert.equal(gauges.querySelector('.gauge strong').textContent,'54 / 100');
+  assert.equal(gauges.querySelector('.gauge-delta,.chicago-last-vote'),null);
  }
 });
 
-test('Cosa Nostra : cinq jauges graduées dès le dilemme et jusqu’à la révélation',async()=>{
- let s=chicagoProjectionState();
- const codes=Object.keys(s.game.city);
- for(const [index,code] of codes.entries())s.game.city[code]=[0,30,50,70,100][index];
- const live=await screen('city',s);
- for(const phase of ['PRESENTATION','NEGOTIATION','COUNCIL']){
+test('Cosa Nostra : les valeurs cumulées et les effets du vote précédent persistent au Conseil suivant',async()=>{
+ let s=chicagoProjectionState('pour');
+ const first=structuredClone(s.lastReveal),live=await screen('city',s);
+ const row=(doc,code)=>[...doc.querySelectorAll('#gauges .gauge')].find(el=>el.querySelector('span').textContent===s.skin.labels.resources[code]);
+ const checkPrevious=doc=>{
+  assert.equal(doc.querySelector('#gauges .chicago-last-vote').textContent,'Dernier vote · '+first.title);
+  assert.equal(row(doc,'PRO').querySelector('strong').textContent,'64 / 100');
+  assert.equal(row(doc,'PRO').querySelector('.bar').style.width,'64%');
+  assert.equal(row(doc,'PRO').querySelector('.gauge-delta-positive').textContent,'+10');
+  assert.equal(row(doc,'POL').querySelector('strong').textContent,'51 / 100');
+  assert.equal(row(doc,'POL').querySelector('.gauge-delta-negative').textContent,'−3');
+  assert.equal(row(doc,'EMP').querySelector('.gauge-delta'),null);
+  assert.equal(doc.querySelector('.chicago-stability-value').textContent,'56 / 100');
+  assert.equal(doc.querySelector('.chicago-stability-score .gauge-delta').textContent,'+2');
+ };
+ for(const [kind,phase] of [['next','PRESENTATION'],['next','NEGOTIATION'],['beginVote','COUNCIL']]){
+  s=command(s,owner,kind);
   assert.equal(s.phase,phase);
-  const gauges=live.document.querySelectorAll('#cineState .gauge');
-  assert.equal(gauges.length,5);
-  for(const [index,gauge] of Array.from(gauges).entries()){
-   const code=Object.keys(s.skin.labels.resources).filter(k=>k!=='stabilite')[index];
-   const level=codes.indexOf(code);
-   assert.equal(gauge.querySelectorAll('.gauge-steps > span').length,5);
-   assert.equal(gauge.querySelectorAll('.gauge-steps .filled').length,level+1);
-   assert.equal(gauge.querySelector('strong').textContent,['Critique','Faible','Stable','Bon','Excellent'][level]);
-  }
-  if(phase!=='COUNCIL'){
-   s=command(s,owner,phase==='PRESENTATION'?'next':'beginVote');
-   await live.update(s);
-  }
+  assert.equal(narrativeView(s,{role:'public'}).reveal,null);
+  await live.update(s);checkPrevious(live.document);
  }
- const resolved=(await screen('city',chicagoProjectionState('pour'))).document;
- assert.equal(resolved.querySelectorAll('#cineState .gauge .track').length,5);
- assert.equal(resolved.querySelectorAll('#cineState .gauge-steps').length,0);
+ // Independent clients, including a reloaded projection, use the public history.
+ for(const app of ['city','family','regie'])checkPrevious((await screen(app,s)).document);
+ s=resolveChicagoProjectionVote(s,'contre');
+ const second=structuredClone(s.lastReveal);
+ assert.notEqual(first.id,second.id);
+ assert.deepEqual(second.cityBefore,first.cityAfter);
+ s=command(s,owner,'next');
+ await live.update(s);
+ for(const code of Object.keys(first.cityAfter)){
+  const value=second.cityAfter[code],delta=value-second.cityBefore[code],gauge=row(live.document,code);
+  assert.equal(gauge.querySelector('strong').textContent,value+' / 100');
+  assert.equal(gauge.querySelector('.gauge-delta')?.textContent,delta>0?'+'+delta:delta<0?'−'+Math.abs(delta):undefined);
+ }
+});
+
+test('Cosa Nostra : une correction de régie conserve sa valeur et le delta historique réel',async()=>{
+ let s=chicagoProjectionState('pour');
+ s=command(command(command(s,owner,'next'),owner,'pause'),owner,'correctCity',{indicator:'PRO',value:88});
+ const {document}=await screen('city',s);
+ const gauge=[...document.querySelectorAll('#gauges .gauge')].find(el=>el.querySelector('span').textContent===s.skin.labels.resources.PRO);
+ assert.equal(gauge.querySelector('strong').textContent,'88 / 100');
+ assert.equal(gauge.querySelector('.gauge-delta').textContent,'+10');
+ assert.match(gauge.querySelector('.gauge-delta').title,/54 → 64/);
 });
 
 test('Projection Cosa Nostra : les commandes et les jauges à côté de la scène, le chapitre dans le dilemme',async()=>{
@@ -422,4 +444,80 @@ test('Projection Cosa Nostra : les six qualificatifs changent aux bornes éditor
    assert.equal(live.document.querySelector('.chicago-stability-state').textContent,label);
   }
  }
+});
+
+test('Décisions-clés Chicago : cinq fiches privées, proposition exacte et rappel limité au terminal concerné',async()=>{
+ const campaign=chicagoCampaign(),houses=campaign.metadata.family_objectives;
+ // Distinct titles make privacy assertions independent of the synthetic fixture.
+ for(const [index,scene] of campaign.dilemmas.entries()){
+  scene.title='Conseil confidentiel '+(index+1);
+  for(const option of scene.options)option.title='Proposition '+option.choice+' du Conseil '+(index+1);
+ }
+ const [slot]=houses[0].major_slots;
+ const key=campaign.dilemmas.find(d=>d.id===slot[0]);
+ const source=key.options.find(o=>o.choice===slot[1]);
+ const other=key.options.find(o=>o!==source);
+ other.secret_success=source.secret_success;source.secret_success=null;slot[1]=other.choice;
+ const {preview,names}=chicagoSessionPreview(prepareCosaNostra(campaign),[1,1,1,1,1]);
+ let s=createNarrativeSession(preview,{ownerId:owner.id,id:'d'.repeat(24),code:'CLEFS',title:'Chicago',names,now:1000});
+ const ids=Object.keys(s.scenario.chicago.ambitions);
+ // A saved session may still contain wording from the original private JSON.
+ Object.assign(s.scenario.chicago.ambitions.D,{specialty:'Accords sociaux',medium:{points:3,condition:'Jauge familiale à 60/100.'}});
+ const start=await screen('family',s);
+ assert.ok(start.document.getElementById('keyDecisionBanner').hidden);
+ s=command(s,owner,'start');
+ while(s.scenario.dilemmas.find(d=>d.id===s.currentDilemmaId).sourceId!==key.id){
+  s=resolveChicagoProjectionVote(command(command(s,owner,'next'),owner,'beginVote'),'pour');
+  s=command(s,owner,'next');
+ }
+ for(const [i,id] of ids.entries()){
+  const {document}=await screen('family',s,id);
+  const own=houses[i].major_slots.map(([sceneId])=>campaign.dilemmas.find(d=>d.id===sceneId).title);
+  const section=document.getElementById('chicagoAmbition');
+  assert.deepEqual([...section.querySelectorAll('li > strong')].map(e=>e.textContent),own);
+  assert.equal(section.querySelectorAll('li').length,3);
+  assert.match(section.textContent,/Votre priorité.*2 points.*3 points.*Vos 3 décisions-clés — 5 points/);
+  assert.match(section.textContent,/0 \/ 2 décisions nécessaires/);
+  assert.doesNotMatch(section.textContent,/60\s*\/\s*100|jauge familiale|pivot|occasion commune|secret_success|CN_\d|0\d\.0\d|Accords sociaux/i);
+  assert.equal(document.getElementById('keyDecisionBanner').hidden,id!=='A');
+  assert.equal(document.querySelectorAll('#chicagoChoices .key-position').length,id==='A'?1:0);
+  if(id==='A'){
+   const note=document.querySelector('#chicagoChoices .key-position');
+   assert.equal(note.textContent,'Votre position-clé : '+other.choice);
+   assert.ok(note.parentElement.textContent.includes(other.title));
+  }
+  if(names[i]==='Vitale')assert.match(section.textContent,/Solidarité du réseau/);
+ }
+ for(const app of ['city','regie']){
+  const {document}=await screen(app,s);
+  assert.equal(document.querySelector('.key-decision-banner,.key-position'),null);
+  if(app==='regie')assert.equal(document.querySelectorAll('#chicagoObjectivesAudit .key-decisions li').length,15);
+  else assert.equal(document.querySelector('.key-decisions'),null);
+ }
+ s=command(command(s,owner,'next'),owner,'beginVote');
+ const a=await screen('family',s,'A');
+ for(const button of a.document.querySelectorAll('#firstVote [data-vote]'))assert.equal(button.disabled,false);
+ // A supports the opposite camp. B wins for A's preferred proposal with a larger bid.
+ const ballot=(base,winner)=>{
+  let state=base;
+  while(state.game.vote){
+   const vote=state.game.vote,who=vote.turn;
+   const data=Object.hasOwn(vote.choices,who)?{kind:'maintien'}:who==='A'?{kind:source.choice.toLowerCase(),amount:1}:
+    who==='B'?{kind:winner.toLowerCase(),amount:2}:{kind:'passe_pouvoir'};
+   state=command(state,team(who),'vote',data);
+  }
+  return state;
+ };
+ const won=ballot(s,other.choice),lost=ballot(s,source.choice);
+ await a.update(won);
+ assert.ok(a.document.getElementById('keyDecisionBanner').hidden);
+ assert.match(a.document.getElementById('chicagoAmbition').textContent,/Réussie ✓.*1 \/ 2 décisions nécessaires/);
+ assert.equal(narrativeView(won,team('A')).voteCommitment,null);
+ const missed=await screen('family',lost);
+ assert.match(missed.document.getElementById('chicagoAmbition').textContent,/Manquée.*0 \/ 2 décisions nécessaires/);
+ const early=command(won,owner,'requestChicagoFinale',{confirm:true});
+ await a.update(early);
+ const final=a.document.getElementById('chicagoAmbition');
+ assert.match(final.textContent,/Réussie ✓.*Non jouée.*Finale anticipée/);
+ assert.doesNotMatch(final.textContent,/Manquée|0 \/ 0/);
 });

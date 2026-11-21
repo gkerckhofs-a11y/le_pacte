@@ -1,3 +1,4 @@
+import {renderChicagoObjectivesAudit} from './chicago-objectives.js';
 import {renderRehearsal} from './founders-rehearsal.js';
 import {renderSuccession,showChicagoRanking,chicagoPhase,chicagoImage} from './chicago-succession.js';
 import {isHotspring,isCurrentChicago,isCurrentHotspring,narrativeRegie} from './founders-univers.js';
@@ -185,6 +186,7 @@ function render(s){
   set('createAnotherSession','Créer un autre test');
  }
  renderFacilitator(s);
+ renderChicagoObjectivesAudit($('chicagoObjectivesAudit'),s);
  current=s;
  renderRehearsal(s,command);
  renderSuccession($('chicagoSuccession'),s,'organizer',command);

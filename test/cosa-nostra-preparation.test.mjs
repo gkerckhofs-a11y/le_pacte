@@ -14,7 +14,12 @@ import {fixture} from './helpers/chicago.mjs';
 test('Cosa Nostra V3 conserve les 30 scènes et valide la réserve, les effets et les pivots', () => {
  const campaign = fixture();
  const prepared = prepareCosaNostra(campaign);
- assert.deepEqual(prepared.campaign, campaign);
+ assert.deepEqual(prepared.campaign.dilemmas,campaign.dilemmas);
+ assert.deepEqual(prepareCosaNostra(prepared.campaign),prepared);
+ for(const objective of prepared.campaign.metadata.family_objectives){
+  assert.match(objective.medium.condition,/deux jauges les plus élevées/);
+  assert.doesNotMatch(JSON.stringify(objective),/60\s*\/\s*100|jauge familiale/i);
+ }
  assert.equal(prepared.crisisIds.length, 10);
  assert.equal(prepareCosaNostra(campaign, []).checksum, prepared.checksum);
  const chapterCrises = campaign.dilemmas.filter(d => d.chapter === 1 && d.type === 'Crise');
@@ -59,6 +64,8 @@ test('La régie est reliée à l’accueil et sa préparation est authentifiée,
  assert.equal(page.status, 200);
  assert.match(await page.text(), /Régie de préparation/);
  assert.equal((await fetch(base + '/cosa-nostra.js')).status, 200);
+ const objectiveModule=await fetch(base+'/chicago-objectives.js');
+ assert.equal(objectiveModule.status,200);assert.match(objectiveModule.headers.get('content-type'),/javascript/);
  assert.equal((await call()).status, 403);
  assert.equal((await call(familyToken, {revision: 0, campaign: fixture()})).status, 403);
  assert.deepEqual(await (await call(organizer)).json(), {preparation: null});
@@ -68,7 +75,7 @@ test('La régie est reliée à l’accueil et sa préparation est authentifiée,
  assert.equal(imported.status, 200);
  const {preparation} = await imported.json();
  assert.equal(preparation.revision, 1);
- assert.deepEqual(preparation.campaign, campaign);
+ assert.deepEqual(preparation.campaign,prepareCosaNostra(campaign).campaign);
  assert.deepEqual(await (await call(otherOrganizer)).json(), {preparation: null});
 
  const updates = await Promise.all([
@@ -80,7 +87,7 @@ test('La régie est reliée à l’accueil et sa préparation est authentifiée,
  assert.equal(saved.revision, 2);
  assert.deepEqual(saved.crisisIds, []);
  assert.equal(saved.checksum, preparation.checksum);
- assert.deepEqual(saved.campaign, campaign);
+ assert.deepEqual(saved.campaign,preparation.campaign);
 });
 
 test('Répétition Chicago à cinq terminaux : choix binaires, accords, jauges et confidentialité', async t => {
@@ -112,17 +119,24 @@ test('Répétition Chicago à cinq terminaux : choix binaires, accords, jauges e
  assert.equal(publicView.chicago,true);
  assert.equal(publicView.gaugeMaximum,100);
  assert.deepEqual(Object.values((await game.regie()).city),[50,50,50,50,50,50]);
- assert.deepEqual(publicView.city,{});
+ assert.deepEqual(publicView.city,(await game.regie()).city);
  assert.equal(Object.keys(publicView.cityLevels).length,5);
  assert.deepEqual(publicView.families.map(f => f.name),campaign.metadata.family_objectives.map(objective => objective.family));
  assert.deepEqual(publicView.families.map(f => f.members),[2,3,4,5,6]);
  for(const [index, {family}] of created.access.entries()){
   const view = await game.family(family);
-  assert.deepEqual(view.chicagoAmbition.pivots.map(pivot => pivot.id),campaign.metadata.family_objectives[index].major_slots.map(slot => slot[0]));
+  const expected=campaign.metadata.family_objectives[index].major_slots.map(([id,choice])=>{
+   const scene=scenes.find(d=>d.id===id);
+   return {title:scene.title,choice,proposal:scene.options.find(o=>o.choice===choice).title,status:'upcoming',current:false,excluded:false};
+  });
+  assert.deepEqual(view.chicagoAmbition.pivots,expected);
+  assert.equal(view.chicagoFamilyObjectives,undefined);
+  assert.doesNotMatch(JSON.stringify(view.chicagoAmbition),/60\s*\/\s*100|major_slots|secret_success|CN_\d|0\d\.0\d/);
   assert.equal(view.chicagoAmbition.pivots.length,3);
   assert.equal(view.scenario,undefined);
  }
  assert.equal(publicView.chicagoAmbition,undefined);
+ assert.equal(publicView.chicagoFamilyObjectives,undefined);
  await game.command(publicView,'start');
  publicView = await game.projection();
  assert.equal(publicView.phase,'PRESENTATION');
