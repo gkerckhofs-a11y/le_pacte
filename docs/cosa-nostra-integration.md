@@ -2,6 +2,23 @@
 
 Le 20 novembre 2026, la page publiée sur `/cosa-nostra` correspondait octet pour octet au fichier de la branche `deploy/firebase` au commit `1f45a94e0653906bb748a927c8b928f9db5b3e3a`. Empreinte SHA-256 de la page : `c1125164eec38dbe781db159588e289bc899ccd0b6a8c9e40ffac4edaaecc205`. [Publication vérifiée](https://github.com/gkerckhofs-a11y/le_pacte/actions/runs/44717612822).
 
+## Les indicateurs et la projection
+
+Les cinq jauges décrivent l’état de la Cosa Nostra. Chicago est le théâtre des conséquences de ses décisions. Chaque famille poursuit une ambition liée à l’une des jauges collectives. Chaque univers définit l’entité dont les indicateurs mesurent l’évolution.
+
+La Stabilité de la Cosa Nostra est la moyenne arithmétique des cinq jauges sur 100. Le jeu la recalcule à partir des valeurs effectives après les effets et les corrections. La régie peut corriger une jauge fondamentale pendant une pause. La Stabilité se consulte en lecture seule.
+
+| Stabilité | Qualificatif |
+| --- | --- |
+| Moins de 20 | Organisation en déroute |
+| De 20 à moins de 40 | Guerre ouverte |
+| De 40 à moins de 60 | Équilibre fragile |
+| De 60 à moins de 80 | Ordre établi |
+| De 80 à moins de 95 | Syndicat puissant |
+| De 95 à 100 | Empire criminel |
+
+Après le vote, projeter la scène entière de l’issue retenue, puis lire les variations sous « Conséquences pour la Cosa Nostra ». La Stabilité figure sous les cinq jauges, avec les valeurs avant et après le vote et le qualificatif du nouvel état. Les options de la projection donnent accès à la chronique et au plein écran.
+
 ## Contrats vérifiés et correspondance
 
 | Source ou fonction | Version publiée | Version de recette |

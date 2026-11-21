@@ -3,7 +3,7 @@ import {renderSuccession,showChicagoRanking,chicagoPhase,chicagoImage} from './c
 import {isHotspring,isCurrentChicago,isCurrentHotspring,narrativeRegie} from './founders-univers.js';
 import {rememberAccess} from './founders-workspace.js';
 import {CAMPAIGN_PHASES,renderHotspringStage,renderTendencies,renderCampaignAdmin,renderCampaignActions,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
-import {decorateGauge,formatGaugeNumber,renderPhaseClock,renderChicagoChoices,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
+import {decorateGauge,formatGaugeNumber,renderPhaseClock,renderChicagoChoices,renderChicagoGauges,voteTotals,appendGaugeDelta} from './founders-live-ui.js';
 import {mountPrintKit} from './founders-print.js';
 import {renderCouncilMonitor} from './founders-council-monitor.js';
 import {councilGuidance,startCouncil,organizerError,validNarrativeSession} from './founders-regie-flow.js';
@@ -118,6 +118,8 @@ async function refresh(){
 }
 function gauge(s){
  const root=$('gauges');root.replaceChildren();
+ if(s.skin.labels.indicatorGroup)$('gaugeHeading').textContent=s.skin.labels.indicatorGroup;
+ if(renderChicagoGauges(root,s)){renderCityAudit(s);return;}
  for(const k of Object.keys(s.city)){
   const el=document.createElement('div');el.className='gauge';
   const row=document.createElement('div');row.className='gauge-head';
@@ -134,7 +136,7 @@ function renderCityAudit(s){
  audit.replaceChildren();audit.hidden=true;
  if(!expanded)return;
  const indicators=Object.keys(s.city).filter(key=>key!=='stabilite');
- formula.textContent='Stabilité en lecture seule · ('+indicators.map(key=>s.city[key]).join(' + ')+') ÷ 5 = '+formatGaugeNumber(s.city.stabilite,true);
+ formula.textContent=(s.skin.labels.resources.stabilite??'Stabilité')+' en lecture seule · ('+indicators.map(key=>s.city[key]).join(' + ')+') ÷ 5 = '+formatGaugeNumber(s.city.stabilite,true);
  const select=$('correctIndicator');
  if(!select.options.length)for(const key of indicators){
   const option=document.createElement('option');option.value=key;option.textContent=s.skin.labels.resources[key];select.append(option);
@@ -155,7 +157,7 @@ function renderCityAudit(s){
    list.append(row);
   }
   const stability=document.createElement('li');
-  stability.textContent='Stabilité calculée · '+formatGaugeNumber(record.cityBefore.stabilite,true)+' → '+formatGaugeNumber(record.cityAfter.stabilite,true);
+  stability.textContent=(s.skin.labels.resources.stabilite??'Stabilité')+' calculée · '+formatGaugeNumber(record.cityBefore.stabilite,true)+' → '+formatGaugeNumber(record.cityAfter.stabilite,true);
   list.append(stability);audit.append(list);
  }
 }

@@ -1,3 +1,5 @@
+import {chicagoScore,chicagoStabilityState} from './founders-live-ui.js';
+
 // The latest public resolution survives a new council and a page reload.
 // This module consumes revealed history only; it never predicts an outcome.
 export function latestChronicle(view){
@@ -49,15 +51,20 @@ export function renderChronicle(root,view){
   img.addEventListener('error',()=>{img.hidden=true;},{once:true});root.append(img);
  }
  const body=el('div','chronicle-body');
- body.append(el('div','eyeline','Chronique de la ville · Décision '+chapter.number),
+ body.append(el('div','eyeline',(view.chicago?'Chronique de la Cosa Nostra':'Chronique de la ville')+' · Décision '+chapter.number),
   el('h2','',chapter.title),
   el('p','chronicle-decision',(chapter.winner==='pour'?'Adopté : ':'Alternative retenue : ')+chapter.decisionLabel),
   el('p','small muted','Vote révélé · '+chapter.yes+' Influence POUR / '+chapter.no+' CONTRE'),
   el('p','chronicle-narration',expanded?chapter.narration:chapter.summary));
+ if(view.succession)body.append(el('h3','','Conséquences pour la Cosa Nostra'));
  const list=el('ul','chronicle-changes');
  for(const c of chapter.changes)list.append(el('li','',chronicleChangeText(c,view.skin.labels.resources[c.indicator]??c.indicator,view.gaugeMaximum??10)));
  if(!chapter.changes.length)list.append(el('li','','Aucune variation de jauge pour cette décision.'));
  body.append(list);
+ const entry=view.history[chapter.number-1];
+ if(view.succession&&Number.isFinite(entry.cityAfter?.stabilite)){
+  body.append(el('p','',view.skin.labels.resources.stabilite+' · '+chicagoScore(entry.cityAfter.stabilite,entry.cityBefore?.stabilite)+' · '+chicagoStabilityState(entry.cityAfter.stabilite)));
+ }
  if(expanded)body.append(el('p','small muted','Les autres indicateurs restent inchangés.'));
  const toggle=el('button','btn secondary',expanded?'Réduire la chronique':'Lire le chapitre complet');
  toggle.type='button';toggle.setAttribute('aria-expanded',String(expanded));

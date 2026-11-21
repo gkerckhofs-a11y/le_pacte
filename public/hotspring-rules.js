@@ -35,7 +35,7 @@ export function createHotspringRules({print=false,manual=false,chicago=false}={}
       <li>Les familles peuvent surenchérir avec de l’Influence.</li>
       <li>Le camp ayant engagé le plus d’Influence l’emporte.</li>
      </ol>
-     ${print?'<p>Les conséquences sont révélées après le vote et transforment Hotspring.</p>':'<p>Les conséquences exactes sont révélées après le vote et transforment durablement Hotspring.</p>'}
+     ${chicago?'<p>Les conséquences sont révélées après le vote. La scène montre ce qui arrive à Chicago.</p>':print?'<p>Les conséquences sont révélées après le vote et transforment Hotspring.</p>':'<p>Les conséquences exactes sont révélées après le vote et transforment durablement Hotspring.</p>'}
      ${manual?(print?'<p>Le MJ ouvre le vote et lance le dilemme suivant.</p>':'<p>Le MJ gère le temps. Il ouvre le vote et lance le dilemme suivant quand le groupe est prêt.</p>'):''}
     </section>
     <section>
@@ -119,9 +119,9 @@ export function createHotspringRules({print=false,manual=false,chicago=false}={}
    '<li>Pivots décisifs : jusqu’à 5 points selon les occasions communes.</li>'+
    '<li>Fortune : jusqu’à 3 points.</li>'+
    '<li>Scrutin secret : 2 points par voix reçue, jusqu’à 8 points. Chaque famille vote pour une autre famille.</li></ul>'+
-   '<p>Maximum : 21 points. La Stabilité est la moyenne des cinq jauges.</p>';
+   '<p>Maximum : 21 points.</p><p>Les cinq jauges décrivent l’état de la Cosa Nostra. Chicago est le théâtre des conséquences de ses décisions. La Stabilité de la Cosa Nostra est leur moyenne sur 100.</p>';
   const leader=roleLabel({chicago},'mayor'),arbitrator=roleLabel({chicago},'sheriff');
-  const substitutions={'LES COLONS DE HOTSPRING':'COSA NOSTRA','Construisez Hotspring.':'Façonnez Chicago.',
+  const substitutions={'LES COLONS DE HOTSPRING':'COSA NOSTRA','Construisez Hotspring.':'Façonnez la Cosa Nostra.',
    Hotspring:'Chicago','Le Maire':leader,'Le Shérif':arbitrator,'nouveau Maire':'nouveau titulaire du rôle « '+leader+' »',
    'de Maire':'« '+leader+' »',Maire:leader,Shérif:arbitrator};
   const walker=document.createTreeWalker(root,4);

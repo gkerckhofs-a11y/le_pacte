@@ -1,4 +1,4 @@
-import {gaugeLevelLabel,renderChicagoGaugeLevels} from './founders-live-ui.js';
+import {gaugeLevelLabel,renderChicagoGauges} from './founders-live-ui.js';
 import {renderSuccession,showChicagoRanking,chicagoPhase} from './chicago-succession.js';
 import {CAMPAIGN_PHASES,renderHotspringPanorama,setHotspringOverview,setHotspringImage,renderTendencies,renderHotspringStage,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
 import {decorateGauge,formatGaugeNumber,renderPhaseClock,voteTotals,appendGaugeDelta,gaugeDelta,renderChicagoChoices} from './founders-live-ui.js';
@@ -46,8 +46,9 @@ function drawChicagoScene(s){
   hero.hidden=false;
   const statePanel=$('gauges').parentElement,votePanel=$('ballots').parentElement;
   statePanel.id='cineState';votePanel.id='cineVote';
-  statePanel.querySelector('h2').textContent='État de Chicago';
-  statePanel.append($('panoramaStability'));
+  $('cineMenuButtons').append($('chronicleOpen'),$('projectionFullscreen'));
+  $('chronicleDialog').setAttribute('aria-label','Chronique de la Cosa Nostra');
+  $('finalResults').firstElementChild.textContent='Épilogue · La Commission';
   votePanel.insertBefore($('influenceReserve'),$('ballots'));
   const grid=document.querySelector('.projection-grid');
   grid.prepend(statePanel);grid.append(votePanel);
@@ -70,14 +71,10 @@ function drawChicagoScene(s){
     if(s.reveal&&!matchMedia('(prefers-reduced-motion: reduce)').matches)
      img.animate([{opacity:0},{opacity:1}],{duration:500});
    };
-   img.style.objectPosition=art?.position??'50% 50%';
    img.src=src;
   }else img.removeAttribute('src');
  }
  if(s.reveal){
-  const before=s.reveal.cityBefore??{},after=s.reveal.cityAfter??{};
-  status('cineChanges',Object.entries(after).filter(([k,v])=>before[k]!==v||k==='stabilite').map(([k,v])=>
-   (s.skin.labels.resources[k]??k)+' '+formatGaugeNumber(before[k])+' → '+formatGaugeNumber(v)).join(' · '));
   $('dilemmaTitle').hidden=true;
   text('chapter','Résultat · '+s.reveal.winner.toUpperCase());
  }else if(s.dilemma)text('chapter',s.dilemma.id.replace('CN_','').replace('_','.')+' · Chapitre '+chapter);
@@ -98,7 +95,8 @@ function drawIllustration(s,sceneOnly){
 }
 function drawGauges(s){
  const root=$('gauges');root.replaceChildren();
- if(renderChicagoGaugeLevels(root,s))return;
+ if(s.skin.labels.indicatorGroup)$('gaugeHeading').textContent=s.skin.labels.indicatorGroup;
+ if(renderChicagoGauges(root,s))return;
  const compact=Boolean(s.campaign)&&Object.hasOwn(s.city,'bien_etre');
  root.classList.toggle('projection-gauges-grid',compact);
  for(const key of Object.keys(s.city)){
@@ -135,10 +133,6 @@ function drawPanoramaStability(s,manual){
  track.hidden=qualitative;
  text('stabilityTitle',qualitative?'Stabilité':'Stabilité — '+formatGaugeNumber(value,true)+' / '+maximum);
  text('stabilityState',s.campaign?.stabilityLabel??(qualitative?gaugeLevelLabel(s.stabilityLevel):'Moyenne des cinq jauges'));
- if(s.succession&&Number.isFinite(value)){
-  const labels=['Chicago au bord du chaos','Ville sous contrôle fragile','Ville sous tension','Ordre établi','Chicago prospère','Empire incontesté'];
-  text('stabilityState',labels[[20,40,60,80,95].filter(t=>value>=t).length]);
- }
  if(qualitative)return;
  appendGaugeDelta($('stabilityTitle'),s,'stabilite');
  track.setAttribute('aria-valuemax',String(maximum));
@@ -175,7 +169,7 @@ function render(s){
  text('question',sceneOnly?'':s.dilemma?.vote_question||'');
  renderChicagoChoices($('chicagoChoices'),s);
  drawGauges(s);
- drawPanoramaStability(s,manual);
+ if(!s.succession)drawPanoramaStability(s,manual);
  $('chronicleOpen').hidden=!(s.history?.length);
  if($('chronicleDialog').open)renderChronicle($('cityChronicle'),s);
  $('panoramaOverview').hidden=!s.campaign?.landscape?.location;

@@ -1,4 +1,6 @@
 # Plans à produire pour Chicago
+
+La scène montre ce qui arrive à Chicago. Les jauges indiquent les conséquences pour la Cosa Nostra. La projection présente chaque plan 16:9 en entier, avec le titre et les commandes en dehors du cadre.
 Chaque entrée est un brief à utiliser avec la consigne commune ci-dessous. Utiliser l’introduction du même numéro comme référence des visages, costumes, lieu et lumière. Quand elle manque, produire l’introduction en premier.
 Photogramme réaliste en 16:9, Chicago, 1931. Un seul plan composé autour d’une action principale. Décors, véhicules et accessoires de la prohibition. Lumière motivée par les fenêtres ou lampes du lieu, silhouettes lisibles à distance, point focal dans le tiers central, regards tournés vers l’action. Aucun texte lisible, titre, logo ou collage. Interpréter toute référence à la ville à hauteur de personnage dans un lieu concret.
 
