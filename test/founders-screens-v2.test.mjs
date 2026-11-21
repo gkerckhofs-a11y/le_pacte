@@ -320,7 +320,9 @@ test('Le dernier bouton de progression de Hotspring quitte les commandes ordinai
 function chicagoProjectionState(choice){
  const campaign=chicagoCampaign();
  const scene=campaign.dilemmas[0];
- scene.options.find(o=>o.choice==='POUR').effects={PRO:10};
+ const favor=scene.options.find(o=>o.choice==='POUR');
+ favor.effects={PRO:10};
+ favor.public_trends=[{gauge:'PRO',name:campaign.metadata.gauges.PRO,direction:'↑'}];
  const {preview,names}=chicagoSessionPreview(prepareCosaNostra(campaign),[5,5,5,5,5]);
  let s=createNarrativeSession(preview,{ownerId:owner.id,id:'c'.repeat(24),code:'CADRAGE',title:'Chicago',names,now:1000});
  // Existing sessions have the original skin labels and must also display the new wording.
@@ -353,7 +355,33 @@ test('Cosa Nostra : tous les écrans distinguent les cinq jauges du décor et ga
  }
 });
 
-test('Projection Cosa Nostra : la scène entière, les commandes dans Options et les effets de chaque issue',async()=>{
+test('Cosa Nostra : cinq jauges graduées dès le dilemme et jusqu’à la révélation',async()=>{
+ let s=chicagoProjectionState();
+ const codes=Object.keys(s.game.city);
+ for(const [index,code] of codes.entries())s.game.city[code]=[0,30,50,70,100][index];
+ const live=await screen('city',s);
+ for(const phase of ['PRESENTATION','NEGOTIATION','COUNCIL']){
+  assert.equal(s.phase,phase);
+  const gauges=live.document.querySelectorAll('#cineState .gauge');
+  assert.equal(gauges.length,5);
+  for(const [index,gauge] of Array.from(gauges).entries()){
+   const code=Object.keys(s.skin.labels.resources).filter(k=>k!=='stabilite')[index];
+   const level=codes.indexOf(code);
+   assert.equal(gauge.querySelectorAll('.gauge-steps > span').length,5);
+   assert.equal(gauge.querySelectorAll('.gauge-steps .filled').length,level+1);
+   assert.equal(gauge.querySelector('strong').textContent,['Critique','Faible','Stable','Bon','Excellent'][level]);
+  }
+  if(phase!=='COUNCIL'){
+   s=command(s,owner,phase==='PRESENTATION'?'next':'beginVote');
+   await live.update(s);
+  }
+ }
+ const resolved=(await screen('city',chicagoProjectionState('pour'))).document;
+ assert.equal(resolved.querySelectorAll('#cineState .gauge .track').length,5);
+ assert.equal(resolved.querySelectorAll('#cineState .gauge-steps').length,0);
+});
+
+test('Projection Cosa Nostra : les commandes et les jauges à côté de la scène, le chapitre dans le dilemme',async()=>{
  const intro=(await screen('city',chicagoProjectionState())).document;
  assert.match(intro.getElementById('cineImage').getAttribute('src'),/0101-intro/);
  for(const side of ['pour','contre']){
@@ -361,8 +389,13 @@ test('Projection Cosa Nostra : la scène entière, les commandes dans Options et
   const get=id=>document.getElementById(id);
   assert.match(get('cineImage').getAttribute('src'),new RegExp('0101-'+side));
   assert.equal(get('cineHero').querySelector('figure').children.length,2);
-  assert.equal(get('projectionFullscreen').parentElement,get('cineMenuButtons'));
-  assert.equal(get('chronicleOpen').closest('details'),get('cineMenu'));
+  assert.equal(get('projectionFullscreen').parentElement,get('cineControls'));
+  assert.equal(get('chronicleOpen').parentElement,get('cineControls'));
+  assert.equal(get('projectionFullscreen').closest('details'),null);
+  assert.equal(get('cineControls').parentElement,get('cineRail'));
+  assert.equal(get('cineState').parentElement,get('cineRail'));
+  assert.equal(get('chapter').closest('section'),get('dilemmaPanel'));
+  assert.match(get('chapter').textContent,/Chapitre 1 · L’Héritage · Résultat/);
   assert.equal(get('chronicleOpen').hidden,false);
   assert.equal(get('gauges').querySelector('.chicago-consequences').textContent,'Conséquences pour la Cosa Nostra');
   assert.equal(get('gauges').lastElementChild.className,'chicago-stability');
