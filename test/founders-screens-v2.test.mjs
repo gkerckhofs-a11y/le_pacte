@@ -344,7 +344,8 @@ test('Cosa Nostra : tous les écrans distinguent les cinq jauges du décor et ga
  for(const app of ['city','family','regie']){
   const {document,errors}=await screen(app,state);
   assert.deepEqual(errors,[]);
-  assert.equal(document.getElementById('gaugeHeading').textContent,'État de la Cosa Nostra');
+  if(app==='city')assert.equal(document.getElementById('gaugeHeading'),null);
+  else assert.equal(document.getElementById('gaugeHeading').textContent,'État de la Cosa Nostra');
   const gauges=document.getElementById('gauges');
   assert.equal(gauges.querySelectorAll('.gauge').length,5);
   assert.equal(gauges.querySelector('.chicago-stability h3').textContent,'Stabilité de la Cosa Nostra');
@@ -357,50 +358,59 @@ test('Cosa Nostra : tous les écrans distinguent les cinq jauges du décor et ga
  }
 });
 
-test('Cosa Nostra : les valeurs cumulées et les effets du vote précédent persistent au Conseil suivant',async()=>{
+test('Cosa Nostra : les variations signées se lisent au résultat, les valeurs acquises persistent au Conseil suivant',async()=>{
  let s=chicagoProjectionState('pour');
  const first=structuredClone(s.lastReveal),live=await screen('city',s);
  const row=(doc,code)=>[...doc.querySelectorAll('#gauges .gauge')].find(el=>el.querySelector('span').textContent===s.skin.labels.resources[code]);
- const checkPrevious=doc=>{
-  assert.equal(doc.querySelector('#gauges .chicago-last-vote').textContent,'Dernier vote · '+first.title);
-  assert.equal(row(doc,'PRO').querySelector('strong').textContent,'64 / 100');
-  assert.equal(row(doc,'PRO').querySelector('.bar').style.width,'64%');
+ const checkResult=doc=>{
   assert.equal(row(doc,'PRO').querySelector('.gauge-delta-positive').textContent,'+10');
-  assert.equal(row(doc,'POL').querySelector('strong').textContent,'51 / 100');
   assert.equal(row(doc,'POL').querySelector('.gauge-delta-negative').textContent,'−3');
   assert.equal(row(doc,'EMP').querySelector('.gauge-delta'),null);
-  assert.equal(doc.querySelector('.chicago-stability-value').textContent,'56 / 100');
   assert.equal(doc.querySelector('.chicago-stability-score .gauge-delta').textContent,'+2');
+ };
+ checkResult(live.document);
+ for(const app of ['family','regie'])checkResult((await screen(app,s)).document);
+ const checkCurrent=doc=>{
+  const gauges=doc.getElementById('gauges');
+  assert.equal(gauges.querySelector('.gauge-delta,.chicago-consequences'),null);
+  assert.doesNotMatch(gauges.textContent,/Dernier vote|→/);
+  assert.equal(row(doc,'PRO').querySelector('strong').textContent,'64 / 100');
+  assert.equal(row(doc,'PRO').querySelector('.bar').style.width,'64%');
+  assert.equal(row(doc,'POL').querySelector('strong').textContent,'51 / 100');
+  assert.equal(doc.querySelector('.chicago-stability-value').textContent,'56 / 100');
  };
  for(const [kind,phase] of [['next','PRESENTATION'],['next','NEGOTIATION'],['beginVote','COUNCIL']]){
   s=command(s,owner,kind);
   assert.equal(s.phase,phase);
   assert.equal(narrativeView(s,{role:'public'}).reveal,null);
-  await live.update(s);checkPrevious(live.document);
+  await live.update(s);checkCurrent(live.document);
  }
- // Independent clients, including a reloaded projection, use the public history.
- for(const app of ['city','family','regie'])checkPrevious((await screen(app,s)).document);
+ // Reloading during the new vote must not restore the previous result badges.
+ for(const app of ['city','family','regie'])checkCurrent((await screen(app,s)).document);
  s=resolveChicagoProjectionVote(s,'contre');
  const second=structuredClone(s.lastReveal);
  assert.notEqual(first.id,second.id);
  assert.deepEqual(second.cityBefore,first.cityAfter);
- s=command(s,owner,'next');
  await live.update(s);
  for(const code of Object.keys(first.cityAfter)){
-  const value=second.cityAfter[code],delta=value-second.cityBefore[code],gauge=row(live.document,code);
-  assert.equal(gauge.querySelector('strong').textContent,value+' / 100');
+  const delta=second.cityAfter[code]-second.cityBefore[code],gauge=row(live.document,code);
   assert.equal(gauge.querySelector('.gauge-delta')?.textContent,delta>0?'+'+delta:delta<0?'−'+Math.abs(delta):undefined);
+ }
+ s=command(s,owner,'next');
+ await live.update(s);
+ assert.equal(live.document.querySelector('#gauges .gauge-delta'),null);
+ for(const [code,value] of Object.entries(second.cityAfter)){
+  assert.equal(row(live.document,code).querySelector('strong').textContent,value+' / 100');
  }
 });
 
-test('Cosa Nostra : une correction de régie conserve sa valeur et le delta historique réel',async()=>{
+test('Cosa Nostra : une correction de régie entre deux votes affiche la nouvelle valeur seule',async()=>{
  let s=chicagoProjectionState('pour');
  s=command(command(command(s,owner,'next'),owner,'pause'),owner,'correctCity',{indicator:'PRO',value:88});
  const {document}=await screen('city',s);
  const gauge=[...document.querySelectorAll('#gauges .gauge')].find(el=>el.querySelector('span').textContent===s.skin.labels.resources.PRO);
  assert.equal(gauge.querySelector('strong').textContent,'88 / 100');
- assert.equal(gauge.querySelector('.gauge-delta').textContent,'+10');
- assert.match(gauge.querySelector('.gauge-delta').title,/54 → 64/);
+ assert.equal(gauge.querySelector('.gauge-delta'),null);
 });
 
 test('Projection Cosa Nostra : les commandes et les jauges à côté de la scène, le chapitre dans le dilemme',async()=>{
@@ -416,6 +426,8 @@ test('Projection Cosa Nostra : les commandes et les jauges à côté de la scèn
   assert.equal(get('projectionFullscreen').closest('details'),null);
   assert.equal(get('cineControls').parentElement,get('cineRail'));
   assert.equal(get('cineState').parentElement,get('cineRail'));
+  assert.equal(get('gaugeHeading'),null);
+  assert.equal(get('cineState').getAttribute('aria-label'),'Indicateurs de la Commission');
   assert.equal(get('chapter').closest('section'),get('dilemmaPanel'));
   assert.match(get('chapter').textContent,/Chapitre 1 · L’Héritage · Résultat/);
   assert.equal(get('chronicleOpen').hidden,false);

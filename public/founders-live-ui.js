@@ -19,12 +19,10 @@ export function renderChicagoGauges(root,s){
   const element=document.createElement(tag);element.className=cls;element.textContent=content;return element;
  };
  const resources=s.skin.labels.resources;
- // Historical deltas describe the last published vote, even after the next dilemma opens.
  const reveal=s.phase==='REVEALED'?s.reveal:null;
- const lastVote=reveal??s.history?.at(-1);
- const votedValues=lastVote?.cityAfter??lastVote?.city;
+ const lastResult=reveal??s.history?.at(-1);
+ const votedValues=lastResult?.cityAfter??lastResult?.city;
  const current=s.city;
- if(lastVote&&!reveal)root.append(el('p','chicago-last-vote','Dernier vote · '+lastVote.title));
  if(reveal)root.append(el('h3','chicago-consequences','Conséquences pour la Cosa Nostra'));
  for(const code of Object.keys(resources).filter(key=>key!=='stabilite')){
   const value=current[code]??votedValues?.[code],before=reveal?.cityBefore?.[code];
@@ -32,7 +30,7 @@ export function renderChicagoGauges(root,s){
   const label=el('span','',resources[code]);
   const numeric=Number.isFinite(value);
   head.append(label,el('strong','',numeric?chicagoScore(value,before!==value&&votedValues?.[code]===value?before:undefined):gaugeLevelLabel(s.cityLevels?.[code])));
-  if(lastVote)appendGaugeDelta(head,s,code,lastVote,{hideZero:true});
+  if(reveal)appendGaugeDelta(head,s,code,reveal,{hideZero:true});
   line.append(head);
   if(numeric){
    const track=el('div','track',''),bar=el('div','bar','');
@@ -57,7 +55,7 @@ export function renderChicagoGauges(root,s){
   box.setAttribute('aria-label',label);
   const score=el('div','chicago-stability-score','');
   score.append(el('strong','chicago-stability-value',chicagoScore(value,votedValues?.stabilite===value?reveal?.cityBefore?.stabilite:undefined)));
-  if(lastVote)appendGaugeDelta(score,s,'stabilite',lastVote,{hideZero:true});
+  if(reveal)appendGaugeDelta(score,s,'stabilite',reveal,{hideZero:true});
   box.append(el('h3','',label),score,el('span','chicago-stability-state',chicagoStabilityState(value)));
   root.append(box);
  }

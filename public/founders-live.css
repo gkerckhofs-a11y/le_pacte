@@ -455,7 +455,7 @@ button.danger{background:#a83333!important;color:#fff!important;border-color:#a8
 .chicago-v3 #outcome.card{background:none;border:0;padding:0}
 .chicago-v3 #chicagoChoices li:first-child{background:#1b342c;border-color:#76aa8f}
 .chicago-v3 #chicagoChoices li:last-child{background:#392427;border-color:#ba807d}
-.chicago-v3 #cineVote h2,.chicago-v3 #cineState h2{font-size:clamp(16px,1.28vw,44px);margin:0 0 .4em}
+.chicago-v3 #cineVote h2{font-size:clamp(16px,1.28vw,44px);margin:0 0 .4em}
 .chicago-v3 #cineVote .ballot{font-size:clamp(12px,1vw,34px);padding:2px 3px;grid-template-columns:minmax(0,1fr) auto 2ch}
 .chicago-v3 #cineVote .ballot[aria-current=true]{outline:2px solid var(--gold);outline-offset:-1px}
 .chicago-v3 #cineVote #councilPrompt{color:var(--gold);font-weight:bold;margin:.25em 0}
@@ -469,7 +469,6 @@ button.danger{background:#a83333!important;color:#fff!important;border-color:#a8
 .gauge-steps .filled{background:var(--level-color)}
 .chicago-v3 #cineState :is(.track,.gauge-steps){height:clamp(5px,.72vh,17px)}
 .chicago-v3 #cineState .chicago-stability{font-size:clamp(13px,1.1vw,38px);margin:.1em 0 0}
-.chicago-last-vote{margin:0;color:var(--gold);font-size:.92em;line-height:1.2}
 .chicago-stability-score{display:flex;align-items:baseline;gap:.45em;flex-wrap:wrap}
 .chicago-consequences{color:var(--gold);font-size:1em;margin:.4em 0}
 .chicago-stability{border-top:1px solid var(--border);margin-top:.6em;padding-top:.45em;display:grid;gap:.12em}
@@ -489,7 +488,7 @@ button.danger{background:#a83333!important;color:#fff!important;border-color:#a8
  .cine-screen figure{width:100%}
  .chicago-v3 #cineState{grid-area:3/1/4/-1;padding:10px}
  .chicago-v3 #cineState #gauges{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px}
- .chicago-v3 #cineState :is(.chicago-consequences,.chicago-stability,.chicago-last-vote){grid-column:1/-1}
+ .chicago-v3 #cineState :is(.chicago-consequences,.chicago-stability){grid-column:1/-1}
  .chicago-v3.projection-dashboard .projection-grid{display:flex;flex-direction:column;align-items:stretch}
 }
 
