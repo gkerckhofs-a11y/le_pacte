@@ -455,7 +455,7 @@ button.danger{background:#a83333!important;color:#fff!important;border-color:#a8
 .chicago-v3 #outcome.card{background:none;border:0;padding:0}
 .chicago-v3 #chicagoChoices li:first-child{background:#1b342c;border-color:#76aa8f}
 .chicago-v3 #chicagoChoices li:last-child{background:#392427;border-color:#ba807d}
-.chicago-v3 #cineVote h2,.chicago-v3 #cineState h2{font-size:clamp(16px,1.28vw,44px);margin:0 0 .4em}
+.chicago-v3 #cineVote h2{font-size:clamp(16px,1.28vw,44px);margin:0 0 .4em}
 .chicago-v3 #cineVote .ballot{font-size:clamp(12px,1vw,34px);padding:2px 3px;grid-template-columns:minmax(0,1fr) auto 2ch}
 .chicago-v3 #cineVote .ballot[aria-current=true]{outline:2px solid var(--gold);outline-offset:-1px}
 .chicago-v3 #cineVote #councilPrompt{color:var(--gold);font-weight:bold;margin:.25em 0}

@@ -46,6 +46,8 @@ function drawChicagoScene(s){
   hero.hidden=false;
   const statePanel=$('gauges').parentElement,votePanel=$('ballots').parentElement;
   statePanel.id='cineState';votePanel.id='cineVote';
+  statePanel.setAttribute('role','group');statePanel.setAttribute('aria-label','Indicateurs de la Commission');
+  $('gaugeHeading').remove();
   $('cineControls').append($('projectionFullscreen'),$('chronicleOpen'));
   $('chronicleDialog').setAttribute('aria-label','Chronique de la Cosa Nostra');
   $('finalResults').firstElementChild.textContent='Épilogue · La Commission';
@@ -97,8 +99,8 @@ function drawIllustration(s,sceneOnly){
 }
 function drawGauges(s){
  const root=$('gauges');root.replaceChildren();
- if(s.skin.labels.indicatorGroup)$('gaugeHeading').textContent=s.skin.labels.indicatorGroup;
  if(renderChicagoGauges(root,s))return;
+ if(s.skin.labels.indicatorGroup)$('gaugeHeading').textContent=s.skin.labels.indicatorGroup;
  const compact=Boolean(s.campaign)&&Object.hasOwn(s.city,'bien_etre');
  root.classList.toggle('projection-gauges-grid',compact);
  for(const key of Object.keys(s.city)){

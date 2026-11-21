@@ -344,7 +344,8 @@ test('Cosa Nostra : tous les écrans distinguent les cinq jauges du décor et ga
  for(const app of ['city','family','regie']){
   const {document,errors}=await screen(app,state);
   assert.deepEqual(errors,[]);
-  assert.equal(document.getElementById('gaugeHeading').textContent,'État de la Cosa Nostra');
+  if(app==='city')assert.equal(document.getElementById('gaugeHeading'),null);
+  else assert.equal(document.getElementById('gaugeHeading').textContent,'État de la Cosa Nostra');
   const gauges=document.getElementById('gauges');
   assert.equal(gauges.querySelectorAll('.gauge').length,5);
   assert.equal(gauges.querySelector('.chicago-stability h3').textContent,'Stabilité de la Cosa Nostra');
@@ -425,6 +426,8 @@ test('Projection Cosa Nostra : les commandes et les jauges à côté de la scèn
   assert.equal(get('projectionFullscreen').closest('details'),null);
   assert.equal(get('cineControls').parentElement,get('cineRail'));
   assert.equal(get('cineState').parentElement,get('cineRail'));
+  assert.equal(get('gaugeHeading'),null);
+  assert.equal(get('cineState').getAttribute('aria-label'),'Indicateurs de la Commission');
   assert.equal(get('chapter').closest('section'),get('dilemmaPanel'));
   assert.match(get('chapter').textContent,/Chapitre 1 · L’Héritage · Résultat/);
   assert.equal(get('chronicleOpen').hidden,false);
