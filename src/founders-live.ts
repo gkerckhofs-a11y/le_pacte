@@ -1,5 +1,5 @@
 import {finalCommands,chicagoCommand,chicagoFinalView,chicagoScores} from './chicago-succession.ts';
-import {isChicago,chicagoAmbition,hasChicagoSuccession,chicagoCityIndicators} from './founders-chicago.ts';
+import {isChicago,chicagoAmbition,hasChicagoSuccession,chicagoCityIndicators,chicagoIndicatorLabels} from './founders-chicago.ts';
 import {isV2,GOALS_V2,TIMING_V2,validateTiming,validateThresholds,usesManualCouncil,setPhaseClock,presentDilemma,beginNegotiation,beginVote,revealResolution,nextV2,finishV2,continueHotspring,suspendSitting,resumeSitting,revealHotspringResults} from './founders-v2.ts';
 import {isHotspring,createHotspringState,campaignDilemma,campaignFamily,campaignOrganizer,campaignPresentation,hotspringSupports,crisisCandidates,hotspringCityIndicators,hotspringOutcome,HOTSPRING_INDICATORS} from './founders-hotspring.ts';
 import {DEFAULT_TEAM_COLORS,DEFAULT_TEAM_NAMES,teamColor} from '../public/founders-identity.js';
@@ -387,7 +387,7 @@ export function narrativePublicView(s){
   ...(isHotspring(s)?{campaign:campaignPresentation(s)}:{}),
   ...(isHotspring(s)||chicago?{influenceReserve:publicInfluenceReserve(s,resolved)}:{}),
   story:{id:s.scenario.scenario.id,title:s.scenario.scenario.title,location:s.scenario.scenario.location,year:s.scenario.scenario.year,schemaVersion:s.scenario.schema_version},
-  skin:{id:s.skin.id,title:s.skin.title,labels:copy(s.skin.labels),theme:copy(s.skin.theme),publicScene:copy(s.skin.publicScene)},
+  skin:{id:s.skin.id,title:s.skin.title,labels:copy(isChicago(s)?chicagoIndicatorLabels(s.skin.labels):s.skin.labels),theme:copy(s.skin.theme),publicScene:copy(s.skin.publicScene)},
   ...(chicago?{stabilityScore:city.stabilite}:{}),
   ...(qualitative?{cityLevels:Object.fromEntries(Object.entries(s.game.city).map(([k,value])=>[k,level(value)])),stabilityLevel:level(city.stabilite)}:{}),
   city:qualitative?{}:city,families:activeFounders(s.game).map((id,i)=>({id,name:s.names[id],color:copy(teamColor(s.colors?.[id]??DEFAULT_TEAM_COLORS[i])),members:s.game.families[id].members})),

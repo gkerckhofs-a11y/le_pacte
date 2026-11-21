@@ -6,13 +6,44 @@ const gaugeNumber=new Intl.NumberFormat('fr-BE',{maximumFractionDigits:1});
 const stabilityNumber=new Intl.NumberFormat('fr-BE',{minimumFractionDigits:1,maximumFractionDigits:1});
 export const formatGaugeNumber=(value,decimal=false)=>(decimal?stabilityNumber:gaugeNumber).format(value);
 export const gaugeLevelLabel=level=>levels[level]??'';
-export function renderChicagoGaugeLevels(root,s){
- if(!s.cityLevels)return false;
- for(const [code,level] of Object.entries(s.cityLevels)){
-  const line=document.createElement('div');line.className='gauge gauge-head';
-  const label=document.createElement('span');label.textContent=s.skin.labels.resources[code];
-  const state=document.createElement('strong');state.textContent=levels[level];
-  line.append(label,state);root.append(line);
+const chicagoStabilityStates=['Organisation en déroute','Guerre ouverte','Équilibre fragile','Ordre établi','Syndicat puissant','Empire criminel'];
+export function chicagoStabilityState(value){
+ return chicagoStabilityStates[[20,40,60,80,95].filter(threshold=>value>=threshold).length];
+}
+export function chicagoScore(value,before){
+ return (Number.isFinite(before)?formatGaugeNumber(before)+' → ':'')+formatGaugeNumber(value)+' / 100';
+}
+export function renderChicagoGauges(root,s){
+ if(!s.succession)return false;
+ const el=(tag,cls,content)=>{
+  const element=document.createElement(tag);element.className=cls;element.textContent=content;return element;
+ };
+ const resources=s.skin.labels.resources;
+ const reveal=s.phase==='REVEALED'?s.reveal:null;
+ if(reveal)root.append(el('h3','chicago-consequences','Conséquences pour la Cosa Nostra'));
+ for(const code of Object.keys(resources).filter(key=>key!=='stabilite')){
+  const value=s.city[code],before=reveal?.cityBefore?.[code];
+  const line=el('div','gauge',''),head=el('div','gauge-head','');
+  const label=el('span','',resources[code]);
+  const numeric=Number.isFinite(value);
+  head.append(label,el('strong','',numeric?chicagoScore(value,before===value?undefined:before):gaugeLevelLabel(s.cityLevels?.[code])));
+  if(reveal&&before!==value)appendGaugeDelta(head,s,code);
+  line.append(head);
+  if(numeric){
+   const track=el('div','track',''),bar=el('div','bar','');
+   bar.style.width=value+'%';decorateGauge(bar,label,value,s,{compact:true});
+   track.setAttribute('aria-hidden','true');track.append(bar);line.append(track);
+  }
+  root.append(line);
+ }
+ const value=s.city.stabilite??s.stabilityScore;
+ if(Number.isFinite(value)){
+  const box=el('section','chicago-stability','');
+  const label=resources.stabilite;
+  box.setAttribute('aria-label',label);
+  box.append(el('h3','',label),el('strong','chicago-stability-value',chicagoScore(value,reveal?.cityBefore?.stabilite)),
+   el('span','chicago-stability-state',chicagoStabilityState(value)));
+  root.append(box);
  }
  return true;
 }

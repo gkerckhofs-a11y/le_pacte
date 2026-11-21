@@ -129,7 +129,7 @@ function render(saved) {
   const details = element('details');
   const gauge = metadata.gauges[metadata.gauge_mapping[objective.family]];
   details.append(element('summary', objective.family + ' · ' + gauge), element('p', objective.specialty));
-  const trajectory={...objective.medium,condition:'Votre jauge prioritaire (« '+gauge+' ») figure parmi les deux plus élevées de Chicago, ex æquo compris.'};
+  const trajectory={...objective.medium,condition:'Votre jauge prioritaire (« '+gauge+' ») figure parmi les deux plus élevées de la Cosa Nostra, ex æquo compris.'};
   for (const goal of [objective.small, trajectory, objective.major]) {
    details.append(element('p', goal.points + ' points · ' + goal.condition));
   }

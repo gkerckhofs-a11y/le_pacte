@@ -316,3 +316,77 @@ test('Le dernier bouton de progression de Hotspring quitte les commandes ordinai
   assert.equal(document.querySelector('#finishGame').hidden,true);
  }
 });
+
+function chicagoProjectionState(choice){
+ const campaign=chicagoCampaign();
+ const scene=campaign.dilemmas[0];
+ scene.options.find(o=>o.choice==='POUR').effects={PRO:10};
+ const {preview,names}=chicagoSessionPreview(prepareCosaNostra(campaign),[5,5,5,5,5]);
+ let s=createNarrativeSession(preview,{ownerId:owner.id,id:'c'.repeat(24),code:'CADRAGE',title:'Chicago',names,now:1000});
+ // Existing sessions have the original skin labels and must also display the new wording.
+ for(const code of Object.keys(s.game.city))s.game.city[code]=54;
+ s=command(s,owner,'start');
+ if(!choice)return s;
+ s=command(command(s,owner,'next'),owner,'beginVote');
+ while(s.game.vote){
+  const v=s.game.vote;
+  const who=v.turn;
+  s=command(s,team(who),'vote',Object.hasOwn(v.choices,who)?{kind:'maintien'}:who==='A'?{kind:choice,amount:1}:{kind:'passe_pouvoir'});
+ }
+ return s;
+}
+
+test('Cosa Nostra : tous les écrans distinguent les cinq jauges du décor et gardent les effets secrets avant la résolution',async()=>{
+ const state=chicagoProjectionState();
+ for(const app of ['city','family','regie']){
+  const {document,errors}=await screen(app,state);
+  assert.deepEqual(errors,[]);
+  assert.equal(document.getElementById('gaugeHeading').textContent,'État de la Cosa Nostra');
+  const gauges=document.getElementById('gauges');
+  assert.equal(gauges.querySelectorAll('.gauge').length,5);
+  assert.equal(gauges.querySelector('.chicago-stability h3').textContent,'Stabilité de la Cosa Nostra');
+  assert.equal(gauges.querySelector('.chicago-stability-value').textContent,'54 / 100');
+  assert.equal(gauges.querySelector('.chicago-stability-state').textContent,'Équilibre fragile');
+  assert.doesNotMatch(document.body.textContent,/état de Chicago|stabilité de Chicago|moyenne générale de Chicago/i);
+  assert.equal(gauges.querySelector('.chicago-consequences'),null);
+  if(app!=='regie')assert.doesNotMatch(gauges.querySelector('.gauge').textContent,/\d/);
+ }
+});
+
+test('Projection Cosa Nostra : la scène entière, les commandes dans Options et les effets de chaque issue',async()=>{
+ const intro=(await screen('city',chicagoProjectionState())).document;
+ assert.match(intro.getElementById('cineImage').getAttribute('src'),/0101-intro/);
+ for(const side of ['pour','contre']){
+  const {document}=await screen('city',chicagoProjectionState(side));
+  const get=id=>document.getElementById(id);
+  assert.match(get('cineImage').getAttribute('src'),new RegExp('0101-'+side));
+  assert.equal(get('cineHero').querySelector('figure').children.length,2);
+  assert.equal(get('projectionFullscreen').parentElement,get('cineMenuButtons'));
+  assert.equal(get('chronicleOpen').closest('details'),get('cineMenu'));
+  assert.equal(get('chronicleOpen').hidden,false);
+  assert.equal(get('gauges').querySelector('.chicago-consequences').textContent,'Conséquences pour la Cosa Nostra');
+  assert.equal(get('gauges').lastElementChild.className,'chicago-stability');
+  if(side==='pour'){
+   assert.equal(get('gauges').querySelector('.chicago-stability-value').textContent,'54 → 56 / 100');
+   assert.match(get('gauges').textContent,/54 → 64 \/ 100/);
+   get('chronicleOpen').click();
+   assert.match(get('cityChronicle').textContent,/Conséquences pour la Cosa Nostra/);
+   assert.match(get('cityChronicle').textContent,/Stabilité de la Cosa Nostra · 54 → 56 \/ 100 · Équilibre fragile/);
+  }
+ }
+ const hotspring=(await screen('city',state)).document;
+ assert.ok(hotspring.getElementById('projectionFullscreen').closest('.top'));
+ assert.equal(hotspring.getElementById('cineHero').hidden,true);
+});
+
+test('Projection Cosa Nostra : les six qualificatifs changent aux bornes éditoriales',async()=>{
+ const s=chicagoProjectionState(),live=await screen('city',s);
+ for(const [low,high,label] of [[0,19,'Organisation en déroute'],[20,39,'Guerre ouverte'],[40,59,'Équilibre fragile'],[60,79,'Ordre établi'],[80,94,'Syndicat puissant'],[95,100,'Empire criminel']]){
+  for(const n of [low,high]){
+   for(const code of Object.keys(s.game.city))s.game.city[code]=n;
+   if(high!==100&&n===high)s.game.city.PRO+=1; // 19,2, 39,2, etc.
+   s.revision++;await live.update(s);
+   assert.equal(live.document.querySelector('.chicago-stability-state').textContent,label);
+  }
+ }
+});

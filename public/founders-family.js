@@ -1,4 +1,4 @@
-import {renderChicagoGaugeLevels} from './founders-live-ui.js';
+import {renderChicagoGauges} from './founders-live-ui.js';
 import {renderSuccession,chicagoImage,chicagoPhase} from './chicago-succession.js';
 import {CAMPAIGN_PHASES,setHotspringImage,renderTendencies,renderHotspringStage,campaignScoreText,hotspringWinners} from './founders-hotspring.js';
 import {decorateGauge,formatGaugeNumber,renderPhaseClock,voteTotals,appendGaugeDelta,renderChicagoChoices} from './founders-live-ui.js';
@@ -32,7 +32,8 @@ async function call(method='GET',payload){
 }
 function gauge(data){
  const root=$('gauges');root.replaceChildren();
- if(renderChicagoGaugeLevels(root,data))return;
+ if(data.skin.labels.indicatorGroup)$('gaugeHeading').textContent=data.skin.labels.indicatorGroup;
+ if(renderChicagoGauges(root,data))return;
  for(const indicator of Object.keys(data.city)){
   const item=document.createElement('div');item.className='gauge';
   const top=document.createElement('div');top.className='gauge-head';
@@ -102,7 +103,7 @@ function render(data){
  if(!identityDirty&&document.activeElement!==$('chosenName'))$('chosenName').value=self.name==='Nom à choisir'?'':self.name;
  set('terminalSession','Session '+data.code+' · Équipe '+self.id);set('familyName',self.name);appendFamilyRoles($('familyName'),data,self.id);set('phase',(chicagoPhase(data)||nice[data.phase]||data.phase)+(manual&&data.clock?.paused?' · Pause':''));
  set('turn',data.phase==='COUNCIL'?(c.turn===self.id?'C’est à vous.':c.turn?'En attente — '+teamLabel(data,c.turn)+' joue actuellement.':c.phase==='await_moderator'?'Arbitrage':data.chicago?'Choix · '+roleLabel(data,'mayor'):'Choix du Maire'):'—');
- set('dilemmaLabel',data.dilemma?'Chapitre '+data.dilemma.chapter:'Conseil des Fondateurs');
+ set('dilemmaLabel',data.dilemma?'Chapitre '+data.dilemma.chapter:data.chicago?'La Commission':'Conseil des Fondateurs');
  set('dilemmaTitle',data.dilemma?.title||(data.phase==='FINISHED'?'Fin de la campagne':'Conseil en préparation'));
  set('dilemmaText',data.dilemma?.public_text||'');
  set('question',data.dilemma?.vote_question||'');

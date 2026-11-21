@@ -5,7 +5,9 @@
 <section id="cineHero" hidden aria-label="Scène de Chicago">
  <div class="cine-brand"><span>Games of Influence</span><strong>Cosa Nostra</strong><small>Chicago, 1931</small></div>
  <figure><img id="cineImage" alt="" hidden><figcaption id="cineMissing" hidden></figcaption></figure>
- <div id="cineChapter"></div>
+ <div class="cine-side"><div id="cineChapter"></div>
+  <details id="cineMenu"><summary aria-label="Options de projection">Options</summary><div id="cineMenuButtons"></div></details>
+ </div>
 </section>
 <header class="top">
  <div><span class="eyebrow" id="universeTitle">Games of Influence</span><h1 id="pageTitle">Hot Spring · 1876</h1></div>
@@ -29,7 +31,7 @@
   <ul id="chicagoChoices" hidden></ul>
   <div id="hotspringTendencies" class="hotspring-tendencies" hidden></div>
   <div id="hotspringStage" class="hotspring-stage" hidden></div>
-  <div id="outcome" class="card" hidden><div class="eyeline">Décision du Conseil</div><h3 id="outcomeTitle"></h3><p id="outcomeText"></p><p id="cineChanges" hidden></p></div>
+  <div id="outcome" class="card" hidden><div class="eyeline">Décision du Conseil</div><h3 id="outcomeTitle"></h3><p id="outcomeText"></p></div>
  </div>
  <figure id="dilemmaArtwork" class="projection-artwork" hidden><img id="decisionImage" alt="" hidden></figure>
 </section>
@@ -59,7 +61,7 @@
    <div id="ballots"></div>
   </div>
   <div class="panel">
-   <h2>La ville après vos décisions</h2><div id="gauges"></div>
+   <h2 id="gaugeHeading">La ville après vos décisions</h2><div id="gauges"></div>
    <dl id="influenceReserve" class="projection-reserve" aria-label="Partage de la réserve d’influence" aria-live="polite" hidden>
     <div><dt id="influenceAvailableLabel">Influence en réserve</dt><dd id="influenceAvailable"></dd></div>
     <div><dt>Familles en récupération</dt><dd id="influenceParticipants"></dd></div>
