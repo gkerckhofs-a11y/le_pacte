@@ -34,6 +34,15 @@ export function renderChicagoGauges(root,s){
    bar.style.width=value+'%';decorateGauge(bar,label,value,s,{compact:true});
    track.setAttribute('aria-hidden','true');track.append(bar);line.append(track);
   }
+  if(!numeric && Number.isInteger(s.cityLevels?.[code])){
+   const level=s.cityLevels[code],track=el('div','gauge-steps','');
+   track.setAttribute('aria-hidden','true');
+   track.style.setProperty('--level-color',colors[level]);
+   for(let index=0;index<levels.length;index++){
+    track.append(el('span',index<=level?'filled':'',''));
+   }
+   line.append(track);
+  }
   root.append(line);
  }
  const value=s.city.stabilite??s.stabilityScore;

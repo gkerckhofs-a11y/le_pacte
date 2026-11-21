@@ -46,21 +46,21 @@ function drawChicagoScene(s){
   hero.hidden=false;
   const statePanel=$('gauges').parentElement,votePanel=$('ballots').parentElement;
   statePanel.id='cineState';votePanel.id='cineVote';
-  $('cineMenuButtons').append($('chronicleOpen'),$('projectionFullscreen'));
+  $('cineControls').append($('projectionFullscreen'),$('chronicleOpen'));
   $('chronicleDialog').setAttribute('aria-label','Chronique de la Cosa Nostra');
   $('finalResults').firstElementChild.textContent='Épilogue · La Commission';
   votePanel.insertBefore($('influenceReserve'),$('ballots'));
-  const grid=document.querySelector('.projection-grid');
-  grid.prepend(statePanel);grid.append(votePanel);
+  $('cineRail').insertBefore(statePanel,$('cineControls'));
+  document.querySelector('.projection-grid').append(votePanel);
   $('outcome').firstElementChild.textContent='Décision de la Commission';
   img.onerror=()=>{img.hidden=true;$('cineMissing').hidden=false;};
  }
  const record=s.reveal??s.dilemma;
  const chapter=s.dilemma?.chapter??Number(s.reveal?.id?.split('_')[1]);
- text('cineChapter',chapterNames[chapter-1]?'Chapitre '+chapter+' · '+chapterNames[chapter-1]:'');
+ const chapterTitle=chapterNames[chapter-1]?'Chapitre '+chapter+' · '+chapterNames[chapter-1]:'';
  const waiting=s.phase==='READY';
  const art=s.reveal?s.reveal.visual:s.dilemma?.image;
- const src=waiting?'/assets/chicago/v3/chicago.webp':art?.url;
+ const src=waiting||!record?'/assets/chicago/v3/chicago.webp':art?.url;
  text('cineMissing',s.reveal?'Illustration du résultat indisponible':record?'Illustration du dilemme indisponible':'La Commission');
  if((src??'')!==img.dataset.scene){
   img.dataset.scene=src??'';
@@ -76,8 +76,10 @@ function drawChicagoScene(s){
  }
  if(s.reveal){
   $('dilemmaTitle').hidden=true;
-  text('chapter','Résultat · '+s.reveal.winner.toUpperCase());
- }else if(s.dilemma)text('chapter',s.dilemma.id.replace('CN_','').replace('_','.')+' · Chapitre '+chapter);
+  text('chapter',[chapterTitle,'Résultat '+s.reveal.winner.toUpperCase()].filter(Boolean).join(' · '));
+ }else if(s.dilemma && s.phase!=='SUSPENDED'){
+  text('chapter',[chapterTitle,'Dilemme '+s.dilemma.id.replace('CN_','').replace('_','.')].filter(Boolean).join(' · '));
+ }
 }
 function drawIllustration(s,sceneOnly){
  const image=$('decisionImage');

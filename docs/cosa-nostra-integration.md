@@ -17,7 +17,9 @@ La Stabilité de la Cosa Nostra est la moyenne arithmétique des cinq jauges sur
 | De 80 à moins de 95 | Syndicat puissant |
 | De 95 à 100 | Empire criminel |
 
-Après le vote, projeter la scène entière de l’issue retenue, puis lire les variations sous « Conséquences pour la Cosa Nostra ». La Stabilité figure sous les cinq jauges, avec les valeurs avant et après le vote et le qualificatif du nouvel état. Les options de la projection donnent accès à la chronique et au plein écran.
+Dès la proposition du dilemme, les cinq jauges affichent chacune leur niveau sur cinq segments. Sur grand écran, la colonne supérieure gauche regroupe le titre, les jauges, la Stabilité et les commandes de projection. À sa droite, la scène entière conserve le format 16:9. Le chapitre, le dilemme et le suivi du vote se lisent en dessous. [Aperçu de la projection](chicago-projection/panneau-et-dilemme.jpg)
+
+Après le vote, projeter la scène entière de l’issue retenue, puis lire les variations sous « Conséquences pour la Cosa Nostra ». La Stabilité figure sous les cinq jauges, avec les valeurs avant et après le vote et le qualificatif du nouvel état. Le bouton Plein écran est directement accessible. Le bouton Chronique apparaît dès la première décision révélée.
 
 ## Contrats vérifiés et correspondance
 
