@@ -469,7 +469,6 @@ button.danger{background:#a83333!important;color:#fff!important;border-color:#a8
 .gauge-steps .filled{background:var(--level-color)}
 .chicago-v3 #cineState :is(.track,.gauge-steps){height:clamp(5px,.72vh,17px)}
 .chicago-v3 #cineState .chicago-stability{font-size:clamp(13px,1.1vw,38px);margin:.1em 0 0}
-.chicago-last-vote{margin:0;color:var(--gold);font-size:.92em;line-height:1.2}
 .chicago-stability-score{display:flex;align-items:baseline;gap:.45em;flex-wrap:wrap}
 .chicago-consequences{color:var(--gold);font-size:1em;margin:.4em 0}
 .chicago-stability{border-top:1px solid var(--border);margin-top:.6em;padding-top:.45em;display:grid;gap:.12em}
@@ -489,7 +488,7 @@ button.danger{background:#a83333!important;color:#fff!important;border-color:#a8
  .cine-screen figure{width:100%}
  .chicago-v3 #cineState{grid-area:3/1/4/-1;padding:10px}
  .chicago-v3 #cineState #gauges{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px}
- .chicago-v3 #cineState :is(.chicago-consequences,.chicago-stability,.chicago-last-vote){grid-column:1/-1}
+ .chicago-v3 #cineState :is(.chicago-consequences,.chicago-stability){grid-column:1/-1}
  .chicago-v3.projection-dashboard .projection-grid{display:flex;flex-direction:column;align-items:stretch}
 }
 
