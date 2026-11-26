@@ -66,16 +66,24 @@ function renderAmountMenu(id,min,max,{prefix='',suffix=''}={}){
 const isPoliticalOffer=offer=>Boolean(offer.commitment&&offer.commitment.choice!=='gift');
 function offers(data){
  const root=$('offers');root.replaceChildren();
- for(const o of data.offers.slice(-30).reverse()){
+ const shown=$('negotiationPanel').hidden?data.offers.filter(o=>o.status==='pending'&&o.from===data.self.id):data.offers;
+ $('offerHistory').hidden=!shown.length||Boolean(data.clock?.paused)||!['NEGOTIATION','COUNCIL'].includes(data.phase);
+ if($('offerHistory').hidden)return;
+ const status={pending:'En attente d’une réponse',accepted:'Acceptée · argent versé',rejected:'Clôturée sans transfert',expired:'Expirée · aucun transfert'};
+ for(const o of shown.slice(-30).reverse()){
   const el=document.createElement('div');el.className='card';
+  const outgoing=o.from===data.self.id;
+  const title=document.createElement('strong');
+  title.textContent=(outgoing?'Proposition à ':'Proposition de ')+teamLabel(data,outgoing?o.to:o.from)+' · '+o.amount+' $';
   const content=document.createElement('p');
-  content.textContent=(o.from===data.self.id?'Vous proposez ':'Proposition reçue : ')+o.amount+' '+data.skin.labels.currency+' de '+teamLabel(data,o.from)+' à '+teamLabel(data,o.to)+' · '+o.reason+' · '+o.status+' · '+(data.campaign?.version>=3&&!isPoliticalOffer(o)?'Transfert sans engagement politique':commitmentLabel(o.commitment));
-  el.append(content);
+  content.textContent=(isPoliticalOffer(o)?commitmentLabel(o.commitment):'Don libre')+' · '+status[o.status];
+  el.append(title,content);
+  if(o.reason&&o.reason!=='Proposition financière'){
+   const note=document.createElement('p');note.textContent=o.reason;el.append(note);
+  }
   if(o.status==='pending'&&o.to===data.self.id){
-   for(const [name,kind] of [['Accepter','acceptOffer'],['Refuser','rejectOffer']]){
-    const b=document.createElement('button');b.className=kind==='rejectOffer'?'secondary':'';b.textContent=kind==='acceptOffer'&&o.commitment?.choice!=='gift'&&o.commitment?'Accepter et s’engager':name;
-    b.addEventListener('click',()=>command(kind,{id:o.id}));el.append(b);
-   }
+   const b=document.createElement('button');b.textContent='Examiner la proposition';
+   b.addEventListener('click',()=>renderOfferDialog(current,o.id));el.append(b);
   }
   if(o.status==='pending'&&o.from===data.self.id){
    const b=document.createElement('button');b.className='secondary';b.textContent='Annuler';b.addEventListener('click',()=>command('rejectOffer',{id:o.id}));el.append(b);
@@ -90,6 +98,7 @@ function render(data){
  renderVoteProgress($('voteProgress'),data);
  renderPhaseClock($('phaseClock'),data);
  set('familyVoteTotals',(()=>{const t=voteTotals(data);return 'POUR '+t.yes+' · CONTRE '+t.no+' · ABSTENTIONS '+t.abstentions;})());
+ if(current?.phase!==data.phase)$('offerFeedback').hidden=true;
  current=data;
  renderSuccession($('chicagoSuccession'),data,'team',command);
  $('chicagoEquity').hidden=$('chicagoPriority').hidden=!data.succession;
@@ -168,7 +177,7 @@ function render(data){
   $('moderatorLeader').querySelector('p').textContent='Choisissez la famille qui reprend le rôle « '+roleLabel(data,'mayor')+' ».';
  }
  set('committed',self.choice?'Votre position : '+self.choice+' · Mise engagée : '+self.bid:'Aucun vote engagé pour ce dilemme.');
- set('voteHint',self.mayVote?'Votre famille doit décider maintenant.':data.phase==='COUNCIL'?'Vous pouvez négocier en attendant votre tour.':'Le Conseil attend la prochaine phase.');
+ set('voteHint',self.mayVote?'Votre famille doit décider maintenant.':data.phase==='COUNCIL'?'Vous serez prévenus quand ce sera à vous de voter.':'Le Conseil attend la prochaine phase.');
  const chapter=$('familyChapter'),votePanel=$('familyVotePanel');
  if(data.phase==='COUNCIL'){
   if(votePanel.nextElementSibling!==chapter)chapter.before(votePanel);
@@ -202,7 +211,7 @@ function render(data){
  if(self.mayChooseLeader)for(const id of c.pendingLeaderChoices){
   const b=document.createElement('button');b.textContent='Désigner '+teamLabel(data,id);b.addEventListener('click',()=>command('chooseLeader',{family:id}));candidate.append(b);
  }
- $('offerForm').hidden=!['NEGOTIATION','COUNCIL'].includes(data.phase);
+ $('negotiationPanel').hidden=data.clock?.paused||(data.experienceVersion===2?data.phase!=='NEGOTIATION':data.phase!=='COUNCIL');
  const freeOnly=data.experienceVersion===2&&!manual;
  $('offerCommitmentFields').hidden=freeOnly;
  $('offerBindingHelp').hidden=freeOnly;
@@ -236,21 +245,46 @@ function render(data){
  $('familyEpilogue').hidden=!data.narrativeEnding||Boolean(data.campaign);$('familyEpilogue').replaceChildren();
  if(data.narrativeEnding&&!data.campaign){const h=document.createElement('h2');h.textContent=data.narrativeEnding.title;$('familyEpilogue').append(h);for(const t of data.narrativeEnding.paragraphs){const p=document.createElement('p');p.textContent=t;$('familyEpilogue').append(p);}}
 }
-function renderOfferDialog(data){
- const dialog=$('offerDialog');const offer=data.offers.find(o=>o.to===data.self.id&&o.status==='pending');
- if(!offer||data.clock?.paused){if(dialog.open)dialog.close();return;}
- if(dialog.dataset.offer===offer.id&&dialog.open)return;
+function renderOfferDialog(data,requestedId){
+ const dialog=$('offerDialog');
+ const canRespond=['NEGOTIATION','COUNCIL'].includes(data.phase)&&!data.clock?.paused;
+ const incoming=canRespond?data.offers.filter(o=>o.to===data.self.id&&o.status==='pending'):[];
+ $('incomingOffers').hidden=incoming.length===0;
+ if(!incoming.length){
+  if(dialog.open)dialog.close();
+  delete dialog.dataset.offer;
+  return;
+ }
+ const offer=incoming.find(o=>o.id===(requestedId||dialog.dataset.offer))??incoming[0];
+ const sender=teamLabel(data,offer.from);
+ set('incomingSummary',incoming.length===1?'Proposition de '+sender+' · '+offer.amount+' $':incoming.length+' propositions attendent votre réponse.');
+ const changed=dialog.dataset.offer!==offer.id;
  dialog.dataset.offer=offer.id;
- const manual=data.manualCouncil||data.campaign?.version>=3||data.chicago,binding=isPoliticalOffer(offer);
- const side=binding?offer.commitment.choice.toUpperCase():'';
- const sender=data.families.find(f=>f.id===offer.from)?.name??offer.from;
- set('receivedOffer',manual?'La famille « '+sender+' » vous propose '+offer.amount+' $'+(binding?' en échange d’un vote '+side:'')+'.':teamLabel(data,offer.from)+' vous propose '+offer.amount+' '+data.skin.labels.currency+'.');
- set('receivedMessage',offer.reason);
- set('receivedCommitment',manual?(binding?'En acceptant, vous devrez voter '+side+' et engager au moins '+offer.commitment.minInfluence+' Influence.':'Transfert sans engagement politique.'):
-  data.experienceVersion===2?'L’acceptation ne vous engage pas à voter.':commitmentLabel(offer.commitment));
- set('offerAccept',manual&&binding?'Accepter et s’engager':'Accepter');
- if(!dialog.open)dialog.showModal();
+ const binding=isPoliticalOffer(offer),choice=offer.commitment?.choice;
+ set('offerHeading',binding?'Accord de vote proposé':'Don proposé à votre famille');
+ set('receivedOffer',offer.amount+' $ de la part de '+sender+'.');
+ const proposal=data.dilemma?.labels?.[choice];
+ const terms=choice==='passe_pouvoir'?'Vous devrez vous abstenir pour récupérer de l’Influence.':
+  binding?'Vous devrez voter '+choice.toUpperCase()+(proposal?' — « '+proposal+' »':'')+' et engager au moins '+offer.commitment.minInfluence+' Influence.':
+  'Ce don ne vous engage pas à voter. Votre famille garde le choix de son camp.';
+ set('receivedCommitment',terms);
+ const closed=binding&&data.phase==='COUNCIL'&&(data.self.choice!==null||data.council.phase!=='voting');
+ const conflicts=binding&&data.voteCommitment&&data.voteCommitment.choice!==choice;
+ $('offerAccept').disabled=Boolean(closed||conflicts);
+ set('receivedBalance',closed?'Vous avez déjà pris position ou le scrutin est clos. Vous pouvez écarter cette proposition.':
+  conflicts?'Vous avez déjà accepté un accord pour un autre camp. Vous pouvez refuser cette proposition.':
+  'Si vous acceptez, votre solde passera de '+data.self.dollars+' $ à '+(data.self.dollars+offer.amount)+' $. En cas de refus, chacun garde son argent.');
+ $('receivedMessage').hidden=!offer.reason||offer.reason==='Proposition financière';
+ set('receivedMessage','Message de la famille : '+(offer.reason||''));
+ set('offerAccept',binding?'Accepter l’accord':'Accepter le don');
+ set('offerReject',binding?'Refuser l’accord':'Refuser le don');
+ if(changed||requestedId){
+  $('offerError').hidden=true;
+  if(!dialog.open)dialog.showModal();
+  else if(changed)$('offerHeading').focus();
+ }
 }
+$('reviewOffer').addEventListener('click',()=>renderOfferDialog(current,$('offerDialog').dataset.offer));
 $('offerAccept').addEventListener('click',()=>command('acceptOffer',{id:$('offerDialog').dataset.offer}));
 $('offerReject').addEventListener('click',()=>command('rejectOffer',{id:$('offerDialog').dataset.offer}));
 async function refresh(){
@@ -261,8 +295,24 @@ async function refresh(){
 async function command(kind,data){
  if(!current||busy)return;
  busy=true;notify('Enregistrement…');
- try{const result=await call('POST',{kind,data,expectedRevision:current.revision});render(result);notify(kind==='acceptOffer'?'Proposition acceptée : transfert effectué.':kind==='rejectOffer'?'Proposition refusée : aucun transfert.':'Décision enregistrée.');}
- catch(e){notify(e.message);try{const latest=await call();render(latest);}catch{ /* Keep original failure visible. */ }}
+ const answering=kind==='acceptOffer'||kind==='rejectOffer';
+ const offer=answering?current.offers.find(o=>o.id===data.id):null;
+ try{
+  const result=await call('POST',{kind,data,expectedRevision:current.revision});
+  render(result);
+  if(offer||kind==='offer'){
+   const message=kind==='offer'?'Proposition envoyée à '+teamLabel(result,data.to)+'.':
+    kind==='acceptOffer'?'Vous avez reçu '+offer.amount+' $ de '+teamLabel(result,offer.from)+'. Votre solde est de '+result.self.dollars+' $.':
+    offer.from===result.self.id?'Proposition annulée. Aucun dollar versé.':'Proposition refusée. Aucun dollar transféré.';
+   set('offerFeedback',message);$('offerFeedback').hidden=false;notify('');
+  }else notify('Décision enregistrée.');
+ }catch(e){
+  notify(e.message);
+  try{const latest=await call();render(latest);}catch{ /* Keep the command error visible. */ }
+  if(answering&&$('offerDialog').open&&$('offerDialog').dataset.offer===data.id){
+   set('offerError',e.message);$('offerError').hidden=false;
+  }
+ }
  finally{busy=false;}
 }
 document.querySelectorAll('[data-vote]').forEach(button=>{

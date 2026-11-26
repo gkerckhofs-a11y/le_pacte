@@ -238,7 +238,7 @@ export function applyNarrativeCommand(input,actor,command,now){
    break;
   }
   case 'offer': {
-   team();check(['NEGOTIATION','COUNCIL'].includes(s.phase),'Négociations fermées');
+   team();check(isV2(s)?s.phase==='NEGOTIATION':s.phase==='COUNCIL','Les propositions se font pendant la négociation');
    check(activeOffers(s)<maxOffers,'Trop d’offres en attente');
    check(activeFounders(s.game).includes(data.to)&&data.to!==actor.family,'Destinataire invalide');
    check(Number.isSafeInteger(data.amount)&&data.amount>=1&&data.amount<=s.game.families[actor.family].dollars,'Dollars insuffisants');

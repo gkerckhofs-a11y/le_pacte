@@ -130,20 +130,29 @@ export function castFoundersAction(input,id,action) {
  if(current>0&&activeFounders(s).every(other=>other===id||current>(v.bids[other]||0)))s.leader=id;
  v.steps.push({family:id,kind,amount:action.amount||0,leaderAfter:s.leader});
  if(s.auctionMode==='continuous'){
-  // Every family gets its initial choice. Abstentions are then skipped forever.
-  // A full circuit of active voters without a raise closes the auction.
   if(kind==='augmenter')v.held=[];
   else if(prior!==undefined)v.held=[...new Set([...(v.held??[]),id])];
-  const ids=activeFounders(s),unplayed=ids.filter(f=>v.choices[f]===undefined);
-  const active=ids.filter(f=>['pour','contre'].includes(v.choices[f]));
-  if(!unplayed.length&&active.every(f=>(v.held??[]).includes(f))){
-   const sum=side=>active.reduce((n,f)=>n+(v.choices[f]===side?v.bids[f]:0),0);
-   const yes=sum('pour'),no=sum('contre');
-   if(yes===no){v.phase='await_moderator';v.turn=null;return s;}
-   return complete(s,yes>no?'pour':'contre');
+  const ids=activeFounders(s);
+  const canRaise=f=>['pour','contre'].includes(v.choices[f])&&s.families[f].power>0;
+  if(ids.every(f=>v.choices[f]!==undefined)){
+   const bids={pour:0,contre:0},remaining={pour:0,contre:0};
+   for(const f of ids){
+    const side=v.choices[f];
+    if(side==='pour'||side==='contre'){
+     bids[side]+=v.bids[f];
+     remaining[side]+=s.families[f].power;
+    }
+   }
+   // A reachable tie still matters: the moderator can award either outcome.
+   if(bids.pour>bids.contre+remaining.contre)return complete(s,'pour');
+   if(bids.contre>bids.pour+remaining.pour)return complete(s,'contre');
+   if(ids.every(f=>!canRaise(f)||v.held?.includes(f))){
+    if(bids.pour===bids.contre){v.phase='await_moderator';v.turn=null;return s;}
+    return complete(s,bids.pour>bids.contre?'pour':'contre');
+   }
   }
   let candidate=next(s,id);
-  while(v.choices[candidate]!==undefined&&!active.includes(candidate))candidate=next(s,candidate);
+  while(v.choices[candidate]!==undefined&&!canRaise(candidate))candidate=next(s,candidate);
   v.turn=candidate;
   requireThat(totalPower(s)===expectedFoundersPowerSupply(s),'Invariant Influence violé');
   return s;

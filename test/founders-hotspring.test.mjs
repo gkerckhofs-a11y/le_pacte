@@ -32,11 +32,12 @@ test('Hotspring : cinq ambitions confidentielles, lecture et tendances avant le 
 });
 
 test('Hotspring : surenchère, abstention sautée, sauvegarde du scrutin et des offres',()=>{
- const g=newCampaign();g.command('start');g.untilCouncil();
+ const g=newCampaign();g.command('start');g.command('next');g.command('next');
+ g.command('offer',{id:'d01-offer',to:'D',amount:2,reason:'Aide'},team('A'));
+ g.command('beginVote');
  g.command('vote',{kind:'pour',amount:2},team('A'));
  g.command('vote',{kind:'passe_pouvoir'},team('B'));
  g.command('vote',{kind:'contre',amount:1},team('C'));
- g.command('offer',{id:'d01-offer',to:'D',amount:2,reason:'Aide'},team('A'));
  const vote=structuredClone(g.state.game.vote),timeLeft=g.state.clock.deadline-g.state.updatedAt-100;
  assert.equal(narrativePublicView(g.state).council.bids.A,2);
  g.command('endSitting');

@@ -44,7 +44,7 @@ export function createHotspringRules({print=false,manual=false,chicago=false}={}
      <ul>
       <li>POUR ou CONTRE : engagez au moins <strong>1 Influence</strong>.</li>
       <li>${print?'Votre camp est fixé pour ce dilemme.':'Votre camp devient définitif pour ce dilemme.'}</li>
-      <li>${print?'Ensuite, surenchérissez ou passez.':'Aux tours suivants : ajoutez de l’Influence ou passez.'}</li>
+      <li>Après le premier tour, si le camp en retard ne peut plus égaliser, le vote est clos. Sinon, surenchérissez ou passez.</li>
       <li>Un tour complet sans nouvelle mise termine le vote.</li>
       <li>L’Influence du camp perdant est rendue.</li>
       <li>${print?'Les mises gagnantes vont à la réserve.':'L’Influence du camp gagnant rejoint la réserve commune.'}</li>
@@ -69,9 +69,9 @@ export function createHotspringRules({print=false,manual=false,chicago=false}={}
      <${heading}>Les dollars</${heading}>
      ${print?'':'<p>Les dollars servent à négocier.</p>'}
      ${manual?
-      (print?'<p>Proposez un don ou payez pour un vote POUR ou CONTRE. La famille qui accepte l’accord doit voter dans le camp convenu et miser au moins 1 Influence.</p><p>Un don n’engage pas le vote.</p>':
-       '<p>Proposez un don, ou des dollars en échange d’un vote POUR ou CONTRE. En acceptant un accord de vote, la famille reçoit les dollars et s’engage à voter dans le camp convenu en misant au moins 1 Influence. Elle ne peut pas s’abstenir.</p><p>Un don est sans engagement politique. Le solde de l’émetteur est vérifié au moment de l’acceptation.</p>'):
-      '<p>Vous pouvez proposer de l’argent à une autre famille, qui peut accepter ou refuser. Une promesse n’est jamais automatiquement contraignante.</p>'}
+      (print?'<p>Pendant la négociation, proposez un don ou payez pour un vote POUR ou CONTRE. La famille qui accepte l’accord doit voter dans le camp convenu et miser au moins 1 Influence.</p><p>Un don n’engage pas le vote.</p>':
+       '<p>Pendant la négociation, proposez un don, ou des dollars en échange d’un vote POUR ou CONTRE. En acceptant un accord de vote, la famille reçoit les dollars et s’engage à voter dans le camp convenu en misant au moins 1 Influence. Elle ne peut pas s’abstenir.</p><p>Un don est sans engagement politique. Le solde de l’émetteur est vérifié au moment de l’acceptation.</p>'):
+      '<p>Pendant la négociation, vous pouvez proposer de l’argent à une autre famille, qui peut accepter ou refuser. Une promesse n’est jamais automatiquement contraignante.</p>'}
      ${print?`<p>Le classement des fortunes rapporte <strong>3 points à la première famille, 2 à la deuxième et 1 à la troisième</strong>. Les autres gagnent 0 point. Les ex æquo partagent le rang et les points.</p>
       <p>Si deux familles finissent deuxièmes, elles gagnent chacune 2 points et la suivante se classe quatrième.</p>`:`
       <p>Les dollars conservés rapportent également des points en fin de partie :</p>

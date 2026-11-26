@@ -99,7 +99,7 @@ test('V1.2 : engagement contraignant dès la négociation et validation serveur 
  g.command('vote',{kind:'passe_pouvoir'},team('C'));
  assert.throws(()=>g.command('vote',{kind:'pour',amount:1},team('D')),/position de vote/);
  g.command('vote',{kind:'contre',amount:1},team('D'));
- assert.throws(()=>offer('contrat07','E','B','pour',1),/déjà voté/);
+ assert.throws(()=>offer('contrat07','E','B','pour',1),/pendant la négociation/);
 });
 
 test('V1.2 : offres sans réservation et contrôle des fonds à l’acceptation',()=>{
