@@ -328,7 +328,7 @@ test('Les peintures reprennent les votes, le bon site et les trois parcelles hab
   assert.equal(parcel('settlement'),'rue');assert.equal(parcel('homes'),'maisons_familles');
   next(site);
   assert.equal(parcel('porchLot'),site==='contre'?undefined:'maison_perron');
-  assert.equal(parcel('sawmill'),site==='contre'?undefined:'scierie');
+  assert.equal(parcel('sawmill'),site==='contre'?'coupe_regulee':'scierie_rive');
   next('pour');assert.equal(parcel('porchLot'),'maison_perron');
   g.state.campaign.markers.push('QUARTIER_BRULE');
   assert.equal(parcel('homestead'),'foyer_brule');assert.equal(parcel('homes'),'quartier_brule');
@@ -348,4 +348,48 @@ test('Le cadrage reste dans son tableau et s’élargit jusqu’à l’épilogue
   }
   assert.equal(previous,1000);
   }
+});
+
+test('Le panorama peint traduit la population et la sécurité indépendamment, sur les deux sites',()=>{
+ const game=newCampaign();
+ for(const [marker,site] of [['VILLE_BASSE','plaine'],['VILLE_HAUTE','terrasse']]){
+  game.state.campaign.markers=[marker,'CENTRE_PRIVE','GRAND_SALOON','SCIERIE_INTENSIVE'];
+  function painting(population,security){
+   Object.assign(game.state.game.city,{demographie:population,securite:security});
+   const scene=narrativePublicView(game.state).campaign.landscape;
+   return parseHTML(renderTownPainting(scene)).document;
+  }
+  const sparse=painting(4,6),growing=painting(5,6),crowded=painting(8,6),danger=painting(8,3);
+  assert.equal(sparse.querySelector('[data-layer="sideStreetHomes"]'),null);
+  assert.ok(growing.querySelector('[data-layer="sideStreetHomes"]'));
+  assert.equal(growing.querySelector('[data-layer="frontStreetHomes"]'),null);
+  for(const key of ['sideStreetHomes','frontStreetHomes','streetMarket','residents'])assert.ok(crowded.querySelector('[data-layer="'+key+'"]'));
+  assert.ok(danger.querySelector('[data-layer="frontStreetHomes"]'));
+  assert.ok(danger.querySelector('[data-layer="streetConflict"] title').textContent.includes('coups de feu'));
+  for(const key of ['streetMarket','residents'])assert.equal(danger.querySelector('[data-layer="'+key+'"]'),null);
+  for(const doc of [sparse,growing,crowded,danger]){
+   assert.ok(doc.querySelector('[data-paint="saloon"]'));
+   const mill=doc.querySelector('[data-paint="scierie_rive"] image');
+   assert.ok(mill.getAttribute('href').endsWith(site+'_scierie_rive.webp'));
+   const viewLeft=Number(doc.querySelector('svg').getAttribute('viewBox').split(' ')[0]);
+   assert.ok(Number(mill.getAttribute('x'))*1000/1672>=viewLeft,site+' : le quai reste dans le cadre');
+  }
+ }
+});
+
+test('Le portrait de fin retrouve la ville votée après consultation de la carte, même lors d’une fin anticipée',()=>{
+ const game=newCampaign();game.command('start');game.vote('contre');
+ const s=narrativePublicView(game.state),{document}=parseHTML('<div id="town"></div>');
+ const old=globalThis.document;globalThis.document=document;
+ try{
+  const town=document.getElementById('town');
+  renderHotspringPanorama(town,s);
+  setHotspringOverview(town,true);
+  assert.equal(town.querySelector('.hotspring-town'),null);
+  renderHotspringPanorama(town,{...s,phase:'EPILOGUE',reveal:null},{finalPortrait:true});
+  assert.equal(town.querySelector('.hotspring-town').getAttribute('viewBox'),'0 0 1000 562.5');
+  assert.equal(town.querySelector('.hotspring-town').getAttribute('data-site'),'terrasse');
+  assert.equal(town.querySelector('[data-paint="saloon"]'),null);
+  assert.equal(town.querySelector('.hotspring-camp-memory'),null);
+ }finally{globalThis.document=old;}
 });

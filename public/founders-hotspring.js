@@ -60,19 +60,20 @@ export function setHotspringOverview(root,overview){
  renderHotspringPanorama(root,state.view,state.options);
 }
 
-export function renderHotspringPanorama(root,s,{showResultStill=true}={}){
+export function renderHotspringPanorama(root,s,{showResultStill=true,finalPortrait=false}={}){
  const map=s.campaign.landscape;
  let state=panes.get(root);
  if(!state){root.replaceChildren();root.classList.add('hotspring-panorama');state={};panes.set(root,state);}
- state.view=s;state.options={showResultStill};
+ state.view=s;state.options={showResultStill,finalPortrait};
+ if(finalPortrait&&state.overview){state.overview=false;state.modeChanged=true;}
  const preloadKey=map.location+'|'+s.dilemma?.id;
  if(preloadKey!==state.preloadKey){
   state.preloadKey=preloadKey;
   if(typeof Image!=='undefined')for(const url of nextTownImages(map,s.dilemma?.id))image(url);
  }
- const key=JSON.stringify(map);
+ const key=JSON.stringify(map)+'|'+finalPortrait;
  const reveal=s.phase==='REVEALED'?s.reveal:null;
- const ending=s.phase==='EPILOGUE'&&Boolean(map.epilogue);
+ const ending=!finalPortrait&&s.phase==='EPILOGUE'&&Boolean(map.epilogue);
  const effectKey=reveal?reveal.id+'_'+reveal.winner:s.phase==='INTRO'||ending?s.phase:null;
  const modeChanged=state.modeChanged;
  if(!modeChanged&&state.key===key&&state.effectKey===effectKey)return;
@@ -80,7 +81,7 @@ export function renderHotspringPanorama(root,s,{showResultStill=true}={}){
  const previous=root.querySelector('.hotspring-map:not(.hotspring-before)');
  const prior=state.map;
  const painting=Boolean(map.location)&&!state.overview;
- root.innerHTML=painting?renderTownPainting(map,{campMemory:ending}):renderPanoramaSvg(map,{campMemory:ending,overview:state.overview});
+ root.innerHTML=painting?renderTownPainting(map,{campMemory:ending,wide:finalPortrait}):renderPanoramaSvg(map,{campMemory:ending,overview:state.overview});
  state.key=key;state.effectKey=effectKey;state.map=map;
  const current=root.querySelector('.hotspring-map');
  const changingFrame=previous&&previous.getAttribute('viewBox')!==current.getAttribute('viewBox');

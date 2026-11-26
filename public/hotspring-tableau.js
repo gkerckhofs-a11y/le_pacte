@@ -1,4 +1,5 @@
 import {townPlots} from './hotspring-tableau-plots.js';
+import {townLifeLayers} from './hotspring-town-life.js';
 
 const locationKey=scene=>scene.location==='terrasse'?'terrasse':'plaine';
 const asset=(site,key)=>'/assets/hotspring/v1/tableaux/'+site+'_'+key+'.webp';
@@ -18,7 +19,12 @@ export function townViewBox(scene){
  }
  width=Math.min(1000,width);
  const height=width*9/16;
- const left=Math.max(0,Math.min(1000-width,512-width/2));
+ let left=Math.max(0,Math.min(1000-width,512-width/2));
+ const timber=scene.layers.find(l=>l.id==='sawmill'&&l.state!=='absent');
+ if(timber){
+  const [bankX]=townPlots[locationKey(scene)][timber.kind==='mill'?'scierie_rive':'coupe_regulee'];
+  left=Math.min(left,Math.max(0,bankX*1000/1672-12));
+ }
  const centerY=sites.has('surveyed')?321:282;
  const top=Math.max(0,Math.min(562.5-height,centerY-height/2));
  return [left,top,width,height].join(' ');
@@ -28,6 +34,7 @@ export function townViewBox(scene){
 export function townExposure(scene){
  const lots=new Map(scene.layers.filter(l=>l.state!=='absent').map(l=>[l.id,l]));
  const layers=[];
+ const life=townLifeLayers(scene,locationKey(scene));
  const add=(id,key)=>{
   const lot=lots.get(id);
   if(lot&&key)layers.push({id,key,state:lot.state,label:lot.label});
@@ -44,6 +51,7 @@ export function townExposure(scene){
   add('homes',lots.get('homes')?.kind==='cottages'?'maisons_familles':null);
   add('porchLot',lots.get('porchLot')?.kind==='porchHouse'?'maison_perron':null);
  }
+ layers.push(...life.districts);
  add('council',lots.get('council')?.kind==='hall'?'conseil':null);
  add('mine',lots.get('mine')?.kind==='mine'?'mine':null);
  add('depot','gare');
@@ -52,38 +60,43 @@ export function townExposure(scene){
  add('trade','comptoir');
  add('school','ecole');
  add('saloon',lots.get('saloon')?.kind==='inn'?'auberge':'saloon');
- add('sawmill',lots.get('sawmill')?.kind==='mill'?'scierie':null);
+ add('sawmill',lots.get('sawmill')?.kind==='mill'?'scierie_rive':'coupe_regulee');
  add('well',lots.get('well')?.kind==='tower'?'tour':'puits');
  add('bank','banque');
  add('clinic','dispensaire');
  add('shops',lots.get('shops')?.kind==='shops'?'boutiques':null);
- if(lots.has('surveyed')&&scene.density==='forte'&&scene.street!=='barricadée'&&scene.street!=='vide')
-  layers.push({id:'residents',key:'passants',state:'complete',label:'Des habitants circulent dans la rue'});
+ layers.push(...life.people);
  return layers;
 }
 
 const upcoming={
- D02:['maison_planches','tour','puits'],D03:['rue','maisons_familles','boutiques'],D04:['maison_perron','scierie'],
+ D02:['maison_planches','tour','puits'],D03:['rue','maisons_familles','boutiques'],D04:['maison_perron','scierie_rive','coupe_regulee'],
  D05:['maison_perron','ecole'],D06:['saloon','auberge'],D07:['dispensaire'],D11:['comptoir'],
  D15:['gare'],D16:['mine'],D17:['quartier','faubourg'],D18:['banque'],D19:['betail'],
  D24:['foyer_brule','quartier_brule'],D29:['conseil']
 };
 export function nextTownImages(scene,dilemma){
  if(!scene.location)return [asset('terrasse','camp'),asset('plaine','camp')];
- return (upcoming[dilemma]??[]).map(key=>asset(locationKey(scene),key));
+ const images=(upcoming[dilemma]??[]).map(key=>asset(locationKey(scene),key));
+ if(dilemma==='D03'){
+  for(const key of ['vie_rue_laterale','vie_maisons_proches','vie_marche','vie_rue_sous_tension']){
+   images.push('/assets/hotspring/v1/tableaux/'+key+'.webp');
+  }
+ }
+ return images;
 }
 
-export function renderTownPainting(scene,{campMemory=false,imageUrl=url=>url}={}){
+export function renderTownPainting(scene,{campMemory=false,wide=false,imageUrl=url=>url}={}){
  const site=locationKey(scene),plots=townPlots[site];
  const layers=townExposure(scene);
  const description=(site==='terrasse'?'Hotspring sur le plateau. ':'Hotspring dans les terres basses. ')+layers.map(l=>l.label).join('. ');
- function region(key){
-  const [x,y,width,height]=plots[key];
-  return `<image x="${x}" y="${y}" width="${width}" height="${height}" preserveAspectRatio="none" href="${escapeText(imageUrl(asset(site,key)))}"/>`;
+ function region(key,box=plots[key],src=asset(site,key)){
+  const [x,y,width,height]=box;
+  return `<image x="${x}" y="${y}" width="${width}" height="${height}" preserveAspectRatio="none" href="${escapeText(imageUrl(src))}"/>`;
  }
- const painted=layers.map(({id,key,state,label})=>{
-  return `<g data-layer="${id}" data-paint="${key}" data-state="${escapeText(state)}"><title>${escapeText(label)}</title>${region(key)}</g>`;
+ const painted=layers.map(({id,key,state,label,box,src})=>{
+  return `<g data-layer="${id}" data-paint="${key}" data-state="${escapeText(state)}"><title>${escapeText(label)}</title>${region(key,box,src)}</g>`;
  }).join('');
  const memory=campMemory?`<g class="hotspring-camp-memory" aria-hidden="true">${region('camp')}</g>`:'';
- return `<svg xmlns="http://www.w3.org/2000/svg" class="hotspring-map hotspring-town" width="1000" height="562.5" viewBox="${townViewBox(scene)}" role="img" aria-label="${escapeText(description)}" data-site="${site}"><g transform="scale(${1000/1672} ${562.5/941})">${painted}${memory}</g></svg>`;
+ return `<svg xmlns="http://www.w3.org/2000/svg" class="hotspring-map hotspring-town" width="1000" height="562.5" viewBox="${wide?full:townViewBox(scene)}" role="img" aria-label="${escapeText(description)}" data-site="${site}"><g transform="scale(${1000/1672} ${562.5/941})">${painted}${memory}</g></svg>`;
 }
