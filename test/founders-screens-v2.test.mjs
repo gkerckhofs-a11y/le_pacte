@@ -11,6 +11,7 @@ import {prepareCosaNostra} from '../server/cosa-nostra-preparation.ts';
 import {chicagoSessionPreview} from '../server/cosa-nostra-session.ts';
 import {fixture as chicagoCampaign} from './helpers/chicago.mjs';
 import {newCampaign,team} from './helpers/hotspring.mjs';
+import {createSentOfferNotices,offerStatusText} from '../public/founders-agreements.js';
 const owner={role:'organizer',id:'host'};
 let state=createNarrativeSession(foundersPreview({scenarioId:'hot-spring-reserve-hybride',scenarioVersion:'2.0.0',skinId:'western',members:[1,1,1,1,1]}),{ownerId:'host',id:'1'.repeat(24),code:'SCREENV2',title:'Test écrans',now:1000});
 const command=(s,actor,kind,data={})=>applyNarrativeCommand(s,actor,{kind,data,expectedRevision:s.revision},2000);
@@ -343,6 +344,55 @@ test('Pendant le vote, les familles peuvent traiter les propositions en attente 
  assert.equal(get('dollars').textContent,'11');
  assert.equal(get('incomingOffers').hidden,true);
  assert.equal(get('offerDialog').open,false);
+});
+test('Un émetteur voit pourquoi l’accord avec les Verts est impossible et suit la réponse à son don',async()=>{
+ const g=newCampaign({scenarioVersion:'1.2.0'});
+ for(const kind of ['start','next','next','pause'])g.command(kind);
+ g.command('correctResource',{family:'C',resource:'power',value:0});
+ g.command('resume');
+ const sender=await screen('family',g.state,'A'),get=id=>sender.document.getElementById(id);
+ function choose(id,value){
+  get(id).value=value;get(id).dispatchEvent(new sender.document.defaultView.Event('change',{bubbles:true}));
+ }
+ choose('targetFamily','C');choose('offerCommitment','pour');
+ assert.equal(get('sendOffer').disabled,true);
+ assert.match(get('offerLimitHint').textContent,/POUR impossible.*Équipe Verte.*Influence insuffisante.*Don/);
+ choose('offerCommitment','gift');
+ assert.equal(get('sendOffer').disabled,false);assert.equal(get('offerLimitHint').hidden,true);
+ const gift={id:'don_verts_01',amount:3,to:'C',commitment:{choice:'gift'}};
+ g.command('offer',gift,team('A'));await sender.update(g.state);
+ assert.equal(get('sentOfferTitle').textContent,'En attente de réponse');
+ assert.match(get('sentOfferText').textContent,/Offre de 3 \$ à .*Équipe Verte/);
+ assert.equal(narrativeView(g.state,{role:'public'}).voteOfferLimits,undefined);
+ const bystander=await screen('family',g.state,'B');
+ assert.equal(bystander.document.getElementById('sentOfferNotice').hidden,true);
+ get('dismissSentOffer').click();assert.equal(get('sentOfferNotice').hidden,true);
+ g.command('acceptOffer',{id:gift.id},team('C'));await sender.update(g.state);
+ assert.equal(get('sentOfferNotice').hidden,false);assert.equal(get('sentOfferTitle').textContent,'Proposition acceptée');
+ assert.match(get('sentOfferText').textContent,/Versement de 3 \$ à .*Équipe Verte/);
+ assert.equal(get('dollars').textContent,'7');
+ g.command('offer',{...gift,id:'don_verts_02'},team('A'));await sender.update(g.state);
+ assert.equal(get('sentOfferTitle').textContent,'En attente de réponse');
+ g.command('beginVote');g.command('rejectOffer',{id:'don_verts_02'},team('C'));await sender.update(g.state);
+ assert.equal(get('sentOfferTitle').textContent,'Proposition refusée');assert.equal(get('dollars').textContent,'7');
+ get('dismissSentOffer').click();assert.equal(get('sentOfferTitle').textContent,'Proposition acceptée');
+ get('dismissSentOffer').click();assert.equal(get('sentOfferNotice').hidden,true);
+});
+test('Suivi des offres : reprise après rechargement, retrait et clôture des anciennes offres',()=>{
+ const values=new Map(),storage={getItem:k=>values.get(k),setItem:(k,v)=>values.set(k,v)};
+ const offer={id:'aux-verts',from:'A',to:'C',councilNumber:1,status:'pending'};
+ const data={offers:[offer],self:{id:'A'},history:[{}],phase:'NEGOTIATION'};
+ let notices=createSentOfferNotices(storage,'session-bleus');
+ assert.equal(notices.unread(data).length,1);notices.dismiss(offer);
+ notices=createSentOfferNotices(storage,'session-bleus');
+ assert.equal(notices.unread(data).length,0);
+ offer.status='rejected';offer.closedBy='A';
+ data.history.push({});data.phase='PRESENTATION';
+ assert.equal(offerStatusText(notices.unread(data)[0]),'Proposition retirée');
+ notices.dismiss(offer);
+ assert.equal(createSentOfferNotices(storage,'session-bleus').unread(data).length,0);
+ assert.equal(offerStatusText({...offer,closedBy:undefined}),'Proposition clôturée');
+ assert.equal(offerStatusText({...offer,status:'expired'}),'Proposition expirée');
 });
 test('Régie de Chicago : distinguer le vote des familles, la suspension et le scrutin final',async()=>{
  const {preview,names}=chicagoSessionPreview(prepareCosaNostra(chicagoCampaign()),[5,5,5,5,5]);

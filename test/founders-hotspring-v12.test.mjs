@@ -78,6 +78,9 @@ test('V1.2 : engagement contraignant dès la négociation et validation serveur 
  assert.equal(g.state.game.families.B.dollars,12);
  assert.throws(()=>accept('contrat02','B'),/incompatible/);
  assert.equal(g.state.game.families.C.dollars,10);
+ const limits=narrativeFamilyView(g.state,'E').voteOfferLimits;
+ assert.deepEqual(limits,{B:{contre:'Cette famille a déjà accepté un engagement incompatible'}});
+ assert.equal(narrativePublicView(g.state).voteOfferLimits,undefined);
  assert.throws(()=>offer('contrat03','E','B','contre',1),/incompatible/);
  offer('contrat04','C','B','pour',4);accept('contrat04','B');
  assert.deepEqual(acceptedVoteCommitment(g.state,'B'),{choice:'pour',minInfluence:4});

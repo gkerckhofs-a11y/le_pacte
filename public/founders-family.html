@@ -64,7 +64,9 @@
    </div>
    <p class="small" id="offerBindingHelp">Accepter verse les dollars et engage votre choix pour ce Conseil. Vous pouvez miser davantage. Le commentaire ne crée aucune obligation supplémentaire.</p>
    <div class="field"><label for="offerReason">Commentaire de l’accord</label><input id="offerReason" maxlength="300" required placeholder="Précisions pour l’autre famille…"></div>
-   <button id="sendOffer" type="submit">Proposer l’accord</button>
+   <p id="offerSendError" class="offer-send-error" role="alert" hidden></p>
+   <p id="offerLimitHint" class="offer-send-error" role="status" hidden></p>
+   <button aria-describedby="offerLimitHint offerBalanceHint" id="sendOffer" type="submit">Proposer l’accord</button>
    <p id="offerBalanceHint" class="small muted" role="status" hidden>Aucun dollar disponible</p>
   </form>
  </section>
@@ -120,6 +122,10 @@
 <section id="familyEpilogue" class="panel" hidden></section>
 <div id="notice" role="status" style="margin-top:16px"></div>
 </main>
+<aside id="sentOfferNotice" class="sent-offer-notice" aria-label="Suivi de vos propositions" hidden>
+ <div role="status" aria-live="polite" aria-atomic="true"><strong id="sentOfferTitle"></strong><p id="sentOfferText"></p></div>
+ <button type="button" class="secondary" id="dismissSentOffer">Fermer</button>
+</aside>
 <dialog id="offerDialog" aria-labelledby="offerHeading" aria-describedby="receivedOffer receivedCommitment">
  <h2 id="offerHeading" tabindex="-1" autofocus>Proposition reçue</h2>
  <p id="receivedOffer" class="big"></p>

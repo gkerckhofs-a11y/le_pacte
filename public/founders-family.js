@@ -4,7 +4,7 @@ import {renderSuccession,chicagoImage,chicagoPhase} from './chicago-succession.j
 import {CAMPAIGN_PHASES,setHotspringImage,renderTendencies,renderHotspringStage,campaignScoreText,hotspringWinners} from './founders-hotspring.js';
 import {decorateGauge,formatGaugeNumber,renderPhaseClock,voteTotals,appendGaugeDelta,renderChicagoChoices} from './founders-live-ui.js';
 import {renderVoteProgress} from './founders-vote-progress.js';
-import {commitmentLabel} from './founders-agreements.js';
+import {commitmentLabel,offerStatusText,createSentOfferNotices} from './founders-agreements.js';
 import {renderCouncilRoles,appendFamilyRoles,roleLabel} from './founders-role-badges.js';
 import {saveFamilyName} from './founders-name-save.js';
 import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
@@ -63,20 +63,46 @@ function renderAmountMenu(id,min,max,{prefix='',suffix=''}={}){
  if(!select.disabled)select.value=String(previous>=min&&previous<=max?previous:min);
  select.dataset.bounds=bounds;
 }
+let sentNotices,displayedOffer;
+function renderSentNotice(data){
+ sentNotices??=createSentOfferNotices(sessionStorage,'pacte-offres-'+sessionId+'-'+data.self.id);
+ const unread=sentNotices.unread(data),offer=unread[0];
+ $('sentOfferNotice').hidden=!offer;
+ if(!offer){displayedOffer=null;return;}
+ const dismissLabel=unread.length>1?'Suivante ('+(unread.length-1)+')':'Fermer';
+ set('dismissSentOffer',dismissLabel);
+ if(displayedOffer?.id===offer.id&&displayedOffer.status===offer.status)return;
+ displayedOffer=offer;
+ set('sentOfferTitle',offerStatusText(offer));
+ const amount=offer.amount+' $',family=teamLabel(data,offer.to);
+ set('sentOfferText',offer.status==='pending'?'Offre de '+amount+' à '+family+'. Aucun dollar débité.':
+  offer.status==='accepted'?'Versement de '+amount+' à '+family+'.':'Offre de '+amount+' à '+family+(offer.status==='cancelled'?'. Conseil annulé.':'. Aucun dollar versé.'));
+}
+$('dismissSentOffer').addEventListener('click',()=>{
+ if(displayedOffer){sentNotices.dismiss(displayedOffer);renderSentNotice(current);}
+});
+function updateOfferValidity(){
+ const target=$('targetFamily').value,choice=$('offerCommitment').value;
+ const reason=current.voteOfferLimits?.[target]?.[choice],noFunds=current.self.dollars<1;
+ $('offerLimitHint').hidden=!reason;
+ if(reason)set('offerLimitHint','Accord '+choice.toUpperCase()+' impossible avec '+teamLabel(current,target)+'. '+reason+'.'+
+  (noFunds?'':' Vous pouvez choisir « Don / transfert libre ».'));
+ $('sendOffer').disabled=Boolean(reason)||noFunds;
+ $('offerBalanceHint').hidden=!noFunds;
+}
 const isPoliticalOffer=offer=>Boolean(offer.commitment&&offer.commitment.choice!=='gift');
 function offers(data){
  const root=$('offers');root.replaceChildren();
  const shown=$('negotiationPanel').hidden?data.offers.filter(o=>o.status==='pending'&&o.from===data.self.id):data.offers;
  $('offerHistory').hidden=!shown.length||Boolean(data.clock?.paused)||!['NEGOTIATION','COUNCIL'].includes(data.phase);
  if($('offerHistory').hidden)return;
- const status={pending:'En attente d’une réponse',accepted:'Acceptée · argent versé',rejected:'Clôturée sans transfert',expired:'Expirée · aucun transfert'};
  for(const o of shown.slice(-30).reverse()){
   const el=document.createElement('div');el.className='card';
   const outgoing=o.from===data.self.id;
   const title=document.createElement('strong');
   title.textContent=(outgoing?'Proposition à ':'Proposition de ')+teamLabel(data,outgoing?o.to:o.from)+' · '+o.amount+' $';
   const content=document.createElement('p');
-  content.textContent=(isPoliticalOffer(o)?commitmentLabel(o.commitment):'Don libre')+' · '+status[o.status];
+  content.textContent=(isPoliticalOffer(o)?commitmentLabel(o.commitment):'Don libre')+' · '+offerStatusText(o);
   el.append(title,content);
   if(o.reason&&o.reason!=='Proposition financière'){
    const note=document.createElement('p');note.textContent=o.reason;el.append(note);
@@ -98,7 +124,7 @@ function render(data){
  renderVoteProgress($('voteProgress'),data);
  renderPhaseClock($('phaseClock'),data);
  set('familyVoteTotals',(()=>{const t=voteTotals(data);return 'POUR '+t.yes+' · CONTRE '+t.no+' · ABSTENTIONS '+t.abstentions;})());
- if(current?.phase!==data.phase)$('offerFeedback').hidden=true;
+ if(current?.phase!==data.phase){$('offerFeedback').hidden=true;$('offerSendError').hidden=true;}
  current=data;
  renderSuccession($('chicagoSuccession'),data,'team',command);
  $('chicagoEquity').hidden=$('chicagoPriority').hidden=!data.succession;
@@ -225,19 +251,22 @@ function render(data){
   $('offerMinimumField').hidden=true;
   renderAmountMenu('offerAmount',1,self.dollars,{suffix:' $'});
  }
- $('sendOffer').disabled=Boolean(manual&&self.dollars===0);
- $('offerBalanceHint').hidden=!manual||self.dollars>0;
  const campaignRules=$('rulesHotspring');
  campaignRules.hidden=!(data.campaign||data.manualCouncil);
  if(!campaignRules.hidden&&!campaignRules.firstElementChild)campaignRules.append(createHotspringRules({manual,chicago:Boolean(data.chicago)}));
  $('rulesIntroduction').hidden=!campaignRules.hidden;
  $('rulesLegacy').hidden=data.experienceVersion===2;$('rulesV2').hidden=data.experienceVersion!==2||Boolean(data.campaign||data.chicago);
  $('rulesChicago').hidden=!data.chicago;
- const target=$('targetFamily'),prev=target.value;target.replaceChildren();
- for(const f of data.families.filter(f=>f.id!==self.id)){
-  const option=document.createElement('option');option.value=f.id;option.textContent=teamCaption(f);target.append(option);
+ const target=$('targetFamily'),recipients=data.families.filter(f=>f.id!==self.id);
+ if(target.options.length!==recipients.length||recipients.some((f,i)=>target.options[i].value!==f.id||target.options[i].textContent!==teamCaption(f))){
+  const prev=target.value;
+  target.replaceChildren();
+  for(const f of recipients){
+   const option=document.createElement('option');option.value=f.id;option.textContent=teamCaption(f);target.append(option);
+  }
+  if(recipients.some(f=>f.id===prev))target.value=prev;
  }
- if(Array.from(target.options).some(x=>x.value===prev))target.value=prev;
+ updateOfferValidity();renderSentNotice(data);
  const reveal=$('lastReveal');reveal.hidden=!data.reveal;
  if(data.reveal){set('resultTitle',(data.campaign||data.chicago)?data.reveal.chronicle.title:data.reveal.winner==='pour'?'Proposition adoptée':'Proposition rejetée');set('resultNarration',data.reveal.narration);}
  gauge(data);offers(data);renderOfferDialog(data);
@@ -301,7 +330,7 @@ async function command(kind,data){
   const result=await call('POST',{kind,data,expectedRevision:current.revision});
   render(result);
   if(offer||kind==='offer'){
-   const message=kind==='offer'?'Proposition envoyée à '+teamLabel(result,data.to)+'.':
+   const message=kind==='offer'?'Proposition envoyée à '+teamLabel(result,data.to)+' · '+data.amount+' $.':
     kind==='acceptOffer'?'Vous avez reçu '+offer.amount+' $ de '+teamLabel(result,offer.from)+'. Votre solde est de '+result.self.dollars+' $.':
     offer.from===result.self.id?'Proposition annulée. Aucun dollar versé.':'Proposition refusée. Aucun dollar transféré.';
    set('offerFeedback',message);$('offerFeedback').hidden=false;notify('');
@@ -309,6 +338,11 @@ async function command(kind,data){
  }catch(e){
   notify(e.message);
   try{const latest=await call();render(latest);}catch{ /* Keep the command error visible. */ }
+  if(kind==='offer'){
+   const message='Envoi non confirmé. '+e.message;
+   set('offerSendError',message);$('offerSendError').hidden=false;
+   if($('negotiationPanel').hidden){set('offerFeedback',message);$('offerFeedback').hidden=false;}
+  }
   if(answering&&$('offerDialog').open&&$('offerDialog').dataset.offer===data.id){
    set('offerError',e.message);$('offerError').hidden=false;
   }
@@ -327,6 +361,8 @@ document.querySelectorAll('[data-vote]').forEach(button=>{
 document.querySelectorAll('[data-tie]').forEach(button=>button.addEventListener('click',()=>command('resolveTie',{winner:button.dataset.tie})));
 $('offerForm').addEventListener('submit',e=>{
  e.preventDefault();
+ if(!current||$('sendOffer').disabled)return;
+ $('offerSendError').hidden=true;
  const id=crypto.randomUUID?.()??Array.from(crypto.getRandomValues(new Uint8Array(16)),n=>n.toString(16).padStart(2,'0')).join('');
  const choice=$('offerCommitment').value;
  const minInfluence=current?.campaign?.version>=3||current?.chicago?1:Number($('offerMinimum').value);
@@ -356,4 +392,5 @@ tabs.forEach((tab,i)=>{
 });
 refresh();setInterval(refresh,2500);
 
+$('offerForm').addEventListener('change',()=>{if(current){$('offerSendError').hidden=true;updateOfferValidity();}});
 $('offerCommitment').addEventListener('change',()=>{$('offerMinimumField').hidden=current?.campaign?.version>=3||current?.chicago||!['pour','contre'].includes($('offerCommitment').value);});
