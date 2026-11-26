@@ -41,6 +41,7 @@ hr{border:0;border-top:1px solid var(--border);margin:20px 0}
 .family-dashboard .top{background:linear-gradient(110deg,var(--team-dark),#151b20);border-top:5px solid var(--team);border-bottom-color:var(--team)}
 .family-dashboard h1{color:var(--team)}
 .family-dashboard .panel{border-top:2px solid var(--team)}
+.family-council-column>.panel+.panel{margin-top:16px}
 .family-dashboard button:not(.secondary){background:var(--team);border-color:var(--team);color:#13191f}
 .family-dashboard button.secondary{border-color:var(--team)}
 .family-dashboard .family-stat{background:var(--team-dark)}
