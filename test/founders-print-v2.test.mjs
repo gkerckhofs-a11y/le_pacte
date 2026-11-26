@@ -74,7 +74,9 @@ for(const [count,version] of [[5,'2.0.0'],[6,'2.0.0'],[5,'1.1.0'],[5,'1.2.0'],[5
     'Votre but','Un dilemme en 5 étapes','L’Influence','L’abstention','Les dollars','Le Maire','Le Shérif','Rappel express'
    ]);
    assert.match(reminder.textContent,/Gardez vos objectifs secrets/);
-   assert.match(reminder.textContent,/maximum est de 18 points/);
+   const scoreLines=[...reminder.querySelector('ul').children].map(li=>li.textContent.trim());
+   assert.deepEqual(scoreLines,['Objectifs de chapitre : jusqu’à 10 points','Objectif de trajectoire : jusqu’à 2 points','Fortune restante : jusqu’à 3 points']);
+   assert.doesNotMatch(reminder.textContent,/héritage final|18 points/i);
    assert.match(reminder.textContent,/deux familles finissent deuxièmes, elles gagnent chacune 2 points et la suivante se classe quatrième\./);
    assert.match(reminder.textContent,/Préservez votre fortune/);
   }else{
