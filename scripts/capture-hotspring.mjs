@@ -129,7 +129,11 @@ function captureCampaign(){
   magick(['montage',...photos,'-tile','2x3','-geometry','+2+2','-background','#28231e',
    '-strip','-quality','81',join(folder,'croissance-des-deux-sites.webp')]);
  }finally{rmSync(comparison,{recursive:true,force:true});}
- return [{file:'captures/croissance-des-deux-sites.webp',alt:'Deux parties, sur le plateau et en terres basses, de la fondation à l’épilogue.'},
+ return [
+  {file:'captures/projection-dilemme-chapitre-5.webp',alt:'Au chapitre 5, l’illustration du dilemme et le panorama restent côte à côte.'},
+  {file:'captures/demographie-et-securite.webp',alt:'Une même implantation, avec trois densités de population puis une rue sous tension.'},
+  {file:'captures/projection-finale-hotspring.webp',alt:'La ville des terres basses et les scores des cinq familles à l’épilogue d’une partie de test.'},
+  {file:'captures/croissance-des-deux-sites.webp',alt:'Deux parties, sur le plateau et en terres basses, de la fondation à l’épilogue.'},
   {file:'captures/installation-du-camp-au-village.webp',alt:'Sur le plateau, les trois tentes cèdent leur place aux maisons au fil des quatre premiers votes.'},
   ...captures.map(([name,,,alt])=>({file:'captures/'+name+'.webp',alt}))];
 }

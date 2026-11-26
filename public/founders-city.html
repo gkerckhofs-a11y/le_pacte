@@ -27,6 +27,7 @@
   <div class="eyeline" id="chapter">Conseil des fondateurs</div>
   <h2 id="dilemmaTitle">Bienvenue au Conseil</h2>
   <p id="dilemmaText">Le Conseil attend le signal de la régie.</p>
+  <button id="townRead" type="button" class="secondary" aria-haspopup="dialog" hidden>Lire la situation en entier</button>
   <p id="question" class="big hotspring-text"></p>
   <ul id="chicagoChoices" hidden></ul>
   <div id="hotspringTendencies" class="hotspring-tendencies" hidden></div>
@@ -46,7 +47,7 @@
 </section>
 <section class="projection-city">
  <div class="projection-visual">
-  <div class="projection-viewport"><div id="city" aria-label="Illustration évolutive de Hot Spring"></div></div>
+  <div class="projection-viewport"><div id="city" aria-label="Illustration évolutive de Hot Spring"></div><p id="townCaption" class="town-caption" hidden></p></div>
   <section id="panoramaStability" class="panorama-stability" aria-labelledby="stabilityTitle" hidden>
    <div class="gauge-head"><strong id="stabilityTitle"></strong><span id="stabilityState"></span></div>
    <div id="stabilityTrack" class="track" role="progressbar" aria-label="Stabilité" aria-valuemin="0" aria-valuemax="10"><div id="stabilityBar" class="bar"></div></div>
@@ -73,6 +74,10 @@
 </div>
 <div id="notice" role="status"></div>
 </main>
+<dialog id="townReading" aria-labelledby="townReadingTitle">
+ <form method="dialog"><button class="secondary">Revenir au dilemme</button></form>
+ <h2 id="townReadingTitle"></h2><p id="townReadingText"></p>
+</dialog>
 <dialog id="chronicleDialog" aria-label="Chronique de la ville">
  <form method="dialog"><button type="submit" class="secondary">Fermer la chronique</button></form>
  <section id="cityChronicle" class="city-chronicle" hidden></section>

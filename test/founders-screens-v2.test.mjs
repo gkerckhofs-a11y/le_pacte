@@ -258,7 +258,11 @@ test('Hotspring : l’épilogue annonce le classement avant le détail des objec
  assert.match(get('winnerTitle').textContent,/Les Doyle/);
  assert.equal(get('finalRanking').querySelectorAll('ol > li').length,5);
  assert.equal(get('finalRanking').querySelector('details'),null);
- assert.match(get('finalRanking').textContent,/Les Doyle · 5 \/ 5/);
+ assert.ok(projection.document.body.classList.contains('projection-town-final'));
+ assert.equal(get('finalRanking').querySelector('[data-rank="1"] strong').textContent,'5 points');
+ assert.equal(get('finalRanking').querySelector('[data-rank="1"] span:nth-child(2)').textContent,'Les Doyle');
+ assert.equal(get('panoramaOverview').hidden,true);
+ assert.equal(get('narrativeEnding').hasAttribute('open'),false);
  assert.equal(get('narrativeEnding').hidden,false);
  assert.ok(get('endingText').textContent.includes('Qu’avez-vous fait de Hotspring'));
  const regie=(await screen('regie',game.state)).document;
@@ -266,7 +270,9 @@ test('Hotspring : l’épilogue annonce le classement avant le détail des objec
  assert.match(regie.getElementById('hotspringStage').textContent,/Les Doyle · 5 \/ 5/);
  game.command('showResults',{},owner);
  await projection.update(game.state);
- assert.equal(get('finalRanking').querySelectorAll('ol > li > details').length,5);
+ assert.equal(get('finalRanking').querySelectorAll('li').length,5);
+ assert.equal(get('endingText').querySelectorAll('ol > li > details').length,5);
+ assert.equal(get('narrativeEnding').hasAttribute('open'),false);
 });
 
 test('Projection Hotspring : la réserve affiche l’estimation puis le versement',async()=>{

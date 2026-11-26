@@ -1,6 +1,6 @@
 import {gaugeLevelLabel,renderChicagoGauges} from './founders-live-ui.js';
 import {renderSuccession,showChicagoRanking,chicagoPhase} from './chicago-succession.js';
-import {CAMPAIGN_PHASES,renderHotspringPanorama,setHotspringOverview,setHotspringImage,renderTendencies,renderHotspringStage,hotspringWinners,renderCampaignRanking} from './founders-hotspring.js';
+import {CAMPAIGN_PHASES,renderHotspringPanorama,setHotspringOverview,setHotspringImage,renderTendencies,renderHotspringStage,renderCampaignRanking} from './founders-hotspring.js';
 import {decorateGauge,formatGaugeNumber,renderPhaseClock,voteTotals,appendGaugeDelta,gaugeDelta,renderChicagoChoices} from './founders-live-ui.js';
 import {voteProgress} from './founders-vote-progress.js';
 import {appendFamilyRoles} from './founders-role-badges.js';
@@ -145,12 +145,47 @@ function drawPanoramaStability(s,manual){
  bar.style.width=value*100/maximum+'%';
  decorateGauge(bar,state,value,s,{compact:true});
 }
+// Only shorten the public reading when the full text would push the voting options off screen.
+function fitTownReading(){
+ const copy=$('dilemmaText').parentElement,paragraph=$('dilemmaText'),read=$('townRead');
+ read.hidden=true;
+ if(!document.body.classList.contains('projection-town-dilemma')||paragraph.hidden)return;
+ const full=$('townReadingText').textContent;
+ if(!full)return;
+ paragraph.textContent=full;
+ if(!copy.clientHeight||copy.scrollHeight<=copy.clientHeight+1)return;
+ const first=full.match(/^.*?[.!?](?=\s|$)/s)?.[0]??'';
+ paragraph.textContent=first.length<=240?first:'';
+ read.hidden=false;
+ if(copy.scrollHeight>copy.clientHeight+1)paragraph.textContent='';
+}
+function drawHotspringPodium(s,results){
+ const root=$('finalRanking'),list=document.createElement('ol');
+ list.className='town-scoreboard';
+ const winners=results.winners.map(id=>s.families.find(f=>f.id===id)?.name??id);
+ text('winnerTitle',winners.join(' et '));
+ $('finalResults').firstElementChild.textContent=winners.length===1?'Famille victorieuse':'Victoire partagée';
+ for(const row of results.rows){
+  const rank=results.rows.findIndex(other=>other.total===row.total)+1;
+  const entry=document.createElement('li'),place=document.createElement('span');
+  entry.value=rank;entry.dataset.rank=String(rank);
+  place.className='town-place';place.textContent=String(rank);
+  place.setAttribute('aria-label','Rang '+rank);
+  const family=document.createElement('span');family.textContent=row.name;
+  const points=document.createElement('strong');points.textContent=row.total+(row.total>1?' points':' point');
+  entry.append(place,family,points);list.append(entry);
+ }
+ root.replaceChildren(list);
+ if(s.finalResults)renderCampaignRanking($('endingText'),results.rows,true,{compact:true});
+}
 function render(s){
  document.body.classList.toggle('chicago-v3',Boolean(s.succession));
  renderSuccession($('chicagoSuccession'),s,'public');
  const manual=s.manualCouncil||s.campaign?.version>=3;
  const epilogueScores=s.campaign?.epilogueResults;
  const results=s.finalResults??epilogueScores;
+ const townFinal=Boolean(s.campaign&&results);
+ document.body.classList.toggle('projection-town-final',townFinal);
  document.body.classList.toggle('game-finished',Boolean(s.finalResults));
  document.body.classList.toggle('projection-manual-hotspring',s.campaign?.version>=3);
  $('dilemmaPanel').hidden=Boolean(results)||s.phase==='SUCCESSION';
@@ -176,9 +211,13 @@ function render(s){
  if(!s.succession)drawPanoramaStability(s,manual);
  $('chronicleOpen').hidden=!(s.history?.length);
  if($('chronicleDialog').open)renderChronicle($('cityChronicle'),s);
- $('panoramaOverview').hidden=!s.campaign?.landscape?.location;
+ $('panoramaOverview').hidden=townFinal||!s.campaign?.landscape?.location;
  if(s.campaign){
-  renderHotspringPanorama($('city'),s,{showResultStill:false});
+  if(townFinal)$('panoramaOverview').setAttribute('aria-pressed','false');
+  renderHotspringPanorama($('city'),s,{showResultStill:false,finalPortrait:townFinal});
+  const site=s.campaign.landscape.location;
+  $('townCaption').hidden=!townFinal;
+  if(townFinal)text('townCaption',site==='terrasse'?'Hotspring, sur le plateau':site?'Hotspring, dans les terres basses':'La vallée de Hotspring');
   if(!results)renderHotspringStage($('hotspringStage'),s,undefined,{showIntroImage:false});
   renderTendencies($('hotspringTendencies'),sceneOnly||s.reveal?null:s.dilemma);
   status('cityEvolution','');
@@ -202,6 +241,12 @@ function render(s){
  previousCityStates=cityStates;
  }
  if(!s.succession)drawIllustration(s,sceneOnly);
+ document.body.classList.toggle('projection-town-dilemma',Boolean(s.campaign&&!$('dilemmaArtwork').hidden));
+ if(s.campaign){
+  text('townReadingText',s.dilemma?.public_text);
+  text('townReadingTitle',s.dilemma?.title);
+  if($('townReading').open&&latestView?.dilemma?.id!==s.dilemma?.id)$('townReading').close();
+ }
  drawInfluenceReserve(s.influenceReserve,manual);
  const out=$('outcome');out.hidden=!s.reveal;
  if(s.reveal){text('outcomeTitle',(s.campaign||s.chicago)?s.reveal.chronicle.title:s.reveal.winner==='pour'?'PROPOSITION ADOPTÉE':'PROPOSITION REJETÉE');text('outcomeText',s.reveal.narration);}
@@ -226,8 +271,8 @@ function render(s){
   row.append(n,v,amount);ballots.append(row);
  }
  $('finalResults').hidden=!results;
- $('narrativeEnding').hidden=!s.narrativeEnding;
- $('narrativeEnding').querySelector('summary').textContent=epilogueScores?'Lire le récit de l’épilogue':'Relire l’épilogue';
+ $('narrativeEnding').hidden=!s.narrativeEnding&&!(townFinal&&s.finalResults);
+ $('narrativeEnding').querySelector('summary').textContent=townFinal&&s.finalResults?'Récit et détail des points':epilogueScores?'Lire le récit de l’épilogue':'Relire l’épilogue';
  const epilogue=$('endingText');epilogue.replaceChildren();
  if(s.narrativeEnding){
   const title=document.createElement('h3');title.textContent=s.narrativeEnding.title;epilogue.append(title);
@@ -237,17 +282,7 @@ function render(s){
  if(s.succession&&s.finalResults){
   text('winnerTitle',s.narrativeEnding.title);showChicagoRanking($('finalRanking'),s);$('narrativeEnding').open=true;
  }else if(s.campaign&&results){
-  text('winnerTitle',hotspringWinners(s,results));
-  const root=$('finalRanking');root.replaceChildren();
-  if(s.finalResults){
-   const revealText=document.createElement('p');revealText.textContent=s.finalResults.text;root.append(revealText);
-  }
-  const archive=s.campaign.archive;
-  if(archive?.governance){
-   const record=document.createElement('p');record.textContent=archive.governance;
-   root.append(record);
-  }
-  renderCampaignRanking(root,results.rows,Boolean(s.finalResults),{compact:true});
+  drawHotspringPodium(s,results);
  }else if(s.finalResults){
   const ranking=s.finalResults.ranking;
   text('winnerTitle','Victoire de '+teamLabel(s,ranking[0].family)+' · '+ranking[0].score.total+' points');
@@ -261,13 +296,17 @@ function render(s){
   }
  }
 }
+const readingPanel=$('dilemmaText').parentElement;
+if(typeof ResizeObserver==='function')new ResizeObserver(fitTownReading).observe(readingPanel);
+$('townRead').addEventListener('click',()=>$('townReading').showModal());
 async function tick(){
  if(!sessionId||!/^[a-f0-9]{24}$/.test(sessionId)){text('notice','Lien de projection incomplet : session introuvable.');return;}
  try{
   const r=await fetch('/api/founders/sessions/'+sessionId,{cache:'no-store'});
   if(!r.ok)throw new Error('Session indisponible ('+r.status+')');
   const s=await r.json();
-  if(s.revision!==latestView?.revision)render(s);else renderPhaseClock($('phaseClock'),s);
+  if(s.revision!==latestView?.revision){render(s);if(s.campaign)fitTownReading();}
+  else renderPhaseClock($('phaseClock'),s);
   latestView=s;
   text('connection','● Synchronisé');text('notice','');
  }catch(e){text('connection','○ Hors ligne');text('notice',e.message);}
@@ -277,6 +316,7 @@ $('decisionImage').addEventListener('error',()=>{
  $('decisionImage').removeAttribute('src');
  $('decisionImage').hidden=true;
  $('dilemmaArtwork').hidden=true;
+ document.body.classList.remove('projection-town-dilemma');
 });
 $('chronicleOpen').addEventListener('click',()=>{
  $('chronicleDialog').showModal();
