@@ -11,12 +11,12 @@ export function createHotspringRules({print=false,manual=false,chicago=false}={}
    <div>
     <section>
      <${heading}>Votre but</${heading}>
-     ${print?'<p>La famille qui totalise le plus de points gagne. Le maximum est de <strong>18 points</strong>.</p>':
+     ${print?'<p>La famille qui totalise le plus de points gagne.</p>':
       '<p>Devenir <strong>la famille la plus influente de Hotspring</strong>.</p><p>À la fin de la partie, chaque famille additionne ses <strong>points de victoire</strong> :</p>'}
      <ul>
       <li><strong>Objectifs de chapitre</strong> : jusqu’à <strong>10 points</strong>${print?'':' ;'}</li>
       <li><strong>Objectif de trajectoire</strong> : jusqu’à <strong>2 points</strong>${print?'':' ;'}</li>
-      <li><strong>Héritage final</strong> : jusqu’à <strong>3 points</strong>${print?'':' ;'}</li>
+      ${print?'':'<li><strong>Héritage final</strong> : jusqu’à <strong>3 points</strong> ;</li>'}
       <li><strong>Fortune restante</strong> : jusqu’à <strong>3 points</strong>${print?'':'.'}</li>
      </ul>
      ${print?'<p>Gardez vos objectifs secrets.</p>':
