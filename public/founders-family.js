@@ -169,6 +169,12 @@ function render(data){
  }
  set('committed',self.choice?'Votre position : '+self.choice+' · Mise engagée : '+self.bid:'Aucun vote engagé pour ce dilemme.');
  set('voteHint',self.mayVote?'Votre famille doit décider maintenant.':data.phase==='COUNCIL'?'Vous pouvez négocier en attendant votre tour.':'Le Conseil attend la prochaine phase.');
+ const chapter=$('familyChapter'),votePanel=$('familyVotePanel');
+ if(data.phase==='COUNCIL'){
+  if(votePanel.nextElementSibling!==chapter)chapter.before(votePanel);
+ }else if(chapter.nextElementSibling!==votePanel){
+  chapter.after(votePanel);
+ }
  $('firstVote').hidden=!(self.mayVote&&self.choice===null);
  $('raiseVote').hidden=!(self.mayVote&&self.choice!==null);
  $('raiseAmount').closest('.field').hidden=!['pour','contre'].includes(self.choice);

@@ -18,8 +18,8 @@
  <p id="identityNotice" class="identity-notice" role="status" aria-live="polite"></p>
 </section>
 <div class="layout">
-<div>
- <section class="panel">
+<div class="family-council-column">
+ <section id="familyChapter" class="panel">
   <a id="ambitionLink" class="small" href="#objectiveHeading" hidden>Consulter mon ambition et mes décisions-clés ↓</a>
   <div class="eyeline" id="dilemmaLabel">Le conseil municipal</div>
   <h2 id="dilemmaTitle" style="font-size:28px;margin-top:10px">Attente du Conseil</h2>
@@ -30,8 +30,8 @@
   <ul id="chicagoChoices" hidden></ul>
   <div id="lastReveal" class="card" hidden><strong id="resultTitle"></strong><p id="resultNarration"></p></div>
  </section>
- <section class="panel" style="margin-top:16px">
-  <h2>Votre décision politique</h2><p id="familyVoteTotals" class="big"></p><p id="voteCommitment" class="instructions" hidden></p><p class="instructions" id="voteHint">Le porte-parole vote au nom de toute sa famille, après concertation.</p>
+ <section id="familyVotePanel" class="panel">
+  <h2>Votre décision politique</h2><p id="voteCommitment" class="instructions" hidden></p>
   <div id="firstVote" hidden>
    <div class="field"><label for="voteAmount">Influence engagée</label><input type="number" min="1" max="500" id="voteAmount" value="1"></div>
    <div class="row"><button data-vote="pour">Voter POUR</button><button data-vote="contre" class="secondary">Voter CONTRE</button></div>
@@ -43,8 +43,10 @@
   </div>
   <div id="moderatorTie" hidden><p>Le Conseil est à égalité : le Shérif doit trancher.</p><div class="row"><button data-tie="pour">Décider POUR</button><button data-tie="contre" class="secondary">Décider CONTRE</button></div></div>
   <div id="moderatorLeader" hidden><p>Choisis le nouveau Maire parmi les familles gagnantes à égalité.</p><div id="leaderCandidates" class="row"></div></div>
+  <p class="instructions" id="voteHint">Le porte-parole vote au nom de toute sa famille, après concertation.</p>
+  <p id="familyVoteTotals" class="big"></p>
  </section>
- <section class="panel" style="margin-top:16px">
+ <section class="panel">
   <h2>Vos négociations</h2>
   <p class="small muted">Les diplomates négocient physiquement. Le porte-parole enregistre les propositions financières et les confirme.</p>
   <form id="offerForm">

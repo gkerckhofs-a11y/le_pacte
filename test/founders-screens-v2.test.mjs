@@ -162,6 +162,9 @@ test('Hotspring V1.2 : négociation, menus bornés et mise à jour du terminal',
  const {document,update}=await screen('family',g.state,'B');
  const get=id=>document.getElementById(id),options=id=>[...get(id).options].map(o=>o.textContent);
  assert.match(get('objective').textContent,/Bien-être.*2 points.*deux plus élevées/);
+ const chapter=get('familyChapter'),votePanel=get('familyVotePanel');
+ assert.equal(chapter.nextElementSibling,votePanel);
+ assert.equal(get('firstVote').hidden,true);
  assert.equal(get('phaseClock').hidden,true);
  assert.equal(get('offerCommitmentFields').hidden,false);
  assert.equal(get('voteAmount').localName,'select');
@@ -179,8 +182,14 @@ test('Hotspring V1.2 : négociation, menus bornés et mise à jour du terminal',
  assert.match(get('receivedOffer').textContent,/Mercer » vous propose 4 \$ en échange d’un vote POUR/);
  assert.equal(get('offerAccept').textContent,'Accepter et s’engager');
  g.command('acceptOffer',{id:'affaire02'},team('B'));
- g.command('beginVote');g.command('vote',{kind:'pour',amount:2},team('A'));
+ g.command('beginVote');
  await update(g.state);
+ assert.equal(votePanel.nextElementSibling,chapter);
+ assert.equal(get('firstVote').hidden,true);
+ g.command('vote',{kind:'pour',amount:2},team('A'));
+ await update(g.state);
+ assert.ok(votePanel.contains(get('firstVote')));
+ assert.equal(get('firstVote').hidden,false);
  assert.deepEqual(options('offerAmount'),['1 $','2 $','3 $','4 $']);
  assert.deepEqual(options('voteAmount'),['3','4']);
  assert.equal(get('firstVote').querySelector('[data-vote="contre"]').disabled,true);
@@ -193,6 +202,12 @@ test('Hotspring V1.2 : négociation, menus bornés et mise à jour du terminal',
  assert.equal(get('raiseVote').hidden,false);
  assert.deepEqual(options('raiseAmount'),['+1']);
  assert.equal(get('raiseVote').querySelector('[data-vote="maintien"]').disabled,false);
+ assert.ok(votePanel.contains(get('raiseVote')));
+ assert.equal(votePanel.nextElementSibling,chapter);
+ g.vote('pour');
+ await update(g.state);
+ assert.equal(chapter.nextElementSibling,votePanel);
+ assert.equal(get('raiseVote').hidden,true);
 });
 
 test('Hotspring V1.2 : Stabilité sous le panorama et ouverture manuelle depuis la régie',async()=>{
@@ -508,6 +523,9 @@ test('Décisions-clés Chicago : cinq fiches privées, proposition exacte et rap
  }
  s=command(command(s,owner,'next'),owner,'beginVote');
  const a=await screen('family',s,'A');
+ const chapter=a.document.getElementById('familyChapter'),votePanel=a.document.getElementById('familyVotePanel');
+ assert.equal(votePanel.nextElementSibling,chapter);
+ assert.equal(a.document.getElementById('firstVote').hidden,false);
  for(const button of a.document.querySelectorAll('#firstVote [data-vote]'))assert.equal(button.disabled,false);
  // A supports the opposite camp. B wins for A's preferred proposal with a larger bid.
  const ballot=(base,winner)=>{
@@ -522,6 +540,7 @@ test('Décisions-clés Chicago : cinq fiches privées, proposition exacte et rap
  };
  const won=ballot(s,other.choice),lost=ballot(s,source.choice);
  await a.update(won);
+ assert.equal(chapter.nextElementSibling,votePanel);
  assert.ok(a.document.getElementById('keyDecisionBanner').hidden);
  assert.match(a.document.getElementById('chicagoAmbition').textContent,/Réussie ✓.*1 \/ 2 décisions nécessaires/);
  assert.equal(narrativeView(won,team('A')).voteCommitment,null);
