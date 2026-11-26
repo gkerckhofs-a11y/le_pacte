@@ -124,6 +124,11 @@ export function acceptedVoteCommitment(s,family){
  if(!offers.length)return null;
  return {choice:offers[0].commitment.choice,minInfluence:Math.max(...offers.map(o=>o.commitment.minInfluence))};
 }
+function voteOfferObstacle(s,to,choice,minimum,prior){
+ if(s.game.families[to].power<minimum)return 'Influence insuffisante pour cet engagement';
+ if(prior&&prior.choice!==choice)return 'Cette famille a déjà accepté un engagement incompatible';
+ return null;
+}
 function validateOfferCommitment(s,to,commitment){
  check(commitment&&typeof commitment==='object'&&!Array.isArray(commitment),'Choisissez un engagement précis ou un transfert sans contrepartie');
  if(commitment.choice==='gift'){
@@ -133,11 +138,11 @@ function validateOfferCommitment(s,to,commitment){
  check((manual?['pour','contre']:['pour','contre','passe_pouvoir']).includes(commitment.choice),'Engagement de vote invalide');
  check(Object.keys(commitment).every(k=>['choice','minInfluence'].includes(k)),'Champ d’engagement invalide');
  const minimum=commitment.minInfluence;
- check(Number.isSafeInteger(minimum)&&(commitment.choice==='passe_pouvoir'?minimum===0:minimum>=1&&minimum<=s.game.families[to].power),'Influence insuffisante pour cet engagement');
+ check(Number.isSafeInteger(minimum)&&(commitment.choice==='passe_pouvoir'?minimum===0:minimum>=1),'Influence insuffisante pour cet engagement');
  check((manual&&s.phase==='NEGOTIATION')||
   (s.game.vote?.phase==='voting'&&!Object.hasOwn(s.game.vote.choices,to)),'Cette famille a déjà voté ou le vote est clos');
- const prior=acceptedVoteCommitment(s,to);
- check(!prior||prior.choice===commitment.choice,'Cette famille a déjà accepté un engagement incompatible');
+ const obstacle=voteOfferObstacle(s,to,commitment.choice,minimum,acceptedVoteCommitment(s,to));
+ check(!obstacle,obstacle);
 }
 
 export function applyNarrativeCommand(input,actor,command,now){
@@ -264,7 +269,7 @@ export function applyNarrativeCommand(input,actor,command,now){
    team();check(['NEGOTIATION','COUNCIL'].includes(s.phase),'Négociations fermées');
    const offer=has(s.offers,data.id)?s.offers[data.id]:null;
    check(offer&&offer.status==='pending'&&(offer.to===actor.family||offer.from===actor.family),'Offre inaccessible');
-   offer.status='rejected';break;
+   offer.status='rejected';offer.closedBy=actor.family;break;
   }
   case 'beginVote':
    org();check(isV2(s)&&s.phase==='NEGOTIATION','Aucune négociation à clore');beginVote(s,now);break;
@@ -420,6 +425,17 @@ export function narrativeFamilyView(s,family){
  const score=hasChicagoSuccession(s)?(s.succession?.frozen.scores??chicagoScores(s)).find(row=>row.family===family):null;
  const ambition=isChicago(s)?chicagoAmbition(s,family,score):null;
  const offers=Object.values(s.offers).filter(o=>o.from===family||o.to===family).map(copy);
+ const voteOfferLimits={};
+ if(s.phase==='NEGOTIATION'&&usesBindingOffers(s)){
+  for(const id of activeFounders(s.game)){
+   if(id===family)continue;
+   const prior=acceptedVoteCommitment(s,id);
+   for(const side of ['pour','contre']){
+    const reason=voteOfferObstacle(s,id,side,1,prior);
+    if(reason)(voteOfferLimits[id]??={})[side]=reason;
+   }
+  }
+ }
  return {...view,self:{id:family,name:s.names[family],color:copy(view.families.find(f=>f.id===family).color),objective:ambition?.specialty??s.goals[family],
   members:s.game.families[family].members,power:s.game.families[family].power,dollars:s.game.families[family].dollars,
   choice:v?.choices[family]??null,bid:v?.bids[family]??0,
@@ -428,7 +444,7 @@ export function narrativeFamilyView(s,family){
   mayChooseLeader:!s.clock?.paused&&s.phase==='COUNCIL'&&v?.phase==='await_leader'&&s.game.moderator===family},
   ...(hasChicagoSuccession(s)?{succession:chicagoFinalView(s,family),finalResults:visibleFinalResults(s,family)}:{}),
   ...(ambition?{chicagoAmbition:ambition}:isHotspring(s)?{privateCampaign:campaignFamily(s,family)}:{goalCard:copy(card),goalProgress:progress}),
-  offers,voteCommitment:acceptedVoteCommitment(s,family)};
+  offers,...(Object.keys(voteOfferLimits).length?{voteOfferLimits}:{}),voteCommitment:acceptedVoteCommitment(s,family)};
 }
 // A rehearsal shortcut records ordinary votes. Any tie is left to the operator.
 function passRehearsalVotes(input,now){

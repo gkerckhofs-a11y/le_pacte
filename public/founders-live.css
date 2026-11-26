@@ -380,6 +380,9 @@ dialog{max-width:620px;background:var(--panel);color:var(--paper);border:2px sol
 body[data-skin=western].family-dashboard #offerDialog h2{color:inherit}
 .incoming-offers,.offer-feedback{padding:12px 16px;margin:0 0 14px;background:var(--panel);color:var(--paper);border-left:4px solid var(--team)}
 .incoming-offers{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.sent-offer-notice{position:fixed;z-index:8;inset:auto max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) auto;box-sizing:border-box;width:min(26rem,calc(100% - 24px));display:flex;align-items:center;gap:14px;padding:12px 16px;border:1px solid var(--team);border-left-width:5px;border-radius:8px;background:var(--panel);color:var(--paper);box-shadow:0 4px 24px #0006;overflow-wrap:anywhere}
+.sent-offer-notice div{flex:1;min-width:0}.sent-offer-notice p{margin:4px 0 0;font-size:.95rem}
+.offer-send-error{font-weight:700;border-left:3px solid currentColor;padding-left:10px}
 #offerDialog{width:min(32rem,calc(100% - 24px));max-height:90vh;overflow:auto;box-sizing:border-box;overflow-wrap:anywhere}
 #offerDialog h2{margin-top:0}
 #offerDialog .offer-terms{font-weight:700}
