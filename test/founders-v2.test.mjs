@@ -22,6 +22,38 @@ for(const n of [5,6])test(`V2 ${n} : abstention sautée, camp verrouillé, suren
  const publicData=narrativePublicView(s);assert.ok(publicData.reveal);assert.equal(publicData.goalCards,undefined);
  assert.throws(()=>cmd(s,owner,'reveal'),/révéler/);
 });
+for(const n of [5,6])test(`V2 ${n} : chaque famille joue une fois avant la résolution d’un vote acquis`,()=>{
+ for(const [side,opposition] of [['pour',false],['contre',true]]){
+  let s=start(n);const ids=Object.keys(s.game.families),supply=totalPower(s.game);
+  for(const [i,id] of ids.entries()){
+   assert.equal(s.game.vote.turn,id);
+   const other=side==='pour'?'contre':'pour';
+   const data=i<2?{kind:side,amount:opposition?5:1}:i===2&&opposition?{kind:other,amount:1}:{kind:'passe_pouvoir'};
+   s=cmd(s,team(id),'vote',data);
+  }
+  assert.equal(s.phase,'REVEALED');assert.equal(s.lastReveal.winner,side);
+  assert.equal(s.game.history[0].steps.length,n);assert.equal(s.revealedHistory.length,1);
+  assert.equal(totalPower(s.game),supply);
+  assert.throws(()=>cmd(s,team('A'),'vote',{kind:'maintien'}),/fermé/);
+ }
+});
+test('V2 : une égalité encore accessible autorise la surenchère, puis un arbitrage départage les camps épuisés',()=>{
+ let s=start();
+ for(const id of 'ABCDE'){
+  const data=id==='A'?{kind:'pour',amount:8}:id==='B'?{kind:'contre',amount:2}:{kind:'passe_pouvoir'};
+  s=cmd(s,team(id),'vote',data);
+ }
+ assert.equal(s.game.vote.turn,'B');
+ s=cmd(s,team('B'),'vote',{kind:'augmenter',amount:6});
+ assert.equal(s.game.vote.phase,'await_moderator');
+ s=cmd(s,team(s.game.moderator),'resolveTie',{winner:'contre'});
+ assert.equal(s.lastReveal.winner,'contre');assert.equal(s.game.history[0].steps.length,6);
+});
+test('V2 : deux camps à égalité et sans influence passent directement à l’arbitrage du premier tour',()=>{
+ let s=start();
+ for(const id of 'ABCDE')s=cmd(s,team(id),'vote',id==='A'?{kind:'pour',amount:8}:id==='B'?{kind:'contre',amount:8}:{kind:'passe_pouvoir'});
+ assert.equal(s.game.vote.phase,'await_moderator');assert.equal(s.game.vote.steps.length,5);
+});
 test('V2 : tout le monde s’abstient, puis le Shérif tranche et révèle automatiquement',()=>{
  let s=start();for(const id of 'ABCDE')s=cmd(s,team(id),'vote',{kind:'passe_pouvoir'});
  assert.equal(s.game.vote.phase,'await_moderator');s=cmd(s,team('E'),'resolveTie',{winner:'contre'});assert.equal(s.phase,'REVEALED');assert.equal(s.lastReveal.no,0);

@@ -6,6 +6,10 @@
 <section id="voteProgress" class="vote-progress" aria-label="Passage et clôture du vote" role="status" hidden></section>
 <div id="phaseClock" class="phase-clock" role="timer" hidden></div><main class="page">
 <section id="chicagoSuccession" class="panel" aria-live="polite" hidden></section>
+<div id="incomingOffers" class="incoming-offers" hidden>
+ <strong id="incomingSummary"></strong><button id="reviewOffer" type="button">Voir la proposition</button>
+</div>
+<p id="offerFeedback" class="offer-feedback" role="status" hidden></p>
 <nav class="dashboard-tabs" role="tablist" aria-label="Tableau de bord de l’équipe">
  <button id="boardTab" type="button" role="tab" aria-selected="true" aria-controls="boardPanel">Ma table</button>
  <button id="rulesTab" type="button" role="tab" aria-selected="false" aria-controls="rulesPanel" tabindex="-1">Règles</button>
@@ -46,9 +50,9 @@
   <p class="instructions" id="voteHint">Le porte-parole vote au nom de toute sa famille, après concertation.</p>
   <p id="familyVoteTotals" class="big"></p>
  </section>
- <section class="panel">
-  <h2>Vos négociations</h2>
-  <p class="small muted">Les diplomates négocient physiquement. Le porte-parole enregistre les propositions financières et les confirme.</p>
+ <section id="negotiationPanel" class="panel" hidden>
+  <h2>Proposer de l’argent</h2>
+  <p class="small muted">Choisissez une famille et une somme. Elle recevra votre proposition et pourra accepter ou refuser.</p>
   <form id="offerForm">
    <div class="grid2">
     <div class="field"><label for="targetFamily">Famille destinataire</label><select id="targetFamily" required></select></div>
@@ -63,6 +67,9 @@
    <button id="sendOffer" type="submit">Proposer l’accord</button>
    <p id="offerBalanceHint" class="small muted" role="status" hidden>Aucun dollar disponible</p>
   </form>
+ </section>
+ <section id="offerHistory" class="panel" hidden>
+  <h2>Vos propositions</h2>
   <div id="offers"></div>
  </section>
 </div>
@@ -86,12 +93,12 @@
  <div id="rulesHotspring" hidden></div>
  <div id="rulesIntroduction"><div class="eyeline">Aide de jeu · Les familles</div><h2>Les règles à portée de main</h2>
  <p>Discutez en équipe. Votre chef d’équipe, ou porte-parole, enregistre une décision au nom de toute la famille. Le nombre de membres ne multiplie pas les votes.</p></div>
- <div id="rulesV2" hidden><h3>Vote public et surenchères</h3><p>À son premier passage, chaque famille choisit POUR, CONTRE ou ABSTENTION. Une mise d’au moins 1 Influence est requise pour POUR ou CONTRE. Votre camp est ensuite verrouillé. Une famille qui s’abstient est automatiquement sautée pour la suite du vote.</p><p>Aux passages suivants, ajoutez de l’Influence dans votre camp ou passez ce tour. Le vote se termine après un circuit complet des familles actives sans ajout d’Influence. Une surenchère relance ce circuit. En cas d’égalité, le Shérif tranche sur son terminal.</p><p>Une abstention rapporte 1 dollar et permet de récupérer sa part de la réserve ou de revendiquer le rôle de Shérif si disponible. Les mises gagnantes vont en réserve, les mises perdantes sont rendues. Le résultat et ses effets apparaissent automatiquement.</p><h3>Négocier</h3><p>Envoyez une proposition financière ; l’autre famille accepte ou refuse. Le transfert est effectué après acceptation et contrôle du solde. Votre promesse politique reste libre.</p><h3>Gagner</h3><p>Les jauges de la ville sont Économie, Écologie, Sécurité et Démographie. Votre ambition indique ses deux paliers. Le classement additionne objectif secret, richesse, votes remportés et Influence restante.</p></div>
+ <div id="rulesV2" hidden><h3>Vote public et surenchères</h3><p>À son premier passage, chaque famille choisit POUR, CONTRE ou ABSTENTION. Une mise d’au moins 1 Influence est requise pour POUR ou CONTRE. Votre camp est ensuite verrouillé. Une famille qui s’abstient est automatiquement sautée pour la suite du vote.</p><p>Après le premier passage, si le camp en retard ne peut plus égaliser, le vote est clos. Sinon, ajoutez de l’Influence dans votre camp ou passez ce tour. Le vote se termine après un circuit complet des familles actives sans ajout d’Influence. Une surenchère relance ce circuit. En cas d’égalité, le Shérif tranche sur son terminal.</p><p>Une abstention rapporte 1 dollar et permet de récupérer sa part de la réserve ou de revendiquer le rôle de Shérif si disponible. Les mises gagnantes vont en réserve, les mises perdantes sont rendues. Le résultat et ses effets apparaissent automatiquement.</p><h3>Négocier</h3><p>Pendant la négociation, envoyez une proposition financière. L’autre famille accepte ou refuse. Le transfert est effectué après acceptation et contrôle du solde. Votre promesse politique reste libre.</p><h3>Gagner</h3><p>Les jauges de la ville sont Économie, Écologie, Sécurité et Démographie. Votre ambition indique ses deux paliers. Le classement additionne objectif secret, richesse, votes remportés et Influence restante.</p></div>
  <div id="rulesChicago" hidden>
   <p id="chicagoEquity" hidden>En finale anticipée, on retient autant de décisions-clés par famille que la famille qui en a joué le moins, en commençant par les premières. Si aucune décision ne peut être retenue, personne ne reçoit les 5 points. Avec une décision retenue, il faut la réussir. Avec deux ou trois décisions retenues, il faut en réussir deux. Une voix reçue à la succession vaut deux points. En cas d’égalité au score, on départage d’abord par les voix reçues, puis par les décisions-clés réussies qui comptent au classement. Viennent ensuite l’arbitrage d’un titulaire neutre, le scrutin de départage et l’ordre tiré au lancement.</p><p id="chicagoPriority" hidden></p>
   <div id="chicagoLegacyRules">  <h3>Prendre la parole au Conseil</h3>
   <p>L’Homme du Maire joue en premier. Choisissez POUR ou CONTRE et engagez au moins 1 Influence, ou abstenez-vous pour récupérer votre part de la réserve ou revendiquer le rôle de L’Homme du Commissaire.</p>
-  <p>Aux passages suivants, maintenez votre mise ou ajoutez de l’Influence dans le même camp. Le vote se termine après un circuit complet sans surenchère. En cas d’égalité, L’Homme du Commissaire départage. Les mises gagnantes alimentent la réserve, les mises perdantes sont rendues.</p>
+  <p>Si le camp en retard ne peut plus égaliser après le premier passage, le vote est clos. Sinon, maintenez votre mise ou ajoutez de l’Influence dans le même camp. Le vote se termine après un circuit complet sans surenchère. En cas d’égalité, L’Homme du Commissaire départage. Les mises gagnantes alimentent la réserve, les mises perdantes sont rendues.</p>
   <h3>Négocier</h3>
   <p>Un accord de vote accepté transfère les dollars et engage votre camp. Un don est un transfert libre.</p>
   </div>
@@ -112,4 +119,13 @@
 </div></section>
 <section id="familyEpilogue" class="panel" hidden></section>
 <div id="notice" role="status" style="margin-top:16px"></div>
-</main><dialog id="offerDialog" aria-labelledby="offerHeading"><h2 id="offerHeading">Proposition reçue</h2><p id="receivedOffer" class="big"></p><p id="receivedMessage"></p><p id="receivedCommitment"></p><div class="row"><button id="offerAccept">Accepter</button><button id="offerReject" class="secondary">Refuser</button></div></dialog></body></html>
+</main>
+<dialog id="offerDialog" aria-labelledby="offerHeading" aria-describedby="receivedOffer receivedCommitment">
+ <h2 id="offerHeading" tabindex="-1" autofocus>Proposition reçue</h2>
+ <p id="receivedOffer" class="big"></p>
+ <p id="receivedCommitment" class="offer-terms"></p>
+ <p id="receivedBalance"></p>
+ <p id="receivedMessage" class="offer-message" hidden></p>
+ <p id="offerError" role="alert" hidden></p>
+ <div class="row"><button id="offerAccept" type="button">Accepter</button><button id="offerReject" type="button" class="secondary">Refuser</button></div>
+</dialog></body></html>

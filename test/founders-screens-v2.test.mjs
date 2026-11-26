@@ -166,6 +166,7 @@ test('Hotspring V1.2 : négociation, menus bornés et mise à jour du terminal',
  assert.equal(chapter.nextElementSibling,votePanel);
  assert.equal(get('firstVote').hidden,true);
  assert.equal(get('phaseClock').hidden,true);
+ assert.equal(get('negotiationPanel').hidden,false);
  assert.equal(get('offerCommitmentFields').hidden,false);
  assert.equal(get('voteAmount').localName,'select');
  assert.deepEqual(options('voteAmount'),['1','2','3','4']);
@@ -179,12 +180,15 @@ test('Hotspring V1.2 : négociation, menus bornés et mise à jour du terminal',
  assert.equal(get('offerBalanceHint').hidden,false);
  g.command('offer',{id:'affaire02',to:'B',amount:4,commitment:{choice:'pour',minInfluence:3}},team('A'));
  await update(g.state);
- assert.match(get('receivedOffer').textContent,/Mercer » vous propose 4 \$ en échange d’un vote POUR/);
- assert.equal(get('offerAccept').textContent,'Accepter et s’engager');
+ assert.match(get('receivedOffer').textContent,/4 \$ de la part de .*Les Mercer/);
+ assert.match(get('receivedCommitment').textContent,/POUR.*Les terres basses.*3 Influence/);
+ assert.match(get('receivedBalance').textContent,/0 \$ à 4 \$/);
+ assert.equal(get('offerAccept').textContent,'Accepter l’accord');
  g.command('acceptOffer',{id:'affaire02'},team('B'));
  g.command('beginVote');
  await update(g.state);
  assert.equal(votePanel.nextElementSibling,chapter);
+ assert.equal(get('negotiationPanel').hidden,true);
  assert.equal(get('firstVote').hidden,true);
  g.command('vote',{kind:'pour',amount:2},team('A'));
  await update(g.state);
@@ -196,7 +200,8 @@ test('Hotspring V1.2 : négociation, menus bornés et mise à jour du terminal',
  assert.equal(get('firstVote').querySelector('[data-vote="passe_pouvoir"]').disabled,true);
  assert.match(get('voteProgress').textContent,/vous engage à voter POUR avec au moins 3 Influence/);
  g.command('vote',{kind:'pour',amount:3},team('B'));
- for(const id of ['C','D','E'])g.command('vote',{kind:'passe_pouvoir'},team(id));
+ g.command('vote',{kind:'contre',amount:1},team('C'));
+ for(const id of ['D','E'])g.command('vote',{kind:'passe_pouvoir'},team(id));
  g.command('vote',{kind:'maintien'},team('A'));
  await update(g.state);
  assert.equal(get('raiseVote').hidden,false);
@@ -296,9 +301,49 @@ test('Préparation : cinq familles Hotspring et aucun catalogue de prototypes',a
 });
 test('Famille : une proposition reçue ouvre immédiatement une fenêtre avec acceptation et refus',async()=>{
  let s=command(state,owner,'next');s=command(s,{role:'team',family:'B'},'offer',{id:'popup_001',to:'A',amount:3,reason:'Votez avec nous'});
- const {document}=await screen('family',s);assert.equal(document.getElementById('offerDialog').open,true);assert.match(document.getElementById('receivedOffer').textContent,/3/);assert.match(document.getElementById('receivedCommitment').textContent,/ne vous engage pas/);assert.equal(document.getElementById('offerAccept').textContent,'Accepter');
+ const {document,update}=await screen('family',s),get=id=>document.getElementById(id);
+ assert.equal(get('offerDialog').open,true);
+ assert.match(get('receivedOffer').textContent,/3 \$/);
+ assert.match(get('receivedCommitment').textContent,/ne vous engage pas/);
+ assert.equal(get('offerAccept').textContent,'Accepter le don');
+ assert.equal(get('receivedMessage').textContent,'Message de la famille : Votez avec nous');
+ const other=await screen('family',s,'C');
+ assert.equal(other.document.getElementById('incomingOffers').hidden,true);
+ assert.ok(!other.document.getElementById('offerDialog').open);
+ get('offerDialog').close();
+ s=command(s,owner,'beginVote');await update(s);
+ assert.equal(get('negotiationPanel').hidden,true);
+ assert.equal(get('incomingOffers').hidden,false);
+ assert.equal(get('offerDialog').open,false);
+ get('reviewOffer').click();assert.equal(get('offerDialog').open,true);
+ s=command(s,team('A'),'acceptOffer',{id:'popup_001'});await update(s);
+ assert.equal(get('dollars').textContent,'13');
+ assert.equal(get('incomingOffers').hidden,true);assert.equal(get('offerDialog').open,false);
 });
 
+test('Pendant le vote, les familles peuvent traiter les propositions en attente sans en envoyer de nouvelles',async()=>{
+ const g=newCampaign({scenarioVersion:'1.2.0'});
+ for(const kind of ['start','next','next'])g.command(kind);
+ const gift={id:'premiere_offre',to:'B',amount:3,commitment:{choice:'gift'}};
+ g.command('offer',gift,team('A'));
+ g.command('offer',{...gift,id:'deuxieme_offre',amount:1},team('C'));
+ g.command('beginVote');
+ assert.throws(()=>g.command('offer',{...gift,id:'trop_tard'},team('A')),/pendant la négociation/);
+ const sender=await screen('family',g.state,'A'),receiver=await screen('family',g.state,'B');
+ const get=id=>receiver.document.getElementById(id);
+ assert.equal(get('negotiationPanel').hidden,true);
+ assert.match(get('incomingSummary').textContent,/2 propositions/);
+ assert.equal(sender.document.getElementById('offerHistory').hidden,false);
+ assert.equal(sender.document.getElementById('offers').querySelector('button').textContent,'Annuler');
+ g.command('rejectOffer',{id:'premiere_offre'},team('A'));
+ await receiver.update(g.state);
+ assert.equal(get('offerDialog').dataset.offer,'deuxieme_offre');
+ assert.match(get('receivedOffer').textContent,/1 \$ de la part de .*Les Vance/);
+ g.command('acceptOffer',{id:'deuxieme_offre'},team('B'));await receiver.update(g.state);
+ assert.equal(get('dollars').textContent,'11');
+ assert.equal(get('incomingOffers').hidden,true);
+ assert.equal(get('offerDialog').open,false);
+});
 test('Régie de Chicago : distinguer le vote des familles, la suspension et le scrutin final',async()=>{
  const {preview,names}=chicagoSessionPreview(prepareCosaNostra(chicagoCampaign()),[5,5,5,5,5]);
  let s=createNarrativeSession(preview,{ownerId:owner.id,id:'c'.repeat(24),code:'BUREAU',title:'Chicago',rehearsal:true,names,now:1000});

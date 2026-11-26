@@ -365,6 +365,9 @@ html:fullscreen{overflow-y:auto;background:#15191b}
  body.printing-kit .print-hotspring{min-height:282mm;display:flex;flex-direction:column}
  body.printing-kit .print-reminder{display:flex;flex:1;flex-direction:column}
  body.printing-kit .print-reminder-close{margin-top:auto}
+ body.printing-kit.chicago-v3 .print-reminder{font-size:11pt;line-height:1.1}
+ body.printing-kit.chicago-v3 .print-reminder-columns{grid-template-columns:1.18fr 1fr}
+ body.printing-kit.chicago-v3 .print-reminder-columns section+section{margin-top:2mm}
  body.printing-kit .print-preview-link{display:none}
  body.printing-kit .print-card:last-child{break-after:auto;page-break-after:auto}
  body.printing-kit .print-card a{color:#111;overflow-wrap:anywhere}
@@ -375,6 +378,13 @@ html:fullscreen{overflow-y:auto;background:#15191b}
 .time-up{background:#782626}.clock-paused{background:#4c465b}.vote-progress strong{font-size:clamp(20px,3vw,32px)}
 dialog{max-width:620px;background:var(--panel);color:var(--paper);border:2px solid var(--gold);padding:28px;border-radius:12px}dialog::backdrop{background:#000b}
 body[data-skin=western].family-dashboard #offerDialog h2{color:inherit}
+.incoming-offers,.offer-feedback{padding:12px 16px;margin:0 0 14px;background:var(--panel);color:var(--paper);border-left:4px solid var(--team)}
+.incoming-offers{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#offerDialog{width:min(32rem,calc(100% - 24px));max-height:90vh;overflow:auto;box-sizing:border-box;overflow-wrap:anywhere}
+#offerDialog h2{margin-top:0}
+#offerDialog .offer-terms{font-weight:700}
+#offerDialog .offer-message{border-left:2px solid currentColor;padding-left:12px}
+#offerDialog [role=alert]{font-weight:700}
 button.danger{background:#a83333!important;color:#fff!important;border-color:#a83333!important}
 #v2Controls input[type=checkbox]{width:auto;display:inline-block}#v2Controls form{margin:16px 0}#v2Controls label{display:block;margin:10px 0}
 .city-v2-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:16px;background:var(--panel)}.city-v2-summary article{padding:10px;border-left:4px solid var(--gold);background:var(--panel2)}.city-v2-summary strong{display:block;font-size:20px}
