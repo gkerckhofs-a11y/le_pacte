@@ -1,6 +1,7 @@
 import {activeFounders} from './founders.ts';
 import {averageIndicators} from './founders-scoring.ts';
 import {hotspringScores,autonomyIndex,hotspringTrajectoryTarget,HOTSPRING_INDICATORS} from './hotspring-scoring.ts';
+import {cinemaChapterTitle,cinemaSimulations,describeCinemaCity,selectCinemaView} from './hotspring-cinema.ts';
 import {hotspringLandscape} from './hotspring-landscape.ts';
 import art from '../content/hotspring-art-index-v1.json' with {type:'json'};
 
@@ -249,7 +250,9 @@ export function campaignCheckpoint(s,now,chapterBonus){
  const name=chapter===5?'Hotspring — Veille du conseil':chapter===6?'Hotspring — Gouvernement choisi':'Hotspring — '+definition.title;
  const before=hotspringCityIndicators(c.checkpoints.findLast(p=>p.chapter<chapter)?.city??c.initialCity);
  const city=hotspringCityIndicators(s.game.city);
+ const cinema=selectCinemaView({stage:chapter,city,markers:c.markers,playedCrises:c.playedCrises});
  const checkpoint={chapter,name,at:now,city,markers:[...c.markers],trust:c.trust,
+  cinemaViewId:cinema.view.id,playedCrises:[...c.playedCrises],
   scores:hotspringScores(s),decisions:s.revealedHistory.filter(h=>h.chapter===chapter).map(h=>h.id),
   changes:checkpointChanges(before,city)};
  c.checkpoints.push(checkpoint);
@@ -304,17 +307,68 @@ function epilogueRecap(s){
  });
 }
 
-export function campaignPresentation(s){
+function decisionLabel(s,event){
+ const dilemma=s.scenario.dilemmas.find(d=>d.id===event.id);
+ return dilemma?.labels?.[event.winner]??event.chronicle?.title??event.title;
+}
+
+function cinemaMoment(s,preview=false){
+ const c=s.campaign,checkpoints=c.checkpoints,last=checkpoints.at(-1),history=s.revealedHistory;
+ const ending=s.phase==='EPILOGUE'||s.phase==='FINISHED';
+ const atCheckpoint=s.phase==='CHECKPOINT'||s.phase==='SUSPENDED'&&c.suspension?.phase==='CHECKPOINT';
+ const arriving=s.phase==='READY'||s.phase==='INTRO'&&c.chapter===1;
+ if(!preview&&!ending&&!atCheckpoint&&!arriving)return null;
+
+ const founded=c.markers.includes('VILLE_BASSE')||c.markers.includes('VILLE_HAUTE');
+ const lastVote=history.at(-1);
+ const actualChapter=lastVote?.chapter??s.scenario.dilemmas.find(d=>d.id===lastVote?.id)?.chapter??last?.chapter??0;
+ const completed=Boolean(c.charter&&history.some(d=>d.id==='D30'));
+ const record=!preview&&atCheckpoint?last:null;
+ let stage;
+ if(ending)stage=completed?7:founded?actualChapter:0;
+ else if(preview)stage=atCheckpoint?Math.min(c.chapter+1,7):s.currentDilemmaId==='D30'?7:c.chapter;
+ else stage=atCheckpoint?(record?.chapter??c.chapter):0;
+ const city=hotspringCityIndicators(record?.city??s.game.city);
+ // A saved checkpoint is immutable, including if the organizer subsequently corrects a gauge.
+ const markers=record?.markers??c.markers;
+ const chapter=Math.min(stage,6);
+ const previous=record?checkpoints.at(-2):last;
+ const events=record?.decisions?history.filter(d=>record.decisions.includes(d.id)):history;
+ const crises=record?.playedCrises??(record?events.filter(d=>/^D2[4-8]/.test(d.id)).map(d=>d.id):c.playedCrises);
+ const charter=completed?c.charter:null;
+ const savedId=ending?s.narrativeEnding?.cinemaViewId:record?.cinemaViewId;
+ const choice=selectCinemaView({stage,city,markers,playedCrises:crises,charter},savedId,preview);
+ let decisions=[];
+ if(ending){
+  // Summarize founding, external relations, and subsequent development across councils.
+  const groups=[['D01'],['D13','D14A','D14B','D11','D09'],['D24','D25','D26A','D26B','D27','D28','D19','D18','D17','D16','D15','D04']];
+  decisions=groups.map(ids=>history.findLast(d=>ids.includes(d.id))).filter(Boolean);
+ }else if(stage){
+  decisions=events.filter(d=>d.chapter===chapter&&!(previous?.chapter===chapter&&previous.decisions?.includes(d.id))).slice(-3);
+ }
+ const governance=markers.includes('CONSEIL_ELU')?'Conseil élu':markers.includes('CONSEIL_FONDATEURS')?'Conseil des Fondateurs':null;
+ const stabilityLabel=Number.isFinite(city.stabilite)?hotspringStabilityLabel(city.stabilite):null;
+ return {...choice,stage,chapter,chapterTitle:cinemaChapterTitle(stage),title:choice.view.title,
+  city,changes:checkpointChanges(hotspringCityIndicators(previous?.city??c.initialCity),city),
+  summary:stage?describeCinemaCity(city):'Les premiers chariots arrivent dans la vallée de Hotspring.',
+  decisions:decisions.map(d=>decisionLabel(s,d)),stabilityLabel,governance,
+  charter:s.scenario.campaign.charters.find(a=>a.id===charter)?.title??null,early:ending&&!completed};
+}
+
+export function campaignPresentation(s,privateAudience=false){
  const c=s.campaign,content=s.scenario.campaign;
- const endingScores=s.phase==='EPILOGUE'?hotspringScores(s,{final:true}):null;
+ const endingScores=privateAudience&&s.phase==='EPILOGUE'?hotspringScores(s,{final:true}):null;
  const checkpoint=c.checkpoints.at(-1);
+ const cinema=cinemaMoment(s);
+ const yearChapter=cinema?.early?Math.max(cinema.chapter,1):c.chapter;
  const q=c.qualification;
  const summary=s.revealedHistory.slice(-4).map(h=>({id:h.id,title:h.chronicle?.title??h.title,summary:h.narration}));
  const chapterScreen=['CHECKPOINT','SUSPENDED'].includes(s.phase);
  const intro=s.phase==='INTRO'?{...copy(content.intros[c.chapter]),visual:hotspringArt('opening_'+c.chapter)}:null;
  const stopsAtCheckpoint=s.phase==='CHECKPOINT'||c.suspension?.phase==='CHECKPOINT';
  return {
-  chapter:c.chapter,version:c.version,
+  chapter:c.chapter,version:c.version,cinema,
+  year:yearChapter===1?s.scenario.scenario.year:yearChapter===6?s.scenario.scenario.year+21:null,
   ...(endingScores?{epilogueResults:{
    winners:endingScores.winners,
    rows:endingScores.rows.map(({family,name,total,maximum})=>({family,name,total,maximum}))
@@ -331,7 +385,7 @@ export function campaignPresentation(s){
     ?checkpointChanges(c.checkpoints.findLast(p=>p.chapter<checkpoint.chapter)?.city??c.initialCity,checkpoint.city)
     :{},interlude:c.interlude,
    events:c.chapter===5?copy(c.interludeHistory):[],
-   ranking:copy(c.publicRanking)}:null,
+   ...(privateAudience?{ranking:copy(c.publicRanking)}:{})}:null,
   qualification:s.phase==='CHARTER_SUPPORT'&&q?{
    round:q.round,candidates:s.scenario.campaign.charters.filter(a=>q.candidates.includes(a.id)).map(publicCharter),
    supports:copy(q.supports),qualified:copy(q.qualified),previous:copy(q.rounds.at(-1)??null)
@@ -378,7 +432,7 @@ export function campaignFamily(s,family){
 
 export function campaignOrganizer(s){
  const c=s.campaign,m=new Set(c.markers);
- return {trust:c.trust,markers:[...c.markers],autonomy:autonomyIndex(m),
+ return {cinema:{...cinemaMoment(s,true),simulations:cinemaSimulations(hotspringStabilityLabel)},trust:c.trust,markers:[...c.markers],autonomy:autonomyIndex(m),
   crises:c.chapter>=5?crisisCandidates(s):[],crisisMode:c.crisisMode,crisesThisSitting:c.crisesThisSitting,
   mayResumeCrises:s.phase==='CHECKPOINT'&&c.chapter===5&&crisisReport(s).length>0,
   presentationSeconds:c.presentationSeconds,mayCreateVariant:s.phase==='FINISHED'&&Boolean(c.charterSeed),
@@ -421,7 +475,7 @@ export function campaignEpilogue(s){
  const cross=matches.indexOf(true);
  if(cross>=0)paragraphs.push(e.cross[cross]);
  paragraphs.push(e.closing,'Qu’avez-vous fait de Hotspring ?');
- return {title:a?.title??'Épilogue de Hotspring',paragraphs,city:hotspringCityIndicators(city)};
+ return {title:a?.title??'Épilogue de Hotspring',paragraphs,city:hotspringCityIndicators(city),cinemaViewId:cinemaMoment(s).view.id};
 }
 
 export function campaignResults(s){

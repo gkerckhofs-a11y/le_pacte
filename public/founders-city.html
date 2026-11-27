@@ -9,13 +9,14 @@
  </div>
  <div class="cine-screen"><figure><img id="cineImage" alt="" hidden><figcaption id="cineMissing" hidden></figcaption></figure></div>
 </section>
-<header class="top">
+<button id="cinemaTools" type="button" class="secondary" aria-expanded="false" aria-controls="projectionHeader" hidden>Commandes</button>
+<header id="projectionHeader" class="top">
  <div><span class="eyebrow" id="universeTitle">Games of Influence</span><h1 id="pageTitle">Hot Spring · 1876</h1></div>
  <div class="row projection-controls">
   <span class="chip" id="phase">En attente</span><span id="phaseClock" class="chip projection-clock" role="timer" hidden></span>
   <span class="chip" id="connection" role="status">Connexion…</span>
   <button id="chronicleOpen" type="button" class="secondary" aria-haspopup="dialog" hidden>Chronique</button>
-  <button id="panoramaOverview" type="button" class="secondary" aria-controls="city" aria-pressed="false" hidden>Carte de la vallée</button>
+  <button id="panoramaOverview" type="button" class="secondary" aria-controls="valleyDialog" aria-haspopup="dialog" hidden>Carte de la vallée</button>
   <button id="projectionFullscreen" type="button" class="secondary" aria-pressed="false">Plein écran</button>
  </div>
 </header>
@@ -36,6 +37,16 @@
  </div>
  <figure id="dilemmaArtwork" class="projection-artwork" hidden><img id="decisionImage" alt="" hidden></figure>
 </section>
+<section id="cityCinema" aria-labelledby="cinemaTitle" hidden>
+ <img id="cinemaImage" decoding="async" alt="">
+ <p id="cinemaMissing" role="status" hidden>Illustration momentanément indisponible</p>
+ <header class="cinema-chapter-heading"><p id="cinemaChapter"></p><h2 id="cinemaTitle"></h2></header>
+ <footer class="cinema-caption">
+  <h3 id="cinemaMood"></h3><p id="cinemaSummary"></p>
+  <p id="cinemaDecisions"></p><p id="cinemaGovernment"></p>
+  <div id="cinemaGauges" aria-label="Bilan des indicateurs de Hotspring"></div>
+ </footer>
+</section>
 <section id="finalResults" class="panel" hidden>
  <div class="eyeline">Épilogue · Conseil des Fondateurs</div>
  <h2 id="winnerTitle">La famille gagnante</h2>
@@ -47,7 +58,7 @@
 </section>
 <section class="projection-city">
  <div class="projection-visual">
-  <div class="projection-viewport"><div id="city" aria-label="Illustration évolutive de Hot Spring"></div><p id="townCaption" class="town-caption" hidden></p></div>
+  <div class="projection-viewport"><div id="city" aria-label="Illustration évolutive de Hot Spring"></div></div>
   <section id="panoramaStability" class="panorama-stability" aria-labelledby="stabilityTitle" hidden>
    <div class="gauge-head"><strong id="stabilityTitle"></strong><span id="stabilityState"></span></div>
    <div id="stabilityTrack" class="track" role="progressbar" aria-label="Stabilité" aria-valuemin="0" aria-valuemax="10"><div id="stabilityBar" class="bar"></div></div>
@@ -74,6 +85,10 @@
 </div>
 <div id="notice" role="status"></div>
 </main>
+<dialog id="valleyDialog" aria-labelledby="valleyTitle">
+ <header><h2 id="valleyTitle">Carte de la vallée</h2><form method="dialog"><button class="secondary">Fermer la carte</button></form></header>
+ <div id="valleyMap" class="hotspring-panorama"></div>
+</dialog>
 <dialog id="townReading" aria-labelledby="townReadingTitle">
  <form method="dialog"><button class="secondary">Revenir au dilemme</button></form>
  <h2 id="townReadingTitle"></h2><p id="townReadingText"></p>

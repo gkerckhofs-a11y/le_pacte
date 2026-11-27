@@ -2,7 +2,7 @@
 
 Campagne versionnée à cinq familles, de l’arrivée des chariots en 1872 au choix d’une charte en 1893. La sélection « Les Colons de Hotspring » crée une session propre au parcours.
 
-Le catalogue propose la V1.2 par défaut. Les cinq jauges commencent à 5. Sous le panorama, la Stabilité affiche leur moyenne, soit 5,0 au départ. Les sauvegardes antérieures réutilisent leurs règles d’origine. En V1.2, l’animateur ouvre le vote et décide quand poursuivre. La [matrice des résultats](matrice-indicateurs-v1.2.md) détaille les décisions et chartes. Le [rapport de simulation](rapport-simulation-v1.2.md) contient les captures et les points à revoir en salle.
+Le catalogue propose la V1.2 par défaut. Les cinq jauges commencent à 5. Le panneau Stabilité affiche leur moyenne, soit 5,0 au départ. Les sauvegardes antérieures réutilisent leurs règles d’origine. En V1.2, l’animateur ouvre le vote et décide quand poursuivre. La [matrice des résultats](matrice-indicateurs-v1.2.md) détaille les décisions et chartes. Le [rapport de simulation](rapport-simulation-v1.2.md) contient les captures et les points à revoir en salle.
 
 ## Essai local
 
@@ -10,7 +10,7 @@ Le catalogue propose la V1.2 par défaut. Les cinq jauges commencent à 5. Sous 
 2. Ouvrir `/founders-setup.html?scenario=les-colons-de-hotspring` sur ce serveur, puis charger le catalogue avec la clé de régie locale.
 3. Prévisualiser la campagne, nommer les équipes et créer la partie. Choisir « Séance standard » pour limiter le chapitre V à deux crises par séance.
 4. Dans la régie, cliquer sur « Générer les fiches équipes », puis « Imprimer les fiches équipes ». Choisir A4 portrait et une échelle de 100 %. Chaque famille tient sur une page avec son QR et le rappel des règles. Un renouvellement remplace l’accès précédent. Les QR expirent 24 heures après création et peuvent être régénérés à une reprise.
-5. Ouvrir la projection. La régie peut passer de la lecture à la négociation puis au vote. L’épilogue annonce le résultat et les scores. Un bouton dévoile ensuite les ambitions et le détail des points. Les commandes d’animation sont regroupées en haut de la régie.
+5. Ouvrir la projection. La régie peut passer de la lecture à la négociation puis au vote. L’épilogue montre d’abord ce que les familles ont fait de la ville. La régie dévoile ensuite les vainqueurs, les scores et le détail des objectifs. Les commandes d’animation sont regroupées en haut de la régie.
 
 Les cartes de rôle sont accessibles dans « Les équipes et leurs accès ». Choisir le nombre de diplomates par famille et imprimer en A4 portrait à 100 %. Chaque planche contient jusqu’à neuf cartes de 63 × 88 mm.
 
@@ -28,21 +28,11 @@ Dans le cadre « Pause et fin de partie », « Sauvegarder et suspendre la séan
 - En qualification des chartes, une égalité au seuil des deux premières places ouvre un vote simple entre les chartes ex æquo. Le moteur actuel ne fournit pas de registre de Prestige public pour le départage prévu sous le Conseil des Fondateurs. Le test utilise le tour supplémentaire.
 - Le total sur 18 points se compose de deux points au maximum par chapitre clôturé, deux pour la trajectoire, trois pour l’héritage si la charte a été choisie et trois pour le classement des fortunes finales. Les rangs 1, 2 et 3 valent respectivement 3, 2 et 1 point. Deux fortunes égales occupent le même rang et les rangs suivants tiennent compte du nombre de familles devant elles. Les familles à égalité au total le plus élevé partagent la victoire.
 
-## Revue des visuels
+## Projection et revue des visuels
 
-[Projection au chapitre 5](captures/projection-dilemme-chapitre-5.webp) · [Démographie et sécurité sur Main Street](captures/demographie-et-securite.webp) · [Écran final](captures/projection-finale-hotspring.webp)
+Pendant le Conseil, la projection montre la scène du dilemme à gauche et la proposition à droite. Lors de la révélation, la scène et la décision adoptées occupent ces mêmes emplacements. Au bilan, le Conseil découvre une illustration complète de la ville correspondant à son stade de croissance et aux décisions de la partie. Le MJ ouvre le chapitre suivant depuis la régie.
 
-Le manifeste couvre 331 entrées. Le jeu dispose de 202 fichiers WebP, dont les 32 en-têtes, les 62 plans fixes des votes, les six chartes, les six ouvertures, trois variantes en image, 36 calques transparents le fond de vallée et les 56 images des deux tableaux de ville. Les 129 autres entrées sont composées par le moteur. Les coordonnées du panorama restent les mêmes quels que soient les toits, les travaux, la densité, l’état de la rivière ou les traces de crise.
-
-- La [galerie](galerie.html) associe les 129 compositions à des planches de contrôle et présente les neuf captures de croissance et la progression des trois parcelles. Les gros plans des planches sont des états de vérification. Les captures suivent une partie sur la terrasse et montrent aussi une ville fondée dans les terres basses.
-- Dès le choix du site, le premier foyer partage le terrain avec trois tentes. La décision sur l’eau puis le lotissement libèrent les deux premières parcelles pour les maisons de bois. La scierie permet de remplacer la dernière tente immédiatement. Avec la coupe limitée, elle reste un dilemme de plus. Le bouton « Carte de la vallée » de la projection permet de retrouver la vallée entière.
-- Sur la projection, chaque site dispose de son propre point de vue. Le premier foyer garde sa parcelle. La rue se dessine lors du lotissement et le cadrage s’élargit avec les équipements. Les plans lointains sont détourés à leur silhouette pour garder les arbres, les berges et les collines en place. La carte de la vallée donne aussi accès aux ouvrages hors champ et aux repères de crise.
-- Sur la carte de la vallée, les parcelles sont placées sur la même vue de la vallée, avec des ombres au pied des bâtiments et des rues propres à chaque site. Les tracés suivent le terrain sous les bâtiments. Les teintes de la rivière et les traces de crue suivent les berges.
-- Les [crédits](manifeste-assets.json) et les [prompts utilisés](prompts-utilises.json) accompagnent les fichiers intégrés, dont les devantures, la charrette, les peupliers, la charpente et les débris ajoutés après la revue de la direction visuelle. Les entrées « validé » ont un fichier intégré ou un rendu du moteur contrôlable dans la galerie.
-- Sur Main Street, le saloon et l’auberge partagent un emplacement donnant sur la chaussée. Le choix du bois installe un quai de scierie sur la rivière ou un chantier de coupe manuelle. Après le lotissement, une rue de maisons apparaît à 5 de démographie, puis un second rang au premier plan à 8. À 3 de sécurité ou moins, les habitants se mettent à couvert. La ville reprend son activité quand la sécurité remonte.
-- Sur la projection, les deux images conservent chacune un cadre 16:9 pendant les Conseils. Le récit complet reste accessible lorsque sa longueur dépasse la place disponible. Le classement final est accompagné du panorama de la partie, sur le site effectivement choisi. Le récit et le détail des scores sont repliés à l’ouverture.
-- Les repères de contexte apparaissent lorsque le dilemme et l’état de la partie les justifient. Sur les terminaux, l’épilogue part du camp de 1872 et réutilise jusqu’à trois résultats effectivement joués, selon les décisions prises et les crises survenues. Le réglage de mouvement réduit affiche directement la ville finale.
-- `node scripts/capture-hotspring.mjs --states` reproduit les captures 1080p et 4K, les planches et la galerie. ImageMagick est nécessaire.
+La [revue de projection](cinema/README.md) réunit les trajectoires, les illustrations et les vérifications. Le panneau « Carte de la vallée » reste accessible sur demande, y compris via « Commandes » pendant un bilan. La [galerie historique](galerie.html) conserve l’inventaire et les captures de l’ancienne présentation.
 
 ## Vérifications de la répétition
 

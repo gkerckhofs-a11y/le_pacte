@@ -313,7 +313,6 @@ export function renderCampaignAdmin(root,s,newVariant){
  root.hidden=!s.campaignAdmin;
  if(root.hidden){root.replaceChildren();return;}
  const open=[...root.querySelectorAll('details')].map(d=>d.open);
- const scene=root.querySelector('.hotspring-panorama');
  root.replaceChildren();
  const a=s.campaignAdmin;
  root.append(node('h2','Campagne · Chapitre '+s.campaign.chapter));
@@ -332,7 +331,6 @@ export function renderCampaignAdmin(root,s,newVariant){
   }
  }
  root.append(node('p','Confiance '+a.trust+' · Autonomie '+a.autonomy+' · Crises cette séance '+a.crisesThisSitting));
- const map=scene??node('div');renderHotspringPanorama(map,s);root.append(map);
  const detail=node('details');detail.open=Boolean(open[0]);
  detail.append(node('summary','Embranchements et sauvegardes'));
  for(const entry of [...a.progression,...a.crises]){
@@ -349,4 +347,10 @@ export function renderCampaignAdmin(root,s,newVariant){
    node('p',campaignScoreText(r),'small'));
  }
  root.append(privateView);
+ const valley=node('details'),map=node('div',null,'hotspring-panorama');
+ valley.open=Boolean(open[2]);
+ const drawMap=()=>{if(valley.open&&!map.firstElementChild)map.innerHTML=renderPanoramaSvg(s.campaign.landscape,{overview:true});};
+ valley.append(node('summary','Carte de la vallée'),map);
+ valley.addEventListener('toggle',drawMap);
+ root.append(valley);drawMap();
 }

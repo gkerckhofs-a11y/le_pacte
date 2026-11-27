@@ -1,4 +1,5 @@
 import {renderChicagoObjectivesAudit} from './chicago-objectives.js';
+import {mountCinemaPreview} from './hotspring-cinema-regie.js';
 import {renderRehearsal} from './founders-rehearsal.js';
 import {renderSuccession,showChicagoRanking,chicagoPhase,chicagoImage} from './chicago-succession.js';
 import {isHotspring,isCurrentChicago,isCurrentHotspring,narrativeRegie} from './founders-univers.js';
@@ -12,6 +13,7 @@ import {applySkin,applyTeamTheme} from './founders-skin-theme.js';
 import {teamCaption,teamLabel,colorize} from './founders-identity.js';
 "use strict";
 const $=id=>document.getElementById(id),p=new URLSearchParams(location.search);
+const updateCinemaPreview=mountCinemaPreview($('cinemaPreview'));
 const chicagoLobby='/regie?univers=chicago';
 const chicagoHome=location.pathname==='/regie'&&!p.has('session')&&p.get('univers')==='chicago';
 const hotspringHome=!chicagoHome&&(location.pathname==='/hotspring'||(location.pathname==='/regie'&&!p.has('session')));
@@ -196,6 +198,7 @@ function render(s){
  summary.hidden=!s.sittingSummary;
  summary.textContent=s.sittingSummary?'Bilan intermédiaire privé · '+s.sittingSummary.map(row=>teamLabel(s,row.family)+' : '+row.total+' pts').join(' · '):'';
  renderCampaignAdmin($('hotspringAdmin'),s,s.sessionRole==='facilitator'?null:newVariant);
+ updateCinemaPreview(s);
  if(s.campaign){renderHotspringStage($('hotspringStage'),s);renderTendencies($('hotspringTendencies'),s.phase==='REVEALED'?null:s.dilemma);}
  printKit.sync(s);renderPhaseClock($('phaseClock'),s);renderV2Controls(s);
  renderCouncilMonitor($('councilMonitor'),s);

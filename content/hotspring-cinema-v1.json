@@ -1,0 +1,2225 @@
+{
+  "version": 1,
+  "stages": {
+    "0": "Prologue",
+    "1": "Survivre",
+    "2": "Bâtir",
+    "3": "Partager la vallée",
+    "4": "La fièvre de Hotspring",
+    "5": "Le prix du succès",
+    "6": "Hotspring se choisit",
+    "7": "Épilogue"
+  },
+  "views": [
+    {
+      "id": "prologue",
+      "stage": 0,
+      "url": "/assets/hotspring/v1/cinema/prologue.webp",
+      "title": "La vallée attend",
+      "alt": "Des chariots bâchés descendent la piste vers une vallée où serpente une rivière.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [],
+      "profile": {
+        "economie": 5,
+        "ecologie": 5,
+        "securite": 5,
+        "bien_etre": 5,
+        "demographie": 5
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": true,
+      "cityProfile": null,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "prologue"
+      }
+    },
+    {
+      "id": "c1-foyers",
+      "stage": 1,
+      "url": "/assets/hotspring/v1/cinema/c1-foyers.webp",
+      "title": "Les premiers foyers",
+      "alt": "Des familles montent la charpente de leur première maison entre des tentes et un chariot bâché.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "abris",
+        "charpente"
+      ],
+      "profile": {
+        "economie": 5,
+        "ecologie": 5,
+        "securite": 5,
+        "bien_etre": 5,
+        "demographie": 5
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": true,
+      "cityProfile": null,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c1-foyers"
+      }
+    },
+    {
+      "id": "c1-plaine",
+      "stage": 1,
+      "url": "/assets/hotspring/v1/cinema/c1-plaine.webp",
+      "title": "Au bord de la rivière",
+      "alt": "Les premières maisons et les tentes se serrent sur la plaine près de la rivière, au pied de la terrasse encore vide.",
+      "site": "terres basses",
+      "requiredMarkers": [
+        "VILLE_BASSE"
+      ],
+      "incompatibleMarkers": [
+        "VILLE_HAUTE"
+      ],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "abris",
+        "maisons en bois"
+      ],
+      "profile": {
+        "economie": 5,
+        "ecologie": 5,
+        "securite": 5,
+        "bien_etre": 5,
+        "demographie": 5
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "A",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c1-plaine"
+      }
+    },
+    {
+      "id": "c1-terrasse",
+      "stage": 1,
+      "url": "/assets/hotspring/v1/cinema/c1-terrasse.webp",
+      "title": "Sur la terrasse",
+      "alt": "Sur la terrasse en surplomb, une famille tend un cordeau devant la première charpente. La rivière coule loin en contrebas.",
+      "site": "terrasse haute",
+      "requiredMarkers": [
+        "VILLE_HAUTE"
+      ],
+      "incompatibleMarkers": [
+        "VILLE_BASSE"
+      ],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "abris",
+        "charpente"
+      ],
+      "profile": {
+        "economie": 5,
+        "ecologie": 5,
+        "securite": 5,
+        "bien_etre": 5,
+        "demographie": 5
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "C",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c1-terrasse"
+      }
+    },
+    {
+      "id": "c1-a",
+      "stage": 1,
+      "url": "/assets/hotspring/v1/cinema/c1-a.webp",
+      "title": "Expansion prospère — les premiers foyers",
+      "alt": "Un rouleau d’étoffe change de mains parmi les caisses et les sacs déballés. Des tentes et des chariots occupent ce premier camp.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "abris"
+      ],
+      "profile": {
+        "economie": 9,
+        "ecologie": 5,
+        "securite": 7,
+        "bien_etre": 6,
+        "demographie": 7
+      },
+      "limits": {
+        "economie": [
+          5,
+          10
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "A",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c1-a"
+      }
+    },
+    {
+      "id": "c1-b",
+      "stage": 1,
+      "url": "/assets/hotspring/v1/cinema/c1-b.webp",
+      "title": "Prospère mais brutale — les premiers foyers",
+      "alt": "Les marchandises s’entassent près du convoi. Une garde armée surveille les réserves, à distance des ouvriers.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "abris"
+      ],
+      "profile": {
+        "economie": 8,
+        "ecologie": 4,
+        "securite": 2,
+        "bien_etre": 4,
+        "demographie": 6
+      },
+      "limits": {
+        "economie": [
+          5,
+          10
+        ],
+        "securite": [
+          0,
+          5
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "B",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c1-b"
+      }
+    },
+    {
+      "id": "c1-c",
+      "stage": 1,
+      "url": "/assets/hotspring/v1/cinema/c1-c.webp",
+      "title": "Organisée et harmonieuse — les premiers foyers",
+      "alt": "Dans le camp, des voisins partagent les provisions sur un tréteau pendant que d’autres montent un abri.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "abris",
+        "charpente"
+      ],
+      "profile": {
+        "economie": 5,
+        "ecologie": 8,
+        "securite": 8,
+        "bien_etre": 8,
+        "demographie": 5
+      },
+      "limits": {
+        "securite": [
+          5,
+          10
+        ],
+        "bien_etre": [
+          6,
+          10
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "C",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c1-c"
+      }
+    },
+    {
+      "id": "c1-d",
+      "stage": 1,
+      "url": "/assets/hotspring/v1/cinema/c1-d.webp",
+      "title": "Désordonnée — les premiers foyers",
+      "alt": "Une charrette s’enfonce dans la boue entre des tentes et un abri serrés les uns contre les autres.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "abris"
+      ],
+      "profile": {
+        "economie": 4,
+        "ecologie": 3,
+        "securite": 4,
+        "bien_etre": 2,
+        "demographie": 9
+      },
+      "limits": {
+        "demographie": [
+          5,
+          10
+        ],
+        "bien_etre": [
+          0,
+          5
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "D",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c1-d"
+      }
+    },
+    {
+      "id": "c2-rue",
+      "stage": 2,
+      "url": "/assets/hotspring/v1/cinema/c2-rue.webp",
+      "title": "Une rue prend forme",
+      "alt": "Une charrette emprunte la première rue, entre deux rangées de maisons de bois dont un auvent en chantier.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons en bois"
+      ],
+      "profile": {
+        "economie": 5,
+        "ecologie": 5,
+        "securite": 5,
+        "bien_etre": 5,
+        "demographie": 5
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": true,
+      "cityProfile": null,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c2-rue"
+      }
+    },
+    {
+      "id": "c2-ecole",
+      "stage": 2,
+      "url": "/assets/hotspring/v1/cinema/c2-ecole.webp",
+      "title": "L’école ouvre ses portes",
+      "alt": "Des enfants montent vers la porte ouverte de la petite école en bois, auprès de leurs parents.",
+      "site": "hors champ",
+      "requiredMarkers": [
+        "ECOLE"
+      ],
+      "incompatibleMarkers": [
+        "ECOLE_REPORTEE"
+      ],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "école",
+        "maisons en bois"
+      ],
+      "profile": {
+        "economie": 4,
+        "ecologie": 6,
+        "securite": 6,
+        "bien_etre": 7,
+        "demographie": 5
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "C",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c2-ecole"
+      }
+    },
+    {
+      "id": "c2-scie",
+      "stage": 2,
+      "url": "/assets/hotspring/v1/cinema/c2-scie.webp",
+      "title": "Les planches de la scierie",
+      "alt": "Au bord de l’eau, une rampe relie la scierie aux grumes, sous la cheminée de la machine à vapeur.",
+      "site": "hors champ",
+      "requiredMarkers": [
+        "SCIERIE_INTENSIVE"
+      ],
+      "incompatibleMarkers": [
+        "COUPE_REGULEE"
+      ],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "scierie à vapeur"
+      ],
+      "profile": {
+        "economie": 7,
+        "ecologie": 3,
+        "securite": 5,
+        "bien_etre": 5,
+        "demographie": 6
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "A",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c2-scie"
+      }
+    },
+    {
+      "id": "c2-marche",
+      "stage": 2,
+      "url": "/assets/hotspring/v1/cinema/c2-marche.webp",
+      "title": "Le marché du bourg",
+      "alt": "Un marchand a ouvert son chariot de toile au milieu des maisons. Les familles viennent acheter les produits déballés.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons en bois"
+      ],
+      "profile": {
+        "economie": 8,
+        "ecologie": 5,
+        "securite": 6,
+        "bien_etre": 5,
+        "demographie": 7
+      },
+      "limits": {
+        "economie": [
+          6,
+          10
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "A",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c2-marche"
+      }
+    },
+    {
+      "id": "c2-a",
+      "stage": 2,
+      "url": "/assets/hotspring/v1/cinema/c2-a.webp",
+      "title": "Expansion prospère — la rue qui prend forme",
+      "alt": "Les clients examinent une étoffe pendant que les porteurs déchargent les caisses devant les boutiques de la jeune rue.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons et commerces en bois"
+      ],
+      "profile": {
+        "economie": 9,
+        "ecologie": 5,
+        "securite": 7,
+        "bien_etre": 6,
+        "demographie": 7
+      },
+      "limits": {
+        "economie": [
+          5,
+          10
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "A",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c2-a"
+      }
+    },
+    {
+      "id": "c2-b",
+      "stage": 2,
+      "url": "/assets/hotspring/v1/cinema/c2-b.webp",
+      "title": "Prospère mais brutale — la rue qui prend forme",
+      "alt": "Des hommes armés surveillent un chargement de valeur devant une boutique, tandis que les ouvriers attendent à distance.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons et commerces en bois"
+      ],
+      "profile": {
+        "economie": 8,
+        "ecologie": 4,
+        "securite": 2,
+        "bien_etre": 4,
+        "demographie": 6
+      },
+      "limits": {
+        "economie": [
+          5,
+          10
+        ],
+        "securite": [
+          0,
+          5
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "B",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c2-b"
+      }
+    },
+    {
+      "id": "c2-c",
+      "stage": 2,
+      "url": "/assets/hotspring/v1/cinema/c2-c.webp",
+      "title": "Organisée et harmonieuse — la rue qui prend forme",
+      "alt": "Des voisins posent un trottoir en planches et aident une personne âgée à passer. Un enfant et une femme apportent des provisions.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons en bois",
+        "trottoir en planches"
+      ],
+      "profile": {
+        "economie": 5,
+        "ecologie": 8,
+        "securite": 8,
+        "bien_etre": 8,
+        "demographie": 5
+      },
+      "limits": {
+        "securite": [
+          5,
+          10
+        ],
+        "bien_etre": [
+          6,
+          10
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "C",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c2-c"
+      }
+    },
+    {
+      "id": "c2-d",
+      "stage": 2,
+      "url": "/assets/hotspring/v1/cinema/c2-d.webp",
+      "title": "Désordonnée — la rue qui prend forme",
+      "alt": "Des charrettes peinent à se croiser dans un passage boueux, encombré d’habitants et de baraques de bois.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons en bois",
+        "baraques"
+      ],
+      "profile": {
+        "economie": 4,
+        "ecologie": 3,
+        "securite": 4,
+        "bien_etre": 2,
+        "demographie": 9
+      },
+      "limits": {
+        "demographie": [
+          5,
+          10
+        ],
+        "bien_etre": [
+          0,
+          5
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "D",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c2-d"
+      }
+    },
+    {
+      "id": "c3-pistes",
+      "stage": 3,
+      "url": "/assets/hotspring/v1/cinema/c3-pistes.webp",
+      "title": "Les pistes de la vallée",
+      "alt": "Des chevaux chargés s’arrêtent entre les boutiques et la charrette d’un artisan qui répare une roue.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons et commerces en bois"
+      ],
+      "profile": {
+        "economie": 5,
+        "ecologie": 5,
+        "securite": 5,
+        "bien_etre": 5,
+        "demographie": 5
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": true,
+      "cityProfile": null,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c3-pistes"
+      }
+    },
+    {
+      "id": "c3-comptoir",
+      "stage": 3,
+      "url": "/assets/hotspring/v1/cinema/c3-comptoir.webp",
+      "title": "Le comptoir commun",
+      "alt": "Sous la galerie du comptoir commun, des marchands examinent les étoffes et pèsent des marchandises près de la rue.",
+      "site": "hors champ",
+      "requiredMarkers": [
+        "COMPTOIR_COMMUN"
+      ],
+      "incompatibleMarkers": [
+        "MONOPOLE_LOCAL",
+        "HOSTILITE_OUVERTE"
+      ],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "comptoir commun",
+        "maisons en bois"
+      ],
+      "profile": {
+        "economie": 7,
+        "ecologie": 6,
+        "securite": 7,
+        "bien_etre": 6,
+        "demographie": 6
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "A",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c3-comptoir"
+      }
+    },
+    {
+      "id": "c3-corridor",
+      "stage": 3,
+      "url": "/assets/hotspring/v1/cinema/c3-corridor.webp",
+      "title": "Le passage préservé",
+      "alt": "Des voyageurs et leurs bêtes de somme empruntent un chemin libre le long de la rivière, tandis que des habitants l’entretiennent.",
+      "site": "hors champ",
+      "requiredMarkers": [
+        "ACCORD_RIVIERE"
+      ],
+      "incompatibleMarkers": [
+        "ACCORD_ROMPU",
+        "EXPANSION_RIVIERE"
+      ],
+      "playedCrises": [],
+      "visibleConstructions": [],
+      "profile": {
+        "economie": 4,
+        "ecologie": 8,
+        "securite": 7,
+        "bien_etre": 6,
+        "demographie": 4
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "C",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c3-corridor"
+      }
+    },
+    {
+      "id": "c3-tensions",
+      "stage": 3,
+      "url": "/assets/hotspring/v1/cinema/c3-tensions.webp",
+      "title": "Une vallée sous tension",
+      "alt": "Devant un chariot qui barre une partie de la rue, deux hommes se disputent et des habitants gardent leurs enfants près d’eux.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons et commerces en bois"
+      ],
+      "profile": {
+        "economie": 6,
+        "ecologie": 4,
+        "securite": 2,
+        "bien_etre": 4,
+        "demographie": 6
+      },
+      "limits": {
+        "securite": [
+          0,
+          4
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "B",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c3-tensions"
+      }
+    },
+    {
+      "id": "c3-a",
+      "stage": 3,
+      "url": "/assets/hotspring/v1/cinema/c3-a.webp",
+      "title": "Expansion prospère — les échanges dans la vallée",
+      "alt": "Autour des chariots de fruits et légumes, les passants vont et viennent devant de longues rangées de commerces en bois.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons et commerces en bois"
+      ],
+      "profile": {
+        "economie": 9,
+        "ecologie": 5,
+        "securite": 7,
+        "bien_etre": 6,
+        "demographie": 7
+      },
+      "limits": {
+        "economie": [
+          5,
+          10
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "A",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c3-a"
+      }
+    },
+    {
+      "id": "c3-b",
+      "stage": 3,
+      "url": "/assets/hotspring/v1/cinema/c3-b.webp",
+      "title": "Prospère mais brutale — les échanges dans la vallée",
+      "alt": "Un marchand et son escorte armée traversent une artère commerçante bien fournie. Des habitants se tiennent en file le long des bâtiments.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons et commerces en bois"
+      ],
+      "profile": {
+        "economie": 8,
+        "ecologie": 4,
+        "securite": 2,
+        "bien_etre": 4,
+        "demographie": 6
+      },
+      "limits": {
+        "economie": [
+          5,
+          10
+        ],
+        "securite": [
+          0,
+          5
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "B",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c3-b"
+      }
+    },
+    {
+      "id": "c3-c",
+      "stage": 3,
+      "url": "/assets/hotspring/v1/cinema/c3-c.webp",
+      "title": "Organisée et harmonieuse — les échanges dans la vallée",
+      "alt": "Entre des maisons entretenues, les voisins et les voyageurs s’entraident pour décharger les provisions et réparer une charrette.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons et commerces en bois"
+      ],
+      "profile": {
+        "economie": 5,
+        "ecologie": 8,
+        "securite": 8,
+        "bien_etre": 8,
+        "demographie": 5
+      },
+      "limits": {
+        "securite": [
+          5,
+          10
+        ],
+        "bien_etre": [
+          6,
+          10
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "C",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c3-c"
+      }
+    },
+    {
+      "id": "c3-d",
+      "stage": 3,
+      "url": "/assets/hotspring/v1/cinema/c3-d.webp",
+      "title": "Désordonnée — les échanges dans la vallée",
+      "alt": "Des habitants et des chariots s’entassent dans une rue boueuse, entre les maisons et des abris improvisés.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons en bois",
+        "baraques"
+      ],
+      "profile": {
+        "economie": 4,
+        "ecologie": 3,
+        "securite": 4,
+        "bien_etre": 2,
+        "demographie": 9
+      },
+      "limits": {
+        "demographie": [
+          5,
+          10
+        ],
+        "bien_etre": [
+          0,
+          5
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "D",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-debuts.json",
+        "key": "c3-d"
+      }
+    },
+    {
+      "id": "c4-expansion",
+      "stage": 4,
+      "url": "/assets/hotspring/v1/cinema/c4-expansion.webp",
+      "title": "Au-delà de Main Street",
+      "alt": "Un menuisier regarde la livraison de bois et les nouvelles façades depuis son atelier.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons",
+        "ateliers ordinaires"
+      ],
+      "profile": {
+        "economie": 5,
+        "ecologie": 5,
+        "securite": 5,
+        "bien_etre": 5,
+        "demographie": 5
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": true,
+      "cityProfile": null,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c4-expansion"
+      }
+    },
+    {
+      "id": "c4-rail",
+      "stage": 4,
+      "url": "/assets/hotspring/v1/cinema/c4-rail.webp",
+      "title": "Le rail rejoint Hotspring",
+      "alt": "Une locomotive à vapeur entre à quai. Des passagers attendent devant le petit dépôt.",
+      "site": "hors champ",
+      "requiredMarkers": [
+        "CHEMIN_DE_FER"
+      ],
+      "incompatibleMarkers": [
+        "SANS_GARE"
+      ],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "voie ferrée",
+        "gare"
+      ],
+      "profile": {
+        "economie": 8,
+        "ecologie": 4,
+        "securite": 5,
+        "bien_etre": 5,
+        "demographie": 7
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "A",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c4-rail"
+      }
+    },
+    {
+      "id": "c4-mine",
+      "stage": 4,
+      "url": "/assets/hotspring/v1/cinema/c4-mine.webp",
+      "title": "La grande concession",
+      "alt": "Des ouvriers et des mules se tiennent au pied d’un chevalement dans le carreau de la mine.",
+      "site": "hors champ",
+      "requiredMarkers": [
+        "GRANDE_MINE"
+      ],
+      "incompatibleMarkers": [
+        "PETITES_MINES",
+        "SECURITE_MINIERE"
+      ],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "grande mine"
+      ],
+      "profile": {
+        "economie": 9,
+        "ecologie": 2,
+        "securite": 4,
+        "bien_etre": 3,
+        "demographie": 8
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "A",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c4-mine"
+      }
+    },
+    {
+      "id": "c4-ouvriers",
+      "stage": 4,
+      "url": "/assets/hotspring/v1/cinema/c4-ouvriers.webp",
+      "title": "Des logements à la hâte",
+      "alt": "Les ménages occupent baraques et tentes de part et d’autre d’une ruelle boueuse.",
+      "site": "hors champ",
+      "requiredMarkers": [
+        "QUARTIER_PROVISOIRE"
+      ],
+      "incompatibleMarkers": [
+        "QUARTIER_PLANIFIE",
+        "QUARTIER_BRULE"
+      ],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "quartier provisoire"
+      ],
+      "profile": {
+        "economie": 6,
+        "ecologie": 4,
+        "securite": 4,
+        "bien_etre": 2,
+        "demographie": 9
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "D",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c4-ouvriers"
+      }
+    },
+    {
+      "id": "c4-jardins",
+      "stage": 4,
+      "url": "/assets/hotspring/v1/cinema/c4-jardins.webp",
+      "title": "Un quartier dessiné",
+      "alt": "Des habitations modestes s’alignent de part et d’autre des potagers et de leurs clôtures.",
+      "site": "hors champ",
+      "requiredMarkers": [
+        "QUARTIER_PLANIFIE"
+      ],
+      "incompatibleMarkers": [
+        "QUARTIER_PROVISOIRE",
+        "QUARTIER_BRULE"
+      ],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "quartier planifié"
+      ],
+      "profile": {
+        "economie": 5,
+        "ecologie": 7,
+        "securite": 7,
+        "bien_etre": 7,
+        "demographie": 6
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "C",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c4-jardins"
+      }
+    },
+    {
+      "id": "c4-a",
+      "stage": 4,
+      "url": "/assets/hotspring/v1/cinema/c4-a.webp",
+      "title": "Expansion prospère — les nouveaux quartiers",
+      "alt": "Des habitants achètent des pommes à l’étal. Passants et chariots remplissent la rue aux façades neuves.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons ordinaires",
+        "étal de fruits"
+      ],
+      "profile": {
+        "economie": 9,
+        "ecologie": 5,
+        "securite": 7,
+        "bien_etre": 6,
+        "demographie": 7
+      },
+      "limits": {
+        "economie": [
+          5,
+          10
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "A",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c4-a"
+      }
+    },
+    {
+      "id": "c4-b",
+      "stage": 4,
+      "url": "/assets/hotspring/v1/cinema/c4-b.webp",
+      "title": "Prospère mais brutale — les nouveaux quartiers",
+      "alt": "Un commerçant remet la paie devant deux gardes, revolvers au fourreau. Une passante les observe.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "commerce ordinaire"
+      ],
+      "profile": {
+        "economie": 8,
+        "ecologie": 4,
+        "securite": 2,
+        "bien_etre": 4,
+        "demographie": 6
+      },
+      "limits": {
+        "economie": [
+          5,
+          10
+        ],
+        "securite": [
+          0,
+          5
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "B",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c4-b"
+      }
+    },
+    {
+      "id": "c4-c",
+      "stage": 4,
+      "url": "/assets/hotspring/v1/cinema/c4-c.webp",
+      "title": "Organisée et harmonieuse — les nouveaux quartiers",
+      "alt": "Plusieurs voisins montent la traverse d’un porche. D’autres préparent le repas du chantier.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "porche en chantier"
+      ],
+      "profile": {
+        "economie": 5,
+        "ecologie": 8,
+        "securite": 8,
+        "bien_etre": 8,
+        "demographie": 5
+      },
+      "limits": {
+        "securite": [
+          5,
+          10
+        ],
+        "bien_etre": [
+          6,
+          10
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "C",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c4-c"
+      }
+    },
+    {
+      "id": "c4-d",
+      "stage": 4,
+      "url": "/assets/hotspring/v1/cinema/c4-d.webp",
+      "title": "Désordonnée — les nouveaux quartiers",
+      "alt": "Des caisses d’emménagement encadrent une rue de baraques où adultes et enfants s’évitent dans les ornières.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "habitations ordinaires"
+      ],
+      "profile": {
+        "economie": 4,
+        "ecologie": 3,
+        "securite": 4,
+        "bien_etre": 2,
+        "demographie": 9
+      },
+      "limits": {
+        "demographie": [
+          5,
+          10
+        ],
+        "bien_etre": [
+          0,
+          5
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "D",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c4-d"
+      }
+    },
+    {
+      "id": "c4-dispensaire",
+      "stage": 4,
+      "url": "/assets/hotspring/v1/cinema/c4-dispensaire.webp",
+      "title": "Les soins à portée de rue",
+      "alt": "Sur le porche du dispensaire, une soignante bande l’avant-bras d’un homme pendant que des voisins attendent.",
+      "site": "hors champ",
+      "requiredMarkers": [
+        "DISPENSAIRE"
+      ],
+      "incompatibleMarkers": [
+        "SANS_MEDECIN"
+      ],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "dispensaire"
+      ],
+      "profile": {
+        "economie": 3,
+        "ecologie": 7,
+        "securite": 7,
+        "bien_etre": 9,
+        "demographie": 8
+      },
+      "limits": {
+        "bien_etre": [
+          6,
+          10
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "C",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c4-dispensaire"
+      }
+    },
+    {
+      "id": "c5-ville",
+      "stage": 5,
+      "url": "/assets/hotspring/v1/cinema/c5-ville.webp",
+      "title": "Une ville à part entière",
+      "alt": "Un chariot tourne au carrefour de façades en bois peint, vu depuis une galerie haute.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "bâtiments ordinaires"
+      ],
+      "profile": {
+        "economie": 5,
+        "ecologie": 5,
+        "securite": 5,
+        "bien_etre": 5,
+        "demographie": 5
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": true,
+      "cityProfile": null,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c5-ville"
+      }
+    },
+    {
+      "id": "c5-incendie",
+      "stage": 5,
+      "url": "/assets/hotspring/v1/cinema/c5-incendie.webp",
+      "title": "Après le feu",
+      "alt": "Une famille emporte une malle entre les montants noircis d’une habitation. D’autres maisons restent debout.",
+      "site": "hors champ",
+      "requiredMarkers": [
+        "QUARTIER_BRULE"
+      ],
+      "incompatibleMarkers": [
+        "QUARTIERS_SAUVES",
+        "INCENDIE_CONTENU"
+      ],
+      "playedCrises": [
+        "D24"
+      ],
+      "visibleConstructions": [
+        "logements incendiés"
+      ],
+      "profile": {
+        "economie": 3,
+        "ecologie": 3,
+        "securite": 3,
+        "bien_etre": 2,
+        "demographie": 4
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "D",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c5-incendie"
+      }
+    },
+    {
+      "id": "c5-entraide",
+      "stage": 5,
+      "url": "/assets/hotspring/v1/cinema/c5-entraide.webp",
+      "title": "Une ville qui prend soin des siens",
+      "alt": "Des voisins de plusieurs générations se passent le pain à de longues tables de cour.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "cour habitée"
+      ],
+      "profile": {
+        "economie": 5,
+        "ecologie": 6,
+        "securite": 6,
+        "bien_etre": 9,
+        "demographie": 7
+      },
+      "limits": {
+        "bien_etre": [
+          6,
+          10
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "C",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c5-entraide"
+      }
+    },
+    {
+      "id": "c5-precarite",
+      "stage": 5,
+      "url": "/assets/hotspring/v1/cinema/c5-precarite.webp",
+      "title": "Le prix de la croissance",
+      "alt": "Des familles se serrent sous un porche et traversent une ruelle boueuse bordée de logements exigus.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "logements ordinaires",
+        "porche"
+      ],
+      "profile": {
+        "economie": 5,
+        "ecologie": 3,
+        "securite": 4,
+        "bien_etre": 2,
+        "demographie": 9
+      },
+      "limits": {
+        "bien_etre": [
+          0,
+          4
+        ],
+        "demographie": [
+          6,
+          10
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "D",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c5-precarite"
+      }
+    },
+    {
+      "id": "c5-securite",
+      "stage": 5,
+      "url": "/assets/hotspring/v1/cinema/c5-securite.webp",
+      "title": "Des rues tranquilles",
+      "alt": "Une enfant et un aîné traversent parmi les passants, les charrettes et le marché.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [],
+      "profile": {
+        "economie": 5,
+        "ecologie": 6,
+        "securite": 9,
+        "bien_etre": 6,
+        "demographie": 5
+      },
+      "limits": {
+        "securite": [
+          7,
+          10
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "C",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c5-securite"
+      }
+    },
+    {
+      "id": "c5-a",
+      "stage": 5,
+      "url": "/assets/hotspring/v1/cinema/c5-a.webp",
+      "title": "Expansion prospère — la ville établie",
+      "alt": "Des chariots, ballots et rouleaux de tissu animent une rue bordée de galeries à deux étages.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "boutiques ordinaires",
+        "galeries de rue"
+      ],
+      "profile": {
+        "economie": 9,
+        "ecologie": 5,
+        "securite": 7,
+        "bien_etre": 6,
+        "demographie": 7
+      },
+      "limits": {
+        "economie": [
+          5,
+          10
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "A",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c5-a"
+      }
+    },
+    {
+      "id": "c5-b",
+      "stage": 5,
+      "url": "/assets/hotspring/v1/cinema/c5-b.webp",
+      "title": "Prospère mais brutale — la ville établie",
+      "alt": "Un commerçant vérifie son chargement sous la pluie devant des gardes au revolver rengainé.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "boutique ordinaire"
+      ],
+      "profile": {
+        "economie": 8,
+        "ecologie": 4,
+        "securite": 2,
+        "bien_etre": 4,
+        "demographie": 6
+      },
+      "limits": {
+        "economie": [
+          5,
+          10
+        ],
+        "securite": [
+          0,
+          5
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "B",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c5-b"
+      }
+    },
+    {
+      "id": "c5-c",
+      "stage": 5,
+      "url": "/assets/hotspring/v1/cinema/c5-entraide.webp",
+      "title": "Organisée et harmonieuse — la ville établie",
+      "alt": "Des voisins de plusieurs générations se passent le pain à de longues tables de cour.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "cour habitée"
+      ],
+      "profile": {
+        "economie": 5,
+        "ecologie": 8,
+        "securite": 8,
+        "bien_etre": 8,
+        "demographie": 5
+      },
+      "limits": {
+        "securite": [
+          5,
+          10
+        ],
+        "bien_etre": [
+          6,
+          10
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "C",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c5-entraide"
+      }
+    },
+    {
+      "id": "c5-d",
+      "stage": 5,
+      "url": "/assets/hotspring/v1/cinema/c5-precarite.webp",
+      "title": "Désordonnée — la ville établie",
+      "alt": "Des familles se serrent sous un porche et traversent une ruelle boueuse bordée de logements exigus.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "logements ordinaires",
+        "porche"
+      ],
+      "profile": {
+        "economie": 4,
+        "ecologie": 3,
+        "securite": 4,
+        "bien_etre": 2,
+        "demographie": 9
+      },
+      "limits": {
+        "bien_etre": [
+          0,
+          4
+        ],
+        "demographie": [
+          6,
+          10
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "D",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c5-precarite"
+      }
+    },
+    {
+      "id": "c6-conseil",
+      "stage": 6,
+      "url": "/assets/hotspring/v1/cinema/c6-conseil.webp",
+      "title": "La ville au seuil du choix",
+      "alt": "Des habitants conversent sur un porche et traversent le carrefour, près d’un vieil homme qui lit.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons ordinaires"
+      ],
+      "profile": {
+        "economie": 5,
+        "ecologie": 5,
+        "securite": 5,
+        "bien_etre": 5,
+        "demographie": 5
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": true,
+      "cityProfile": null,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c6-conseil"
+      }
+    },
+    {
+      "id": "c6-elu",
+      "stage": 6,
+      "url": "/assets/hotspring/v1/cinema/c6-elu.webp",
+      "title": "La voix des habitants",
+      "alt": "Un homme lit les résultats sur le porche. Le voisinage s’est réuni autour de l’urne en bois.",
+      "site": "hors champ",
+      "requiredMarkers": [
+        "CONSEIL_ELU"
+      ],
+      "incompatibleMarkers": [
+        "CONSEIL_FONDATEURS"
+      ],
+      "playedCrises": [],
+      "visibleConstructions": [],
+      "profile": {
+        "economie": 5,
+        "ecologie": 5,
+        "securite": 5,
+        "bien_etre": 5,
+        "demographie": 5
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "C",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c6-elu"
+      }
+    },
+    {
+      "id": "c6-fondateurs",
+      "stage": 6,
+      "url": "/assets/hotspring/v1/cinema/c6-fondateurs.webp",
+      "title": "Le conseil des fondateurs",
+      "alt": "Autour d’un grand livre fermé, les fondateurs discutent à la lampe, la rue visible par les baies.",
+      "site": "hors champ",
+      "requiredMarkers": [
+        "CONSEIL_FONDATEURS"
+      ],
+      "incompatibleMarkers": [
+        "CONSEIL_ELU"
+      ],
+      "playedCrises": [],
+      "visibleConstructions": [],
+      "profile": {
+        "economie": 5,
+        "ecologie": 5,
+        "securite": 5,
+        "bien_etre": 5,
+        "demographie": 5
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "A",
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c6-fondateurs"
+      }
+    },
+    {
+      "id": "c6-a",
+      "stage": 6,
+      "url": "/assets/hotspring/v1/cinema/c6-a.webp",
+      "title": "Expansion prospère — la cité à l’heure du Conseil",
+      "alt": "Les véhicules chargés et les étals de fruits occupent les deux côtés d’un carrefour bordé de maisons à galerie.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons ordinaires",
+        "étals de fruits"
+      ],
+      "profile": {
+        "economie": 9,
+        "ecologie": 5,
+        "securite": 7,
+        "bien_etre": 6,
+        "demographie": 7
+      },
+      "limits": {
+        "economie": [
+          5,
+          10
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "A",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c6-a"
+      }
+    },
+    {
+      "id": "c6-b",
+      "stage": 6,
+      "url": "/assets/hotspring/v1/cinema/c6-b.webp",
+      "title": "Prospère mais brutale — la cité à l’heure du Conseil",
+      "alt": "Deux porteurs de caisses baissent la tête devant des hommes bien vêtus aux revolvers dans leurs étuis.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "façades ordinaires"
+      ],
+      "profile": {
+        "economie": 8,
+        "ecologie": 4,
+        "securite": 2,
+        "bien_etre": 4,
+        "demographie": 6
+      },
+      "limits": {
+        "economie": [
+          5,
+          10
+        ],
+        "securite": [
+          0,
+          5
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "B",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c6-b"
+      }
+    },
+    {
+      "id": "c6-c",
+      "stage": 6,
+      "url": "/assets/hotspring/v1/cinema/c6-c.webp",
+      "title": "Organisée et harmonieuse — la cité à l’heure du Conseil",
+      "alt": "Des voisins se passent les paniers de récolte depuis un chariot dans une cour ombragée.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "cour habitée"
+      ],
+      "profile": {
+        "economie": 5,
+        "ecologie": 8,
+        "securite": 8,
+        "bien_etre": 8,
+        "demographie": 5
+      },
+      "limits": {
+        "securite": [
+          5,
+          10
+        ],
+        "bien_etre": [
+          6,
+          10
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "C",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c6-c"
+      }
+    },
+    {
+      "id": "c6-d",
+      "stage": 6,
+      "url": "/assets/hotspring/v1/cinema/c6-d.webp",
+      "title": "Désordonnée — la cité à l’heure du Conseil",
+      "alt": "La foule s’entasse dans une impasse boueuse entre vieux appentis, passerelles et logements rapiécés.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "appentis et logements ordinaires"
+      ],
+      "profile": {
+        "economie": 4,
+        "ecologie": 3,
+        "securite": 4,
+        "bien_etre": 2,
+        "demographie": 9
+      },
+      "limits": {
+        "demographie": [
+          5,
+          10
+        ],
+        "bien_etre": [
+          0,
+          5
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": "D",
+      "canonical": true,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c6-d"
+      }
+    },
+    {
+      "id": "fin-ville",
+      "stage": 7,
+      "url": "/assets/hotspring/v1/cinema/c6-conseil.webp",
+      "title": "Hotspring au bout du chemin",
+      "alt": "Des habitants conversent sur un porche et traversent le carrefour, près d’un vieil homme qui lit.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons ordinaires"
+      ],
+      "profile": {
+        "economie": 5,
+        "ecologie": 5,
+        "securite": 5,
+        "bien_etre": 5,
+        "demographie": 5
+      },
+      "limits": {},
+      "preferredCharters": [],
+      "fallback": true,
+      "cityProfile": null,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-expansion.json",
+        "key": "plans.c6-conseil"
+      }
+    },
+    {
+      "id": "fin-equilibre",
+      "stage": 7,
+      "url": "/assets/hotspring/v1/cinema/fin-equilibre.webp",
+      "title": "Une cité florissante",
+      "alt": "Depuis une fenêtre, on aperçoit des familles discutant et un artisan au travail au coude de Main Street.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons ordinaires"
+      ],
+      "profile": {
+        "economie": 8,
+        "ecologie": 8,
+        "securite": 8,
+        "bien_etre": 8,
+        "demographie": 8
+      },
+      "limits": {
+        "economie": [
+          6,
+          10
+        ],
+        "ecologie": [
+          6,
+          10
+        ],
+        "securite": [
+          6,
+          10
+        ],
+        "bien_etre": [
+          6,
+          10
+        ],
+        "demographie": [
+          6,
+          10
+        ]
+      },
+      "preferredCharters": [
+        "B",
+        "D"
+      ],
+      "fallback": false,
+      "cityProfile": null,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-epilogue.json",
+        "key": "instruction_du_plan.fin-equilibre"
+      }
+    },
+    {
+      "id": "fin-industrie",
+      "stage": 7,
+      "url": "/assets/hotspring/v1/cinema/fin-industrie.webp",
+      "title": "La puissance des ateliers",
+      "alt": "Des ouvriers chargent du bois devant la scierie fumante, au bord de la rivière trouble encombrée de grumes.",
+      "site": "hors champ",
+      "requiredMarkers": [
+        "SCIERIE_INTENSIVE"
+      ],
+      "incompatibleMarkers": [
+        "COUPE_REGULEE",
+        "INDUSTRIE_SUSPENDUE"
+      ],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "scierie à vapeur",
+        "maisons ordinaires"
+      ],
+      "profile": {
+        "economie": 9,
+        "ecologie": 2,
+        "securite": 5,
+        "bien_etre": 4,
+        "demographie": 7
+      },
+      "limits": {
+        "economie": [
+          6,
+          10
+        ],
+        "ecologie": [
+          0,
+          5
+        ],
+        "securite": [
+          5,
+          10
+        ]
+      },
+      "preferredCharters": [
+        "A",
+        "C"
+      ],
+      "fallback": false,
+      "cityProfile": null,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-epilogue.json",
+        "key": "instruction_du_plan.fin-industrie"
+      }
+    },
+    {
+      "id": "fin-commerce",
+      "stage": 7,
+      "url": "/assets/hotspring/v1/cinema/fin-commerce.webp",
+      "title": "Une ville de marchands",
+      "alt": "Dans une rue marchande animée, un chariot décharge des sacs pendant que des clients examinent des étoffes.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "boutiques ordinaires"
+      ],
+      "profile": {
+        "economie": 9,
+        "ecologie": 5,
+        "securite": 6,
+        "bien_etre": 6,
+        "demographie": 7
+      },
+      "limits": {
+        "economie": [
+          7,
+          10
+        ],
+        "securite": [
+          5,
+          10
+        ]
+      },
+      "preferredCharters": [
+        "A"
+      ],
+      "fallback": false,
+      "cityProfile": null,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-epilogue.json",
+        "key": "instruction_du_plan.fin-commerce"
+      }
+    },
+    {
+      "id": "fin-ressources",
+      "stage": 7,
+      "url": "/assets/hotspring/v1/cinema/fin-ressources.webp",
+      "title": "La vallée préservée",
+      "alt": "Entre les maisons habitées, des habitants récoltent des légumes dans des jardins ombragés.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons ordinaires",
+        "potagers"
+      ],
+      "profile": {
+        "economie": 4,
+        "ecologie": 9,
+        "securite": 7,
+        "bien_etre": 7,
+        "demographie": 5
+      },
+      "limits": {
+        "ecologie": [
+          7,
+          10
+        ]
+      },
+      "preferredCharters": [
+        "E",
+        "F"
+      ],
+      "fallback": false,
+      "cityProfile": null,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-epilogue.json",
+        "key": "instruction_du_plan.fin-ressources"
+      }
+    },
+    {
+      "id": "fin-tensions",
+      "stage": 7,
+      "url": "/assets/hotspring/v1/cinema/fin-tensions.webp",
+      "title": "La prospérité sous tension",
+      "alt": "Au crépuscule, des marchands rentrent leurs caisses tandis que deux groupes se font face de part et d’autre de la rue.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "boutiques ordinaires"
+      ],
+      "profile": {
+        "economie": 9,
+        "ecologie": 4,
+        "securite": 2,
+        "bien_etre": 4,
+        "demographie": 8
+      },
+      "limits": {
+        "economie": [
+          6,
+          10
+        ],
+        "securite": [
+          0,
+          4
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": null,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-epilogue.json",
+        "key": "instruction_du_plan.fin-tensions"
+      }
+    },
+    {
+      "id": "fin-declin",
+      "stage": 7,
+      "url": "/assets/hotspring/v1/cinema/fin-declin.webp",
+      "title": "Les rues se vident",
+      "alt": "Sous un ciel gris, une famille charge une charrette devant une longue rangée de boutiques aux volets clos.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "boutiques fermées"
+      ],
+      "profile": {
+        "economie": 2,
+        "ecologie": 4,
+        "securite": 4,
+        "bien_etre": 3,
+        "demographie": 2
+      },
+      "limits": {
+        "economie": [
+          0,
+          4
+        ],
+        "demographie": [
+          0,
+          5
+        ]
+      },
+      "preferredCharters": [],
+      "fallback": false,
+      "cityProfile": null,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-epilogue.json",
+        "key": "instruction_du_plan.fin-declin"
+      }
+    },
+    {
+      "id": "fin-civique",
+      "stage": 7,
+      "url": "/assets/hotspring/v1/cinema/fin-civique.webp",
+      "title": "Une communauté qui se tient",
+      "alt": "Dans une rue bordée de petites maisons habitées, une femme sert un bol chaud à une voisine tandis que deux habitants réparent un perron.",
+      "site": "hors champ",
+      "requiredMarkers": [],
+      "anyMarkers": [
+        "ECOLE",
+        "DISPENSAIRE",
+        "ASSAINISSEMENT",
+        "EAU_COMMUNALE",
+        "MARSHAL"
+      ],
+      "incompatibleMarkers": [],
+      "playedCrises": [],
+      "visibleConstructions": [
+        "maisons ordinaires",
+        "perron"
+      ],
+      "profile": {
+        "economie": 3,
+        "ecologie": 7,
+        "securite": 9,
+        "bien_etre": 9,
+        "demographie": 9
+      },
+      "limits": {
+        "securite": [
+          7,
+          10
+        ],
+        "demographie": [
+          7,
+          10
+        ],
+        "bien_etre": [
+          7,
+          10
+        ]
+      },
+      "preferredCharters": [
+        "B",
+        "D"
+      ],
+      "fallback": false,
+      "cityProfile": null,
+      "generationRecord": {
+        "file": "docs/hotspring/cinema/prompts-epilogue.json",
+        "key": "instruction_du_plan.fin-civique"
+      }
+    }
+  ],
+  "cityProfiles": [
+    {
+      "id": "A",
+      "title": "Expansion prospère",
+      "profile": {
+        "economie": 9,
+        "ecologie": 5,
+        "securite": 7,
+        "bien_etre": 6,
+        "demographie": 7
+      },
+      "markers": [
+        "CENTRE_PRIVE",
+        "SCIERIE_INTENSIVE",
+        "BANQUE_CREDIT",
+        "CHEMIN_DE_FER"
+      ],
+      "limits": {
+        "economie": [
+          5,
+          10
+        ]
+      }
+    },
+    {
+      "id": "B",
+      "title": "Prospère mais brutale",
+      "profile": {
+        "economie": 8,
+        "ecologie": 4,
+        "securite": 2,
+        "bien_etre": 4,
+        "demographie": 6
+      },
+      "markers": [
+        "EAU_PRIVEE",
+        "GRAND_SALOON",
+        "POSSE",
+        "DETTE_OUVRIERE"
+      ],
+      "limits": {
+        "economie": [
+          5,
+          10
+        ],
+        "securite": [
+          0,
+          5
+        ]
+      }
+    },
+    {
+      "id": "C",
+      "title": "Organisée et harmonieuse",
+      "profile": {
+        "economie": 5,
+        "ecologie": 8,
+        "securite": 8,
+        "bien_etre": 8,
+        "demographie": 5
+      },
+      "markers": [
+        "EAU_COMMUNALE",
+        "RESERVES_PUBLIQUES",
+        "ECOLE",
+        "DISPENSAIRE",
+        "QUARTIER_PLANIFIE",
+        "ASSAINISSEMENT",
+        "REGLEMENT_INCENDIE"
+      ],
+      "limits": {
+        "ecologie": [
+          5,
+          10
+        ],
+        "securite": [
+          5,
+          10
+        ]
+      }
+    },
+    {
+      "id": "D",
+      "title": "Désordonnée",
+      "profile": {
+        "economie": 4,
+        "ecologie": 3,
+        "securite": 4,
+        "bien_etre": 2,
+        "demographie": 9
+      },
+      "markers": [
+        "CONSTRUCTION_SERREE",
+        "QUARTIER_PROVISOIRE",
+        "DECHETS_LIBRES",
+        "SANS_MEDECIN"
+      ],
+      "limits": {}
+    }
+  ]
+}
