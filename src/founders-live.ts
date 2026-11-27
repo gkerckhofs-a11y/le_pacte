@@ -370,7 +370,8 @@ function visibleFinalResults(s,family=null){
   family:r.family,total:r.total,support:r.support
  })};
 }
-export function narrativePublicView(s){
+export function narrativePublicView(s){return narrativeAudienceView(s,false);}
+function narrativeAudienceView(s,privateAudience){
  check(s?.kind==='founders-live-session-v2.5','Partie inconnue');
  const v=s.game.vote,resolved=(s.phase==='REVEALED'||s.phase==='FINISHED')?s.game.history.at(-1):null;
  const chicago=hasChicagoSuccession(s),manualCouncil=usesManualCouncil(s);
@@ -390,7 +391,7 @@ export function narrativePublicView(s){
   ...(isV2(s)?{experienceVersion:2,manualCouncil,timing:manualCouncil?{...s.timing,autoAdvance:false}:copy(s.timing),clock:manualCouncil?{...s.clock,deadline:null,remainingMs:null}:copy(s.clock),gaugeThresholds:copy(s.gaugeThresholds)}:{}),
   ...(hasChicagoSuccession(s)?{succession:chicagoFinalView(s)}:{}),
   ...(isChicago(s)?{chicago:true,gaugeMaximum:s.game.cityMaximum}:{}),
-  ...(isHotspring(s)?{campaign:campaignPresentation(s)}:{}),
+  ...(isHotspring(s)?{campaign:campaignPresentation(s,privateAudience)}:{}),
   ...(isHotspring(s)||chicago?{influenceReserve:publicInfluenceReserve(s,resolved)}:{}),
   story:{id:s.scenario.scenario.id,title:s.scenario.scenario.title,location:s.scenario.scenario.location,year:s.scenario.scenario.year,schemaVersion:s.scenario.schema_version},
   skin:{id:s.skin.id,title:s.skin.title,labels:copy(isChicago(s)?chicagoIndicatorLabels(s.skin.labels):s.skin.labels),theme:copy(s.skin.theme),publicScene:copy(s.skin.publicScene)},
@@ -419,7 +420,7 @@ export function narrativePublicView(s){
 }
 export function narrativeFamilyView(s,family){
  check(activeFounders(s.game).includes(family),'Famille inconnue');
- const view=narrativePublicView(s),v=s.game.vote;
+ const view=narrativeAudienceView(s,true),v=s.game.vote;
  const card=s.goalCards?.[family]??DEFAULT_GOAL_CARDS[family];
  const progress=isChicago(s)?null:evaluateGoal(card,s.game.city,s.scoreRules??DEFAULT_SCORE_RULES);
  const score=hasChicagoSuccession(s)?(s.succession?.frozen.scores??chicagoScores(s)).find(row=>row.family===family):null;
@@ -488,7 +489,7 @@ export function narrativeOrganizerView(s){
  const ambitions=hasChicagoSuccession(s)?Object.fromEntries((s.succession?.frozen.scores??chicagoScores(s)).map(score=>[
   score.family,{...chicagoAmbition(s,score.family,score),points:{cause:score.small,vision:score.medium,decisions:score.major,total:score.secret},requiredIfEnded:score.required}
  ])):null;
- return {...narrativePublicView(s),...(s.rehearsal?{rehearsal:true,rehearsalTurn:rehearsalTurn(s)}:{}),...(hasChicagoSuccession(s)?{finalResults:s.phase==='FINISHED'?copy(s.finalResults):null}:{}),
+ return {...narrativeAudienceView(s,true),...(s.rehearsal?{rehearsal:true,rehearsalTurn:rehearsalTurn(s)}:{}),...(hasChicagoSuccession(s)?{finalResults:s.phase==='FINISHED'?copy(s.finalResults):null}:{}),
   ...(hasChicagoSuccession(s)&&s.phase==='SUSPENDED'?{sittingSummary:chicagoScores(s).map(({family,secret,wealth})=>({family,total:secret+wealth})).sort((a,b)=>b.total-a.total)}:{}),
   ...(s.succession?{successionAudit:{frozen:copy(s.succession.frozen),request:copy(s.succession.request),events:copy(s.succession.audit),
    rounds:s.succession.rounds.filter(r=>r.closedAt!==null).map(copy),arbitration:copy(s.succession.arbitration??null)}}:{}),

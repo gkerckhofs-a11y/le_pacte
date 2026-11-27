@@ -1,0 +1,1548 @@
+[
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "industrie",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "industrie",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c1",
+    "phase": "PRESENTATION",
+    "résolution": "1280×720",
+    "hauteurImage": 398
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c2",
+    "phase": "PRESENTATION",
+    "résolution": "1280×720",
+    "hauteurImage": 398
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c3",
+    "phase": "PRESENTATION",
+    "résolution": "1280×720",
+    "hauteurImage": 398
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c4",
+    "phase": "PRESENTATION",
+    "résolution": "1280×720",
+    "hauteurImage": 398
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c5",
+    "phase": "PRESENTATION",
+    "résolution": "1280×720",
+    "hauteurImage": 398
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c6",
+    "phase": "PRESENTATION",
+    "résolution": "1280×720",
+    "hauteurImage": 398
+  },
+  {
+    "parcours": "industrie",
+    "étape": "saloon",
+    "phase": "PRESENTATION",
+    "résolution": "1280×720",
+    "hauteurImage": 398
+  },
+  {
+    "parcours": "industrie",
+    "étape": "saloon-pour",
+    "phase": "REVEALED",
+    "résolution": "1280×720",
+    "hauteurImage": 398
+  },
+  {
+    "parcours": "industrie",
+    "étape": "dilemme",
+    "phase": "PRESENTATION",
+    "résolution": "1280×720",
+    "hauteurImage": 398
+  },
+  {
+    "parcours": "industrie",
+    "étape": "negociation",
+    "phase": "NEGOTIATION",
+    "résolution": "1280×720",
+    "hauteurImage": 398
+  },
+  {
+    "parcours": "industrie",
+    "étape": "conseil",
+    "phase": "COUNCIL",
+    "résolution": "1280×720",
+    "hauteurImage": 398
+  },
+  {
+    "parcours": "industrie",
+    "étape": "resultat",
+    "phase": "REVEALED",
+    "résolution": "1280×720",
+    "hauteurImage": 398
+  },
+  {
+    "parcours": "industrie",
+    "étape": "resultat-contre",
+    "phase": "REVEALED",
+    "résolution": "1280×720",
+    "hauteurImage": 398
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "vallee",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "vallee",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "affluence",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "affluence",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "institutions",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "institutions",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "crises",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "crises",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "anticipation",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "1280×720",
+    "hauteurImage": 720
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080,
+    "capture": "industrie-chapitre-2-1920x1080.webp"
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080,
+    "capture": "industrie-chapitre-4-1920x1080.webp"
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "industrie",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080,
+    "capture": "industrie-epilogue-1920x1080.webp"
+  },
+  {
+    "parcours": "industrie",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080,
+    "capture": "industrie-classement-1920x1080.webp"
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c1",
+    "phase": "PRESENTATION",
+    "résolution": "1920×1080",
+    "hauteurImage": 598
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c2",
+    "phase": "PRESENTATION",
+    "résolution": "1920×1080",
+    "hauteurImage": 598
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c3",
+    "phase": "PRESENTATION",
+    "résolution": "1920×1080",
+    "hauteurImage": 598
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c4",
+    "phase": "PRESENTATION",
+    "résolution": "1920×1080",
+    "hauteurImage": 598
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c5",
+    "phase": "PRESENTATION",
+    "résolution": "1920×1080",
+    "hauteurImage": 598
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c6",
+    "phase": "PRESENTATION",
+    "résolution": "1920×1080",
+    "hauteurImage": 598
+  },
+  {
+    "parcours": "industrie",
+    "étape": "saloon",
+    "phase": "PRESENTATION",
+    "résolution": "1920×1080",
+    "hauteurImage": 598,
+    "capture": "industrie-saloon-1920x1080.webp"
+  },
+  {
+    "parcours": "industrie",
+    "étape": "saloon-pour",
+    "phase": "REVEALED",
+    "résolution": "1920×1080",
+    "hauteurImage": 598,
+    "capture": "industrie-saloon-pour-1920x1080.webp"
+  },
+  {
+    "parcours": "industrie",
+    "étape": "dilemme",
+    "phase": "PRESENTATION",
+    "résolution": "1920×1080",
+    "hauteurImage": 598
+  },
+  {
+    "parcours": "industrie",
+    "étape": "negociation",
+    "phase": "NEGOTIATION",
+    "résolution": "1920×1080",
+    "hauteurImage": 598
+  },
+  {
+    "parcours": "industrie",
+    "étape": "conseil",
+    "phase": "COUNCIL",
+    "résolution": "1920×1080",
+    "hauteurImage": 598,
+    "capture": "industrie-conseil-1920x1080.webp"
+  },
+  {
+    "parcours": "industrie",
+    "étape": "resultat",
+    "phase": "REVEALED",
+    "résolution": "1920×1080",
+    "hauteurImage": 598,
+    "capture": "industrie-resultat-1920x1080.webp"
+  },
+  {
+    "parcours": "industrie",
+    "étape": "resultat-contre",
+    "phase": "REVEALED",
+    "résolution": "1920×1080",
+    "hauteurImage": 598
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080,
+    "capture": "vallee-chapitre-3-1920x1080.webp"
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "vallee",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080,
+    "capture": "vallee-epilogue-1920x1080.webp"
+  },
+  {
+    "parcours": "vallee",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080,
+    "capture": "affluence-chapitre-4-1920x1080.webp"
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "affluence",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080,
+    "capture": "affluence-epilogue-1920x1080.webp"
+  },
+  {
+    "parcours": "affluence",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080,
+    "capture": "institutions-chapitre-6-1920x1080.webp"
+  },
+  {
+    "parcours": "institutions",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080,
+    "capture": "institutions-epilogue-1920x1080.webp"
+  },
+  {
+    "parcours": "institutions",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080,
+    "capture": "crises-chapitre-5-1920x1080.webp"
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "crises",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080,
+    "capture": "crises-epilogue-1920x1080.webp"
+  },
+  {
+    "parcours": "crises",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080
+  },
+  {
+    "parcours": "anticipation",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "1920×1080",
+    "hauteurImage": 1080,
+    "capture": "anticipation-epilogue-1920x1080.webp"
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "industrie",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "industrie",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c1",
+    "phase": "PRESENTATION",
+    "résolution": "2560×1440",
+    "hauteurImage": 798
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c2",
+    "phase": "PRESENTATION",
+    "résolution": "2560×1440",
+    "hauteurImage": 798
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c3",
+    "phase": "PRESENTATION",
+    "résolution": "2560×1440",
+    "hauteurImage": 798
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c4",
+    "phase": "PRESENTATION",
+    "résolution": "2560×1440",
+    "hauteurImage": 798
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c5",
+    "phase": "PRESENTATION",
+    "résolution": "2560×1440",
+    "hauteurImage": 798
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c6",
+    "phase": "PRESENTATION",
+    "résolution": "2560×1440",
+    "hauteurImage": 798
+  },
+  {
+    "parcours": "industrie",
+    "étape": "saloon",
+    "phase": "PRESENTATION",
+    "résolution": "2560×1440",
+    "hauteurImage": 798
+  },
+  {
+    "parcours": "industrie",
+    "étape": "saloon-pour",
+    "phase": "REVEALED",
+    "résolution": "2560×1440",
+    "hauteurImage": 798
+  },
+  {
+    "parcours": "industrie",
+    "étape": "dilemme",
+    "phase": "PRESENTATION",
+    "résolution": "2560×1440",
+    "hauteurImage": 798
+  },
+  {
+    "parcours": "industrie",
+    "étape": "negociation",
+    "phase": "NEGOTIATION",
+    "résolution": "2560×1440",
+    "hauteurImage": 798
+  },
+  {
+    "parcours": "industrie",
+    "étape": "conseil",
+    "phase": "COUNCIL",
+    "résolution": "2560×1440",
+    "hauteurImage": 798
+  },
+  {
+    "parcours": "industrie",
+    "étape": "resultat",
+    "phase": "REVEALED",
+    "résolution": "2560×1440",
+    "hauteurImage": 798
+  },
+  {
+    "parcours": "industrie",
+    "étape": "resultat-contre",
+    "phase": "REVEALED",
+    "résolution": "2560×1440",
+    "hauteurImage": 798
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "vallee",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "vallee",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "affluence",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "affluence",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "institutions",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "institutions",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "crises",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "crises",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "anticipation",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "2560×1440",
+    "hauteurImage": 1440
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160,
+    "capture": "industrie-chapitre-2-3840x2160.webp"
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160,
+    "capture": "industrie-chapitre-4-3840x2160.webp"
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "industrie",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "industrie",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160,
+    "capture": "industrie-epilogue-3840x2160.webp"
+  },
+  {
+    "parcours": "industrie",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160,
+    "capture": "industrie-classement-3840x2160.webp"
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c1",
+    "phase": "PRESENTATION",
+    "résolution": "3840×2160",
+    "hauteurImage": 1197
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c2",
+    "phase": "PRESENTATION",
+    "résolution": "3840×2160",
+    "hauteurImage": 1197
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c3",
+    "phase": "PRESENTATION",
+    "résolution": "3840×2160",
+    "hauteurImage": 1197
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c4",
+    "phase": "PRESENTATION",
+    "résolution": "3840×2160",
+    "hauteurImage": 1197
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c5",
+    "phase": "PRESENTATION",
+    "résolution": "3840×2160",
+    "hauteurImage": 1197
+  },
+  {
+    "parcours": "industrie",
+    "étape": "presentation-c6",
+    "phase": "PRESENTATION",
+    "résolution": "3840×2160",
+    "hauteurImage": 1197
+  },
+  {
+    "parcours": "industrie",
+    "étape": "saloon",
+    "phase": "PRESENTATION",
+    "résolution": "3840×2160",
+    "hauteurImage": 1197,
+    "capture": "industrie-saloon-3840x2160.webp"
+  },
+  {
+    "parcours": "industrie",
+    "étape": "saloon-pour",
+    "phase": "REVEALED",
+    "résolution": "3840×2160",
+    "hauteurImage": 1197,
+    "capture": "industrie-saloon-pour-3840x2160.webp"
+  },
+  {
+    "parcours": "industrie",
+    "étape": "dilemme",
+    "phase": "PRESENTATION",
+    "résolution": "3840×2160",
+    "hauteurImage": 1197
+  },
+  {
+    "parcours": "industrie",
+    "étape": "negociation",
+    "phase": "NEGOTIATION",
+    "résolution": "3840×2160",
+    "hauteurImage": 1197
+  },
+  {
+    "parcours": "industrie",
+    "étape": "conseil",
+    "phase": "COUNCIL",
+    "résolution": "3840×2160",
+    "hauteurImage": 1197,
+    "capture": "industrie-conseil-3840x2160.webp"
+  },
+  {
+    "parcours": "industrie",
+    "étape": "resultat",
+    "phase": "REVEALED",
+    "résolution": "3840×2160",
+    "hauteurImage": 1197,
+    "capture": "industrie-resultat-3840x2160.webp"
+  },
+  {
+    "parcours": "industrie",
+    "étape": "resultat-contre",
+    "phase": "REVEALED",
+    "résolution": "3840×2160",
+    "hauteurImage": 1197
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160,
+    "capture": "vallee-chapitre-3-3840x2160.webp"
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "vallee",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "vallee",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160,
+    "capture": "vallee-epilogue-3840x2160.webp"
+  },
+  {
+    "parcours": "vallee",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160,
+    "capture": "affluence-chapitre-4-3840x2160.webp"
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "affluence",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "affluence",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160,
+    "capture": "affluence-epilogue-3840x2160.webp"
+  },
+  {
+    "parcours": "affluence",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "institutions",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160,
+    "capture": "institutions-chapitre-6-3840x2160.webp"
+  },
+  {
+    "parcours": "institutions",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160,
+    "capture": "institutions-epilogue-3840x2160.webp"
+  },
+  {
+    "parcours": "institutions",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-1",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-2",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-3",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-4",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-5",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160,
+    "capture": "crises-chapitre-5-3840x2160.webp"
+  },
+  {
+    "parcours": "crises",
+    "étape": "chapitre-6",
+    "phase": "CHECKPOINT",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "crises",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160,
+    "capture": "crises-epilogue-3840x2160.webp"
+  },
+  {
+    "parcours": "crises",
+    "étape": "classement",
+    "phase": "FINISHED",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160
+  },
+  {
+    "parcours": "anticipation",
+    "étape": "epilogue",
+    "phase": "EPILOGUE",
+    "résolution": "3840×2160",
+    "hauteurImage": 2160,
+    "capture": "anticipation-epilogue-3840x2160.webp"
+  }
+]

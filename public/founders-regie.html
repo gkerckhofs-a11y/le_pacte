@@ -1,6 +1,6 @@
 <!doctype html><html lang="fr">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Games of Influence · Régie organisateur</title><link rel="stylesheet" href="/founders-live.css"><link rel="stylesheet" href="/hotspring.css">
+<title>Games of Influence · Régie organisateur</title><link rel="stylesheet" href="/founders-live.css"><link rel="stylesheet" href="/hotspring.css"><link rel="stylesheet" href="/hotspring-cinema-regie.css">
 <script type="module" src="/founders-regie.js"></script></head>
 <body class="regie-dashboard" data-skin="western">
 <header class="top">
@@ -88,6 +88,26 @@
    
    <div class="row"><a href="#printKit">Cartes et QR à imprimer ↓</a><a id="publicLink" href="#" target="_blank" rel="noopener">Ouvrir l'écran public</a></div>
   </div>
+  <details id="cinemaPreview" class="panel" hidden>
+   <summary>Vues de Hotspring · préparer la projection</summary>
+   <div class="cinema-preview-controls">
+    <label>Parcours à prévisualiser<select id="cinemaPath"></select></label>
+    <label id="cinemaStageField" hidden>Étape à prévisualiser<select id="cinemaStage"></select></label>
+   </div>
+   <p id="cinemaPreviewScope" class="small muted"></p>
+   <figure><div id="cinemaImage"></div><figcaption><span id="cinemaChapter" class="eyeline"></span><strong id="cinemaTitle"></strong><span id="cinemaProfile" class="small"></span></figcaption></figure>
+   <p id="cinemaSummary"></p>
+   <p id="cinemaGauges" class="small"></p>
+   <details><summary>Pourquoi cette vue ?</summary><ul id="cinemaReasons"></ul></details>
+   <details id="cinemaAlternatives" hidden><summary>Autres vues de cette étape</summary><ul id="cinemaCandidates"></ul></details>
+   <button id="cinemaReport" class="secondary" type="button">Signaler une illustration manquante</button>
+   <div id="cinemaProblem" hidden>
+    <p id="cinemaProblemText" role="status"></p>
+    <label>Signalement à compléter et à transmettre à l’organisateur<textarea id="cinemaIssueReport" rows="4"></textarea></label>
+    <div class="row"><button id="cinemaCopy" class="secondary" type="button">Copier le signalement</button><button id="cinemaRetry" class="secondary" type="button">Réessayer le chargement</button></div>
+    <p id="cinemaCopied" class="small" role="status"></p>
+   </div>
+  </details>
   <section class="panel" id="v2Controls" hidden><h2 id="v2ControlsTitle">Réglages</h2>
 <form id="timingForm"><div class="grid2"><label id="presentationTiming" hidden>Lecture (secondes)<input id="presentationSeconds" type="number" min="5" max="7200" disabled></label><label>Négociation (secondes)<input id="negotiationSeconds" type="number" min="5" max="7200" required></label><label>Vote (secondes)<input id="voteSeconds" type="number" min="5" max="7200" required></label><label>Résolution (secondes)<input id="resolutionSeconds" type="number" min="5" max="7200" required></label><label>Seuils des jauges<input id="gaugeThresholds" required value="2,4,6,8"></label></div><label><input id="autoAdvance" type="checkbox"> Passer automatiquement de la négociation au vote et du résultat au chapitre suivant</label><p class="small">Le chrono du vote signale le temps écoulé ; les familles et le Shérif terminent leurs décisions. Les durées enregistrées s’appliquent aux prochaines phases. Les boutons ± 1 minute ajustent le chrono actuel.</p><button type="submit">Enregistrer les réglages</button></form>
 <p id="pendingOffers"></p><details><summary>Correction exceptionnelle d’une ressource</summary><p class="small">Mettez la partie en pause. Les corrections sont conservées dans l’historique technique de la partie.</p><form id="correctionForm"><label>Famille<select id="correctFamily"></select></label><label>Ressource<select id="correctResource"><option value="power">Influence</option><option value="dollars">Argent</option></select></label><label>Nouvelle valeur<input id="correctValue" type="number" min="0" max="100000" required></label><button type="submit">Corriger la ressource</button></form></details></section>

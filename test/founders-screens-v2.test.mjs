@@ -6,7 +6,7 @@ import vm from 'node:vm';
 import {webcrypto} from 'node:crypto';
 import {parseHTML} from 'linkedom';
 import {foundersPreview,foundersCatalogFor} from '../server/founders-catalog.ts';
-import {createNarrativeSession,applyNarrativeCommand,narrativeView} from '../src/founders-live.ts';
+import {createNarrativeSession,applyNarrativeCommand,narrativePublicView,narrativeView} from '../src/founders-live.ts';
 import {prepareCosaNostra} from '../server/cosa-nostra-preparation.ts';
 import {chicagoSessionPreview} from '../server/cosa-nostra-session.ts';
 import {fixture as chicagoCampaign} from './helpers/chicago.mjs';
@@ -58,33 +58,30 @@ test('Projection : seul le cadre de la famille suit la parole du Conseil',async(
  }
 });
 
-test('Projection Hotspring : le visuel du dilemme et le panorama coexistent',async()=>{
- const campaign=newCampaign();
- campaign.command('start');
- const intro=await screen('city',campaign.state);
- assert.equal(intro.document.getElementById('decisionImage').hidden,false);
- assert.equal(intro.document.querySelector('#hotspringStage img'),null);
- campaign.command('next');
- const {document}=await screen('city',campaign.state);
- const artwork=document.getElementById('decisionImage'),city=document.getElementById('city');
- assert.equal(document.querySelectorAll('#gauges .gauge').length,6);
- assert.match(document.getElementById('gauges').textContent,/Bien-être.*Stabilité/);
- assert.match(document.getElementById('gauges').textContent,/5,0\/10Moyenne générale de Hotspring/);
- assert.equal(document.getElementById('cityEvolution').hidden,true);
- assert.equal(artwork.hidden,false);
- assert.equal(city.hidden,false);
- assert.equal(artwork.closest('#dilemmaPanel').id,'dilemmaPanel');
- assert.equal(document.getElementById('dilemmaArtwork').hidden,false);
- assert.ok(document.getElementById('question').textContent);
- campaign.vote('pour');
- const reveal=await screen('city',campaign.state);
- assert.match(reveal.document.getElementById('gauges').textContent,/Stabilité5,0 → 5,4\/10\+0,4/);
- assert.equal(reveal.document.getElementById('city').hidden,false);
- assert.match(reveal.document.getElementById('decisionImage').getAttribute('src'),/d01_result_for_lowlands/);
- assert.equal(reveal.document.getElementById('decisionImage').hidden,false);
- artwork.dispatchEvent(new document.defaultView.Event('error'));
- assert.equal(document.getElementById('dilemmaArtwork').hidden,true);
- assert.equal(city.hidden,false);
+test('Projection Hotspring : une seule scène de Conseil, la carte uniquement sur demande',async()=>{
+ const campaign=newCampaign();campaign.command('start');
+ const {document,update}=await screen('city',campaign.state);
+ const get=id=>document.getElementById(id);
+ assert.equal(get('decisionImage').hidden,false);
+ assert.equal(document.querySelector('#hotspringStage img'),null);
+ campaign.command('next');await update(campaign.state);
+ assert.equal(document.querySelectorAll('#gauges .gauge').length,5);
+ assert.equal(get('stabilityTitle').textContent,'Stabilité — 5,0 / 10');
+ assert.equal(get('decisionImage').closest('#dilemmaPanel'),get('dilemmaPanel'));
+ assert.equal(get('cityCinema').hidden,true);
+ assert.equal(get('city').childElementCount,0);
+ assert.equal(get('valleyMap').childElementCount,0);
+ assert.ok(get('question').textContent);
+ campaign.vote('pour');await update(campaign.state);
+ assert.match(get('stabilityTitle').textContent,/Stabilité — 5,4 \/ 10\+0,4/);
+ assert.match(get('decisionImage').getAttribute('src'),/d01_result_for_lowlands/);
+ assert.equal(document.querySelector('img[src*="result_against"]'),null);
+ get('panoramaOverview').click();
+ assert.ok(get('valleyMap').querySelector('svg'));
+ get('valleyDialog').close();
+ campaign.command('next');await update(campaign.state);
+ assert.equal(get('gauges').querySelector('.gauge-delta'),null);
+ assert.doesNotMatch(get('decisionImage').getAttribute('src'),/d01_result/);
 });
 
 test('Projection en plein écran : le visuel du dilemme garde sa place',async()=>{
@@ -216,7 +213,7 @@ test('Hotspring V1.2 : négociation, menus bornés et mise à jour du terminal',
  assert.equal(get('raiseVote').hidden,true);
 });
 
-test('Hotspring V1.2 : Stabilité sous le panorama et ouverture manuelle depuis la régie',async()=>{
+test('Hotspring V1.2 : Stabilité auprès de la réserve et ouverture manuelle depuis la régie',async()=>{
  const g=newCampaign({scenarioVersion:'1.2.0',ownerId:owner.id});
  for(const action of ['start','next','next'])g.command(action,{},owner);
  const regie=(await screen('regie',g.state)).document;
@@ -233,7 +230,7 @@ test('Hotspring V1.2 : Stabilité sous le panorama et ouverture manuelle depuis 
  const {document}=await screen('city',g.state);
  const get=id=>document.getElementById(id);
  assert.equal(get('phaseClock').hidden,true);
- assert.equal(get('panoramaStability').previousElementSibling.firstElementChild.id,'city');
+ assert.equal(get('panoramaStability').parentElement.id,'townCouncilFinance');
  assert.equal(get('panoramaStability').hidden,false);
  assert.equal(get('stabilityTitle').textContent,'Stabilité — 5,0 / 10');
  assert.equal(get('stabilityState').textContent,'Ville stable');
@@ -244,7 +241,7 @@ test('Hotspring V1.2 : Stabilité sous le panorama et ouverture manuelle depuis 
  assert.equal(get('influencePart').textContent,'3 Influence');
 });
 
-test('Hotspring : l’épilogue annonce le classement avant le détail des objectifs',async()=>{
+test('Hotspring : le bilan collectif précède la révélation manuelle du classement',async()=>{
  const game=newCampaign({scenarioVersion:'1.2.0',ownerId:owner.id});
  game.command('start',{},owner);
  game.command('pause',{},owner);
@@ -254,22 +251,21 @@ test('Hotspring : l’épilogue annonce le classement avant le détail des objec
  const projection=await screen('city',game.state);
  const get=id=>projection.document.getElementById(id);
  assert.equal(get('dilemmaPanel').hidden,true);
- assert.equal(get('finalResults').hidden,false);
- assert.match(get('winnerTitle').textContent,/Les Doyle/);
- assert.equal(get('finalRanking').querySelectorAll('ol > li').length,5);
- assert.equal(get('finalRanking').querySelector('details'),null);
- assert.ok(projection.document.body.classList.contains('projection-town-final'));
- assert.equal(get('finalRanking').querySelector('[data-rank="1"] strong').textContent,'5 points');
- assert.equal(get('finalRanking').querySelector('[data-rank="1"] span:nth-child(2)').textContent,'Les Doyle');
- assert.equal(get('panoramaOverview').hidden,true);
- assert.equal(get('narrativeEnding').hasAttribute('open'),false);
- assert.equal(get('narrativeEnding').hidden,false);
- assert.ok(get('endingText').textContent.includes('Qu’avez-vous fait de Hotspring'));
+ assert.equal(get('finalResults').hidden,true);
+ assert.equal(get('cityCinema').hidden,false);
+ assert.equal(get('cinemaTitle').textContent,'Qu’avez-vous fait de Hotspring ?');
+ assert.equal(get('finalRanking').childElementCount,0);
+ assert.doesNotMatch(get('cityCinema').textContent,/Les Doyle|objectifs secrets/);
+ assert.ok(projection.document.body.classList.contains('hotspring-ending-screen'));
  const regie=(await screen('regie',game.state)).document;
  assert.equal(regie.querySelector('#sessionControls #showResults').hidden,false);
  assert.match(regie.getElementById('hotspringStage').textContent,/Les Doyle · 5 \/ 5/);
  game.command('showResults',{},owner);
  await projection.update(game.state);
+ assert.equal(get('finalResults').hidden,false);
+ assert.match(get('winnerTitle').textContent,/Les Doyle/);
+ assert.ok(projection.document.body.classList.contains('hotspring-ranking-screen'));
+ assert.equal(get('finalRanking').querySelector('[data-rank="1"] strong').textContent,'5 points');
  assert.equal(get('finalRanking').querySelectorAll('li').length,5);
  assert.equal(get('endingText').querySelectorAll('ol > li > details').length,5);
  assert.equal(get('narrativeEnding').hasAttribute('open'),false);
@@ -652,4 +648,34 @@ test('Décisions-clés Chicago : cinq fiches privées, proposition exacte et rap
  const final=a.document.getElementById('chicagoAmbition');
  assert.match(final.textContent,/Réussie ✓.*Non jouée.*Finale anticipée/);
  assert.doesNotMatch(final.textContent,/Manquée|0 \/ 0/);
+});
+
+test('Bilan Hotspring : portrait du chapitre, six jauges et secours du même stade',async()=>{
+ const game=newCampaign({scenarioVersion:'1.2.0'});
+ game.command('start');
+ while(game.state.phase!=='CHECKPOINT'){
+  if(game.state.phase==='REVEALED')game.command('next');
+  else game.vote('pour');
+ }
+ const {document,update}=await screen('city',game.state);
+ const get=id=>document.getElementById(id),cinema=narrativePublicView(game.state).campaign.cinema;
+ assert.equal(get('dilemmaPanel').hidden,true);
+ assert.equal(get('cityCinema').hidden,false);
+ assert.equal(get('cinemaChapter').textContent,'Chapitre 1 terminé');
+ assert.equal(get('cinemaTitle').textContent,cinema.chapterTitle);
+ assert.equal(get('cinemaGauges').children.length,6);
+ assert.equal(get('cinemaGauges').querySelectorAll('small.cinema-delta').length,6);
+ assert.equal(get('finalResults').hidden,true);
+ assert.equal(get('cinemaImage').getAttribute('src'),cinema.view.url);
+ assert.equal(get('city').childElementCount,0);
+ get('cinemaTools').click();
+ assert.equal(get('cinemaTools').getAttribute('aria-expanded'),'true');
+ assert.notEqual(cinema.view.url,cinema.fallback.url);
+ get('cinemaImage').onerror();
+ assert.equal(get('cinemaImage').getAttribute('src'),cinema.fallback.url);
+ get('cinemaImage').onerror();
+ assert.equal(get('cinemaMissing').hidden,false);
+ game.command('next');await update(game.state);
+ assert.equal(get('cityCinema').hidden,true);
+ assert.equal(get('cinemaTools').hidden,true);
 });

@@ -1,0 +1,726 @@
+[
+  {
+    "id": "industrie",
+    "title": "Ville industrielle et polluée",
+    "chapters": [
+      {
+        "stage": 1,
+        "city": {
+          "economie": 10,
+          "ecologie": 5,
+          "securite": 5,
+          "demographie": 7,
+          "bien_etre": 4
+        },
+        "markers": [
+          "VILLE_BASSE",
+          "EAU_PRIVEE",
+          "CENTRE_PRIVE"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 2,
+        "city": {
+          "economie": 7,
+          "ecologie": 3,
+          "securite": 6,
+          "demographie": 10,
+          "bien_etre": 8
+        },
+        "markers": [
+          "SCIERIE_INTENSIVE",
+          "ECOLE",
+          "GRAND_SALOON",
+          "DISPENSAIRE",
+          "REGLEMENT_INCENDIE"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 3,
+        "city": {
+          "economie": 8,
+          "ecologie": 2,
+          "securite": 10,
+          "demographie": 9,
+          "bien_etre": 10
+        },
+        "markers": [
+          "ACCORD_RIVIERE",
+          "PASSAGE_DIRECT",
+          "COMPTOIR_COMMUN",
+          "POSTE_TERRITORIAL",
+          "ACCORD_RESPECTE",
+          "ALLIANCE_VALLEE"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 4,
+        "city": {
+          "economie": 10,
+          "ecologie": 0,
+          "securite": 10,
+          "demographie": 10,
+          "bien_etre": 4
+        },
+        "markers": [
+          "CHEMIN_DE_FER",
+          "TERRAINS_COMPAGNIE",
+          "GRANDE_MINE",
+          "QUARTIER_PROVISOIRE",
+          "BANQUE_CREDIT",
+          "HYPOTHEQUES",
+          "SPECULATION_ACTIVE",
+          "ABATTOIR_CENTRAL",
+          "SCRIP",
+          "MAGASIN_COMPAGNIE",
+          "DETTE_OUVRIERE"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 5,
+        "city": {
+          "economie": 6,
+          "ecologie": 0,
+          "securite": 10,
+          "demographie": 7,
+          "bien_etre": 0
+        },
+        "markers": [
+          "MARSHAL",
+          "PRISON_LOCALE",
+          "DECHETS_LIBRES",
+          "REJETS_NON_REGLEMENTES",
+          "FINANCEMENT_PONCTUEL",
+          "DONATEURS_DOMINANTS",
+          "SAUVETAGE_BANQUE",
+          "DETTE_PUBLIQUE",
+          "BANQUE_SOUS_CONTROLE",
+          "EPIDEMIE_DIFFUSE"
+        ],
+        "playedCrises": [
+          "D28",
+          "D25"
+        ],
+        "charter": null
+      },
+      {
+        "stage": 6,
+        "city": {
+          "economie": 6,
+          "ecologie": 0,
+          "securite": 10,
+          "demographie": 7,
+          "bien_etre": 0
+        },
+        "markers": [
+          "CONSEIL_FONDATEURS",
+          "VETO_FONDATEURS"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 7,
+        "city": {
+          "economie": 8,
+          "ecologie": 0,
+          "securite": 10,
+          "demographie": 8,
+          "bien_etre": 0
+        },
+        "markers": [
+          "CHARTE_ENTREPRISE"
+        ],
+        "playedCrises": [],
+        "charter": "A"
+      }
+    ]
+  },
+  {
+    "id": "vallee",
+    "title": "Communauté paisible de la vallée",
+    "chapters": [
+      {
+        "stage": 1,
+        "city": {
+          "economie": 3,
+          "ecologie": 7,
+          "securite": 6,
+          "demographie": 4,
+          "bien_etre": 7
+        },
+        "markers": [
+          "VILLE_HAUTE",
+          "EAU_COMMUNALE",
+          "RESERVES_PUBLIQUES"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 2,
+        "city": {
+          "economie": 0,
+          "ecologie": 9,
+          "securite": 9,
+          "demographie": 5,
+          "bien_etre": 10
+        },
+        "markers": [
+          "COUPE_REGULEE",
+          "ECOLE",
+          "AUBERGE_REGLEMENTEE",
+          "DISPENSAIRE",
+          "REGLEMENT_INCENDIE"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 3,
+        "city": {
+          "economie": 0,
+          "ecologie": 10,
+          "securite": 10,
+          "demographie": 4,
+          "bien_etre": 10
+        },
+        "markers": [
+          "ACCORD_RIVIERE",
+          "DETOUR_TROUPEAUX",
+          "COMPTOIR_COMMUN",
+          "AUTONOMIE_LOCALE",
+          "ACCORD_RESPECTE",
+          "ALLIANCE_VALLEE"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 4,
+        "city": {
+          "economie": 1,
+          "ecologie": 10,
+          "securite": 10,
+          "demographie": 3,
+          "bien_etre": 10
+        },
+        "markers": [
+          "SANS_GARE",
+          "TERRES_CONSERVEES",
+          "PETITES_MINES",
+          "QUARTIER_PLANIFIE",
+          "CREDIT_LIMITE",
+          "ABATTOIR_ELOIGNE"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 5,
+        "city": {
+          "economie": 0,
+          "ecologie": 10,
+          "securite": 10,
+          "demographie": 3,
+          "bien_etre": 10
+        },
+        "markers": [
+          "MARSHAL",
+          "PRISON_LOCALE",
+          "ASSAINISSEMENT",
+          "COLLECTE_DECHETS",
+          "IMPOT_LOCAL",
+          "BUDGET_PUBLIC",
+          "SERVICES_MAINTENUS"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 6,
+        "city": {
+          "economie": 0,
+          "ecologie": 10,
+          "securite": 9,
+          "demographie": 3,
+          "bien_etre": 10
+        },
+        "markers": [
+          "CONSEIL_ELU"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 7,
+        "city": {
+          "economie": 0,
+          "ecologie": 10,
+          "securite": 10,
+          "demographie": 3,
+          "bien_etre": 10
+        },
+        "markers": [
+          "PACTE_VALLEE_FINAL"
+        ],
+        "playedCrises": [],
+        "charter": "E"
+      }
+    ]
+  },
+  {
+    "id": "affluence",
+    "title": "Ville très peuplée et fragile",
+    "chapters": [
+      {
+        "stage": 1,
+        "city": {
+          "economie": 4,
+          "ecologie": 6,
+          "securite": 5,
+          "demographie": 6,
+          "bien_etre": 7
+        },
+        "markers": [
+          "VILLE_BASSE",
+          "EAU_COMMUNALE",
+          "RESERVES_PUBLIQUES"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 2,
+        "city": {
+          "economie": 10,
+          "ecologie": 4,
+          "securite": 3,
+          "demographie": 7,
+          "bien_etre": 4
+        },
+        "markers": [
+          "SCIERIE_INTENSIVE",
+          "ECOLE_REPORTEE",
+          "GRAND_SALOON",
+          "SANS_MEDECIN",
+          "CONSTRUCTION_SERREE"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 3,
+        "city": {
+          "economie": 9,
+          "ecologie": 8,
+          "securite": 3,
+          "demographie": 9,
+          "bien_etre": 3
+        },
+        "markers": [
+          "ACCORD_RIVIERE",
+          "DETOUR_TROUPEAUX",
+          "MONOPOLE_LOCAL",
+          "AUTONOMIE_LOCALE",
+          "ACCORD_ROMPU",
+          "ENQUETE_CONJOINTE",
+          "DETENTE_PRUDENTE"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 4,
+        "city": {
+          "economie": 9,
+          "ecologie": 8,
+          "securite": 3,
+          "demographie": 10,
+          "bien_etre": 7
+        },
+        "markers": [
+          "CHEMIN_DE_FER",
+          "TERRAINS_COMPAGNIE",
+          "PETITES_MINES",
+          "QUARTIER_PLANIFIE",
+          "BANQUE_CREDIT",
+          "HYPOTHEQUES",
+          "SPECULATION_ACTIVE",
+          "ABATTOIR_ELOIGNE",
+          "SALAIRE_ESPECES"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 5,
+        "city": {
+          "economie": 6,
+          "ecologie": 6,
+          "securite": 0,
+          "demographie": 9,
+          "bien_etre": 1
+        },
+        "markers": [
+          "POSSE",
+          "ARMES_FAMILLES",
+          "DECHETS_LIBRES",
+          "REJETS_NON_REGLEMENTES",
+          "FINANCEMENT_PONCTUEL",
+          "DONATEURS_DOMINANTS",
+          "SAUVETAGE_BANQUE",
+          "DETTE_PUBLIQUE",
+          "BANQUE_SOUS_CONTROLE",
+          "CENTRE_SAUVE",
+          "QUARTIER_BRULE",
+          "CICATRICES_INCENDIE"
+        ],
+        "playedCrises": [
+          "D28",
+          "D24"
+        ],
+        "charter": null
+      },
+      {
+        "stage": 6,
+        "city": {
+          "economie": 6,
+          "ecologie": 6,
+          "securite": 1,
+          "demographie": 9,
+          "bien_etre": 0
+        },
+        "markers": [
+          "CONSEIL_FONDATEURS",
+          "VETO_FONDATEURS"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 7,
+        "city": {
+          "economie": 8,
+          "ecologie": 5,
+          "securite": 1,
+          "demographie": 10,
+          "bien_etre": 0
+        },
+        "markers": [
+          "CHARTE_ENTREPRISE"
+        ],
+        "playedCrises": [],
+        "charter": "A"
+      }
+    ]
+  },
+  {
+    "id": "institutions",
+    "title": "Ville sécurisée et organisée",
+    "chapters": [
+      {
+        "stage": 1,
+        "city": {
+          "economie": 3,
+          "ecologie": 7,
+          "securite": 6,
+          "demographie": 4,
+          "bien_etre": 7
+        },
+        "markers": [
+          "VILLE_HAUTE",
+          "EAU_COMMUNALE",
+          "RESERVES_PUBLIQUES"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 2,
+        "city": {
+          "economie": 6,
+          "ecologie": 5,
+          "securite": 7,
+          "demographie": 7,
+          "bien_etre": 8
+        },
+        "markers": [
+          "SCIERIE_INTENSIVE",
+          "ECOLE",
+          "GRAND_SALOON",
+          "SANS_MEDECIN",
+          "REGLEMENT_INCENDIE"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 3,
+        "city": {
+          "economie": 4,
+          "ecologie": 9,
+          "securite": 9,
+          "demographie": 9,
+          "bien_etre": 9
+        },
+        "markers": [
+          "ACCORD_RIVIERE",
+          "DETOUR_TROUPEAUX",
+          "COMPTOIR_COMMUN",
+          "AUTONOMIE_LOCALE",
+          "ACCORD_ROMPU",
+          "ENQUETE_CONJOINTE",
+          "DETENTE_PRUDENTE"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 4,
+        "city": {
+          "economie": 10,
+          "ecologie": 5,
+          "securite": 9,
+          "demographie": 9,
+          "bien_etre": 5
+        },
+        "markers": [
+          "CHEMIN_DE_FER",
+          "TERRAINS_COMPAGNIE",
+          "GRANDE_MINE",
+          "QUARTIER_PROVISOIRE",
+          "CREDIT_LIMITE",
+          "ABATTOIR_ELOIGNE",
+          "SCRIP",
+          "MAGASIN_COMPAGNIE",
+          "DETTE_OUVRIERE"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 5,
+        "city": {
+          "economie": 9,
+          "ecologie": 7,
+          "securite": 8,
+          "demographie": 9,
+          "bien_etre": 8
+        },
+        "markers": [
+          "MARSHAL",
+          "PRISON_LOCALE",
+          "ASSAINISSEMENT",
+          "COLLECTE_DECHETS",
+          "IMPOT_LOCAL",
+          "BUDGET_PUBLIC",
+          "INCENDIE_CONTENU",
+          "CICATRICES_INCENDIE",
+          "REPRISE_IMMEDIATE",
+          "GREVE_IMMINENTE",
+          "RAPPORT_ACCIDENT",
+          "SERVICES_MAINTENUS"
+        ],
+        "playedCrises": [
+          "D24",
+          "D27"
+        ],
+        "charter": null
+      },
+      {
+        "stage": 6,
+        "city": {
+          "economie": 9,
+          "ecologie": 7,
+          "securite": 7,
+          "demographie": 9,
+          "bien_etre": 9
+        },
+        "markers": [
+          "CONSEIL_ELU"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 7,
+        "city": {
+          "economie": 7,
+          "ecologie": 8,
+          "securite": 9,
+          "demographie": 9,
+          "bien_etre": 10
+        },
+        "markers": [
+          "CHARTE_VILLE_MODERNE"
+        ],
+        "playedCrises": [],
+        "charter": "D"
+      }
+    ]
+  },
+  {
+    "id": "crises",
+    "title": "Ville appauvrie après les crises",
+    "chapters": [
+      {
+        "stage": 1,
+        "city": {
+          "economie": 7,
+          "ecologie": 6,
+          "securite": 5,
+          "demographie": 6,
+          "bien_etre": 6
+        },
+        "markers": [
+          "VILLE_BASSE",
+          "EAU_COMMUNALE",
+          "CENTRE_PRIVE"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 2,
+        "city": {
+          "economie": 3,
+          "ecologie": 8,
+          "securite": 6,
+          "demographie": 8,
+          "bien_etre": 10
+        },
+        "markers": [
+          "COUPE_REGULEE",
+          "ECOLE",
+          "GRAND_SALOON",
+          "DISPENSAIRE",
+          "REGLEMENT_INCENDIE"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 3,
+        "city": {
+          "economie": 8,
+          "ecologie": 7,
+          "securite": 9,
+          "demographie": 8,
+          "bien_etre": 8
+        },
+        "markers": [
+          "EXPANSION_RIVIERE",
+          "DETOUR_TROUPEAUX",
+          "MONOPOLE_LOCAL",
+          "POSTE_TERRITORIAL",
+          "HOSTILITE_OUVERTE"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 4,
+        "city": {
+          "economie": 10,
+          "ecologie": 3,
+          "securite": 9,
+          "demographie": 10,
+          "bien_etre": 4
+        },
+        "markers": [
+          "CHEMIN_DE_FER",
+          "TERRAINS_COMPAGNIE",
+          "GRANDE_MINE",
+          "QUARTIER_PROVISOIRE",
+          "BANQUE_CREDIT",
+          "HYPOTHEQUES",
+          "SPECULATION_ACTIVE",
+          "ABATTOIR_ELOIGNE",
+          "SCRIP",
+          "MAGASIN_COMPAGNIE",
+          "DETTE_OUVRIERE"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 5,
+        "city": {
+          "economie": 0,
+          "ecologie": 1,
+          "securite": 10,
+          "demographie": 4,
+          "bien_etre": 2
+        },
+        "markers": [
+          "POSSE",
+          "ARMES_FAMILLES",
+          "DECHETS_LIBRES",
+          "REJETS_NON_REGLEMENTES",
+          "IMPOT_LOCAL",
+          "BUDGET_PUBLIC",
+          "INCENDIE_CONTENU",
+          "CICATRICES_INCENDIE",
+          "FAILLITES_EN_CHAINE",
+          "SAISIES",
+          "BANQUE_FERMEE",
+          "EPIDEMIE_DIFFUSE",
+          "EVACUATION_ORDONNEE",
+          "FRET_SACRIFIE",
+          "MARQUES_DE_CRUE",
+          "SECURITE_MINIERE",
+          "FONDS_SECOURS",
+          "RAPPORT_ACCIDENT",
+          "SERVICES_MAINTENUS"
+        ],
+        "playedCrises": [
+          "D24",
+          "D28",
+          "D25",
+          "D26A",
+          "D27"
+        ],
+        "charter": null
+      },
+      {
+        "stage": 6,
+        "city": {
+          "economie": 0,
+          "ecologie": 1,
+          "securite": 9,
+          "demographie": 4,
+          "bien_etre": 3
+        },
+        "markers": [
+          "CONSEIL_ELU"
+        ],
+        "playedCrises": [],
+        "charter": null
+      },
+      {
+        "stage": 7,
+        "city": {
+          "economie": 1,
+          "ecologie": 1,
+          "securite": 8,
+          "demographie": 4,
+          "bien_etre": 2
+        },
+        "markers": [
+          "CHARTE_FRONTIERE_LIBRE"
+        ],
+        "playedCrises": [],
+        "charter": "C"
+      }
+    ]
+  }
+]

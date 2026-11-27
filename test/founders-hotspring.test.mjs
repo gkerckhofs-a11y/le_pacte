@@ -42,7 +42,8 @@ test('Hotspring : surenchère, abstention sautée, sauvegarde du scrutin et des 
  assert.equal(narrativePublicView(g.state).council.bids.A,2);
  g.command('endSitting');
  assert.equal(g.state.phase,'SUSPENDED');
- assert.equal(narrativePublicView(g.state).campaign.checkpoint.ranking[0].maximum,2);
+ assert.equal(narrativePublicView(g.state).campaign.checkpoint.ranking,undefined);
+ assert.equal(narrativeFamilyView(g.state,'A').campaign.checkpoint.ranking[0].maximum,2);
  assert.equal(narrativeOrganizerView(g.state).offers['d01-offer'].status,'pending');
  assert.throws(()=>g.command('vote',{kind:'pour',amount:1},team('D')),/Séance sauvegardée/);
  g.replaceState(JSON.parse(JSON.stringify(g.state)));
@@ -287,7 +288,8 @@ test('Hotspring : Terminer l’histoire produit un épilogue anticipé et rembou
  g.command('finish',{confirm:true});
  assert.equal(g.state.game.families.A.power,8);
  assert.equal(g.state.phase,'EPILOGUE');assert.equal(g.state.campaign.charter,null);
- const summary=narrativePublicView(g.state).campaign.epilogueResults;
+ assert.equal(narrativePublicView(g.state).campaign.epilogueResults,undefined);
+ const summary=narrativeFamilyView(g.state,'A').campaign.epilogueResults;
  assert.equal(summary.winners.length,5);
  assert.ok(summary.rows.every(row=>row.total===3&&row.maximum===5));
  g.command('pause');
@@ -317,7 +319,8 @@ for(const [name,policy] of Object.entries(trajectories))test('Hotspring : parcou
  assert.ok(s.revealedHistory.some(h=>h.id.startsWith('D14')));
  for(const round of snapshots.filter(s=>s.phase==='CHECKPOINT')){
   const pub=narrativePublicView(round);
-  assert.equal(pub.campaign.checkpoint.ranking.length,5);
+  assert.equal(pub.campaign.checkpoint.ranking,undefined);
+  assert.equal(narrativeFamilyView(round,'A').campaign.checkpoint.ranking.length,5);
   assert.ok(!JSON.stringify(pub).includes(round.goals.A));
  }
  if(name==='commerce'){assert.ok(s.game.city.ecologie<=3);assert.ok(s.campaign.markers.includes('BANQUE_CREDIT'));}

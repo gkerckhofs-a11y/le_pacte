@@ -1,6 +1,7 @@
+import {prepareTownProjection,drawTownCinema,drawValleyMap} from './hotspring-cinema-projection.js';
 import {gaugeLevelLabel,renderChicagoGauges} from './founders-live-ui.js';
 import {renderSuccession,showChicagoRanking,chicagoPhase} from './chicago-succession.js';
-import {CAMPAIGN_PHASES,renderHotspringPanorama,setHotspringOverview,setHotspringImage,renderTendencies,renderHotspringStage,renderCampaignRanking} from './founders-hotspring.js';
+import {CAMPAIGN_PHASES,setHotspringImage,renderTendencies,renderHotspringStage,renderCampaignRanking} from './founders-hotspring.js';
 import {decorateGauge,formatGaugeNumber,renderPhaseClock,voteTotals,appendGaugeDelta,gaugeDelta,renderChicagoChoices} from './founders-live-ui.js';
 import {voteProgress} from './founders-vote-progress.js';
 import {appendFamilyRoles} from './founders-role-badges.js';
@@ -86,7 +87,8 @@ function drawChicagoScene(s){
 function drawIllustration(s,sceneOnly){
  const image=$('decisionImage');
  const previous=image.getAttribute('src');
- const art=s.reveal?.visual??s.campaign?.intro?.visual??(!sceneOnly&&!s.reveal?s.dilemma?.image:null);
+ const opening=s.campaign&&['READY','INTRO'].includes(s.phase)&&s.campaign.chapter===1?s.campaign.cinema?.view:null;
+ const art=s.reveal?.visual??opening??s.campaign?.intro?.visual??(!sceneOnly?s.dilemma?.image:null);
  if($('dilemmaPanel').hidden)image.removeAttribute('src');
 
  else if(s.campaign)setHotspringImage(image,art);
@@ -104,15 +106,14 @@ function drawGauges(s){
  const compact=Boolean(s.campaign)&&Object.hasOwn(s.city,'bien_etre');
  root.classList.toggle('projection-gauges-grid',compact);
  for(const key of Object.keys(s.city)){
-  if(key==='stabilite'&&(s.manualCouncil||s.campaign?.version>=3))continue;
-  const g=document.createElement('div');g.className='gauge';
+  if(key==='stabilite'&&(s.manualCouncil||s.campaign))continue;
+  const g=document.createElement('div');g.className='gauge';g.dataset.indicator=key;
   const row=document.createElement('div');row.className='gauge-head';
   const label=document.createElement('span');label.textContent=s.skin.labels.resources[key]||key;
   const score=document.createElement('strong'),before=s.reveal?.cityBefore?.[key];
-  const decimal=compact&&key==='stabilite',value=formatGaugeNumber(s.city[key],decimal);
-  if(decimal)label.setAttribute('aria-description','Moyenne des cinq indicateurs de Hotspring');
-  score.textContent=(compact&&Number.isFinite(before)&&s.reveal?.cityAfter?.[key]===s.city[key]&&(decimal||gaugeDelta(s,key)?.value!==0)
-   ?formatGaugeNumber(before,decimal)+' → '+value:value)+'/'+(s.gaugeMaximum??10);
+  const value=formatGaugeNumber(s.city[key]);
+  score.textContent=(compact&&Number.isFinite(before)&&s.reveal?.cityAfter?.[key]===s.city[key]&&gaugeDelta(s,key)?.value!==0
+   ?formatGaugeNumber(before)+' → '+value:value)+'/'+(s.gaugeMaximum??10);
   appendGaugeDelta(score,s,key);
   row.append(label,score);g.append(row);
   const track=document.createElement('div');track.className='track';
@@ -120,10 +121,6 @@ function drawGauges(s){
   bar.style.width=((Number.isFinite(before)?before:s.city[key])*100/(s.gaugeMaximum??10))+'%';
   decorateGauge(bar,label,s.city[key],s,{compact});
   track.append(bar);g.append(track);
-  if(decimal){
-   const description=document.createElement('small');description.className='stability-caption';
-   description.textContent='Moyenne générale de Hotspring';g.append(description);
-  }
   requestAnimationFrame(()=>requestAnimationFrame(()=>{bar.style.width=(s.city[key]*100/(s.gaugeMaximum??10))+'%';}));
   root.append(g);
  }
@@ -149,7 +146,7 @@ function drawPanoramaStability(s,manual){
 function fitTownReading(){
  const copy=$('dilemmaText').parentElement,paragraph=$('dilemmaText'),read=$('townRead');
  read.hidden=true;
- if(!document.body.classList.contains('projection-town-dilemma')||paragraph.hidden)return;
+ if(!document.body.classList.contains('hotspring-council-screen')||paragraph.hidden)return;
  const full=$('townReadingText').textContent;
  if(!full)return;
  paragraph.textContent=full;
@@ -182,13 +179,13 @@ function render(s){
  document.body.classList.toggle('chicago-v3',Boolean(s.succession));
  renderSuccession($('chicagoSuccession'),s,'public');
  const manual=s.manualCouncil||s.campaign?.version>=3;
- const epilogueScores=s.campaign?.epilogueResults;
- const results=s.finalResults??epilogueScores;
+ const results=s.finalResults;
  const townFinal=Boolean(s.campaign&&results);
- document.body.classList.toggle('projection-town-final',townFinal);
+ const townMode=s.campaign?prepareTownProjection(s):null;
+ const collective=townMode==='chapter'||townMode==='ending';
  document.body.classList.toggle('game-finished',Boolean(s.finalResults));
  document.body.classList.toggle('projection-manual-hotspring',s.campaign?.version>=3);
- $('dilemmaPanel').hidden=Boolean(results)||s.phase==='SUCCESSION';
+ $('dilemmaPanel').hidden=collective||Boolean(results)||s.phase==='SUCCESSION';
  $('ballots').closest('.panel').hidden=s.phase==='SUCCESSION'||Boolean(s.succession&&s.finalResults);
  const stageReading=Boolean(s.campaign)&&['CHECKPOINT','SUSPENDED','CHARTER_SUPPORT','EPILOGUE'].includes(s.phase);
  document.body.classList.toggle('projection-stage-reading',stageReading);
@@ -198,8 +195,8 @@ function render(s){
  $('phase').hidden=!$('phaseClock').hidden;
  const totals=voteTotals(s);
  applySkin(document.body,s.skin);document.body.classList.toggle('campaign-hotspring',Boolean(s.campaign));text('universeTitle',s.campaign?s.story.title:'Games of Influence · '+s.skin.title);
- text('pageTitle',s.story.location+' · '+s.story.year);text('phase',(chicagoPhase(s)||pretty[s.phase]||s.phase)+(manual&&s.clock?.paused?' · Pause':''));
- text('chapter',s.dilemma?(s.dilemma.sequence?'Conseil '+s.dilemma.sequence:'Chapitre '+s.dilemma.chapter):s.chicago?'La Commission':'Le Conseil des Fondateurs');
+ text('pageTitle',s.story.location+' · '+(s.campaign?(s.campaign.year??('fondée en '+s.story.year)):s.story.year));text('phase',(chicagoPhase(s)||pretty[s.phase]||s.phase)+(manual&&s.clock?.paused?' · Pause':''));
+ text('chapter',s.campaign?'Chapitre '+s.campaign.chapter:s.dilemma?(s.dilemma.sequence?'Conseil '+s.dilemma.sequence:'Chapitre '+s.dilemma.chapter):s.chicago?'La Commission':'Le Conseil des Fondateurs');
  const sceneOnly=s.phase==='SUSPENDED'||s.campaign&&['INTRO','CHECKPOINT','SUSPENDED','CHARTER_SUPPORT','EPILOGUE','FINISHED'].includes(s.phase);
  $('dilemmaTitle').hidden=Boolean(sceneOnly);$('dilemmaText').hidden=Boolean(sceneOnly||s.reveal);
  text('dilemmaTitle',s.dilemma?.title||(s.phase==='FINISHED'?(s.chicago?'Les Conseils de Chicago sont terminés':'La ville entre dans l’histoire'):'Bienvenue au Conseil'));
@@ -208,18 +205,16 @@ function render(s){
  text('question',sceneOnly?'':s.dilemma?.vote_question||'');
  renderChicagoChoices($('chicagoChoices'),s);
  drawGauges(s);
- if(!s.succession)drawPanoramaStability(s,manual);
+ if(!s.succession)drawPanoramaStability(s,manual||Boolean(s.campaign));
  $('chronicleOpen').hidden=!(s.history?.length);
  if($('chronicleDialog').open)renderChronicle($('cityChronicle'),s);
- $('panoramaOverview').hidden=townFinal||!s.campaign?.landscape?.location;
+ $('panoramaOverview').hidden=!s.campaign;
  if(s.campaign){
-  if(townFinal)$('panoramaOverview').setAttribute('aria-pressed','false');
-  renderHotspringPanorama($('city'),s,{showResultStill:false,finalPortrait:townFinal});
-  const site=s.campaign.landscape.location;
-  $('townCaption').hidden=!townFinal;
-  if(townFinal)text('townCaption',site==='terrasse'?'Hotspring, sur le plateau':site?'Hotspring, dans les terres basses':'La vallée de Hotspring');
-  if(!results)renderHotspringStage($('hotspringStage'),s,undefined,{showIntroImage:false});
-  renderTendencies($('hotspringTendencies'),sceneOnly||s.reveal?null:s.dilemma);
+  drawTownCinema(s,townMode);
+  if($('valleyDialog').open)drawValleyMap(s);
+  if(!collective&&!townFinal)renderHotspringStage($('hotspringStage'),s,undefined,{showIntroImage:false});
+  const showTrends=['NEGOTIATION','COUNCIL','AWAITING_REVEAL'].includes(s.phase);
+  renderTendencies($('hotspringTendencies'),showTrends?s.dilemma:null);
   status('cityEvolution','');
  }else if(s.succession){
   drawChicagoScene(s);
@@ -241,7 +236,6 @@ function render(s){
  previousCityStates=cityStates;
  }
  if(!s.succession)drawIllustration(s,sceneOnly);
- document.body.classList.toggle('projection-town-dilemma',Boolean(s.campaign&&!$('dilemmaArtwork').hidden));
  if(s.campaign){
   text('townReadingText',s.dilemma?.public_text);
   text('townReadingTitle',s.dilemma?.title);
@@ -272,7 +266,7 @@ function render(s){
  }
  $('finalResults').hidden=!results;
  $('narrativeEnding').hidden=!s.narrativeEnding&&!(townFinal&&s.finalResults);
- $('narrativeEnding').querySelector('summary').textContent=townFinal&&s.finalResults?'Récit et détail des points':epilogueScores?'Lire le récit de l’épilogue':'Relire l’épilogue';
+ $('narrativeEnding').querySelector('summary').textContent=townFinal?'Récit et détail des points':'Relire l’épilogue';
  const epilogue=$('endingText');epilogue.replaceChildren();
  if(s.narrativeEnding){
   const title=document.createElement('h3');title.textContent=s.narrativeEnding.title;epilogue.append(title);
@@ -316,17 +310,16 @@ $('decisionImage').addEventListener('error',()=>{
  $('decisionImage').removeAttribute('src');
  $('decisionImage').hidden=true;
  $('dilemmaArtwork').hidden=true;
- document.body.classList.remove('projection-town-dilemma');
 });
 $('chronicleOpen').addEventListener('click',()=>{
  $('chronicleDialog').showModal();
  // Render the current chronicle even when opening it between two state revisions.
  if(latestView)renderChronicle($('cityChronicle'),latestView);
 });
-$('panoramaOverview').addEventListener('click',event=>{
- const button=event.currentTarget,overview=button.getAttribute('aria-pressed')!=='true';
- button.setAttribute('aria-pressed',String(overview));
- setHotspringOverview($('city'),overview);
+$('panoramaOverview').addEventListener('click',()=>{
+ if(!latestView?.campaign)return;
+ drawValleyMap(latestView);
+ $('valleyDialog').showModal();
 });
 setupProjectionFullscreen($('projectionFullscreen'),$('notice'));
 tick();setInterval(tick,2500);
